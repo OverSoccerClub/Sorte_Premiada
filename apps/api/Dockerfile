@@ -38,6 +38,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/
 COPY --from=builder --chown=nestjs:nodejs /app/packages/database ./packages/database
 
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/seed-manual.js ./seed-manual.js
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/seed-game.js ./seed-game.js
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
