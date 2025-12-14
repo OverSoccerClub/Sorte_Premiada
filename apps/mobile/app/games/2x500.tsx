@@ -558,6 +558,15 @@ export default function Game2x500Screen() {
                 </View>
             </Modal>
 
+            <ReceiptModal
+                visible={receiptVisible}
+                onClose={handleCloseReceipt}
+                onPrint={handleAutoPrint}
+                autoPrint={true}
+                isReprint={false}
+                ticketData={lastTicket}
+            />
+
             <CustomAlert
                 visible={alertConfig.visible}
                 title={alertConfig.title}
@@ -568,15 +577,6 @@ export default function Game2x500Screen() {
                 onConfirm={alertConfig.onConfirm}
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
-            />
-
-            <ReceiptModal
-                visible={receiptVisible}
-                onClose={handleCloseReceipt}
-                onPrint={handleAutoPrint}
-                autoPrint={true}
-                isReprint={false}
-                ticketData={lastTicket}
             />
         </SafeAreaView>
     );
