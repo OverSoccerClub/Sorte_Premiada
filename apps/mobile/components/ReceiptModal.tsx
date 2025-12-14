@@ -103,11 +103,9 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
                 <View style={tw`w-full`}>
-                    <Text style={tw`text-white font-bold text-xl mb-1 text-center`}>
+                    <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>
                         {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
                     </Text>
-                    {!isReprint && <Text style={tw`text-emerald-400 font-bold text-xs mb-4 text-center uppercase`}>Boa Sorte!</Text>}
-                    {isReprint && <View style={tw`h-2`} />}
 
                     {/* Capture Area */}
                     <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
