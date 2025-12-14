@@ -263,14 +263,7 @@ export default function Game2x500Screen() {
             const ticketData = await res.json();
             const finalNumbers = ticketData.numbers || [];
 
-            const printSuccess = await printTicket(
-                finalNumbers,
-                ticketData.id,
-                new Date(ticketData.createdAt),
-                10.00,
-                "2x500",
-                printerType
-            );
+
 
             hide();
             // Refresh sold numbers for next bet
@@ -527,7 +520,7 @@ export default function Game2x500Screen() {
                     <View style={tw`w-[90%] max-w-[400px]`}>
                         <Text style={tw`text-white font-bold text-lg mb-6 text-center uppercase tracking-widest`}>Confirmação</Text>
 
-                        <View style={tw`bg-white p-4 rounded-3xl mb-6 shadow-2xl items-center overflow-hidden`}>
+                        <View style={tw`bg-white mb-6 shadow-2xl items-center overflow-hidden w-full`}>
                             <TicketPreview
                                 gameName="2x500"
                                 numbers={selectedNumbers}
