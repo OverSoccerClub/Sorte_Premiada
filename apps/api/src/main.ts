@@ -34,7 +34,12 @@ async function bootstrap() {
     console.error('Seeding failed:', e);
   }
 
-  app.enableCors();
+  app.enableCors({
+    origin: ['https://pos-jogos-plataforma-web.uawtgc.easypanel.host', 'http://localhost:3000', 'http://localhost:3001'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   await app.listen(3333, '0.0.0.0');
 }
 bootstrap();
