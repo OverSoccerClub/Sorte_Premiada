@@ -1,20 +1,18 @@
 
 FROM node:20-alpine AS base
 
-# Prune necessary files
+# Builder stage
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-# Since we are in a monorepo, we might strictly need turbo to prune, 
-# but for simplicity in this specific project structure which seems relatively flat for deps:
-# We will copy everything and build. optimized approach would use turbo prune.
-COPY package.json package-lock.json turbo.json ./
-COPY apps/web/package.json ./apps/web/package.json
-COPY apps/api/package.json ./apps/api/package.json
-COPY apps/mobile/package.json ./apps/mobile/package.json
-COPY packages/database/package.json ./packages/database/package.json
+
+# Copy all files
 COPY . .
+
+# Install all dependencies
 RUN npm ci
+
+# Build
 RUN npx turbo run build --filter=api...
 
 # Production image
