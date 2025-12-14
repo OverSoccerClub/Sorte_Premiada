@@ -13,6 +13,9 @@ COPY . .
 # Install dependencies
 RUN npm ci
 
+# Generate Prisma Client
+RUN npx turbo run db:generate
+
 # Disable telemetry
 # ENV NEXT_TELEMETRY_DISABLED 1
 

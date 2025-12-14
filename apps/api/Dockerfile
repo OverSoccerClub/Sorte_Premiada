@@ -12,6 +12,9 @@ COPY . .
 # Install all dependencies
 RUN npm ci
 
+# Generate Prisma Client
+RUN npx turbo run db:generate
+
 # Build
 RUN npx turbo run build --filter=api...
 
