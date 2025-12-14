@@ -524,7 +524,7 @@ export default function Game2x500Screen() {
                     <View style={tw`w-[90%] max-w-[400px]`}>
                         <Text style={tw`text-white font-bold text-lg mb-6 text-center uppercase tracking-widest`}>Confirmação</Text>
 
-                        <View style={tw`bg-white p-4 rounded-3xl mb-6 shadow-2xl`}>
+                        <View style={tw`bg-white p-4 rounded-3xl mb-6 shadow-2xl items-center`}>
                             <TicketPreview
                                 gameName="2x500"
                                 numbers={selectedNumbers}
