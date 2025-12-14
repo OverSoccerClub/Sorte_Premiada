@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as Clipboard from 'expo-clipboard';
@@ -102,75 +101,68 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
     return (
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
-                {/* ScrollView Wrapper for overflow/small screens */}
-                <ScrollView
-                    contentContainerStyle={tw`flex-grow justify-center items-center py-4`}
-                    showsVerticalScrollIndicator={false}
-                    style={tw`w-full`}
-                >
-                    <View style={tw`w-full`}>
-                        <Text style={tw`text-white font-bold text-2xl mb-2 text-center`}>
-                            {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
-                        </Text>
-                        {!isReprint && <Text style={tw`text-emerald-400 font-bold text-sm mb-6 text-center uppercase`}>Boa Sorte!</Text>}
-                        {isReprint && <View style={tw`h-4`} />}
+                <View style={tw`w-full`}>
+                    <Text style={tw`text-white font-bold text-xl mb-1 text-center`}>
+                        {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
+                    </Text>
+                    {!isReprint && <Text style={tw`text-emerald-400 font-bold text-xs mb-4 text-center uppercase`}>Boa Sorte!</Text>}
+                    {isReprint && <View style={tw`h-2`} />}
 
-                        {/* Capture Area */}
-                        <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
-                            <TicketPreview
-                                gameName={ticketData.gameName}
-                                numbers={ticketData.numbers}
-                                price={ticketData.price}
-                                date={ticketData.date}
-                                id={ticketData.id}
-                            />
-                        </ViewShot>
+                    {/* Capture Area */}
+                    <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
+                        <TicketPreview
+                            gameName={ticketData.gameName}
+                            numbers={ticketData.numbers}
+                            price={ticketData.price}
+                            date={ticketData.date}
+                            id={ticketData.id}
+                        />
+                    </ViewShot>
 
-                        {/* Actions */}
-                        <View style={tw`mt-8 gap-3 mb-4`}>
-                            <View style={tw`flex-row gap-3`}>
-                                {(isReprint && onPrint) && (
-                                    <TouchableOpacity
-                                        style={tw`flex-1 bg-emerald-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
-                                        onPress={handlePrintPayload}
-                                        disabled={isPrinting || isSharing}
-                                    >
-                                        {isPrinting ? (
-                                            <ActivityIndicator color="white" />
-                                        ) : (
-                                            <>
-                                                <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
-                                                <Text style={tw`text-white font-bold text-lg`}>Reimprimir</Text>
-                                            </>
-                                        )}
-                                    </TouchableOpacity>
-                                )}
-
+                    {/* Actions */}
+                    <View style={tw`mt-4 gap-2`}>
+                        <View style={tw`flex-row gap-2`}>
+                            {(isReprint && onPrint) && (
                                 <TouchableOpacity
-                                    style={tw`${(isReprint && onPrint) ? 'flex-1' : 'w-full'} bg-green-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
-                                    onPress={handleShare}
-                                    disabled={isSharing || isPrinting}
+                                    style={tw`flex-1 bg-emerald-600 p-3 rounded-xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
+                                    onPress={handlePrintPayload}
+                                    disabled={isPrinting || isSharing}
                                 >
-                                    {isSharing ? (
-                                        <ActivityIndicator color="white" />
+                                    {isPrinting ? (
+                                        <ActivityIndicator color="white" size="small" />
                                     ) : (
                                         <>
-                                            <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
-                                            <Text style={tw`text-white font-bold text-lg`}>{isReprint ? "WhatsApp" : "Compartilhar"}</Text>
+                                            <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
+                                            <Text style={tw`text-white font-bold text-base`}>Reimprimir</Text>
                                         </>
                                     )}
                                 </TouchableOpacity>
-                            </View>
+                            )}
 
                             <TouchableOpacity
-                                style={tw`bg-gray-800 p-4 rounded-2xl flex-row justify-center items-center border border-gray-700`}
-                                onPress={onClose}
+                                style={tw`${(isReprint && onPrint) ? 'flex-1' : 'w-full'} bg-green-600 p-3 rounded-xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
+                                onPress={handleShare}
+                                disabled={isSharing || isPrinting}
                             >
-                                <Text style={tw`text-gray-300 font-bold text-lg`}>{isReprint ? "Fechar" : "Novo Jogo"}</Text>
+                                {isSharing ? (
+                                    <ActivityIndicator color="white" size="small" />
+                                ) : (
+                                    <>
+                                        <Ionicons name="logo-whatsapp" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold text-base`}>{isReprint ? "WhatsApp" : "Compartilhar"}</Text>
+                                    </>
+                                )}
                             </TouchableOpacity>
                         </View>
+
+                        <TouchableOpacity
+                            style={tw`bg-gray-800 p-3 rounded-xl flex-row justify-center items-center border border-gray-700`}
+                            onPress={onClose}
+                        >
+                            <Text style={tw`text-gray-300 font-bold text-base`}>{isReprint ? "Fechar" : "Novo Jogo"}</Text>
+                        </TouchableOpacity>
                     </View>
-                </ScrollView>
+                </View>
             </View>
         </Modal>
     );

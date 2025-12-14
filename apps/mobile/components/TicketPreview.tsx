@@ -16,28 +16,28 @@ interface TicketPreviewProps {
 
 export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "TEST-ID" }: TicketPreviewProps) {
     return (
-        <View style={tw`bg-white p-4 w-full overflow-hidden`}>
+        <View style={tw`bg-white p-2 w-full overflow-hidden`}>
             {/* Header */}
-            <View style={tw`items-center border-b-2 border-dashed border-black pb-3 mb-3`}>
-                <Ionicons name="ticket-outline" size={28} color="#000" style={tw`mb-1`} />
-                <Text style={[tw`text-xl text-black uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>SORTE PREMIADA</Text>
-                <Text style={[tw`text-[10px] text-black uppercase tracking-widest`, { fontFamily: 'Roboto_700Bold' }]}>Comprovante de Aposta</Text>
+            <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2`}>
+                <Ionicons name="ticket-outline" size={24} color="#000" style={tw`mb-1`} />
+                <Text style={[tw`text-lg text-black uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>SORTE PREMIADA</Text>
+                <Text style={[tw`text-[9px] text-black uppercase tracking-widest`, { fontFamily: 'Roboto_700Bold' }]}>Comprovante de Aposta</Text>
             </View>
 
             {/* Game Info */}
-            <View style={tw`mb-4`}>
-                <Text style={[tw`text-lg text-black uppercase text-center mb-1`, { fontFamily: 'Roboto_700Bold' }]}>{gameName}</Text>
+            <View style={tw`mb-2`}>
+                <Text style={[tw`text-base text-black uppercase text-center mb-1`, { fontFamily: 'Roboto_700Bold' }]}>{gameName}</Text>
                 {drawDate && (
-                    <Text style={[tw`text-xs text-black text-center mb-1 uppercase`, { fontFamily: 'Roboto_700Bold' }]}>
+                    <Text style={[tw`text-[10px] text-black text-center mb-1 uppercase`, { fontFamily: 'Roboto_700Bold' }]}>
                         Sorteio: {drawDate}
                     </Text>
                 )}
-                <Text style={[tw`text-[10px] text-black text-center mb-3`, { fontFamily: 'RobotoMono_700Bold' }]}>Gerado em: {date}</Text>
+                <Text style={[tw`text-[9px] text-black text-center mb-2`, { fontFamily: 'RobotoMono_700Bold' }]}>Gerado em: {date}</Text>
 
-                <View style={tw`p-3 rounded-lg border-2 border-black`}>
+                <View style={tw`p-2 rounded-lg border-2 border-black`}>
                     <View style={tw`flex-row flex-wrap justify-center items-center gap-2`}>
                         {numbers.sort((a, b) => a - b).map((num) => (
-                            <Text key={num} style={[tw`${gameName === "2x500" ? "text-base" : "text-lg"} text-black tracking-widest`, { fontFamily: 'RobotoMono_700Bold' }]}>
+                            <Text key={num} style={[tw`${gameName === "2x500" ? "text-sm" : "text-base"} text-black tracking-widest`, { fontFamily: 'RobotoMono_700Bold' }]}>
                                 {num.toString().padStart(gameName === "2x500" ? 4 : 2, "0")}
                             </Text>
                         ))}
@@ -46,28 +46,27 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
             </View>
 
             {/* Price */}
-            <View style={tw`flex-row justify-between items-center border-t-2 border-dashed border-black pt-3 mb-4`}>
-                <Text style={[tw`text-black uppercase text-xs`, { fontFamily: 'Roboto_700Bold' }]}>Total a Pagar</Text>
-                <Text style={[tw`text-xl text-black`, { fontFamily: 'RobotoMono_700Bold' }]}>{price}</Text>
+            <View style={tw`flex-row justify-between items-center border-t-[1px] border-dashed border-black pt-2 mb-2`}>
+                <Text style={[tw`text-black uppercase text-[10px]`, { fontFamily: 'Roboto_700Bold' }]}>Total a Pagar</Text>
+                <Text style={[tw`text-lg text-black`, { fontFamily: 'RobotoMono_700Bold' }]}>{price}</Text>
             </View>
 
             {/* QR Code */}
-            {/* QR Code */}
-            <View style={tw`items-center mb-3 mt-2`}>
-                <View style={tw`bg-white p-2 rounded-lg`}>
+            <View style={tw`items-center mb-2 mt-1`}>
+                <View style={tw`bg-white p-1 rounded-lg`}>
                     <QRCode
                         value={id}
-                        size={150}
+                        size={120}
                     />
                 </View>
-                <Text style={[tw`text-[9px] text-black mt-2`, { fontFamily: 'RobotoMono_700Bold' }]}>
+                <Text style={[tw`text-[8px] text-black mt-1`, { fontFamily: 'RobotoMono_700Bold' }]}>
                     {id}
                 </Text>
             </View>
 
             {/* Footer */}
             <View style={tw`items-center`}>
-                <Text style={[tw`text-[9px] text-black text-center`, { fontFamily: 'RobotoMono_700Bold' }]}>
+                <Text style={[tw`text-[8px] text-black text-center`, { fontFamily: 'RobotoMono_700Bold' }]}>
                     Este bilhete não possui valor fiscal.
                     {"\n"}Boa Sorte!
                 </Text>
