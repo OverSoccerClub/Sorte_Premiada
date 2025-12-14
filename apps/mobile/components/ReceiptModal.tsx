@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as Clipboard from 'expo-clipboard';
@@ -102,77 +102,75 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
     return (
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
-                {/* Removed max-w-sm for full width capability if desired, or keep logic */}
-                {/* User wants "full width" like reprint. If reprint is "w-full max-w-sm" and New Bet is different? */}
-                {/* Actually user said reprint IS showing full width. Let's make sure we match it. */}
-                {/* I will remove max-w-sm constraint for now to see if it expands */}
-                <View style={tw`w-full`}>
-                    <Text style={tw`text-white font-bold text-2xl mb-2 text-center`}>
-                        {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
-                    </Text>
-                    {!isReprint && <Text style={tw`text-emerald-400 font-bold text-sm mb-6 text-center uppercase`}>Boa Sorte!</Text>}
-                    {isReprint && <View style={tw`h-4`} />}
+                {/* ScrollView Wrapper for overflow/small screens */}
+                <ScrollView
+                    contentContainerStyle={tw`flex-grow justify-center items-center py-4`}
+                    showsVerticalScrollIndicator={false}
+                    style={tw`w-full`}
+                >
+                    <View style={tw`w-full`}>
+                        <Text style={tw`text-white font-bold text-2xl mb-2 text-center`}>
+                            {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
+                        </Text>
+                        {!isReprint && <Text style={tw`text-emerald-400 font-bold text-sm mb-6 text-center uppercase`}>Boa Sorte!</Text>}
+                        {isReprint && <View style={tw`h-4`} />}
 
-                    {/* Capture Area */}
-                    <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
-                        <TicketPreview
-                            gameName={ticketData.gameName}
-                            numbers={ticketData.numbers}
-                            price={ticketData.price}
-                            date={ticketData.date}
-                            id={ticketData.id}
-                        />
-                    </ViewShot>
+                        {/* Capture Area */}
+                        <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
+                            <TicketPreview
+                                gameName={ticketData.gameName}
+                                numbers={ticketData.numbers}
+                                price={ticketData.price}
+                                date={ticketData.date}
+                                id={ticketData.id}
+                            />
+                        </ViewShot>
 
-                    {/* Actions */}
-                    <View style={tw`mt-8 gap-3`}>
-                        <View style={tw`flex-row gap-3`}>
-                            {/* Show Print button manually ONLY if it is Reprint OR we want to allow manual retry */}
-                            {/* If New Bet (AutoPrint), user said "don't show reprint screen features", implying hide print button? */}
-                            {/* But what if auto print fails? Better keep it but maybe as secondary? */}
-                            {/* User said "nao é para mostrar a tela de re-impressao". */}
-                            {/* I will hide Print Button for New Bet since it auto prints. */}
-                            {(isReprint && onPrint) && (
+                        {/* Actions */}
+                        <View style={tw`mt-8 gap-3 mb-4`}>
+                            <View style={tw`flex-row gap-3`}>
+                                {(isReprint && onPrint) && (
+                                    <TouchableOpacity
+                                        style={tw`flex-1 bg-emerald-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
+                                        onPress={handlePrintPayload}
+                                        disabled={isPrinting || isSharing}
+                                    >
+                                        {isPrinting ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <>
+                                                <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
+                                                <Text style={tw`text-white font-bold text-lg`}>Reimprimir</Text>
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
+                                )}
+
                                 <TouchableOpacity
-                                    style={tw`flex-1 bg-emerald-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
-                                    onPress={handlePrintPayload}
-                                    disabled={isPrinting || isSharing}
+                                    style={tw`${(isReprint && onPrint) ? 'flex-1' : 'w-full'} bg-green-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
+                                    onPress={handleShare}
+                                    disabled={isSharing || isPrinting}
                                 >
-                                    {isPrinting ? (
+                                    {isSharing ? (
                                         <ActivityIndicator color="white" />
                                     ) : (
                                         <>
-                                            <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
-                                            <Text style={tw`text-white font-bold text-lg`}>Reimprimir</Text>
+                                            <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
+                                            <Text style={tw`text-white font-bold text-lg`}>{isReprint ? "WhatsApp" : "Compartilhar"}</Text>
                                         </>
                                     )}
                                 </TouchableOpacity>
-                            )}
+                            </View>
 
                             <TouchableOpacity
-                                style={tw`${(isReprint && onPrint) ? 'flex-1' : 'w-full'} bg-green-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
-                                onPress={handleShare}
-                                disabled={isSharing || isPrinting}
+                                style={tw`bg-gray-800 p-4 rounded-2xl flex-row justify-center items-center border border-gray-700`}
+                                onPress={onClose}
                             >
-                                {isSharing ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <>
-                                        <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
-                                        <Text style={tw`text-white font-bold text-lg`}>{isReprint ? "WhatsApp" : "Compartilhar"}</Text>
-                                    </>
-                                )}
+                                <Text style={tw`text-gray-300 font-bold text-lg`}>{isReprint ? "Fechar" : "Novo Jogo"}</Text>
                             </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity
-                            style={tw`bg-gray-800 p-4 rounded-2xl flex-row justify-center items-center border border-gray-700`}
-                            onPress={onClose}
-                        >
-                            <Text style={tw`text-gray-300 font-bold text-lg`}>{isReprint ? "Fechar" : "Novo Jogo"}</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
+                </ScrollView>
             </View>
         </Modal>
     );

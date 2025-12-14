@@ -52,11 +52,14 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
             </View>
 
             {/* QR Code */}
-            <View style={tw`items-center mb-3`}>
-                <QRCode
-                    value={id}
-                    size={100}
-                />
+            {/* QR Code */}
+            <View style={tw`items-center mb-3 mt-2`}>
+                <View style={tw`bg-white p-2 rounded-lg`}>
+                    <QRCode
+                        value={id}
+                        size={150}
+                    />
+                </View>
                 <Text style={[tw`text-[9px] text-black mt-2`, { fontFamily: 'RobotoMono_700Bold' }]}>
                     {id}
                 </Text>
