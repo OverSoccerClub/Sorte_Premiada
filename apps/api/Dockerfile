@@ -21,6 +21,7 @@ RUN npx turbo run build --filter=api...
 # Production image
 FROM base AS runner
 WORKDIR /app
+RUN apk add --no-cache openssl libc6-compat
 ENV NODE_ENV production
 
 # Don't run as root
