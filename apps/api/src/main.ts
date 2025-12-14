@@ -34,11 +34,12 @@ async function bootstrap() {
     console.error('Seeding failed:', e);
   }
 
+  console.log('🚀 API FIX APPLIED: CORS UPDATE - Origin: TRUE');
   app.enableCors({
-    origin: ['https://pos-jogos-plataforma-web.uawtgc.easypanel.host', 'http://localhost:3000', 'http://localhost:3001'],
+    origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    allowedHeaders: '*',
   });
   await app.listen(3333, '0.0.0.0');
 }
