@@ -7,10 +7,12 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy dependency definitions
+# Copy dependency definitions
 COPY package.json package-lock.json turbo.json ./
 COPY apps/web/package.json ./apps/web/package.json
+COPY apps/api/package.json ./apps/api/package.json
+COPY apps/mobile/package.json ./apps/mobile/package.json
 COPY packages/database/package.json ./packages/database/package.json
-# Add other packages if necessary
 
 RUN npm ci
 

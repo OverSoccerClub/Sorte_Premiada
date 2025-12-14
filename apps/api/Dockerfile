@@ -8,6 +8,11 @@ WORKDIR /app
 # Since we are in a monorepo, we might strictly need turbo to prune, 
 # but for simplicity in this specific project structure which seems relatively flat for deps:
 # We will copy everything and build. optimized approach would use turbo prune.
+COPY package.json package-lock.json turbo.json ./
+COPY apps/web/package.json ./apps/web/package.json
+COPY apps/api/package.json ./apps/api/package.json
+COPY apps/mobile/package.json ./apps/mobile/package.json
+COPY packages/database/package.json ./packages/database/package.json
 COPY . .
 RUN npm ci
 RUN npx turbo run build --filter=api...
