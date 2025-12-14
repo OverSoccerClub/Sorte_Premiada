@@ -525,14 +525,14 @@ export default function Game2x500Screen() {
                     <View style={tw`w-[90%] max-w-[400px]`}>
                         <Text style={tw`text-white font-bold text-lg mb-6 text-center uppercase tracking-widest`}>Confirmação</Text>
 
-                        <View style={tw`bg-white mb-6 shadow-2xl items-center overflow-hidden w-full`}>
+                        <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl`}>
                             <TicketPreview
                                 gameName="2x500"
                                 numbers={selectedNumbers}
                                 price="R$ 10,00"
                             />
                             {isAutoPick && (
-                                <View style={tw`absolute -top-3 -right-3 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-10`}>
+                                <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
                                     <Text style={tw`text-white font-bold text-xs uppercase`}>Surpresinha</Text>
                                 </View>
                             )}
