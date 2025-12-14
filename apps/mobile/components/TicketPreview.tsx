@@ -3,17 +3,20 @@ import { View, Text, Image } from "react-native";
 import tw from "../lib/tailwind";
 import { Ionicons } from "@expo/vector-icons";
 
+import QRCode from 'react-native-qrcode-svg';
+
 interface TicketPreviewProps {
     gameName: string;
     numbers: number[];
     price: string;
     date?: string;
     drawDate?: string;
+    id?: string;
 }
 
-export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate }: TicketPreviewProps) {
+export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "TEST-ID" }: TicketPreviewProps) {
     return (
-        <View style={tw`bg-white p-4 w-[330px] overflow-hidden`}>
+        <View style={tw`bg-white p-4 w-full overflow-hidden`}>
             {/* Header */}
             <View style={tw`items-center border-b-2 border-dashed border-black pb-3 mb-3`}>
                 <Ionicons name="ticket-outline" size={28} color="#000" style={tw`mb-1`} />
@@ -48,25 +51,14 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                 <Text style={[tw`text-xl text-black`, { fontFamily: 'RobotoMono_700Bold' }]}>{price}</Text>
             </View>
 
-            {/* Barcode Simulation */}
+            {/* QR Code */}
             <View style={tw`items-center mb-3`}>
-                <View style={tw`h-10 w-full flex-row justify-between items-end overflow-hidden`}>
-                    {Array.from({ length: 40 }).map((_, i) => (
-                        <View
-                            key={i}
-                            style={[
-                                tw`bg-black`,
-                                {
-                                    width: Math.random() > 0.5 ? 2 : 4,
-                                    height: '100%',
-                                    marginRight: 2
-                                }
-                            ]}
-                        />
-                    ))}
-                </View>
-                <Text style={[tw`text-[9px] text-black mt-1`, { fontFamily: 'RobotoMono_700Bold' }]}>
-                    {Math.random().toString(36).substring(2, 15).toUpperCase()}-{Date.now()}
+                <QRCode
+                    value={id}
+                    size={100}
+                />
+                <Text style={[tw`text-[9px] text-black mt-2`, { fontFamily: 'RobotoMono_700Bold' }]}>
+                    {id}
                 </Text>
             </View>
 
