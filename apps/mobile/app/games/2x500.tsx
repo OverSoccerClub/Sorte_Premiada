@@ -300,15 +300,20 @@ export default function Game2x500Screen() {
 
     const handleAutoPrint = async (imageUri?: string) => {
         if (!lastTicket) return;
-        await printTicket(
+        const success = await printTicket(
             lastTicket.numbers,
             lastTicket.id,
             new Date(), // Current date for print or parse from lastTicket.date if needed
             10.00,
             "2x500",
-            printerType, // Use Global Printer Type (BLE/NATIVE)
-            imageUri // Pass the captured image!
+            printerType,
+            imageUri
         );
+        if (success) {
+            showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
+        } else {
+            showAlert("Erro", "Falha ao enviar para impressão.", "error");
+        }
     };
 
     // Grid Render Item (Optimized)

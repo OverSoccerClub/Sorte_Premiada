@@ -55,15 +55,6 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     }
                 }
                 await onPrint(uri);
-                // User requested "message that ticket was printed" for new bets (autoPrint)
-                // Reprint usually handles this in the parent, but for autoPrint the parent might not show an alert.
-                // We'll show a simple alert here if it's successful (assumed success if onPrint doesn't throw or return false)
-                // But wait, onPrint returns Promise<void>. 
-                // Let's assume if it finished, it worked. Or we can rely on parent.
-                // However, user specifically asked for it "In the impression of the new ticket... show the message".
-                alert("Bilhete enviado para impressão!");
-            } catch (err) {
-                alert("Erro ao enviar para impressão.");
             } finally {
                 setIsPrinting(false);
             }
