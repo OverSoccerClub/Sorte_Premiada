@@ -41,6 +41,8 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: '*',
   });
-  await app.listen(3333, '0.0.0.0');
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 API FIX APPLIED: LISTENING ON PORT ${port}`);
 }
 bootstrap();
