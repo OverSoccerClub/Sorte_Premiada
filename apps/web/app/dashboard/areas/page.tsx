@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { API_URL } from "@/lib/api"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -47,7 +47,7 @@ export default function AreasPage() {
     const fetchAreas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch("http://localhost:3333/areas", {
+            const res = await fetch(`${API_URL}/areas`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
@@ -79,7 +79,7 @@ export default function AreasPage() {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch("http://localhost:3333/areas", {
+            const res = await fetch(`${API_URL}/areas`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export default function AreasPage() {
             async () => {
                 try {
                     const token = localStorage.getItem("token")
-                    const res = await fetch(`http://localhost:3333/areas/${id}`, {
+                    const res = await fetch(`${API_URL}/areas/${id}`, {
                         method: "DELETE",
                         headers: { Authorization: `Bearer ${token}` },
                     })

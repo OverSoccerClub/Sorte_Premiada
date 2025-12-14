@@ -1,4 +1,4 @@
-"use client"
+import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { useAlert } from "@/context/alert-context"
@@ -39,7 +39,7 @@ export default function AreaReportPage() {
         setLoading(true)
         try {
             const token = localStorage.getItem("token")
-            const url = `http://localhost:3333/reports/sales-by-area?startDate=${startDate}&endDate=${endDate}`
+            const url = `${API_URL}/reports/sales-by-area?startDate=${startDate}&endDate=${endDate}`
 
             const res = await fetch(url, {
                 headers: { Authorization: `Bearer ${token}` },

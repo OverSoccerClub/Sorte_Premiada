@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { API_URL } from "@/lib/api"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -51,7 +51,7 @@ export default function CambistasPage() {
     const fetchAreas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch("http://localhost:3333/areas", {
+            const res = await fetch(`${API_URL}/areas`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
@@ -66,7 +66,7 @@ export default function CambistasPage() {
     const fetchCambistas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch("http://localhost:3333/users", {
+            const res = await fetch(`${API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
@@ -114,8 +114,8 @@ export default function CambistasPage() {
         try {
             const token = localStorage.getItem("token")
             const url = editingId
-                ? `http://localhost:3333/users/${editingId}`
-                : "http://localhost:3333/users"
+                ? `${API_URL}/users/${editingId}`
+                : `${API_URL}/users"
 
             const method = editingId ? "PATCH" : "POST"
 
@@ -129,7 +129,7 @@ export default function CambistasPage() {
                 method: method,
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${ token }`,
                 },
                 body: JSON.stringify(bodyData),
             })
@@ -159,9 +159,9 @@ export default function CambistasPage() {
             async () => {
                 try {
                     const token = localStorage.getItem("token")
-                    const res = await fetch(`http://localhost:3333/users/${id}`, {
+                    const res = await fetch(`${ API_URL } /users/${ id } `, {
                         method: "DELETE",
-                        headers: { Authorization: `Bearer ${token}` },
+                        headers: { Authorization: `Bearer ${ token } ` },
                     })
 
                     if (res.ok) {

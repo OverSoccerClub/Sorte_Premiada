@@ -1,4 +1,4 @@
-"use client"
+import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -35,7 +35,7 @@ export default function DashboardPage() {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem("token")
-                const res = await fetch("http://localhost:3333/reports/dashboard", {
+                const res = await fetch(`${API_URL}/reports/dashboard`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 if (res.ok) {

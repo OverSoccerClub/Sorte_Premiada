@@ -1,4 +1,4 @@
-"use client"
+import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
@@ -27,7 +27,7 @@ export default function RelatoriosPage() {
     const fetchCambistas = async () => {
         const token = localStorage.getItem("token")
         try {
-            const res = await fetch("http://localhost:3333/users", {
+            const res = await fetch(`${API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
 
@@ -72,7 +72,7 @@ export default function RelatoriosPage() {
             const startStr = new Date(startDate + 'T00:00:00').toISOString()
             const endStr = new Date(endDate + 'T23:59:59').toISOString()
 
-            let url = `http://localhost:3333/reports/sales-by-date?startDate=${startStr}&endDate=${endStr}`
+            let url = `${API_URL}/reports/sales-by-date?startDate=${startStr}&endDate=${endStr}`
             if (selectedCambista && selectedCambista !== "all") {
                 url += `&cambistaId=${selectedCambista}`
             }

@@ -1,4 +1,4 @@
-"use client"
+import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
@@ -48,7 +48,7 @@ export default function CashConferencePage() {
     const fetchCambistas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch("http://localhost:3333/users", {
+            const res = await fetch(`${API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
@@ -79,7 +79,7 @@ export default function CashConferencePage() {
         setLoading(true)
         try {
             const token = localStorage.getItem("token")
-            const url = `http://localhost:3333/reports/finance-summary?cambistaId=${selectedCambista}&date=${date}`
+            const url = `${API_URL}/reports/finance-summary?cambistaId=${selectedCambista}&date=${date}`
 
             const res = await fetch(url, {
                 headers: { Authorization: `Bearer ${token}` },
