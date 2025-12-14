@@ -521,9 +521,9 @@ export default function Game2x500Screen() {
 
             {/* Modal & Alerts */}
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleBackFromModal}>
-                <View style={tw`flex-1 justify-center items-center bg-black/95 p-6`}>
-                    <View style={tw`w-[90%] max-w-[400px]`}>
-                        <Text style={tw`text-white font-bold text-lg mb-6 text-center uppercase tracking-widest`}>Confirmação</Text>
+                <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
+                    <View style={tw`w-full`}>
+                        <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAÇÃO</Text>
 
                         <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl`}>
                             <TicketPreview
