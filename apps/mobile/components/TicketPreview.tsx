@@ -48,7 +48,7 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
             {/* Price */}
             <View style={tw`flex-row justify-between items-center border-t-[1px] border-dashed border-black pt-2 mb-2`}>
                 <Text style={[tw`text-black uppercase text-xs`, { fontFamily: 'Roboto_700Bold' }]}>Total a Pagar</Text>
-                <Text style={[tw`text-2xl text-black`, { fontFamily: 'RobotoMono_700Bold' }]}>{price}</Text>
+                <Text style={[tw`text-xl text-black`, { fontFamily: 'RobotoMono_700Bold' }]}>{price}</Text>
             </View>
 
             {/* QR Code */}
