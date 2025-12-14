@@ -1,6 +1,7 @@
 "use client"
 
 import { API_URL } from "@/lib/api"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -115,7 +116,7 @@ export default function CambistasPage() {
             const token = localStorage.getItem("token")
             const url = editingId
                 ? `${API_URL}/users/${editingId}`
-                : `${API_URL}/users"
+                : `${API_URL}/users`
 
             const method = editingId ? "PATCH" : "POST"
 
@@ -129,7 +130,7 @@ export default function CambistasPage() {
                 method: method,
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${ token }`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(bodyData),
             })
@@ -159,9 +160,9 @@ export default function CambistasPage() {
             async () => {
                 try {
                     const token = localStorage.getItem("token")
-                    const res = await fetch(`${ API_URL } /users/${ id } `, {
+                    const res = await fetch(`${API_URL}/users/${id}`, {
                         method: "DELETE",
-                        headers: { Authorization: `Bearer ${ token } ` },
+                        headers: { Authorization: `Bearer ${token}` },
                     })
 
                     if (res.ok) {
