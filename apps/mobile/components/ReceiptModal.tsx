@@ -48,12 +48,22 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                 let uri: string | undefined;
                 if (viewShotRef.current?.capture) {
                     try {
+                        // Switch to PNG for better legibility (no compression artifacts on text)
                         uri = await viewShotRef.current.capture();
                     } catch (err) {
                         console.warn("Failed to capture receipt image for printing", err);
                     }
                 }
                 await onPrint(uri);
+                // User requested "message that ticket was printed" for new bets (autoPrint)
+                // Reprint usually handles this in the parent, but for autoPrint the parent might not show an alert.
+                // We'll show a simple alert here if it's successful (assumed success if onPrint doesn't throw or return false)
+                // But wait, onPrint returns Promise<void>. 
+                // Let's assume if it finished, it worked. Or we can rely on parent.
+                // However, user specifically asked for it "In the impression of the new ticket... show the message".
+                alert("Bilhete enviado para impressão!");
+            } catch (err) {
+                alert("Erro ao enviar para impressão.");
             } finally {
                 setIsPrinting(false);
             }
@@ -108,7 +118,8 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     </Text>
 
                     {/* Capture Area */}
-                    <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
+                    {/* PNG format for lossless quality */}
+                    <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
                         <TicketPreview
                             gameName={ticketData.gameName}
                             numbers={ticketData.numbers}
