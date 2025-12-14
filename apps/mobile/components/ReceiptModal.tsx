@@ -19,12 +19,24 @@ interface ReceiptModalProps {
         drawDate?: string;
     } | null;
     onPrint?: (imageUri?: string) => Promise<void>;
+    autoPrint?: boolean;
 }
 
-export function ReceiptModal({ visible, onClose, ticketData, onPrint }: ReceiptModalProps) {
+export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint }: ReceiptModalProps) {
     const viewShotRef = useRef<ViewShot>(null);
     const [isSharing, setIsSharing] = useState(false);
     const [isPrinting, setIsPrinting] = useState(false);
+
+    // Auto-Print Effect
+    React.useEffect(() => {
+        if (visible && autoPrint && onPrint && !isPrinting) {
+            // Small delay to ensure rendering
+            const timer = setTimeout(() => {
+                handlePrintPayload();
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [visible, autoPrint]);
 
     if (!ticketData) return null;
 

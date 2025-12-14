@@ -276,27 +276,17 @@ export default function Game2x500Screen() {
             // Refresh sold numbers for next bet
             fetchSoldNumbers(gameId);
 
-            setTimeout(() => {
-                const formattedNums = finalNumbers.map((n: number) => n.toString().padStart(4, '0')).join(", ");
+            // Prepare Receipt Data & Auto Print
+            setLastTicket({
+                gameName: "2x500",
+                numbers: finalNumbers,
+                price: "R$ 10,00",
+                id: ticketData.id,
+                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
+                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
+            });
 
-                // Show Printing Feedback via simple alert if needed, or just proceed to Receipt
-                if (!printSuccess) {
-                    // Optional: warn about printer, but still show receipt
-                    // showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
-                }
-
-                // Prepare Receipt Data
-                setLastTicket({
-                    gameName: "2x500",
-                    numbers: finalNumbers,
-                    price: "R$ 10,00",
-                    id: ticketData.id,
-                    date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                    drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
-                });
-
-                setReceiptVisible(true);
-            }, 500);
+            setReceiptVisible(true);
 
         } catch (error: any) {
             hide();
@@ -313,6 +303,19 @@ export default function Game2x500Screen() {
         setSelectedNumbers([]);
         setIsAutoPick(false);
         setCurrentRangeStart(0);
+    };
+
+    const handleAutoPrint = async (imageUri?: string) => {
+        if (!lastTicket) return;
+        await printTicket(
+            lastTicket.numbers,
+            lastTicket.id,
+            new Date(), // Current date for print or parse from lastTicket.date if needed
+            10.00,
+            "2x500",
+            printerType, // Use Global Printer Type (BLE/NATIVE)
+            imageUri // Pass the captured image!
+        );
     };
 
     // Grid Render Item (Optimized)
@@ -524,7 +527,7 @@ export default function Game2x500Screen() {
                     <View style={tw`w-[90%] max-w-[400px]`}>
                         <Text style={tw`text-white font-bold text-lg mb-6 text-center uppercase tracking-widest`}>Confirmação</Text>
 
-                        <View style={tw`bg-white p-4 rounded-3xl mb-6 shadow-2xl items-center`}>
+                        <View style={tw`bg-white p-4 rounded-3xl mb-6 shadow-2xl items-center overflow-hidden`}>
                             <TicketPreview
                                 gameName="2x500"
                                 numbers={selectedNumbers}
@@ -572,6 +575,8 @@ export default function Game2x500Screen() {
             <ReceiptModal
                 visible={receiptVisible}
                 onClose={handleCloseReceipt}
+                onPrint={handleAutoPrint}
+                autoPrint={true}
                 ticketData={lastTicket}
             />
         </SafeAreaView>
