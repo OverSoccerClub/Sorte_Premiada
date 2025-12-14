@@ -20,9 +20,10 @@ interface ReceiptModalProps {
     } | null;
     onPrint?: (imageUri?: string) => Promise<void>;
     autoPrint?: boolean;
+    isReprint?: boolean;
 }
 
-export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint }: ReceiptModalProps) {
+export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint, isReprint = false }: ReceiptModalProps) {
     const viewShotRef = useRef<ViewShot>(null);
     const [isSharing, setIsSharing] = useState(false);
     const [isPrinting, setIsPrinting] = useState(false);
@@ -101,12 +102,16 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint 
     return (
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
-                <View style={tw`w-full max-w-sm`}>
+                {/* Removed max-w-sm for full width capability if desired, or keep logic */}
+                {/* User wants "full width" like reprint. If reprint is "w-full max-w-sm" and New Bet is different? */}
+                {/* Actually user said reprint IS showing full width. Let's make sure we match it. */}
+                {/* I will remove max-w-sm constraint for now to see if it expands */}
+                <View style={tw`w-full`}>
                     <Text style={tw`text-white font-bold text-2xl mb-2 text-center`}>
-                        {onPrint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
+                        {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
                     </Text>
-                    {!onPrint && <Text style={tw`text-emerald-400 font-bold text-sm mb-6 text-center uppercase`}>Boa Sorte!</Text>}
-                    {onPrint && <View style={tw`h-4`} />}
+                    {!isReprint && <Text style={tw`text-emerald-400 font-bold text-sm mb-6 text-center uppercase`}>Boa Sorte!</Text>}
+                    {isReprint && <View style={tw`h-4`} />}
 
                     {/* Capture Area */}
                     <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
@@ -115,13 +120,19 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint 
                             numbers={ticketData.numbers}
                             price={ticketData.price}
                             date={ticketData.date}
+                            id={ticketData.id}
                         />
                     </ViewShot>
 
                     {/* Actions */}
                     <View style={tw`mt-8 gap-3`}>
                         <View style={tw`flex-row gap-3`}>
-                            {onPrint && (
+                            {/* Show Print button manually ONLY if it is Reprint OR we want to allow manual retry */}
+                            {/* If New Bet (AutoPrint), user said "don't show reprint screen features", implying hide print button? */}
+                            {/* But what if auto print fails? Better keep it but maybe as secondary? */}
+                            {/* User said "nao é para mostrar a tela de re-impressao". */}
+                            {/* I will hide Print Button for New Bet since it auto prints. */}
+                            {(isReprint && onPrint) && (
                                 <TouchableOpacity
                                     style={tw`flex-1 bg-emerald-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
                                     onPress={handlePrintPayload}
@@ -132,14 +143,14 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint 
                                     ) : (
                                         <>
                                             <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
-                                            <Text style={tw`text-white font-bold text-lg`}>Imprimir</Text>
+                                            <Text style={tw`text-white font-bold text-lg`}>Reimprimir</Text>
                                         </>
                                     )}
                                 </TouchableOpacity>
                             )}
 
                             <TouchableOpacity
-                                style={tw`${onPrint ? 'flex-1' : 'w-full'} bg-green-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
+                                style={tw`${(isReprint && onPrint) ? 'flex-1' : 'w-full'} bg-green-600 p-4 rounded-2xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
                                 onPress={handleShare}
                                 disabled={isSharing || isPrinting}
                             >
@@ -148,7 +159,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint 
                                 ) : (
                                     <>
                                         <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
-                                        <Text style={tw`text-white font-bold text-lg`}>{onPrint ? "WhatsApp" : "Compartilhar"}</Text>
+                                        <Text style={tw`text-white font-bold text-lg`}>{isReprint ? "WhatsApp" : "Compartilhar"}</Text>
                                     </>
                                 )}
                             </TouchableOpacity>
@@ -158,7 +169,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint 
                             style={tw`bg-gray-800 p-4 rounded-2xl flex-row justify-center items-center border border-gray-700`}
                             onPress={onClose}
                         >
-                            <Text style={tw`text-gray-300 font-bold text-lg`}>{onPrint ? "Fechar" : "Novo Jogo"}</Text>
+                            <Text style={tw`text-gray-300 font-bold text-lg`}>{isReprint ? "Fechar" : "Novo Jogo"}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

@@ -317,6 +317,7 @@ export default function HistoryScreen() {
             <ReceiptModal
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
+                isReprint={true}
                 ticketData={selectedTicket ? {
                     gameName: selectedTicket.gameType,
                     numbers: selectedTicket.numbers,

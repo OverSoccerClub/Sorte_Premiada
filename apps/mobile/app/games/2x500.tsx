@@ -570,6 +570,7 @@ export default function Game2x500Screen() {
                 onClose={handleCloseReceipt}
                 onPrint={handleAutoPrint}
                 autoPrint={true}
+                isReprint={false}
                 ticketData={lastTicket}
             />
         </SafeAreaView>
