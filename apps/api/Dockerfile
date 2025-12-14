@@ -37,6 +37,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/
 # Copy Prisma Client if needed explicitly, usually in node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/packages/database ./packages/database
 
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/seed-manual.js ./seed-manual.js
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
