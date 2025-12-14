@@ -1,0 +1,149 @@
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import { BLEPrinter } from 'react-native-thermal-receipt-printer-image-qr';
+import { PrinterType } from '../services/printing.service';
+
+interface PrinterContextType {
+    connectedPrinter: any;
+    isScanning: boolean;
+    printers: any[];
+    printerType: PrinterType;
+    setPrinterType: (type: PrinterType) => void;
+    scanPrinters: () => Promise<void>;
+    connectPrinter: (printer: any) => Promise<void>;
+    disconnectPrinter: () => void;
+    isPosDevice: (printer: any) => boolean;
+}
+
+const PrinterContext = createContext<PrinterContextType>({} as PrinterContextType);
+
+export const usePrinter = () => useContext(PrinterContext);
+
+export const PrinterProvider = ({ children }: { children: React.ReactNode }) => {
+    const [printers, setPrinters] = useState<any[]>([]);
+    const [connectedPrinter, setConnectedPrinter] = useState<any>(null);
+    const [isScanning, setIsScanning] = useState(false);
+    const [printerType, setPrinterType] = useState<PrinterType>('BLE');
+
+    useEffect(() => {
+        const init = async () => {
+            if (Platform.OS === 'android') {
+                try {
+                    if (Platform.Version >= 31) {
+                        await PermissionsAndroid.requestMultiple([
+                            PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+                            PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+                        ]);
+                    } else {
+                        await PermissionsAndroid.requestMultiple([
+                            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                        ]);
+                    }
+                } catch (err) {
+                    console.warn(err);
+                }
+            }
+
+            try {
+                // Wrap init in try-catch to prevent crash on devices without Bluetooth or permissions
+                await BLEPrinter.init();
+                console.log("BLE Printer initialized");
+            } catch (err) {
+                console.warn("BLE Printer init failed (Expected on POS):", err);
+                // Fallback to Native if BLE fails completely
+                setPrinterType('NATIVE');
+            }
+        };
+
+        init();
+    }, []);
+
+    const scanPrinters = async () => {
+        if (printerType === 'NATIVE') {
+            Alert.alert("Modo Nativo", "A busca por impressoras Bluetooth está desativada no modo Nativo.");
+            return;
+        }
+
+        setIsScanning(true);
+        try {
+            // Ensure initialized before scanning
+            try {
+                await BLEPrinter.init();
+            } catch (err) {
+                console.log("Re-init BLE ignored:", err);
+            }
+
+            const results = await BLEPrinter.getDeviceList();
+
+            // Sort POS printers to top
+            const sorted = results.sort((a: any, b: any) => {
+                const isPosA = isPosDevice(a);
+                const isPosB = isPosDevice(b);
+                if (isPosA && !isPosB) return -1;
+                if (!isPosA && isPosB) return 1;
+                return 0;
+            });
+
+            setPrinters(sorted);
+
+            // Auto-connect if only one POS printer found and not connected
+            const posPrinters = sorted.filter(isPosDevice);
+            if (posPrinters.length === 1 && !connectedPrinter) {
+                console.log("POS Printer found:", posPrinters[0].device_name);
+            }
+
+        } catch (error) {
+            console.error("Scan error:", error);
+            // If scanning fails hard, likely no bluetooth or permission. 
+            // Better to stay in BLE mode visually but show empty list than crash or force switch loop
+            // Alert.alert("Erro", "Não foi possível buscar dispositivos Bluetooth."); 
+        } finally {
+            setIsScanning(false);
+        }
+    };
+
+    const isPosDevice = (printer: any) => {
+        const name = (printer.device_name || "").toUpperCase();
+        const mac = (printer.inner_mac_address || "").toUpperCase();
+        const knownNames = ['INNERPRINTER', 'AR-SP5', 'RPP02', 'MPT-II', 'POS-58', 'POS58', 'PRINTER'];
+        return knownNames.some(n => name.includes(n));
+    };
+
+    const connectPrinter = async (printer: any) => {
+        try {
+            await BLEPrinter.connectPrinter(printer.inner_mac_address || printer.mac_address);
+            setConnectedPrinter(printer);
+            Alert.alert("Conectado", `Impressora ${printer.device_name} conectada!`);
+        } catch (error) {
+            console.error("Connection error:", error);
+            Alert.alert("Erro", "Falha ao conectar na impressora.");
+        }
+    };
+
+    const disconnectPrinter = async () => {
+        if (connectedPrinter) {
+            try {
+                await BLEPrinter.closeConn();
+                setConnectedPrinter(null);
+            } catch (error) {
+                console.error("Disconnect error:", error);
+            }
+        }
+    };
+
+    return (
+        <PrinterContext.Provider value={{
+            connectedPrinter,
+            isScanning,
+            printers,
+            printerType,
+            setPrinterType,
+            scanPrinters,
+            connectPrinter,
+            disconnectPrinter,
+            isPosDevice
+        }}>
+            {children}
+        </PrinterContext.Provider>
+    );
+};

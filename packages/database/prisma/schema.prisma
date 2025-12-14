@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  role      Role     @default(CAMBISTA)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tickets      Ticket[]
+  transactions Transaction[]
+  dailyCloses  DailyClose[]
+  areaId       String?
+  area         Area?    @relation(fields: [areaId], references: [id])
+}
+
+model Area {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  state     String
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  name      String
+  rules     Json
+  draws     Draw[]
+  tickets   Ticket[]
+}
+
+model Draw {
+  id        String   @id @default(uuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  numbers   Int[]
+  drawDate  DateTime
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  gameType  String   // e.g., "Mega Sena", "Quina"
+  gameId    String?
+  game      Game?    @relation(fields: [gameId], references: [id])
+  numbers   Int[]
+  amount    Decimal
+  status    TicketStatus @default(PENDING)
+  drawDate  DateTime?    // For 2x500: Scheduled Draw Time
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  CAMBISTA
+}
+
+enum TicketStatus {
+  PENDING
+  PAID
+  CANCELLED
+  WON
+  LOST
+  EXPIRED
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  description String
+  amount      Decimal
+  type        TransactionType
+  createdAt   DateTime        @default(now())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+}
+
+model DailyClose {
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  totalSales      Decimal
+  totalCredits    Decimal
+  totalDebits     Decimal
+  finalBalance    Decimal
+  totalCommission Decimal  @default(0)
+  netBalance      Decimal  @default(0)
+  closedByUserId  String
+  closedByUser    User     @relation(fields: [closedByUserId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}

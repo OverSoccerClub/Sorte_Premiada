@@ -1,0 +1,28 @@
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { GamesService } from './games.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '@repo/database';
+
+@Controller('games')
+export class GamesController {
+    constructor(private readonly gamesService: GamesService) { }
+
+    @Post()
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    async create(@Body() createGameDto: any) {
+        return this.gamesService.create(createGameDto);
+    }
+
+    @Get()
+    async findAll() {
+        return this.gamesService.findAll();
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return this.gamesService.findOne(id);
+    }
+}
