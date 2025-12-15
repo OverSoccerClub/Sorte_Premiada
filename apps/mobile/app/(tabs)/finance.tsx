@@ -428,17 +428,26 @@ export default function FinanceScreen() {
                 animationType="slide"
                 onRequestClose={() => setReportModalVisible(false)}
             >
-                <View style={tw`flex-1 justify-center items-center bg-black/80 p-4`}>
-                    <View style={tw`w-[90%] max-w-[400px]`}>
-                        <View style={tw`flex-row justify-end mb-2`}>
-                            <TouchableOpacity onPress={() => setReportModalVisible(false)} style={tw`bg-gray-800 rounded-full p-2`}>
+                <View style={tw`flex-1 justify-center items-center bg-black/80`}>
+                    <View style={tw`w-full h-full bg-transparent justify-center my-4 px-1`}>
+                        {/* Close Button Row */}
+                        <View style={tw`flex-row justify-end mb-2 mr-2`}>
+                            <TouchableOpacity onPress={() => setReportModalVisible(false)} style={tw`bg-gray-800 rounded-full p-2 border border-gray-600`}>
                                 <Ionicons name="close" size={24} color="#FFF" />
                             </TouchableOpacity>
                         </View>
 
-                        <ScrollView style={tw`bg-transparent`} contentContainerStyle={tw`pb-4`}>
+                        <ScrollView
+                            style={tw`bg-transparent flex-1`}
+                            contentContainerStyle={tw`pb-8 items-center justify-center`}
+                            showsVerticalScrollIndicator={false}
+                        >
                             {summary && (
-                                <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+                                <ViewShot
+                                    ref={viewShotRef}
+                                    options={{ format: "jpg", quality: 0.9 }}
+                                    style={{ backgroundColor: '#ffffff' }} // Force white background
+                                >
                                     <ReportPreview
                                         data={summary}
                                         date={new Date()}
@@ -446,36 +455,39 @@ export default function FinanceScreen() {
                                     />
                                 </ViewShot>
                             )}
+
+                            {/* Action Buttons Container */}
+                            <View style={tw`w-full mt-6 gap-3`}>
+                                <View style={tw`flex-row gap-3`}>
+                                    <TouchableOpacity
+                                        onPress={handlePrintReport}
+                                        style={tw`flex-1 bg-gray-900 p-4 rounded-xl items-center flex-row justify-center border border-gray-700`}
+                                    >
+                                        <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold`}>Imprimir</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={handleShareReport}
+                                        style={tw`flex-1 bg-green-500 p-4 rounded-xl items-center flex-row justify-center`}
+                                    >
+                                        <Ionicons name="logo-whatsapp" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold`}>WhatsApp</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Final Close Button inside Preview */}
+                                {!summary?.isClosed && (
+                                    <TouchableOpacity
+                                        onPress={handleConfirmClose}
+                                        style={tw`bg-red-600 p-4 rounded-xl items-center flex-row justify-center`}
+                                    >
+                                        <Ionicons name="lock-closed" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold uppercase`}>Encerrar Dia (Definitivo)</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </ScrollView>
-
-                        <View style={tw`flex-row gap-3 mt-4`}>
-                            <TouchableOpacity
-                                onPress={handlePrintReport}
-                                style={tw`flex-1 bg-gray-900 p-4 rounded-xl items-center flex-row justify-center border border-gray-700`}
-                            >
-                                <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
-                                <Text style={tw`text-white font-bold`}>Imprimir</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={handleShareReport}
-                                style={tw`flex-1 bg-green-500 p-4 rounded-xl items-center flex-row justify-center`}
-                            >
-                                <Ionicons name="logo-whatsapp" size={20} color="white" style={tw`mr-2`} />
-                                <Text style={tw`text-white font-bold`}>WhatsApp</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Final Close Button inside Preview */}
-                        {!summary?.isClosed && (
-                            <TouchableOpacity
-                                onPress={handleConfirmClose}
-                                style={tw`mt-4 bg-red-600 p-4 rounded-xl items-center flex-row justify-center`}
-                            >
-                                <Ionicons name="lock-closed" size={20} color="white" style={tw`mr-2`} />
-                                <Text style={tw`text-white font-bold uppercase`}>Encerrar Dia (Definitivo)</Text>
-                            </TouchableOpacity>
-                        )}
                     </View>
                 </View>
             </Modal>

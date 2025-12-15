@@ -29,13 +29,13 @@ export function ReportPreview({ data, date, isCapture = false }: ReportPreviewPr
     } : { padding: 16 };
 
     return (
-        <View style={[tw`bg-white w-full overflow-hidden`, containerStyle, !isCapture && tw`max-w-[340px] rounded-sm shadow-xl`]}>
+        <View style={[tw`bg-white w-full overflow-hidden`, containerStyle, !isCapture && tw`rounded-sm shadow-xl`]}>
 
             {/* Header with Logo */}
-            <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2`}>
+            <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2 bg-white`}>
                 <Ionicons name="receipt-outline" size={isCapture ? 32 : 28} color="#000" style={tw`mb-1`} />
-                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>SORTE PREMIADA</Text>
-                <Text style={[tw`${isCapture ? 'text-xs' : 'text-[10px]'} text-black uppercase tracking-widest`, { fontFamily: 'Roboto_700Bold' }]}>Fechamento de Caixa</Text>
+                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black text-center uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>SORTE PREMIADA</Text>
+                <Text style={[tw`${isCapture ? 'text-xs' : 'text-[10px]'} text-black text-center uppercase tracking-widest`, { fontFamily: 'Roboto_700Bold' }]}>Fechamento de Caixa</Text>
             </View>
 
             {/* Date */}
