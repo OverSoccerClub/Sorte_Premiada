@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppConfig } from '../constants/AppConfig';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,7 @@ import { printSangriaReceipt } from '../services/printing.service';
 import ViewShot from 'react-native-view-shot';
 import { SangriaReceipt } from './SangriaReceipt';
 import tw from '../lib/tailwind';
+import { CustomAlert, AlertType } from './CustomAlert';
 
 interface Cobrador {
     id: string;
@@ -46,6 +47,25 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
         cobradorName: string;
         id: string;
     } | null>(null);
+
+    // Custom Alert State
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertConfig, setAlertConfig] = useState({
+        title: "",
+        message: "",
+        type: "info" as AlertType,
+        onConfirm: () => { }
+    });
+
+    const showAlert = (title: string, message: string, type: AlertType = 'info', onConfirm?: () => void) => {
+        setAlertConfig({
+            title,
+            message,
+            type,
+            onConfirm: onConfirm || (() => setAlertVisible(false))
+        });
+        setAlertVisible(true);
+    };
 
     useEffect(() => {
         if (visible) {
@@ -95,11 +115,11 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
 
     const handleNext = () => {
         if (!amount || parseFloat(amount.replace(',', '.')) <= 0) {
-            Alert.alert("Erro", "Digite um valor válido.");
+            showAlert("Erro", "Digite um valor válido.", "error");
             return;
         }
         if (!selectedCobrador) {
-            Alert.alert("Erro", "Selecione um cobrador.");
+            showAlert("Erro", "Selecione um cobrador.", "error");
             return;
         }
         setStep(1);
@@ -120,7 +140,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
 
     const handleSubmit = async () => {
         if (pin.length !== 4) {
-            Alert.alert("Erro", "O PIN deve ter 4 dígitos.");
+            showAlert("Erro", "O PIN deve ter 4 dígitos.", "error");
             return;
         }
 
@@ -169,16 +189,18 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                         transactionId: rData.id
                     }, printerType, imageUri);
 
-                    Alert.alert("Sucesso", "Sangria realizada e registrada!");
-                    onSuccess();
+                    showAlert("Sucesso", "Sangria realizada e registrada!", "success", () => {
+                        setAlertVisible(false);
+                        onSuccess();
+                    });
                 }, 500);
 
             } else {
-                Alert.alert("Erro", result.error || "PIN Incorreto ou Falha ao registrar.");
+                showAlert("Erro", result.error || "PIN Incorreto ou Falha ao registrar.", "error");
             }
         } catch (e) {
             console.error(e);
-            Alert.alert("Erro", "Erro desconhecido.");
+            showAlert("Erro", "Erro desconhecido.", "error");
         } finally {
             setLoading(false);
         }
@@ -310,6 +332,14 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                     </ViewShot>
                 )}
             </View>
+            <CustomAlert
+                visible={alertVisible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onClose={() => setAlertVisible(false)}
+                onConfirm={alertConfig.onConfirm}
+            />
         </Modal>
     );
 }
