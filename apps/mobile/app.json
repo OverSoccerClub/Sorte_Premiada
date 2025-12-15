@@ -46,6 +46,12 @@
           }
         }
       ]
-    ]
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/YOUR-PROJECT-ID-HERE",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
