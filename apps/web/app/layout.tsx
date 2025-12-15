@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google"; // Premium modern font
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AlertProvider } from "@/context/alert-context";
+import { AuthProvider } from "@/context/auth-context";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -25,10 +26,12 @@ export default function RootLayout({
         className={`${outfit.variable} antialiased font-sans bg-background text-foreground`}
         suppressHydrationWarning
       >
-        <AlertProvider>
-          {children}
-          <Toaster />
-        </AlertProvider>
+        <AuthProvider>
+          <AlertProvider>
+            {children}
+            <Toaster />
+          </AlertProvider>
+        </AuthProvider>
       </body>
     </html>
   );
