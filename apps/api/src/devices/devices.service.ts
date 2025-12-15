@@ -34,15 +34,32 @@ export class DevicesService {
             longitude: data.longitude,
         };
 
+        // Fetch current state to handle history logic
+        const currentTerminal = await this.prisma.posTerminal.findUnique({
+            where: { deviceId: data.deviceId },
+            select: { currentUserId: true }
+        });
+
         if (data.currentUserId) {
             connectUser = { connect: { id: data.currentUserId } };
-            // Update current user
             updateData.currentUser = connectUser;
-            // Also update last user
-            updateData.lastUser = connectUser;
+
+            // Only update lastUser if the user CHANGED (A -> B transitions)
+            // If it's the same user sending heartbeat, keep lastUser as the *previous* one.
+            if (currentTerminal && currentTerminal.currentUserId && currentTerminal.currentUserId !== data.currentUserId) {
+                // User changed A -> B. Last User becomes A.
+                updateData.lastUser = { connect: { id: currentTerminal.currentUserId } };
+            }
+            // If currentUserId was null before (New Login), technically lastUser should be whoever was before that.
+            // But if we don't touch lastUser here, it remains correct!
+
         } else if (data.currentUserId === null) {
             updateData.currentUser = { disconnect: true };
-            // Do not clear lastUser
+
+            // User Logout (A -> null). Last User must become A.
+            if (currentTerminal && currentTerminal.currentUserId) {
+                updateData.lastUser = { connect: { id: currentTerminal.currentUserId } };
+            }
         }
 
         return this.prisma.posTerminal.upsert({
@@ -55,6 +72,7 @@ export class DevicesService {
                 latitude: data.latitude,
                 longitude: data.longitude,
                 currentUser: connectUser,
+                // On create, lastUser is logicless, let's set it to current or null
                 lastUser: connectUser
             },
         });
