@@ -11,7 +11,7 @@ export class DevicesController {
     }
 
     @Post('heartbeat')
-    async heartbeat(@Body() body: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string }) {
+    async heartbeat(@Body() body: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string; status?: string }) {
         return this.devicesService.heartbeat(body);
     }
 

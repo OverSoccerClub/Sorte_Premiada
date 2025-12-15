@@ -45,20 +45,33 @@ export const FinanceService = {
         }
     },
 
-    async createTransaction(token: string, data: CreateTransactionDto): Promise<boolean> {
+    async createTransaction(token: string, data: CreateTransactionDto, cobradorId?: string, pin?: string): Promise<{ success: boolean; data?: any; error?: string }> {
         try {
+            const payload: any = { ...data };
+            if (cobradorId) {
+                payload.cobradorId = cobradorId;
+                payload.pin = pin;
+            }
+
             const res = await fetch(`${AppConfig.api.baseUrl}/finance/transaction`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload)
             });
-            return res.ok;
+
+            if (res.ok) {
+                const json = await res.json();
+                return { success: true, data: json };
+            } else {
+                const err = await res.json();
+                return { success: false, error: err.message || "Erro desconhecido" };
+            }
         } catch (e) {
             console.error("Error creating transaction", e);
-            return false;
+            return { success: false, error: "Erro de conexão" };
         }
     },
 

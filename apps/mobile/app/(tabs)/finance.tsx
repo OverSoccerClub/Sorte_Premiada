@@ -13,6 +13,7 @@ import { FinanceService, FinanceSummary } from "../../services/finance.service";
 import { printDailyReport, formatDailyReport } from "../../services/printing.service";
 import { CustomAlert } from "../../components/CustomAlert";
 import { ReportPreview } from "../../components/ReportPreview";
+import { SangriaModal } from "../../components/SangriaModal"; // Added import
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 
@@ -27,6 +28,7 @@ export default function FinanceScreen() {
     const [summary, setSummary] = useState<FinanceSummary | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [sangriaModalVisible, setSangriaModalVisible] = useState(false); // Added state
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -257,22 +259,33 @@ export default function FinanceScreen() {
                     </View>
 
                     {/* Actions */}
-                    <View style={tw`flex-row gap-3 mb-6`}>
+                    <View style={tw`mb-6`}>
+                        <View style={tw`flex-row gap-3 mb-3`}>
+                            <TouchableOpacity
+                                onPress={() => handleOpenModal('CREDIT')}
+                                disabled={summary?.isClosed}
+                                style={tw`flex-1 bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                            >
+                                <Ionicons name="add-circle" size={20} color="#60a5fa" style={tw`mr-2`} />
+                                <Text style={tw`text-blue-400 font-bold`}>Crédito</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => handleOpenModal('DEBIT')}
+                                disabled={summary?.isClosed}
+                                style={tw`flex-1 bg-red-500/10 border border-red-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                            >
+                                <Ionicons name="remove-circle" size={20} color="#f87171" style={tw`mr-2`} />
+                                <Text style={tw`text-red-400 font-bold`}>Débito</Text>
+                            </TouchableOpacity>
+                        </View>
+
                         <TouchableOpacity
-                            onPress={() => handleOpenModal('CREDIT')}
+                            onPress={() => setSangriaModalVisible(true)}
                             disabled={summary?.isClosed}
-                            style={tw`flex-1 bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                            style={tw`w-full bg-indigo-500/10 border border-indigo-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
                         >
-                            <Ionicons name="add-circle" size={20} color="#60a5fa" style={tw`mr-2`} />
-                            <Text style={tw`text-blue-400 font-bold`}>Crédito</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => handleOpenModal('DEBIT')}
-                            disabled={summary?.isClosed}
-                            style={tw`flex-1 bg-red-500/10 border border-red-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
-                        >
-                            <Ionicons name="remove-circle" size={20} color="#f87171" style={tw`mr-2`} />
-                            <Text style={tw`text-red-400 font-bold`}>Débito</Text>
+                            <Ionicons name="cash-outline" size={20} color="#818cf8" style={tw`mr-2`} />
+                            <Text style={tw`text-indigo-400 font-bold uppercase`}>Sangria / Recolhimento</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -466,7 +479,19 @@ export default function FinanceScreen() {
                 </View>
             </Modal>
 
-            {/* Custom Alert */}
+            {/* ... Custom Alert ... */}
+
+            <SangriaModal
+                visible={sangriaModalVisible}
+                onClose={() => setSangriaModalVisible(false)}
+                onSuccess={() => {
+                    setSangriaModalVisible(false); // Close Sangria Modal
+                    loadData(); // Refresh data
+                    // Alert is already shown inside SangriaModal for success, but maybe refresh summary is enough?
+                    // Actually SangriaModal shows success.
+                }}
+            />
+
             <CustomAlert
                 visible={alertConfig.visible}
                 title={alertConfig.title}

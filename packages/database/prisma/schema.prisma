@@ -14,13 +14,16 @@ model User {
   username  String   @unique
   email     String?  @unique
   password  String
+  securityPin String?  // 4-digit PIN for Cobradores
   role      Role     @default(CAMBISTA)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tickets      Ticket[]
   transactions Transaction[]
+  transactionsCollected Transaction[] @relation("TransactionCobrador")
   dailyCloses  DailyClose[]
-  posTerminals PosTerminal[]
+  posTerminalsAsCurrent PosTerminal[] @relation("PosCurrentUser")
+  posTerminalsAsLast    PosTerminal[] @relation("PosLastUser")
   areaId       String?
   area         Area?    @relation(fields: [areaId], references: [id])
 }
@@ -117,8 +120,13 @@ model PosTerminal {
   lastSeenAt    DateTime @default(now())
   latitude      Float?
   longitude     Float?
+  
   currentUserId String?
-  currentUser   User?    @relation(fields: [currentUserId], references: [id])
+  currentUser   User?    @relation("PosCurrentUser", fields: [currentUserId], references: [id])
+  
+  lastUserId    String?
+  lastUser      User?    @relation("PosLastUser", fields: [lastUserId], references: [id])
+
   appVersion    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

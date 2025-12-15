@@ -13,9 +13,13 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 
 import { usePosTracking } from "../hooks/usePosTracking";
 
-export default function RootLayout() {
-    usePosTracking(); // Auto-start POS Tracking
+// Helper component to use hook inside provider
+function PosTracker() {
+    usePosTracking();
+    return null;
+}
 
+export default function RootLayout() {
     const [fontsLoaded] = useFonts({
         Roboto_400Regular,
         Roboto_700Bold,
@@ -35,6 +39,7 @@ export default function RootLayout() {
     return (
         <LoadingProvider>
             <AuthProvider>
+                <PosTracker />
                 <PrinterProvider>
                     <SafeAreaProvider>
                         <Stack screenOptions={{ headerShown: false }}>

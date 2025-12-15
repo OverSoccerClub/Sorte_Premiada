@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 export function usePosTracking() {
     const { user } = useAuth();
     const heartbeatInterval = useRef<NodeJS.Timeout | null>(null);
+    const deviceIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -61,6 +62,8 @@ export function usePosTracking() {
                     console.warn("Location error", e);
                 }
 
+                console.log(`[POS Tracking] Sending Heartbeat. Device: ${deviceId}, User: ${user?.username} (${user?.id})`);
+
                 await DevicesService.heartbeat({
                     deviceId,
                     latitude: lat,
@@ -71,19 +74,13 @@ export function usePosTracking() {
 
             // Request Perms Once
             try {
-                const { status } = await Location.requestForegroundPermissionsAsync();
+                await Location.requestForegroundPermissionsAsync();
             } catch (e) {
                 console.warn("Perm req failed", e);
             }
 
-            console.log(`[POS Tracking] Sending Heartbeat. Device: ${deviceId}, User: ${user?.username} (${user?.id})`);
-
-            await DevicesService.heartbeat({
-                deviceId,
-                latitude: lat,
-                longitude: lon,
-                currentUserId: user?.id || null
-            });
+            // Initial Heartbeat
+            sendHeartbeat();
 
             // Loop
             heartbeatInterval.current = setInterval(sendHeartbeat, 60000); // 60s
@@ -94,6 +91,15 @@ export function usePosTracking() {
         return () => {
             isMounted = false;
             if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
+
+            // Try to set offline on unmount (best effort)
+            if (deviceIdRef.current) {
+                console.log('[POS Tracking] Cleanup: Sending OFFLINE status');
+                DevicesService.heartbeat({
+                    deviceId: deviceIdRef.current,
+                    status: 'OFFLINE'
+                }).catch(e => console.warn("Failed to set offline", e));
+            }
         };
     }, [user]); // Re-run if user changes? Yes to update currentUserId immediately on login/logout?
     // Actually if we re-run verify, we register again. Register is idempotent (upsert). 

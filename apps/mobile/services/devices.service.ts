@@ -26,7 +26,7 @@ export const DevicesService = {
         }
     },
 
-    async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string | null }) {
+    async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string | null; status?: string }) {
         try {
             const res = await fetch(`${AppConfig.api.baseUrl}/devices/heartbeat`, {
                 method: 'POST',

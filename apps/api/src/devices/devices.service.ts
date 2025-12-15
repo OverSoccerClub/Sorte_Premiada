@@ -23,28 +23,26 @@ export class DevicesService {
         });
     }
 
-    async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string }) {
-        console.log(`[API Heartbeat] Device: ${data.deviceId}, UserID: ${data.currentUserId}`);
+    async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string; status?: string }) {
+        console.log(`[API Heartbeat] Device: ${data.deviceId}, UserID: ${data.currentUserId}, Status: ${data.status}`);
 
         let connectUser = undefined;
-        if (data.currentUserId) {
-            connectUser = { connect: { id: data.currentUserId } };
-        } else {
-            // If null explicitly sent, disconnect (optional, assumes logged out)
-            // But for safety, let's only disconnect if we know
-        }
-
-        // Prepare update payload
-        const updateData: any = {
+        let updateData: any = {
             lastSeenAt: new Date(),
-            status: 'ONLINE',
+            status: data.status || 'ONLINE',
             latitude: data.latitude,
             longitude: data.longitude,
         };
-        if (connectUser) {
+
+        if (data.currentUserId) {
+            connectUser = { connect: { id: data.currentUserId } };
+            // Update current user
             updateData.currentUser = connectUser;
+            // Also update last user
+            updateData.lastUser = connectUser;
         } else if (data.currentUserId === null) {
             updateData.currentUser = { disconnect: true };
+            // Do not clear lastUser
         }
 
         return this.prisma.posTerminal.upsert({
@@ -52,11 +50,12 @@ export class DevicesService {
             update: updateData,
             create: {
                 deviceId: data.deviceId,
-                status: 'ONLINE',
+                status: data.status || 'ONLINE',
                 lastSeenAt: new Date(),
                 latitude: data.latitude,
                 longitude: data.longitude,
-                currentUser: connectUser
+                currentUser: connectUser,
+                lastUser: connectUser
             },
         });
     }
@@ -65,6 +64,12 @@ export class DevicesService {
         return this.prisma.posTerminal.findMany({
             include: {
                 currentUser: {
+                    select: {
+                        name: true,
+                        username: true,
+                    },
+                },
+                lastUser: {
                     select: {
                         name: true,
                         username: true,

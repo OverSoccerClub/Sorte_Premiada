@@ -13,12 +13,33 @@ export class FinanceService {
             throw new BadRequestException("O caixa do dia já foi fechado. Não é possível adicionar novas movimentações.");
         }
 
+        let cobradorId = undefined;
+        if (data.cobradorId) {
+            if (!data.pin) {
+                throw new BadRequestException("PIN do cobrador é obrigatório para sangrias.");
+            }
+
+            const cobrador = await this.prisma.user.findUnique({
+                where: { id: data.cobradorId },
+            });
+
+            if (!cobrador || cobrador.role !== 'COBRADOR') {
+                throw new BadRequestException("Cobrador inválido.");
+            }
+
+            if (cobrador.securityPin !== data.pin) {
+                throw new BadRequestException("PIN incorreto.");
+            }
+            cobradorId = data.cobradorId;
+        }
+
         return this.prisma.transaction.create({
             data: {
                 description: data.description,
                 amount: data.amount,
                 type: data.type,
                 userId: userId,
+                cobradorId: cobradorId,
             },
         });
     }

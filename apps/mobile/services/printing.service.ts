@@ -410,3 +410,119 @@ export const printDailyReport = async (
     return false;
   }
 };
+
+export const printSangriaReceipt = async (
+  data: {
+    date: Date;
+    amount: number;
+    cambistaName: string;
+    cobradorName: string;
+    transactionId: string;
+  },
+  printerType: PrinterType = 'BLE'
+) => {
+  const formatDate = (date: Date) => date.toLocaleString('pt-BR');
+  const formatCurrency = (val: number) => `R$ ${Number(val).toFixed(2).replace('.', ',')}`;
+
+  const dateStr = formatDate(new Date(data.date));
+
+  // ESC/POS Commands
+  const ESC = "\x1b";
+  const GS = "\x1d";
+  const INITIALIZE = ESC + "@";
+  const CENTER = ESC + "\x61\x01";
+  const LEFT = ESC + "\x61\x00";
+  const BOLD_ON = ESC + "\x45\x01";
+  const BOLD_OFF = ESC + "\x45\x00";
+  const DOUBLE_WIDTH_HEIGHT = GS + "!" + "\x11";
+  const DOUBLE_HEIGHT = GS + "!" + "\x10";
+  const NORMAL = GS + "!" + "\x00";
+
+  const buildReceipt = (copyName: string, signerLabel: string) => {
+    let r = "";
+    r += INITIALIZE;
+    r += CENTER;
+    r += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "SANGRIA / RECOLHIMENTO" + BOLD_OFF + NORMAL + "\n";
+    r += dateStr + "\n";
+    r += "- - - - - - - - - - - - - - - -\n\n";
+
+    r += LEFT;
+    r += `VALOR RECOLHIDO: ${formatCurrency(data.amount)}\n`;
+    r += `CAMBISTA: ${data.cambistaName}\n`;
+    r += `COBRADOR: ${data.cobradorName}\n`;
+    r += `ID: ${data.transactionId.substring(0, 8)}\n`;
+    r += "\n";
+    r += CENTER;
+    r += BOLD_ON + copyName.toUpperCase() + BOLD_OFF + "\n";
+    r += "\n\n________________________________\n";
+    r += `Assinatura ${signerLabel}\n`; // Whoever receives the money or gives it? 
+    // Usually: 
+    // Copy for Cambista (Proof he gave money) -> Signed by Cobrador (Receiver)
+    // Copy for Cobrador (Proof he got money) -> Signed by Cambista (Giver)
+    r += "\n\n\n";
+    return r;
+  };
+
+  try {
+    const receipt1 = buildReceipt("Via do Cambista", "Cobrador");
+    const receipt2 = buildReceipt("Via do Cobrador", "Cambista");
+
+    if (printerType === 'BLE') {
+      // Print Copy 1
+      if (BLEPrinter.printBill) {
+        await BLEPrinter.printBill(receipt1);
+        await new Promise(r => setTimeout(r, 2000)); // Pause for tear off
+        await BLEPrinter.printBill(receipt2);
+      } else {
+        await BLEPrinter.printText(receipt1 + "\n\n\n");
+        await new Promise(r => setTimeout(r, 2000));
+        await BLEPrinter.printText(receipt2 + "\n\n\n");
+      }
+    } else {
+      // Native Print (HTML)
+      // Logic for HTML dual receipt?
+      // Just print one long or two jobs. 
+      // Simplified for Native: Print combined
+      const html = `
+        <html>
+        <head>
+          <style>
+             body { font-family: monospace; font-size: 12px; margin: 0; padding: 0; width: 58mm; text-align: center; }
+             h2 { font-size: 14px; margin: 5px 0; }
+             .dashed { border-top: 1px dashed black; margin: 10px 0; }
+             .bold { font-weight: bold; }
+             .left { text-align: left; }
+             .cut { border-bottom: 2px dotted black; margin: 20px 0; padding: 10px 0; }
+          </style>
+        </head>
+        <body>
+           ${[1, 2].map(i => `
+              <h2>SANGRIA / RECOLHIMENTO</h2>
+              <div>${dateStr}</div>
+              <div class="dashed"></div>
+              <div class="left">
+                <div>VALOR: <b>${formatCurrency(data.amount)}</b></div>
+                <div>CAMBISTA: ${data.cambistaName}</div>
+                <div>COBRADOR: ${data.cobradorName}</div>
+                <div>ID: ${data.transactionId.substring(0, 8)}</div>
+              </div>
+              <br/>
+              <div class="bold">${i === 1 ? 'VIA DO CAMBISTA' : 'VIA DO COBRADOR'}</div>
+              <br/><br/>
+              <div class="dashed" style="border-top: 1px solid black; width: 80%; margin: 0 auto;"></div>
+              <div>Assinatura ${i === 1 ? 'Cobrador' : 'Cambista'}</div>
+              <br/><br/>
+              ${i === 1 ? '<div class="cut">--- CORTE AQUI ---</div>' : ''}
+           `).join('')}
+        </body>
+        </html>
+      `;
+      await Print.printAsync({ html });
+    }
+
+    return true;
+  } catch (e) {
+    console.error("Print Sangria Error", e);
+    return false;
+  }
+};

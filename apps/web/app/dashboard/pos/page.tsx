@@ -21,6 +21,10 @@ interface PosDevice {
         name: string;
         username: string;
     };
+    lastUser?: {
+        name: string;
+        username: string;
+    };
 }
 
 export default function PosManagementPage() {
@@ -54,14 +58,23 @@ export default function PosManagementPage() {
 
     useEffect(() => {
         fetchDevices();
-        const interval = setInterval(fetchDevices, 30000); // Poll every 30s
-        return () => clearInterval(interval);
+        const interval = setInterval(fetchDevices, 30000); // Poll API every 30s
+
+        // Update UI status every 5s (to turn offline visual faster without api call)
+        const tickInterval = setInterval(() => setTick(t => t + 1), 5000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(tickInterval);
+        };
     }, []);
 
-    const isOnline = (dateStr: string) => {
+    const isOnline = (dateStr: string, status: string) => {
+        if (status === 'OFFLINE') return false; // Explicit offline
+        // Also check timeout
         const lastSeen = new Date(dateStr).getTime();
         const now = new Date().getTime();
-        return (now - lastSeen) < 120000; // 2 minutes tolerance
+        return (now - lastSeen) < 90000; // 90 seconds tolerance
     };
 
     const filteredDevices = devices.filter(d =>
@@ -69,7 +82,7 @@ export default function PosManagementPage() {
         d.currentUser?.name.toLowerCase().includes(filter.toLowerCase())
     );
 
-    const onlineCount = devices.filter(d => isOnline(d.lastSeenAt)).length;
+    const onlineCount = devices.filter(d => isOnline(d.lastSeenAt, d.status)).length;
 
     return (
         <div className="space-y-6">
@@ -155,6 +168,15 @@ export default function PosManagementPage() {
                                                         {device.currentUser.username[0].toUpperCase()}
                                                     </div>
                                                     <span>{device.currentUser.username}</span>
+                                                </div>
+                                            ) : device.lastUser ? (
+                                                <div className="flex items-center gap-2 opacity-60">
+                                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold">
+                                                        {device.lastUser.username[0].toUpperCase()}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-medium">Último: {device.lastUser.username}</span>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground text-xs italic">Nenhum</span>
