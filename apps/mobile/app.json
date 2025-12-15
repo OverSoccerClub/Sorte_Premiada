@@ -3,6 +3,9 @@
     "name": "Sorte Premiada",
     "slug": "sorte-premiada",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "scheme": "megasena",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
