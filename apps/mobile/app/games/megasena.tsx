@@ -14,6 +14,7 @@ import { VersionFooter } from "../../components/VersionFooter";
 import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
+import { ReceiptModal } from "../../components/ReceiptModal";
 
 // --- Number Ball Component ---
 const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: boolean, onToggle: () => void }) => {
@@ -102,6 +103,10 @@ export default function MegaSenaScreen() {
         type: "success",
     });
 
+    // Receipt Modal State
+    const [receiptVisible, setReceiptVisible] = useState(false);
+    const [lastTicket, setLastTicket] = useState<any>(null);
+
     const numbers = Array.from({ length: 60 }, (_, i) => i + 1);
 
     const showAlert = (
@@ -142,7 +147,7 @@ export default function MegaSenaScreen() {
 
     const handlePrint = async () => {
         setModalVisible(false);
-        show("Processando Aposta..."); // Show global loading
+        show("Processando Aposta...");
 
         try {
             const API_URL = AppConfig.api.baseUrl;
@@ -162,44 +167,29 @@ export default function MegaSenaScreen() {
 
             if (!res.ok) {
                 const errorText = await res.text();
-                console.error("Failed to save bet:", res.status, errorText);
                 throw new Error(`Falha ao salvar aposta: ${res.status} - ${errorText}`);
             }
 
             const ticketData = await res.json();
 
-            // Notify loading status update (optional, but keep simple for now)
-            // show("Imprimindo..."); 
+            hide();
 
-            // Print the ticket using text
-            const printSuccess = await printTicket(
-                selectedNumbers,
-                ticketData.id,
-                new Date(ticketData.createdAt),
-                5.00,
-                "Mega Sena",
-                printerType
-            );
+            // Setup for Receipt Modal
+            setLastTicket({
+                gameName: "Mega Sena",
+                numbers: selectedNumbers,
+                price: "R$ 5,00",
+                id: ticketData.id,
+                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
+                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
+            });
 
-            hide(); // Hide before showing alert
-
-            // Delay alert slightly to allow modal to close smoothly
-            setTimeout(() => {
-                const formattedNumbers = selectedNumbers
-                    .sort((a, b) => a - b)
-                    .map(n => n.toString().padStart(2, "0"))
-                    .join(", ");
-
-                if (printSuccess) {
-                    showAlert("Sucesso!", `Aposta salva e enviada para impressão!\n\nNúmeros: ${formattedNumbers}`, "success");
-                } else {
-                    showAlert("Aposta Salva", `Aposta salva, mas houve um erro na impressão.\n\nNúmeros: ${formattedNumbers}`, "warning");
-                }
-                setSelectedNumbers([]); // Clear selection
-            }, 500);
+            setReceiptVisible(true);
+            setSelectedNumbers([]); // Clear selection immediately or after close? 2x500 clears on close. Let's wait.
+            // Actually 2x500 clears on Close.
 
         } catch (error) {
-            hide(); // Hide on error
+            hide();
             console.error(error);
             setTimeout(() => {
                 showAlert("Erro", "Não foi possível salvar a aposta. Tente novamente.", "error");
@@ -222,6 +212,30 @@ export default function MegaSenaScreen() {
             "Sim, Limpar",
             "Cancelar"
         );
+    };
+
+    const handleCloseReceipt = () => {
+        setReceiptVisible(false);
+        setLastTicket(null);
+        setSelectedNumbers([]);
+    };
+
+    const handleAutoPrint = async (imageUri?: string) => {
+        if (!lastTicket) return;
+        const success = await printTicket(
+            lastTicket.numbers,
+            lastTicket.id,
+            new Date(),
+            5.00,
+            "Mega Sena",
+            printerType,
+            imageUri
+        );
+
+        // Optional: Show success toast or just let it be silent as user sees the modal
+        if (!success) {
+            showAlert("Erro", "Falha ao enviar para impressão.", "error");
+        }
     };
 
     return (
@@ -338,6 +352,15 @@ export default function MegaSenaScreen() {
                 onConfirm={alertConfig.onConfirm}
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
+            />
+
+            <ReceiptModal
+                visible={receiptVisible}
+                onClose={handleCloseReceipt}
+                onPrint={handleAutoPrint}
+                autoPrint={true}
+                isReprint={false}
+                ticketData={lastTicket}
             />
         </SafeAreaView>
     );

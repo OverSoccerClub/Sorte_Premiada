@@ -4,9 +4,10 @@ import { Alert } from 'react-native';
 export class UpdatesService {
     static async checkForUpdate(): Promise<boolean> {
         try {
+            // SIMULATION MODE FOR UI TESTING
             if (__DEV__) {
-                console.log("UpdatesService: Skipping check in DEV mode");
-                return false;
+                console.log("UpdatesService: SIMULATING UPDATE AVAILABLE");
+                return true;
             }
 
             const update = await Updates.checkForUpdateAsync();
@@ -16,13 +17,18 @@ export class UpdatesService {
             return false;
         } catch (error) {
             console.log("UpdatesService Error (Check):", error);
+            // Return true to test error handling UI if needed, but for now false
             return false;
         }
     }
 
     static async fetchUpdate(): Promise<boolean> {
         try {
-            if (__DEV__) return false;
+            // SIMULATION MODE FOR UI TESTING
+            if (__DEV__) {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Fake download time
+                return true;
+            };
 
             const update = await Updates.fetchUpdateAsync();
             if (update.isNew) {

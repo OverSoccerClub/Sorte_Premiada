@@ -11,7 +11,11 @@ import { PrinterProvider } from "../context/PrinterContext";
 import { LoadingProvider } from "../context/LoadingContext";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 
+import { usePosTracking } from "../hooks/usePosTracking";
+
 export default function RootLayout() {
+    usePosTracking(); // Auto-start POS Tracking
+
     const [fontsLoaded] = useFonts({
         Roboto_400Regular,
         Roboto_700Bold,

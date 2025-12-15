@@ -44,12 +44,9 @@ export const printTicket = async (
 
         // Try standard width 384 (58mm) and center alignment
         try {
-          // Increase width to 576 (standard 80mm) or try auto-scaling.
-          // User asked for "wider print, less height". Wider image width helps utilization.
-          await BLEPrinter.printImageBase64(base64, { imageWidth: 576, paddingX: 0 });
+          await BLEPrinter.printImageBase64(base64, { imageWidth: 384, paddingX: 0 });
         } catch (innerErr) {
-          console.warn("Standard printImageBase64 failed, trying without options", innerErr);
-          // Fallback: try without options
+          console.warn("Standard printImageBase64 failed, making one fallback attempt", innerErr);
           await BLEPrinter.printImageBase64(base64);
         }
 
@@ -376,9 +373,13 @@ export const printDailyReport = async (
 
         if (BLEPrinter.printImageBase64) {
           try {
-            await BLEPrinter.printImageBase64(base64, { imageWidth: 576, paddingX: 0 });
+            // Try standard width 384 (58mm) which is standard for most portable bluetooth printers
+            // Using 576 (80mm) on a 58mm printer often causes vertical stretching or cropping.
+            // PaddingX 0 ensures it uses full width.
+            await BLEPrinter.printImageBase64(base64, { imageWidth: 384, paddingX: 0 });
           } catch (innerErr) {
-            console.warn("Standard printImageBase64 failed, trying without options", innerErr);
+            console.warn("Standard printImageBase64 failed, making one fallback attempt", innerErr);
+            // Fallback: try with default settings (often assumes 384 anyway)
             await BLEPrinter.printImageBase64(base64);
           }
         } else {
@@ -387,7 +388,7 @@ export const printDailyReport = async (
           throw new Error("Generic BL Printer does not support image printing or method missing");
         }
 
-        await BLEPrinter.printText("\n\n\n");
+        await BLEPrinter.printText("\n\n\n"); // Feed
         return true;
       } catch (imgError) {
         console.warn("Failed to print image FINAL, falling back to text:", imgError);

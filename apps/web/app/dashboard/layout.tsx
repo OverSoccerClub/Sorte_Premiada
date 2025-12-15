@@ -3,13 +3,14 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Ticket, MapPin } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
+    { icon: Smartphone, label: "Gestão de POS", href: "/dashboard/pos" },
     { icon: MapPin, label: "Gestão de Praças", href: "/dashboard/areas" },
     { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
 ];

@@ -10,6 +10,7 @@ import { TicketsModule } from './tickets/tickets.module';
 import { ReportsModule } from './reports/reports.module';
 import { FinanceModule } from './finance/finance.module';
 import { AreasModule } from './areas/areas.module';
+import { DevicesModule } from './devices/devices.module';
 
 @Module({
   imports: [
@@ -23,9 +24,9 @@ import { AreasModule } from './areas/areas.module';
     GamesModule,
     TicketsModule,
     ReportsModule,
-    ReportsModule,
     FinanceModule,
     AreasModule,
+    DevicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

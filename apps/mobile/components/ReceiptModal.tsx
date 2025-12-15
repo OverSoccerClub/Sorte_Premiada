@@ -108,17 +108,32 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                         {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
                     </Text>
 
-                    {/* Capture Area */}
-                    {/* PNG format for lossless quality */}
-                    <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff' }}>
+                    {/* 1. Visible, Nice Looking Preview */}
+                    <View style={tw`mb-4`}>
                         <TicketPreview
                             gameName={ticketData.gameName}
                             numbers={ticketData.numbers}
                             price={ticketData.price}
                             date={ticketData.date}
                             id={ticketData.id}
+                            isCapture={false} // Normal aspect ratio for screen
                         />
-                    </ViewShot>
+                    </View>
+
+                    {/* 2. Hidden Capture Area (Distorted for Print) */}
+                    {/* Position absolute off-screen or behind to avoid visual clutter but keep renderable */}
+                    <View style={{ position: 'absolute', opacity: 0, zIndex: -10, left: -1000 }}>
+                        <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                            <TicketPreview
+                                gameName={ticketData.gameName}
+                                numbers={ticketData.numbers}
+                                price={ticketData.price}
+                                date={ticketData.date}
+                                id={ticketData.id}
+                                isCapture={true} // Applies scaleX: 1.5
+                            />
+                        </ViewShot>
+                    </View>
 
                     {/* Actions */}
                     <View style={tw`mt-4 gap-2`}>
