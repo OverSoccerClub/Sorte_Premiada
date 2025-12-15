@@ -76,8 +76,14 @@ export function usePosTracking() {
                 console.warn("Perm req failed", e);
             }
 
-            // Initial Heartbeat
-            sendHeartbeat();
+            console.log(`[POS Tracking] Sending Heartbeat. Device: ${deviceId}, User: ${user?.username} (${user?.id})`);
+
+            await DevicesService.heartbeat({
+                deviceId,
+                latitude: lat,
+                longitude: lon,
+                currentUserId: user?.id || null
+            });
 
             // Loop
             heartbeatInterval.current = setInterval(sendHeartbeat, 60000); // 60s

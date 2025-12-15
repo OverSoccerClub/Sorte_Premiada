@@ -24,6 +24,8 @@ export class DevicesService {
     }
 
     async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string }) {
+        console.log(`[API Heartbeat] Device: ${data.deviceId}, UserID: ${data.currentUserId}`);
+
         let connectUser = undefined;
         if (data.currentUserId) {
             connectUser = { connect: { id: data.currentUserId } };
