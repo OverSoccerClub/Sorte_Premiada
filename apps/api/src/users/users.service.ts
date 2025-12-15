@@ -17,8 +17,9 @@ export class UsersService {
             data,
         });
     }
-    async findAll(): Promise<User[]> {
+    async findAll(username?: string): Promise<User[]> {
         return this.prisma.user.findMany({
+            where: username ? { username } : undefined,
             include: { area: true },
         });
     }

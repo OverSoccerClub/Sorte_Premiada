@@ -32,12 +32,12 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
     const viewShotRef = React.useRef<ViewShot>(null);
 
     const [amount, setAmount] = useState("");
-    const [cobradores, setCobradores] = useState<Cobrador[]>([]);
+    const [cobradorUsername, setCobradorUsername] = useState(""); // Input
     const [selectedCobrador, setSelectedCobrador] = useState<Cobrador | null>(null);
     const [pin, setPin] = useState("");
 
     const [loading, setLoading] = useState(false);
-    const [fetchingCobradores, setFetchingCobradores] = useState(false);
+    const [verifyingCobrador, setVerifyingCobrador] = useState(false);
 
     // Receipt Data for Capture
     const [receiptData, setReceiptData] = useState<{
@@ -70,59 +70,58 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
     useEffect(() => {
         if (visible) {
             resetForm();
-            fetchCobradores();
         }
     }, [visible]);
 
     const resetForm = () => {
         setStep(0);
         setAmount("");
+        setCobradorUsername("");
         setSelectedCobrador(null);
         setPin("");
         setReceiptData(null);
     };
 
-    const fetchCobradores = async () => {
-        setFetchingCobradores(true);
-        try {
-            // Re-using generic users endpoint, filtering client-side or specific endpoint?
-            // Assuming generic /users works and returns all users (as per UsersController logic we saw earlier)
-            // But usually normal users can't see all users. 
-            // We might need a specific endpoint /users/cobradores or check if current user permissions allow.
-            // Let's try fetching from /users. If fails (403), we might need API change.
-            // Assumption: Cambista might not have permission to list all users. 
-            // Workaround: We might need a public/shared endpoint or Cambista permissions.
-            // Let's assume for now Cambista can list or we need to add endpoint.
-            // *Wait*, implementing logic: If fetch fails, we can't select.
+    const handleNext = async () => {
+        if (!amount || parseFloat(amount.replace(',', '.')) <= 0) {
+            showAlert("Erro", "Digite um valor válido.", "error");
+            return;
+        }
+        if (!cobradorUsername.trim()) {
+            showAlert("Erro", "Digite a matrícula (usuário) do cobrador.", "error");
+            return;
+        }
 
-            const res = await fetch(`${AppConfig.api.baseUrl}/users`, {
+        // Verify Cobrador
+        setVerifyingCobrador(true);
+        try {
+            const res = await fetch(`${AppConfig.api.baseUrl}/users?username=${cobradorUsername.trim()}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
             if (res.ok) {
                 const data = await res.json();
-                const filtered = data.filter((u: any) => u.role === 'COBRADOR');
-                setCobradores(filtered);
+                // Expecting array
+                if (Array.isArray(data) && data.length > 0) {
+                    const foundUser = data[0];
+                    if (foundUser.role === 'COBRADOR') {
+                        setSelectedCobrador(foundUser);
+                        setStep(1); // Proceed
+                    } else {
+                        showAlert("Erro", "Este usuário não é um Cobrador.", "error");
+                    }
+                } else {
+                    showAlert("Erro", "Cobrador não encontrado.", "error");
+                }
             } else {
-                console.warn("Failed to fetch users");
+                showAlert("Erro", "Falha ao verificar cobrador.", "error");
             }
         } catch (e) {
             console.error(e);
+            showAlert("Erro", "Erro desconhecido.", "error");
         } finally {
-            setFetchingCobradores(false);
+            setVerifyingCobrador(false);
         }
-    };
-
-    const handleNext = () => {
-        if (!amount || parseFloat(amount.replace(',', '.')) <= 0) {
-            showAlert("Erro", "Digite um valor válido.", "error");
-            return;
-        }
-        if (!selectedCobrador) {
-            showAlert("Erro", "Selecione um cobrador.", "error");
-            return;
-        }
-        setStep(1);
     };
 
     const formatCurrency = (val: string) => {
@@ -228,43 +227,33 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                                 placeholder="0,00"
                             />
 
-                            <Text style={styles.label}>Selecionar Cobrador</Text>
-                            {fetchingCobradores ? (
-                                <ActivityIndicator size="small" color="#000" />
-                            ) : (
-                                <View style={styles.listContainer}>
-                                    <FlatList
-                                        data={cobradores}
-                                        keyExtractor={item => item.id}
-                                        renderItem={({ item }) => (
-                                            <TouchableOpacity
-                                                style={[
-                                                    styles.cobradorItem,
-                                                    selectedCobrador?.id === item.id && styles.selectedItem
-                                                ]}
-                                                onPress={() => setSelectedCobrador(item)}
-                                            >
-                                                <Ionicons
-                                                    name={selectedCobrador?.id === item.id ? "radio-button-on" : "radio-button-off"}
-                                                    size={20}
-                                                    color={selectedCobrador?.id === item.id ? "#059669" : "#666"}
-                                                />
-                                                <Text style={styles.cobradorName}>{item.name} ({item.username})</Text>
-                                            </TouchableOpacity>
-                                        )}
-                                        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum cobrador encontrado.</Text>}
-                                    />
-                                </View>
-                            )}
+                            <Text style={styles.label}>Matrícula do Cobrador (Usuário)</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={cobradorUsername}
+                                onChangeText={setCobradorUsername}
+                                autoCapitalize="none"
+                                placeholder="ex: cobrador01"
+                            />
 
-                            <TouchableOpacity style={styles.button} onPress={handleNext}>
-                                <Text style={styles.buttonText}>Continuar</Text>
+                            <TouchableOpacity
+                                style={[styles.button, verifyingCobrador && { opacity: 0.7 }]}
+                                onPress={handleNext}
+                                disabled={verifyingCobrador}
+                            >
+                                {verifyingCobrador ? (
+                                    <ActivityIndicator color="#FFF" />
+                                ) : (
+                                    <Text style={styles.buttonText}>Verificar e Continuar</Text>
+                                )}
                             </TouchableOpacity>
                         </View>
                     ) : (
                         <View style={styles.content}>
                             <Text style={styles.pinInstructions}>
-                                Passe o celular para o Cobrador <Text style={{ fontWeight: 'bold' }}>{selectedCobrador?.name}</Text>.
+                                Confirmado: <Text style={{ fontWeight: 'bold', color: '#059669' }}>{selectedCobrador?.name}</Text>
+                                {"\n"}
+                                Passe o celular para o Cobrador digitar a senha.
                             </Text>
                             <Text style={styles.label}>Digite seu PIN (Cobrador)</Text>
 

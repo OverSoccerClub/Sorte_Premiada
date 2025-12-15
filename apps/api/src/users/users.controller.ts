@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Prisma } from '@repo/database';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -42,13 +42,14 @@ export class UsersController {
     @Get()
     @UseGuards(RolesGuard)
     // @Roles('ADMIN')
-    async findAll() {
-        const users = await this.usersService.findAll();
-        console.log('UsersController: findAll called. Users found:', users.length);
-        console.log('Roles found:', users.map(u => u.role));
-        // Cast to any to avoid TS error during debug if types are strict enums
-        const cambistaCount = users.filter(u => (u.role as any) === 'CAMBISTA' || (u.role as any) === 'cambista').length;
-        console.log('Users with matching role count:', cambistaCount);
+    async findAll(@Query('username') username?: string) {
+        const users = await this.usersService.findAll(username);
+        // console.log('UsersController: findAll called. Users found:', users.length);
+        if (!username) { // Only log counts for full list to avoid spam on individual checks
+            // console.log('Roles found:', users.map(u => u.role));
+            const cambistaCount = users.filter(u => (u.role as any) === 'CAMBISTA' || (u.role as any) === 'cambista').length;
+            // console.log('Users with matching role count:', cambistaCount);
+        }
         return users;
     }
 
