@@ -32,6 +32,8 @@ export default function PosManagementPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("");
 
+    const [tick, setTick] = useState(0);
+
     const fetchDevices = async () => {
         try {
             // Assuming API proxy or direct call if user is authenticated
@@ -148,7 +150,7 @@ export default function PosManagementPage() {
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
                             {filteredDevices.map((device) => {
-                                const online = isOnline(device.lastSeenAt);
+                                const online = isOnline(device.lastSeenAt, device.status);
                                 return (
                                     <tr key={device.id} className="border-b transition-colors hover:bg-muted/50">
                                         <td className="p-4 align-middle">
