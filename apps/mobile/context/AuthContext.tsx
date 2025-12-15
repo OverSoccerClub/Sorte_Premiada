@@ -55,7 +55,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             clearTimeout(timeoutId);
 
-            if (!res.ok) throw new Error("Credenciais inválidas");
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error(`Login failed: ${res.status} ${errorText}`);
+                if (res.status === 500) throw new Error("Erro interno no servidor (500). Verifique os logs.");
+                if (res.status === 401) throw new Error("Credenciais inválidas");
+                throw new Error(`Erro no login (${res.status}): ${errorText}`);
+            }
 
             const data = await res.json();
             const accessToken = data.access_token;
