@@ -7,7 +7,7 @@ import { AppConfig } from "../../AppConfig"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Plus, Trash2, Edit, Save, X, Eye, EyeOff } from "lucide-react"
+import { Plus, Trash2, Edit, Save, X, Eye, EyeOff, Users } from "lucide-react"
 import {
     Dialog,
     DialogContent,

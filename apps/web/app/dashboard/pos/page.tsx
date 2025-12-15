@@ -152,6 +152,7 @@ export default function PosManagementPage() {
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground">ID do Dispositivo</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Modelo / Versão</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Usuário Atual</th>
+                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Último Usuário</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Localização</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Visto por último</th>
                             </tr>
@@ -174,22 +175,25 @@ export default function PosManagementPage() {
                                         <td className="p-4 align-middle">
                                             {device.currentUser ? (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">
+                                                    <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xs font-bold ring-1 ring-emerald-500/20">
                                                         {device.currentUser.username[0].toUpperCase()}
                                                     </div>
-                                                    <span>{device.currentUser.username}</span>
-                                                </div>
-                                            ) : device.lastUser ? (
-                                                <div className="flex items-center gap-2 opacity-60">
-                                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold">
-                                                        {device.lastUser.username[0].toUpperCase()}
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-medium">Último: {device.lastUser.username}</span>
-                                                    </div>
+                                                    <span className="font-medium text-foreground">{device.currentUser.username}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground text-xs italic">Nenhum</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            {device.lastUser ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs font-bold">
+                                                        {device.lastUser.username[0].toUpperCase()}
+                                                    </div>
+                                                    <span className="text-muted-foreground">{device.lastUser.username}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted-foreground text-xs">-</span>
                                             )}
                                         </td>
                                         <td className="p-4 align-middle">
@@ -215,7 +219,7 @@ export default function PosManagementPage() {
                             })}
                             {filteredDevices.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="p-4 text-center text-muted-foreground">
+                                    <td colSpan={7} className="p-4 text-center text-muted-foreground">
                                         Nenhum dispositivo encontrado.
                                     </td>
                                 </tr>
