@@ -72,6 +72,7 @@ model Ticket {
 enum Role {
   ADMIN
   CAMBISTA
+  COBRADOR
 }
 
 enum TicketStatus {
@@ -91,6 +92,8 @@ model Transaction {
   createdAt   DateTime        @default(now())
   userId      String
   user        User            @relation(fields: [userId], references: [id])
+  cobradorId  String?
+  cobrador    User?           @relation("TransactionCobrador", fields: [cobradorId], references: [id])
 }
 
 model DailyClose {
