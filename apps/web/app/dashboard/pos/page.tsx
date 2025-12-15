@@ -88,7 +88,15 @@ export default function PosManagementPage() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight">Gestão de POS</h2>
+            <div>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                        <Smartphone className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    Gestão de POS
+                </h2>
+                <p className="text-muted-foreground mt-1 ml-14">Monitore terminais, status online e usuários ativos.</p>
+            </div>
 
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>

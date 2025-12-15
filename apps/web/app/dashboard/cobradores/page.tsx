@@ -169,8 +169,13 @@ export default function CobradoresPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Gestão de Cobradores</h2>
-                    <p className="text-muted-foreground">Cadastre e gerencie os responsáveis pelas sangrias.</p>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Users className="w-8 h-8 text-emerald-500" />
+                        </div>
+                        Gestão de Cobradores
+                    </h2>
+                    <p className="text-muted-foreground mt-1 ml-14">Cadastre e gerencie os responsáveis pelas sangrias.</p>
                 </div>
                 <Button onClick={() => { resetForm(); setIsDialogOpen(true) }}>
                     <Plus className="mr-2 h-4 w-4" /> Novo Cobrador
