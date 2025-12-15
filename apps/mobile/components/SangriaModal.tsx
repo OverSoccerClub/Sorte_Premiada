@@ -6,6 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import { FinanceService } from '../services/finance.service';
 import { usePrinter } from '../context/PrinterContext';
 import { printSangriaReceipt } from '../services/printing.service';
+import ViewShot from 'react-native-view-shot';
+import { SangriaReceipt } from './SangriaReceipt';
+import tw from '../lib/tailwind';
 
 interface Cobrador {
     id: string;
@@ -25,6 +28,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
 
     // Steps: 0 = Amount/Cobrador, 1 = PIN
     const [step, setStep] = useState(0);
+    const viewShotRef = React.useRef<ViewShot>(null);
 
     const [amount, setAmount] = useState("");
     const [cobradores, setCobradores] = useState<Cobrador[]>([]);
@@ -33,6 +37,15 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
 
     const [loading, setLoading] = useState(false);
     const [fetchingCobradores, setFetchingCobradores] = useState(false);
+
+    // Receipt Data for Capture
+    const [receiptData, setReceiptData] = useState<{
+        date: string;
+        amount: string;
+        cambistaName: string;
+        cobradorName: string;
+        id: string;
+    } | null>(null);
 
     useEffect(() => {
         if (visible) {
@@ -46,6 +59,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
         setAmount("");
         setSelectedCobrador(null);
         setPin("");
+        setReceiptData(null);
     };
 
     const fetchCobradores = async () => {
@@ -113,36 +127,57 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
         setLoading(true);
         try {
             const val = parseFloat(amount.replace(',', '.'));
+            const transactionData = {
+                description: `SANGRIA - ${selectedCobrador?.name}`,
+                amount: val,
+                type: 'DEBIT' as const
+            }; // Fixed TS error by adding as const or explicit casting if needed. using generic obj for now.
 
             // 1. Create Transaction
             const result = await FinanceService.createTransaction(
                 token || '',
-                {
-                    description: `SANGRIA - ${selectedCobrador?.name}`,
-                    amount: val,
-                    type: 'DEBIT'
-                },
+                { ...transactionData, type: 'DEBIT' },
                 selectedCobrador?.id,
                 pin
             );
 
             if (result.success) {
-                Alert.alert("Sucesso", "Sangria realizada e registrada!");
-
-                // 2. Print Receipts
-                await printSangriaReceipt({
-                    date: new Date(),
-                    amount: val,
+                // Set Data for ViewShot to render
+                const rData = {
+                    date: new Date().toLocaleString('pt-BR'),
+                    amount: `R$ ${val.toFixed(2).replace('.', ',')}`,
                     cambistaName: user?.name || user?.username || "Cambista",
                     cobradorName: selectedCobrador?.name || selectedCobrador?.username || "Cobrador",
-                    transactionId: result.data.id // Need ID from response
-                }, printerType);
+                    id: result.data.id
+                };
+                setReceiptData(rData);
 
-                onSuccess();
+                // Wait for render
+                setTimeout(async () => {
+                    let imageUri: string | undefined;
+                    try {
+                        imageUri = await viewShotRef.current?.capture?.();
+                    } catch (e) {
+                        console.warn("ViewShot capture failed", e);
+                    }
+
+                    await printSangriaReceipt({
+                        date: new Date(),
+                        amount: val,
+                        cambistaName: rData.cambistaName,
+                        cobradorName: rData.cobradorName,
+                        transactionId: rData.id
+                    }, printerType, imageUri);
+
+                    Alert.alert("Sucesso", "Sangria realizada e registrada!");
+                    onSuccess();
+                }, 500);
+
             } else {
                 Alert.alert("Erro", result.error || "PIN Incorreto ou Falha ao registrar.");
             }
         } catch (e) {
+            console.error(e);
             Alert.alert("Erro", "Erro desconhecido.");
         } finally {
             setLoading(false);
@@ -239,6 +274,41 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                         </View>
                     )}
                 </View>
+            </View>
+            <View style={{ position: 'absolute', opacity: 0, zIndex: -10, left: -2000, top: 0 }}>
+                {(receiptData) && (
+                    <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                        {/* Copy 1 */}
+                        <SangriaReceipt
+                            amount={receiptData.amount}
+                            cambistaName={receiptData.cambistaName}
+                            cobradorName={receiptData.cobradorName}
+                            date={receiptData.date}
+                            id={receiptData.id}
+                            copyName="Via do Cambista"
+                            signerLabel="Cobrador"
+                            isCapture={true}
+                        />
+                        {/* Cut Line */}
+                        <View style={tw`w-full border-b-[2px] border-dashed border-black my-8 h-1`} />
+                        <View style={tw`items-center -mt-5 bg-white self-center px-2 mb-4`}>
+                            <Ionicons name="cut-outline" size={24} color="black" />
+                        </View>
+
+                        {/* Copy 2 */}
+                        <SangriaReceipt
+                            amount={receiptData.amount}
+                            cambistaName={receiptData.cambistaName}
+                            cobradorName={receiptData.cobradorName}
+                            date={receiptData.date}
+                            id={receiptData.id}
+                            copyName="Via do Cobrador"
+                            signerLabel="Cambista"
+                            isCapture={true}
+                        />
+                        <View style={tw`h-8`} />
+                    </ViewShot>
+                )}
             </View>
         </Modal>
     );

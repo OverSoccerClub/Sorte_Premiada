@@ -419,59 +419,97 @@ export const printSangriaReceipt = async (
     cobradorName: string;
     transactionId: string;
   },
-  printerType: PrinterType = 'BLE'
+  printerType: PrinterType = 'BLE',
+  imageUri?: string
 ) => {
   const formatDate = (date: Date) => date.toLocaleString('pt-BR');
   const formatCurrency = (val: number) => `R$ ${Number(val).toFixed(2).replace('.', ',')}`;
 
   const dateStr = formatDate(new Date(data.date));
 
-  // ESC/POS Commands
-  const ESC = "\x1b";
-  const GS = "\x1d";
-  const INITIALIZE = ESC + "@";
-  const CENTER = ESC + "\x61\x01";
-  const LEFT = ESC + "\x61\x00";
-  const BOLD_ON = ESC + "\x45\x01";
-  const BOLD_OFF = ESC + "\x45\x00";
-  const DOUBLE_WIDTH_HEIGHT = GS + "!" + "\x11";
-  const DOUBLE_HEIGHT = GS + "!" + "\x10";
-  const NORMAL = GS + "!" + "\x00";
-
-  const buildReceipt = (copyName: string, signerLabel: string) => {
-    let r = "";
-    r += INITIALIZE;
-    r += CENTER;
-    r += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "SANGRIA / RECOLHIMENTO" + BOLD_OFF + NORMAL + "\n";
-    r += dateStr + "\n";
-    r += "- - - - - - - - - - - - - - - -\n\n";
-
-    r += LEFT;
-    r += `VALOR RECOLHIDO: ${formatCurrency(data.amount)}\n`;
-    r += `CAMBISTA: ${data.cambistaName}\n`;
-    r += `COBRADOR: ${data.cobradorName}\n`;
-    r += `ID: ${data.transactionId.substring(0, 8)}\n`;
-    r += "\n";
-    r += CENTER;
-    r += BOLD_ON + copyName.toUpperCase() + BOLD_OFF + "\n";
-    r += "\n\n________________________________\n";
-    r += `Assinatura ${signerLabel}\n`; // Whoever receives the money or gives it? 
-    // Usually: 
-    // Copy for Cambista (Proof he gave money) -> Signed by Cobrador (Receiver)
-    // Copy for Cobrador (Proof he got money) -> Signed by Cambista (Giver)
-    r += "\n\n\n";
-    return r;
-  };
-
   try {
+    // ---------------------------------------------------------
+    // IMAGE PRINTING STRATEGY (High Quality, Logo, Styling)
+    // ---------------------------------------------------------
+    if (imageUri) {
+      console.log(`Printing Sangria Image: Type=${printerType}`);
+
+      if (printerType === 'BLE') {
+        try {
+          let base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
+          if (base64.startsWith('data:image')) {
+            base64 = base64.split(',')[1];
+          }
+
+          console.log(`Printing Sangria Image Base64: Length=${base64.length}`);
+
+          await BLEPrinter.printText("\n");
+          try {
+            // 384px width for standard 58mm
+            await BLEPrinter.printImageBase64(base64, { imageWidth: 384, paddingX: 0 });
+          } catch (innerErr) {
+            console.warn("Fallback printImageBase64", innerErr);
+            await BLEPrinter.printImageBase64(base64);
+          }
+          await BLEPrinter.printText("\n\n\n");
+          return true;
+        } catch (imgErr) {
+          console.error("Sangria Image Print Failed (BLE)", imgErr);
+          // Fallback to text below
+        }
+      } else {
+        // NATIVE
+        console.log("Printing Sangria Image via Native System");
+        await Print.printAsync({ uri: imageUri });
+        return true;
+      }
+    }
+
+    // ---------------------------------------------------------
+    // TEXT/HTML FALLBACK (Old logic)
+    // ---------------------------------------------------------
+
+    // ESC/POS Commands
+    const ESC = "\x1b";
+    const GS = "\x1d";
+    const INITIALIZE = ESC + "@";
+    const CENTER = ESC + "\x61\x01";
+    const LEFT = ESC + "\x61\x00";
+    const BOLD_ON = ESC + "\x45\x01";
+    const BOLD_OFF = ESC + "\x45\x00";
+    const DOUBLE_WIDTH_HEIGHT = GS + "!" + "\x11";
+    const DOUBLE_HEIGHT = GS + "!" + "\x10";
+    const NORMAL = GS + "!" + "\x00";
+
+    const buildReceipt = (copyName: string, signerLabel: string) => {
+      let r = "";
+      r += INITIALIZE;
+      r += CENTER;
+      r += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "SANGRIA / RECOLHIMENTO" + BOLD_OFF + NORMAL + "\n";
+      r += dateStr + "\n";
+      r += "- - - - - - - - - - - - - - - -\n\n";
+
+      r += LEFT;
+      r += `VALOR RECOLHIDO: ${formatCurrency(data.amount)}\n`;
+      r += `CAMBISTA: ${data.cambistaName}\n`;
+      r += `COBRADOR: ${data.cobradorName}\n`;
+      r += `ID: ${data.transactionId.substring(0, 8)}\n`;
+      r += "\n";
+      r += CENTER;
+      r += BOLD_ON + copyName.toUpperCase() + BOLD_OFF + "\n";
+      r += "\n\n________________________________\n";
+      r += `Assinatura ${signerLabel}\n`;
+      r += "\n\n\n";
+      return r;
+    };
+
     const receipt1 = buildReceipt("Via do Cambista", "Cobrador");
     const receipt2 = buildReceipt("Via do Cobrador", "Cambista");
 
     if (printerType === 'BLE') {
-      // Print Copy 1
       if (BLEPrinter.printBill) {
         await BLEPrinter.printBill(receipt1);
-        await new Promise(r => setTimeout(r, 2000)); // Pause for tear off
+        await new Promise(r => setTimeout(r, 2000));
         await BLEPrinter.printBill(receipt2);
       } else {
         await BLEPrinter.printText(receipt1 + "\n\n\n");
@@ -479,10 +517,6 @@ export const printSangriaReceipt = async (
         await BLEPrinter.printText(receipt2 + "\n\n\n");
       }
     } else {
-      // Native Print (HTML)
-      // Logic for HTML dual receipt?
-      // Just print one long or two jobs. 
-      // Simplified for Native: Print combined
       const html = `
         <html>
         <head>
