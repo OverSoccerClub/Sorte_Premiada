@@ -60,7 +60,7 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
 
     const scanPrinters = async () => {
         if (printerType === 'NATIVE') {
-            Alert.alert("Modo Nativo", "A busca por impressoras Bluetooth está desativada no modo Nativo.");
+            // Alert.alert("Modo Nativo", "A busca por impressoras Bluetooth está desativada no modo Nativo.");
             return;
         }
 
@@ -94,9 +94,8 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
 
         } catch (error) {
             console.error("Scan error:", error);
-            // If scanning fails hard, likely no bluetooth or permission. 
-            // Better to stay in BLE mode visually but show empty list than crash or force switch loop
-            // Alert.alert("Erro", "Não foi possível buscar dispositivos Bluetooth."); 
+            // Throwing might be too aggressive for auto-scan, let's just log.
+            // UI can show "retry" if list is empty.
         } finally {
             setIsScanning(false);
         }
@@ -113,10 +112,10 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
         try {
             await BLEPrinter.connectPrinter(printer.inner_mac_address || printer.mac_address);
             setConnectedPrinter(printer);
-            Alert.alert("Conectado", `Impressora ${printer.device_name} conectada!`);
+            // Alert removed here. Caller must handle success feedback.
         } catch (error) {
             console.error("Connection error:", error);
-            Alert.alert("Erro", "Falha ao conectar na impressora.");
+            throw error; // Rethrow to let UI handle alert
         }
     };
 

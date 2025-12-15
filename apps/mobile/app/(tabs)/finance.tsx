@@ -442,6 +442,7 @@ export default function FinanceScreen() {
                                     <ReportPreview
                                         data={summary}
                                         date={new Date()}
+                                        isCapture={true}
                                     />
                                 </ViewShot>
                             )}
