@@ -103,23 +103,37 @@ export default function JogoDoBichoReportPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Relatório Jogo do Bicho</h2>
-                    <p className="text-muted-foreground">Vendas filtradas por data e cambista.</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="bg-card p-3 rounded-lg border shadow-sm">
-                        <span className="text-xs text-muted-foreground block">Total Vendido</span>
-                        <span className="text-xl font-bold text-emerald-500">
+            <div>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                        <Ticket className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    Relatório Jogo do Bicho
+                </h2>
+                <p className="text-muted-foreground mt-1 ml-14">Vendas filtradas por data e cambista.</p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Vendido</CardTitle>
+                        <Ticket className="h-4 w-4 text-emerald-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-emerald-500">
                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totals.amount)}
-                        </span>
-                    </div>
-                    <div className="bg-card p-3 rounded-lg border shadow-sm">
-                        <span className="text-xs text-muted-foreground block">Bilhetes</span>
-                        <span className="text-xl font-bold text-foreground">{totals.count}</span>
-                    </div>
-                </div>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Bilhetes</CardTitle>
+                        <Ticket className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{totals.count}</div>
+                    </CardContent>
+                </Card>
             </div>
 
             <Card>
@@ -219,8 +233,8 @@ export default function JogoDoBichoReportPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                        ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                                                            'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                                    ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
+                                                        'bg-gray-50 text-gray-600 ring-gray-500/10'
                                                     }`}>
                                                     {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
                                                 </span>
