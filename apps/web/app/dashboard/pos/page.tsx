@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smartphone, RotateCw, MapPin, Search } from "lucide-react";
+import { Smartphone, RotateCw, MapPin, Search, Calendar, User, Tag, Cpu, Radio } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -167,10 +167,21 @@ export default function PosManagementPage() {
                                                 {online ? "ONLINE" : "OFFLINE"}
                                             </Badge>
                                         </td>
-                                        <td className="p-4 align-middle font-mono text-xs">{device.deviceId}</td>
                                         <td className="p-4 align-middle">
-                                            <div className="font-medium">{device.model || "Genérico"}</div>
-                                            <div className="text-xs text-muted-foreground">{device.appVersion}</div>
+                                            <div className="flex items-center gap-2 font-mono text-xs text-foreground bg-muted/40 px-2 py-1 rounded w-fit">
+                                                <Radio className="w-3 h-3 text-emerald-500" />
+                                                {device.deviceId}
+                                            </div>
+                                        </td>
+                                        <td className="p-4 align-middle">
+                                            <div className="font-medium flex items-center gap-1.5">
+                                                <Cpu className="w-3.5 h-3.5 text-slate-500" />
+                                                {device.model || "Genérico"}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                                                <Tag className="w-3 h-3" />
+                                                {device.appVersion}
+                                            </div>
                                         </td>
                                         <td className="p-4 align-middle">
                                             {device.currentUser ? (
@@ -178,19 +189,24 @@ export default function PosManagementPage() {
                                                     <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xs font-bold ring-1 ring-emerald-500/20">
                                                         {device.currentUser.username[0].toUpperCase()}
                                                     </div>
-                                                    <span className="font-medium text-foreground">{device.currentUser.username}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-foreground text-xs">{device.currentUser.username}</span>
+                                                        <span className="text-[10px] text-emerald-600 flex items-center gap-0.5">
+                                                            <User className="w-2.5 h-2.5" /> Logado
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <span className="text-muted-foreground text-xs italic">Nenhum</span>
+                                                <span className="text-muted-foreground text-xs italic pl-2">Nenhum</span>
                                             )}
                                         </td>
                                         <td className="p-4 align-middle">
                                             {device.lastUser ? (
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 opacity-70">
                                                     <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs font-bold">
                                                         {device.lastUser.username[0].toUpperCase()}
                                                     </div>
-                                                    <span className="text-muted-foreground">{device.lastUser.username}</span>
+                                                    <span className="text-muted-foreground text-xs">{device.lastUser.username}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-muted-foreground text-xs">-</span>
@@ -202,7 +218,7 @@ export default function PosManagementPage() {
                                                     href={`https://www.google.com/maps?q=${device.latitude},${device.longitude}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-1 text-blue-500 hover:underline text-xs"
+                                                    className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 hover:underline text-xs bg-emerald-50 px-2 py-1 rounded border border-emerald-100 w-fit"
                                                 >
                                                     <MapPin className="w-3 h-3" />
                                                     Ver no Mapa
@@ -212,7 +228,10 @@ export default function PosManagementPage() {
                                             )}
                                         </td>
                                         <td className="p-4 align-middle text-muted-foreground text-xs">
-                                            {new Date(device.lastSeenAt).toLocaleString('pt-BR')}
+                                            <div className="flex items-center gap-1.5">
+                                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                                {new Date(device.lastSeenAt).toLocaleString('pt-BR')}
+                                            </div>
                                         </td>
                                     </tr>
                                 )

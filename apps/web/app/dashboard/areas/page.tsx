@@ -275,9 +275,17 @@ export default function AreasPage() {
                                     areas.map((area) => (
                                         <TableRow key={area.id} className="hover:bg-muted/50 transition-colors">
                                             <TableCell className="font-medium text-foreground">
-                                                {area.city} - {area.state}
+                                                <div className="flex items-center gap-2">
+                                                    <Building2 className="w-4 h-4 text-emerald-500" />
+                                                    {area.city} <span className="text-muted-foreground">- {area.state}</span>
+                                                </div>
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground">{area.name}</TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="w-4 h-4 text-slate-400" />
+                                                    {area.name}
+                                                </div>
+                                            </TableCell>
                                             <TableCell>
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
                                                     {area._count?.users || 0} Vinculados

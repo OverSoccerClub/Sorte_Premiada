@@ -379,12 +379,18 @@ export default function CambistasPage() {
                                     <TableRow key={cambista.id} className="hover:bg-muted/50 transition-colors">
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs uppercase">
+                                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-2 ring-emerald-500/20">
                                                     {cambista.username.substring(0, 2)}
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-foreground">{cambista.name || cambista.username}</div>
-                                                    <div className="text-xs text-muted-foreground">{cambista.email || "Sem email"}</div>
+                                                    <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                        <User className="w-3.5 h-3.5 text-emerald-500" />
+                                                        {cambista.name || cambista.username}
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                        <Mail className="w-3 h-3" />
+                                                        {cambista.email || "Sem email"}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TableCell>
@@ -396,15 +402,24 @@ export default function CambistasPage() {
                                                     <span className="text-muted-foreground text-xs">({cambista.area.name})</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-muted-foreground text-xs italic">Sem praça</span>
+                                                <span className="text-muted-foreground text-xs italic flex items-center gap-1">
+                                                    <MapPin className="h-3 w-3 text-slate-400" />
+                                                    Sem praça
+                                                </span>
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                                 Ativo
                                             </span>
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">{cambista.role}</TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            <div className="flex items-center gap-1.5">
+                                                <Users className="w-3.5 h-3.5 text-emerald-500" />
+                                                {cambista.role}
+                                            </div>
+                                        </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <Button

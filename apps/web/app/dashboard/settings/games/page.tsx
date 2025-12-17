@@ -119,7 +119,12 @@ export default function GameSettingsPage() {
                                 ) : (
                                     games.map((game) => (
                                         <TableRow key={game.id}>
-                                            <TableCell className="font-medium">{game.name}</TableCell>
+                                            <TableCell className="font-medium">
+                                                <div className="flex items-center gap-2">
+                                                    <Ticket className="w-4 h-4 text-emerald-500" />
+                                                    {game.name}
+                                                </div>
+                                            </TableCell>
                                             <TableCell>
                                                 {editingId === game.id ? (
                                                     <Input
@@ -130,8 +135,9 @@ export default function GameSettingsPage() {
                                                         step="0.01"
                                                     />
                                                 ) : (
-                                                    <span className="font-bold text-emerald-600">
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(game.price || 0))}
+                                                    <span className="font-bold text-emerald-600 flex items-center gap-1">
+                                                        <span className="text-xs text-muted-foreground">R$</span>
+                                                        {new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(game.price || 0))}
                                                     </span>
                                                 )}
                                             </TableCell>

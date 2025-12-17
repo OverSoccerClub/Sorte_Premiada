@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2 } from "lucide-react"
+import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle } from "lucide-react"
 
 export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -199,20 +199,37 @@ export default function DrawsSettingsPage() {
                                     draws.map(draw => (
                                         <TableRow key={draw.id}>
                                             <TableCell>
-                                                {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                <div className="flex items-center gap-1.5 text-foreground font-medium">
+                                                    <Calendar className="w-4 h-4 text-emerald-500" />
+                                                    {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                </div>
                                             </TableCell>
                                             <TableCell>
                                                 {new Date(draw.drawDate) > new Date() ?
-                                                    <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded text-xs font-bold">Agendado</span> :
+                                                    <span className="flex items-center gap-1 text-yellow-700 bg-yellow-100 px-2 py-1 rounded text-xs font-bold w-fit border border-yellow-200">
+                                                        <Clock className="w-3 h-3" />
+                                                        Agendado
+                                                    </span> :
                                                     draw.numbers && draw.numbers.length > 0 ?
-                                                        <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs font-bold">Realizado</span> :
-                                                        <span className="text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs font-bold">Pendente</span>
+                                                        <span className="flex items-center gap-1 text-green-700 bg-green-100 px-2 py-1 rounded text-xs font-bold w-fit border border-green-200">
+                                                            <CheckCircle className="w-3 h-3" />
+                                                            Realizado
+                                                        </span> :
+                                                        <span className="flex items-center gap-1 text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs font-bold w-fit border border-gray-200">
+                                                            <AlertCircle className="w-3 h-3" />
+                                                            Pendente
+                                                        </span>
                                                 }
                                             </TableCell>
                                             <TableCell>
                                                 {draw.numbers && draw.numbers.length > 0 ?
-                                                    <span className="font-mono text-sm">{draw.numbers.join(', ')}</span> :
-                                                    <span className="text-muted-foreground italic">-</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="p-1 bg-yellow-100 rounded text-yellow-600">
+                                                            <Trophy className="w-3 h-3" />
+                                                        </div>
+                                                        <span className="font-mono text-sm tracking-widest">{draw.numbers.join(' - ')}</span>
+                                                    </div> :
+                                                    <span className="text-muted-foreground italic text-xs pl-2">-</span>
                                                 }
                                             </TableCell>
                                             <TableCell className="text-right flex justify-end gap-2">

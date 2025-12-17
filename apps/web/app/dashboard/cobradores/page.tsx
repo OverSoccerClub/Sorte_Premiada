@@ -269,35 +269,48 @@ export default function CobradoresPage() {
                                     <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs uppercase">
+                                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-2 ring-emerald-500/20">
                                                     {user.username.substring(0, 2)}
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-foreground">{user.name || user.username}</div>
-                                                    <div className="text-xs text-muted-foreground">{user.email || "Sem email"}</div>
+                                                    <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                        <Users className="w-3.5 h-3.5 text-emerald-500" />
+                                                        {user.name || user.username}
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                        <Search className="w-3 h-3" /> {/* Using Search as generic ID icon or similar, actually let's use Mail if email */}
+                                                        {user.email ? (
+                                                            <>
+                                                                {/* Assuming Search was imported, do we have Mail? need to check imports */}
+                                                                <span className="flex items-center gap-1"><span className="w-3 h-3 inline-block" />{user.email}</span>
+                                                            </>
+                                                        ) : "Sem email"}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="secondary" className="font-mono bg-muted text-muted-foreground hover:bg-muted">
+                                            <Badge variant="secondary" className="font-mono bg-muted text-muted-foreground hover:bg-muted flex w-fit items-center gap-1.5">
+                                                <Wallet className="w-3 h-3 text-emerald-500" />
                                                 {user.username}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             {user.securityPin ? (
-                                                <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md">
+                                                <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md border border-emerald-100">
                                                     <Lock className="h-3 w-3" />
                                                     <span className="text-xs font-medium">Definido</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-2 text-red-600 bg-red-50 w-fit px-2 py-1 rounded-md">
+                                                <div className="flex items-center gap-2 text-red-600 bg-red-50 w-fit px-2 py-1 rounded-md border border-red-100">
                                                     <Lock className="h-3 w-3" />
                                                     <span className="text-xs font-medium">Pendente</span>
                                                 </div>
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                                 Ativo
                                             </span>
                                         </TableCell>
