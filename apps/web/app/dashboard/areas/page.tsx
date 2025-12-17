@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Plus, Search, Loader2, Trash2, MapPin, Building2, Map } from "lucide-react"
+import { Plus, Search, Loader2, Trash2, MapPin, Building2, Map, SquarePen } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const formSchema = z.object({
@@ -68,7 +68,10 @@ export default function AreasPage() {
         fetchAreas()
     }, [])
 
+    const [editingId, setEditingId] = useState<string | null>(null)
+
     const handleOpenDialog = () => {
+        setEditingId(null)
         form.reset({
             name: "",
             city: "",
@@ -77,11 +80,24 @@ export default function AreasPage() {
         setIsDialogOpen(true)
     }
 
+    const handleEdit = (area: Area) => {
+        setEditingId(area.id)
+        form.reset({
+            name: area.name,
+            city: area.city,
+            state: area.state,
+        })
+        setIsDialogOpen(true)
+    }
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch(`${API_URL}/areas`, {
-                method: "POST",
+            const url = editingId ? `${API_URL}/areas/${editingId}` : `${API_URL}/areas`
+            const method = editingId ? "PATCH" : "POST"
+
+            const res = await fetch(url, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
@@ -92,9 +108,9 @@ export default function AreasPage() {
             if (res.ok) {
                 setIsDialogOpen(false)
                 fetchAreas()
-                showAlert("Sucesso!", "Nova praça cadastrada com sucesso!", "success")
+                showAlert("Sucesso!", editingId ? "Praça atualizada com sucesso!" : "Nova praça cadastrada com sucesso!", "success")
             } else {
-                showAlert("Erro", "Não foi possível criar a praça.", "error")
+                showAlert("Erro", "Não foi possível salvar a praça.", "error")
             }
         } catch (error) {
             showAlert("Erro", "Ocorreu um erro ao enviar o formulário.", "error")
@@ -159,10 +175,10 @@ export default function AreasPage() {
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                                     <MapPin className="w-5 h-5 text-emerald-500" />
                                 </div>
-                                Adicionar Nova Praça
+                                {editingId ? "Editar Praça" : "Adicionar Nova Praça"}
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
-                                Cadastre uma nova área de atuação (Cidade/Bairro).
+                                {editingId ? "Atualize os dados da praça." : "Cadastre uma nova área de atuação (Cidade/Bairro)."}
                             </DialogDescription>
                         </DialogHeader>
                         <Form {...form}>
@@ -225,9 +241,9 @@ export default function AreasPage() {
                                         {form.formState.isSubmitting ? (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         ) : (
-                                            <Plus className="mr-2 h-4 w-4" />
+                                            editingId ? <SquarePen className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />
                                         )}
-                                        Criar Praça
+                                        {editingId ? "Salvar Alterações" : "Criar Praça"}
                                     </Button>
                                 </DialogFooter>
                             </form>
@@ -292,15 +308,26 @@ export default function AreasPage() {
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    onClick={() => handleDelete(area.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                    <span className="sr-only">Excluir</span>
-                                                </Button>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                        onClick={() => handleEdit(area)}
+                                                    >
+                                                        <SquarePen className="h-4 w-4" />
+                                                        <span className="sr-only">Editar</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        onClick={() => handleDelete(area.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                        <span className="sr-only">Excluir</span>
+                                                    </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))

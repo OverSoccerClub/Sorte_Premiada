@@ -7,7 +7,7 @@ import { AppConfig } from "../../AppConfig"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Plus, Trash2, Edit, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet } from "lucide-react"
+import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet, SquarePen } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -322,7 +322,7 @@ export default function CobradoresPage() {
                                                     className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                                                     onClick={() => handleEdit(user)}
                                                 >
-                                                    <Edit className="h-4 w-4" />
+                                                    <SquarePen className="h-4 w-4" />
                                                 </Button>
                                                 <Button
                                                     variant="outline"

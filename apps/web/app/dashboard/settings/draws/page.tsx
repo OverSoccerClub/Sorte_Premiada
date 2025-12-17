@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle } from "lucide-react"
+import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen } from "lucide-react"
 
 export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -233,8 +233,8 @@ export default function DrawsSettingsPage() {
                                                 }
                                             </TableCell>
                                             <TableCell className="text-right flex justify-end gap-2">
-                                                <Button size="sm" variant="outline" onClick={() => handleOpenModal(draw)}>
-                                                    <SettingsIcon className="w-4 h-4" />
+                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => handleOpenModal(draw)}>
+                                                    <SquarePen className="w-4 h-4" />
                                                 </Button>
                                                 <Button size="sm" variant="destructive" onClick={() => handleDelete(draw.id)}>
                                                     <Trash2 className="w-4 h-4" />

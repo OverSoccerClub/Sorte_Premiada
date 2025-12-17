@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, Pencil } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen } from "lucide-react"
 
 export default function GameSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -152,8 +152,8 @@ export default function GameSettingsPage() {
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <Button variant="outline" size="sm" onClick={() => startEditing(game)}>
-                                                        <Pencil className="h-4 w-4" />
+                                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => startEditing(game)}>
+                                                        <SquarePen className="h-4 w-4" />
                                                     </Button>
                                                 )}
                                             </TableCell>

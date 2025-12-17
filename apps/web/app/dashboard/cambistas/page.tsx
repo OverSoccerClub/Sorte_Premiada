@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Pencil, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const formSchema = z.object({
@@ -209,7 +209,7 @@ export default function CambistasPage() {
                                 {editingId ? (
                                     <>
                                         <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <Pencil className="w-5 h-5 text-emerald-500" />
+                                            <SquarePen className="w-5 h-5 text-emerald-500" />
                                         </div>
                                         Editar Cambista
                                     </>
@@ -428,7 +428,7 @@ export default function CambistasPage() {
                                                     className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                                                     onClick={() => handleOpenDialog(cambista)}
                                                 >
-                                                    <Pencil className="h-4 w-4" />
+                                                    <SquarePen className="h-4 w-4" />
                                                     <span className="sr-only">Editar</span>
                                                 </Button>
                                                 <Button
