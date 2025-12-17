@@ -206,22 +206,26 @@ export default function JogoDoBichoScreen() {
 
             // 1. Print Logic
             setIsPrinting(true);
-            try {
-                await printTicket(
-                    ticketObj.numbers,
-                    ticketObj.id,
-                    new Date(),
-                    gamePrice,
-                    ticketObj.gameName,
-                    printerType
-                );
-            } catch (err) {
-                console.error("Print error", err);
-                showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
-            } finally {
-                setIsPrinting(false);
-                setReceiptVisible(true);
-            }
+
+            // Use setTimeout to ensure UI updates (Modal Paints) before blocking (Print Command)
+            setTimeout(async () => {
+                try {
+                    await printTicket(
+                        ticketObj.numbers,
+                        ticketObj.id,
+                        new Date(),
+                        gamePrice,
+                        ticketObj.gameName,
+                        printerType
+                    );
+                } catch (err) {
+                    console.error("Print error", err);
+                    showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
+                } finally {
+                    setIsPrinting(false);
+                    setReceiptVisible(true);
+                }
+            }, 500);
 
         } catch (error: any) {
             hide();

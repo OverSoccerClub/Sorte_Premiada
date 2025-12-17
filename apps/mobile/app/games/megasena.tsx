@@ -216,25 +216,27 @@ export default function MegaSenaScreen() {
             // 1. Show Printing Modal
             setIsPrinting(true);
 
-            // 2. Print immediately (Text Mode)
-            try {
-                await printTicket(
-                    selectedNumbers,
-                    ticketData.id,
-                    new Date(),
-                    gamePrice,
-                    "Mega Sena",
-                    printerType
-                );
-            } catch (err) {
-                console.error("Print failed", err);
-                showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
-            } finally {
-                // 3. Hide Printing, Show Receipt
-                setIsPrinting(false);
-                setReceiptVisible(true);
-                setSelectedNumbers([]);
-            }
+            // 2. Print immediately (Text Mode) - Usage of setTimeout to ensure Modal renders first
+            setTimeout(async () => {
+                try {
+                    await printTicket(
+                        selectedNumbers,
+                        ticketData.id,
+                        new Date(),
+                        gamePrice,
+                        "Mega Sena",
+                        printerType
+                    );
+                } catch (err) {
+                    console.error("Print failed", err);
+                    showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
+                } finally {
+                    // 3. Hide Printing, Show Receipt
+                    setIsPrinting(false);
+                    setReceiptVisible(true);
+                    setSelectedNumbers([]);
+                }
+            }, 500);
         } catch (error) {
             hide();
             console.error(error);
