@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Game" ADD COLUMN     "extractionTimes" TEXT[] DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN     "price" DECIMAL(65,30) NOT NULL DEFAULT 5.00;
