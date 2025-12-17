@@ -14,6 +14,7 @@ import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { PrintingModal } from "../../components/PrintingModal";
 
 // Animal Data
 const ANIMALS = [
@@ -217,19 +218,28 @@ export default function JogoDoBichoScreen() {
         setSelectedNumbers([]);
     };
 
+    const [isPrinting, setIsPrinting] = useState(false);
+
     const handleAutoPrint = async (imageUri?: string) => {
         if (!lastTicket) return;
-        const success = await printTicket(
-            lastTicket.numbers,
-            lastTicket.id,
-            new Date(),
-            gamePrice,
-            lastTicket.gameName,
-            printerType,
-            imageUri
-        );
-        if (success) showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
-        else showAlert("Erro", "Falha ao enviar para impressão.", "error");
+        setIsPrinting(true);
+        try {
+            const success = await printTicket(
+                lastTicket.numbers,
+                lastTicket.id,
+                new Date(),
+                gamePrice,
+                lastTicket.gameName,
+                printerType,
+                imageUri
+            );
+            if (success) showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
+            else showAlert("Erro", "Falha ao enviar para impressão.", "error");
+        } catch (error) {
+            showAlert("Erro", "Erro ao tentar imprimir.", "error");
+        } finally {
+            setIsPrinting(false);
+        }
     };
 
     const renderAnimalItem = ({ item }: { item: any }) => {
@@ -373,6 +383,8 @@ export default function JogoDoBichoScreen() {
                 isReprint={false}
                 ticketData={lastTicket}
             />
+
+            <PrintingModal visible={isPrinting} />
 
             <CustomAlert
                 visible={alertConfig.visible}

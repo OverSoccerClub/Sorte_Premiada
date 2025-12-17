@@ -15,6 +15,7 @@ import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { PrintingModal } from "../../components/PrintingModal";
 
 // --- Number Ball Component ---
 const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: boolean, onToggle: () => void }) => {
@@ -190,7 +191,7 @@ export default function MegaSenaScreen() {
                     gameType: "Mega Sena",
                     numbers: selectedNumbers,
                     amount: gamePrice,
-                    gameId: gameId // Optional but good to link
+                    game: { connect: { id: gameId } }
                 })
             });
 
@@ -249,21 +250,29 @@ export default function MegaSenaScreen() {
         setSelectedNumbers([]);
     };
 
+
+    const [isPrinting, setIsPrinting] = useState(false);
+
     const handleAutoPrint = async (imageUri?: string) => {
         if (!lastTicket) return;
-        const success = await printTicket(
-            lastTicket.numbers,
-            lastTicket.id,
-            new Date(),
-            gamePrice,
-            "Mega Sena",
-            printerType,
-            imageUri
-        );
+        setIsPrinting(true);
+        try {
+            const success = await printTicket(
+                lastTicket.numbers,
+                lastTicket.id,
+                new Date(),
+                gamePrice,
+                "Mega Sena",
+                printerType,
+                imageUri
+            );
 
-        // Optional: Show success toast or just let it be silent as user sees the modal
-        if (!success) {
-            showAlert("Erro", "Falha ao enviar para impressão.", "error");
+            if (success) showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
+            else showAlert("Erro", "Falha ao enviar para impressão.", "error");
+        } catch (error) {
+            showAlert("Erro", "Erro ao tentar imprimir.", "error");
+        } finally {
+            setIsPrinting(false);
         }
     };
 
@@ -391,6 +400,8 @@ export default function MegaSenaScreen() {
                 isReprint={false}
                 ticketData={lastTicket}
             />
+
+            <PrintingModal visible={isPrinting} />
         </SafeAreaView>
     );
 }
