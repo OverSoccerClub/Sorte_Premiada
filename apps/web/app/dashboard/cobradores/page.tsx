@@ -170,8 +170,8 @@ export default function CobradoresPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <Wallet className="w-8 h-8 text-blue-500" />
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Wallet className="w-8 h-8 text-emerald-500" />
                         </div>
                         Gestão de Cobradores
                     </h2>
