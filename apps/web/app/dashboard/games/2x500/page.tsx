@@ -222,7 +222,7 @@ export default function TwoXFiveHundredReportPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="lowercase font-mono text-xs">
-                                                    {ticket.numbers.join(', ')}
+                                                    {ticket.numbers.map((n: string) => n.toString().padStart(4, '0')).join(', ')}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right font-bold text-emerald-600">
