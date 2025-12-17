@@ -47,6 +47,7 @@ model Game {
   draws     Draw[]
   tickets   Ticket[]
   price     Decimal  @default(5.00)
+  extractionTimes String[] @default([])
 }
 
 model Draw {

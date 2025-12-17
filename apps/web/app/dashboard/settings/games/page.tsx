@@ -6,9 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, SquarePen } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
 
 export default function GameSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -16,6 +19,12 @@ export default function GameSettingsPage() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editPrice, setEditPrice] = useState<string>("")
     const [saving, setSaving] = useState(false)
+
+    // Schedule Editing State
+    const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+    const [selectedGame, setSelectedGame] = useState<any>(null)
+    const [extractionTimes, setExtractionTimes] = useState<string[]>([])
+    const [newTime, setNewTime] = useState("")
 
     useEffect(() => {
         fetchGames()
@@ -54,7 +63,7 @@ export default function GameSettingsPage() {
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/games/${gameId}`, {
-                method: 'POST',
+                method: 'POST', // or PATCH
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -76,6 +85,58 @@ export default function GameSettingsPage() {
         }
     }
 
+    // Schedule Functions
+    const openScheduleModal = (game: any) => {
+        setSelectedGame(game)
+        setExtractionTimes(game.extractionTimes || [])
+        setScheduleModalOpen(true)
+    }
+
+    const addTime = () => {
+        if (!newTime) return
+        if (extractionTimes.includes(newTime)) {
+            toast.warning("Horário já existe")
+            return
+        }
+        // Simple validation or sorting could go here
+        const sorted = [...extractionTimes, newTime].sort()
+        setExtractionTimes(sorted)
+        setNewTime("")
+    }
+
+    const removeTime = (time: string) => {
+        setExtractionTimes(extractionTimes.filter(t => t !== time))
+    }
+
+    const saveSchedule = async () => {
+        if (!selectedGame) return
+        setSaving(true)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
+                method: 'POST', // Using POST/PATCH typically updates
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ extractionTimes })
+            })
+
+            if (res.ok) {
+                toast.success("Horários atualizados com sucesso")
+                fetchGames()
+                setScheduleModalOpen(false)
+            } else {
+                toast.error("Erro ao salvar horários")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        } finally {
+            setSaving(false)
+        }
+    }
+
+
     return (
         <div className="space-y-6">
             <div>
@@ -85,13 +146,13 @@ export default function GameSettingsPage() {
                     </div>
                     Configuração de Jogos
                 </h2>
-                <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda para cada jogo.</p>
+                <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda e horários de extração.</p>
             </div>
 
             <Card>
                 <CardHeader>
                     <CardTitle>Jogos Disponíveis</CardTitle>
-                    <CardDescription>Gerencie os preços dos jogos listados no sistema.</CardDescription>
+                    <CardDescription>Gerencie os preços e horários de sorteio.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="rounded-md border">
@@ -100,19 +161,20 @@ export default function GameSettingsPage() {
                                 <TableRow>
                                     <TableHead>Nome do Jogo</TableHead>
                                     <TableHead>Preço Atual</TableHead>
-                                    <TableHead className="w-[150px]">Ações</TableHead>
+                                    <TableHead>Extrações Diárias</TableHead>
+                                    <TableHead className="w-[180px] text-right">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="h-24 text-center">
+                                        <TableCell colSpan={4} className="h-24 text-center">
                                             <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                         </TableCell>
                                     </TableRow>
                                 ) : games.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                                             Nenhum jogo encontrado.
                                         </TableCell>
                                     </TableRow>
@@ -142,8 +204,21 @@ export default function GameSettingsPage() {
                                                 )}
                                             </TableCell>
                                             <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {game.extractionTimes && game.extractionTimes.length > 0 ? (
+                                                        game.extractionTimes.map((time: string) => (
+                                                            <Badge key={time} variant="secondary" className="text-xs">
+                                                                {time}
+                                                            </Badge>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-xs italic">Nenhum horário definido</span>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
                                                 {editingId === game.id ? (
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center justify-end gap-2">
                                                         <Button size="sm" onClick={() => savePrice(game.id)} disabled={saving}>
                                                             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                                         </Button>
@@ -152,9 +227,26 @@ export default function GameSettingsPage() {
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => startEditing(game)}>
-                                                        <SquarePen className="h-4 w-4" />
-                                                    </Button>
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="text-muted-foreground hover:text-emerald-600"
+                                                            onClick={() => openScheduleModal(game)}
+                                                            title="Gerenciar Horários"
+                                                        >
+                                                            <Clock className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                            onClick={() => startEditing(game)}
+                                                            title="Editar Preço"
+                                                        >
+                                                            <SquarePen className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
                                                 )}
                                             </TableCell>
                                         </TableRow>
@@ -165,6 +257,63 @@ export default function GameSettingsPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            <Dialog open={scheduleModalOpen} onOpenChange={setScheduleModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Horários de Extração - {selectedGame?.name}</DialogTitle>
+                        <CardDescription>Adicione ou remova os horários de sorteio diários.</CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="flex items-end gap-2">
+                            <div className="grid gap-1.5 flex-1">
+                                <Label htmlFor="time">Novo Horário</Label>
+                                <Input
+                                    id="time"
+                                    type="time"
+                                    value={newTime}
+                                    onChange={(e) => setNewTime(e.target.value)}
+                                />
+                            </div>
+                            <Button onClick={addTime} disabled={!newTime}>
+                                <Plus className="w-4 h-4 mr-2" />
+                                Adicionar
+                            </Button>
+                        </div>
+
+                        <div className="border rounded-md p-2 min-h-[100px] bg-slate-50 dark:bg-slate-900/50">
+                            {extractionTimes.length === 0 ? (
+                                <div className="text-center text-muted-foreground text-sm py-8">
+                                    Nenhum horário adicionado.
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {extractionTimes.map((time) => (
+                                        <div key={time} className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
+                                            <span className="font-mono font-medium">{time}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                onClick={() => removeTime(time)}
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setScheduleModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={saveSchedule} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
+                            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar Horários
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
