@@ -28,8 +28,13 @@ export default function GamesPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground">Relatório por Jogo</h2>
-                <p className="text-muted-foreground mt-1">Selecione um jogo para visualizar as vendas e apostas realizadas.</p>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                        <Ticket className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    Relatório por Jogo
+                </h2>
+                <p className="text-muted-foreground mt-1 ml-14">Selecione um jogo para visualizar as vendas e apostas realizadas.</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
