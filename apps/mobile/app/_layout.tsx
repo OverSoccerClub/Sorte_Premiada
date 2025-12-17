@@ -13,9 +13,19 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 
 import { usePosTracking } from "../hooks/usePosTracking";
 
+import { useEffect } from "react";
+import { UpdaterService } from "../services/updater.service";
 // Helper component to use hook inside provider
 function PosTracker() {
     usePosTracking();
+    useEffect(() => {
+        // Check for updates shortly after app load
+        // Using a small timeout to let UI settle
+        const timer = setTimeout(() => {
+            UpdaterService.checkForUpdates();
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, []);
     return null;
 }
 

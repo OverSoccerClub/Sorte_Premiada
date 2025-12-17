@@ -61,10 +61,15 @@ export const printTicket = async (
     const dateStr = formatDate(date);
     const amountStr = formatCurrency(amount);
 
+    // Determine padding based on game type
+    let padLength = 2;
+    if (gameType.includes("2x500") || gameType.includes("MILHAR")) padLength = 4;
+    else if (gameType.includes("CENTENA")) padLength = 3;
+
     // Format numbers like 08 13 16 ... (No brackets, as per image)
     const numbersStr = numbers
       .sort((a, b) => a - b)
-      .map(n => n.toString().padStart(gameType === "2x500" ? 4 : 2, '0'))
+      .map(n => n.toString().padStart(padLength, '0'))
       .join('  ');
 
     // Generate HTML for Native Print
@@ -172,7 +177,7 @@ export const printTicket = async (
 
     // Numbers (Two Columns, Centered)
     const sortedNumbers = numbers.sort((a, b) => a - b);
-    const formattedNumbers = sortedNumbers.map(n => n.toString().padStart(gameType === "2x500" ? 4 : 2, '0'));
+    const formattedNumbers = sortedNumbers.map(n => n.toString().padStart(padLength, '0'));
 
     // Chunk into pairs
     for (let i = 0; i < formattedNumbers.length; i += 2) {

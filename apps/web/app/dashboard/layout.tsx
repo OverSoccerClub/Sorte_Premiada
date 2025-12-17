@@ -9,6 +9,7 @@ import { AppConfig as Config } from "../AppConfig";
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: Ticket, label: "Jogos / Vendas", href: "/dashboard/games" },
     { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
     { icon: Users, label: "Cobradores", href: "/dashboard/cobradores" },
     { icon: Smartphone, label: "Gestão de POS", href: "/dashboard/pos" },

@@ -21,7 +21,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1e293b"
       },
       "permissions": [
@@ -51,9 +51,9 @@
       ]
     ],
     "updates": {
-      "url": "https://www.inforcoputer.com/Atualizacoes/SORTE_PREMIADA",
+      "url": "https://www.inforcomputer.com/Atualizacoes/SORTE_PREMIADA",
       "enabled": true,
-      "checkAutomatically": "ON_LOAD",
+      "checkAutomatically": "NEVER",
       "fallbackToCacheTimeout": 0
     }
   }

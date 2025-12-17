@@ -52,6 +52,54 @@ export class TicketsService {
                 await this.validateNumbersAvailability(gameId, data.numbers, drawDate);
             }
         }
+        // Jogo do Bicho Logic
+        else if (data.gameType.startsWith('JB-')) {
+            const gameId = data.game?.connect?.id;
+            if (!gameId) {
+                // If gameId is not provided, try to find it? Or force it.
+                // Depending on frontend implementation.
+            }
+
+            // Determine Draw Date (Same logic as 2x500 or standard daily draws?)
+            // Assuming same schedule for now: 12:00 and 19:00
+            drawDate = this.getNextDrawDate();
+
+            const modality = data.gameType.split('-')[1]; // GRUPO, DEZENA, CENTENA, MILHAR
+
+            if (!data.numbers || data.numbers.length === 0) {
+                throw new BadRequestException("Nenhum número selecionado.");
+            }
+
+            const numbers = data.numbers as number[];
+
+            switch (modality) {
+                case 'GRUPO': // 1-25
+                    numbers.forEach(n => {
+                        if (n < 1 || n > 25) throw new BadRequestException(`Grupo inválido: ${n}. Deve ser entre 1 e 25.`);
+                    });
+                    break;
+                case 'DEZENA': // 00-99
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 99) throw new BadRequestException(`Dezena inválida: ${n}. Deve ser entre 00 e 99.`);
+                    });
+                    break;
+                case 'CENTENA': // 000-999
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 999) throw new BadRequestException(`Centena inválida: ${n}. Deve ser entre 000 e 999.`);
+                    });
+                    break;
+                case 'MILHAR': // 0000-9999
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 9999) throw new BadRequestException(`Milhar inválida: ${n}. Deve ser entre 0000 e 9999.`);
+                    });
+                    break;
+                default:
+                    throw new BadRequestException(`Modalidade inválida: ${modality}`);
+            }
+
+            // JB usually doesn't have "Sold Out" logic per number like 2x500 (Raffle).
+            // It allows multiple winners. So NO validateNumbersAvailability check here.
+        }
         // Fallback validation for other games (existing logic)
         else if (data.numbers && (data.numbers as number[]).length < 6) {
             // Basic validation, can be improved

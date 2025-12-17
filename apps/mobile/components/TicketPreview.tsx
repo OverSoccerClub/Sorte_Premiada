@@ -51,11 +51,17 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
 
                 <View style={tw`p-2 rounded-lg border border-black`}>
                     <View style={tw`flex-row flex-wrap justify-center items-center gap-2`}>
-                        {numbers.sort((a, b) => a - b).map((num) => (
-                            <Text key={num} style={[tw`${gameName === "2x500" ? (isCapture ? "text-3xl" : "text-xl") : (isCapture ? "text-4xl" : "text-3xl")} text-black tracking-widest`, { fontFamily: 'RobotoMono_700Bold' }]}>
-                                {num.toString().padStart(gameName === "2x500" ? 4 : 2, "0")}
-                            </Text>
-                        ))}
+                        {numbers.sort((a, b) => a - b).map((num) => {
+                            let pad = 2;
+                            if (gameName.includes("2x500") || gameName.includes("MILHAR")) pad = 4;
+                            else if (gameName.includes("CENTENA")) pad = 3;
+
+                            return (
+                                <Text key={num} style={[tw`${(pad >= 4 || isCapture) ? (isCapture ? "text-3xl" : "text-xl") : (isCapture ? "text-4xl" : "text-3xl")} text-black tracking-widest`, { fontFamily: 'RobotoMono_700Bold' }]}>
+                                    {num.toString().padStart(pad, "0")}
+                                </Text>
+                            );
+                        })}
                     </View>
                 </View>
             </View>

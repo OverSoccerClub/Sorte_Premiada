@@ -14,6 +14,7 @@ const { height } = Dimensions.get("window");
 
 const games = [
     { id: "2x500", name: "2x500", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
+    { id: "jb", name: "Jogo do Bicho", color: "bg-amber-600", icon: "paw-outline", borderColor: "border-amber-500/30" },
 ];
 
 export default function Dashboard() {
@@ -74,6 +75,8 @@ export default function Dashboard() {
 
         if (gameId === "2x500") {
             router.push("/games/2x500");
+        } else if (gameId === "jb") {
+            router.push("/games/jogo-do-bicho");
         } else {
             router.push({ pathname: "/games/placeholder", params: { title: gameName } });
         }
