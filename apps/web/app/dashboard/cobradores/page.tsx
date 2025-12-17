@@ -344,7 +344,7 @@ export default function CobradoresPage() {
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))
+                                ))}
                                 {cobradores.length === 0 && !loading && (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
