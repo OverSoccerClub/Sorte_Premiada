@@ -145,6 +145,34 @@ export default function MegaSenaScreen() {
         setModalVisible(true);
     };
 
+    // Game Price State
+    const [gamePrice, setGamePrice] = useState<number>(5.00); // Default fallback
+    const [gameId, setGameId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchGameDetails = async () => {
+            try {
+                const API_URL = AppConfig.api.baseUrl;
+                const res = await fetch(`${API_URL}/games`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const games = await res.json();
+                    const game = games.find((g: any) => g.name === "Mega Sena" || g.name === "2x500");
+                    if (game) {
+                        setGamePrice(Number(game.price));
+                        setGameId(game.id);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch game price", error);
+            }
+        };
+        fetchGameDetails();
+    }, []);
+
+    // ... (rest of code)
+
     const handlePrint = async () => {
         setModalVisible(false);
         show("Processando Aposta...");
@@ -161,7 +189,8 @@ export default function MegaSenaScreen() {
                 body: JSON.stringify({
                     gameType: "Mega Sena",
                     numbers: selectedNumbers,
-                    amount: 5.00
+                    amount: gamePrice,
+                    gameId: gameId // Optional but good to link
                 })
             });
 
@@ -178,7 +207,7 @@ export default function MegaSenaScreen() {
             setLastTicket({
                 gameName: "Mega Sena",
                 numbers: selectedNumbers,
-                price: "R$ 5,00",
+                price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
@@ -226,7 +255,7 @@ export default function MegaSenaScreen() {
             lastTicket.numbers,
             lastTicket.id,
             new Date(),
-            5.00,
+            gamePrice,
             "Mega Sena",
             printerType,
             imageUri
@@ -314,7 +343,7 @@ export default function MegaSenaScreen() {
                                 <TicketPreview
                                     gameName="Mega Sena"
                                     numbers={selectedNumbers}
-                                    price="R$ 5,00"
+                                    price={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}
                                 />
                             </ViewShot>
                         </View>

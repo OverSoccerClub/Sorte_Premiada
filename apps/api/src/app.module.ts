@@ -11,6 +11,7 @@ import { ReportsModule } from './reports/reports.module';
 import { FinanceModule } from './finance/finance.module';
 import { AreasModule } from './areas/areas.module';
 import { DevicesModule } from './devices/devices.module';
+import { DrawsModule } from './draws/draws.module';
 
 @Module({
   imports: [
@@ -26,7 +27,10 @@ import { DevicesModule } from './devices/devices.module';
     ReportsModule,
     FinanceModule,
     AreasModule,
+    FinanceModule,
+    AreasModule,
     DevicesModule,
+    DrawsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

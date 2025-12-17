@@ -76,6 +76,9 @@ export default function JogoDoBichoScreen() {
         fetchGameId();
     }, []);
 
+    // Game Price State
+    const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
+
     const fetchGameId = async () => {
         setIsLoadingGame(true);
         try {
@@ -88,6 +91,7 @@ export default function JogoDoBichoScreen() {
                 const game = games.find((g: any) => g.name === "Jogo do Bicho");
                 if (game) {
                     setGameId(game.id);
+                    if (game.price) setGamePrice(Number(game.price));
                 } else {
                     showAlert("Jogo Indisponível", "Jodo do Bicho não encontrado.", "error");
                 }
@@ -169,10 +173,7 @@ export default function JogoDoBichoScreen() {
             const payload = {
                 gameType: `JB-${modality}`,
                 numbers: selectedNumbers,
-                amount: 10.00, // Fixed or Variable? Assuming fixed per selection or total?
-                // Let's assume R$ 10,00 TOTAL for now or multiplied? 
-                // "Igual ao 2x500" -> 2x500 is fixed R$ 10.
-                // Let's keep R$ 10.00 Fixed Total for simpler MVP, usually split.
+                amount: gamePrice,
                 game: { connect: { id: gameId } }
             };
 
@@ -195,7 +196,7 @@ export default function JogoDoBichoScreen() {
             setLastTicket({
                 gameName: `JB - ${modality}`,
                 numbers: ticketData.numbers,
-                price: "R$ 10,00",
+                price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
@@ -222,7 +223,7 @@ export default function JogoDoBichoScreen() {
             lastTicket.numbers,
             lastTicket.id,
             new Date(),
-            10.00,
+            gamePrice,
             lastTicket.gameName,
             printerType,
             imageUri
@@ -352,7 +353,7 @@ export default function JogoDoBichoScreen() {
                             <Text style={tw`text-center text-3xl font-black text-emerald-600 tracking-widest mb-4`}>
                                 {selectedNumbers.map(n => n.toString().padStart(modality === 'MILHAR' ? 4 : modality === 'CENTENA' ? 3 : 2, '0')).join(', ')}
                             </Text>
-                            <Text style={tw`text-center text-gray-500 font-bold`}>Valor: R$ 10,00</Text>
+                            <Text style={tw`text-center text-gray-500 font-bold`}>Valor: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}</Text>
                         </View>
                         <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
                             <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>

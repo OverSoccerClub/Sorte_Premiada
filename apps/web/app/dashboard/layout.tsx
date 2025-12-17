@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings as SettingsIcon, LogOut, Ticket, MapPin, Smartphone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
@@ -15,7 +15,8 @@ const sidebarItems = [
     { icon: Smartphone, label: "Gestão de POS", href: "/dashboard/pos" },
     { icon: MapPin, label: "Gestão de Praças", href: "/dashboard/areas" },
     { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
-    { icon: Settings, label: "Configurações", href: "/dashboard/settings/games" },
+    { icon: SettingsIcon, label: "Jogos / Preços", href: "/dashboard/settings/games" },
+    { icon: Calendar, label: "Sorteios", href: "/dashboard/settings/draws" },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

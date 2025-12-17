@@ -30,6 +30,12 @@ export class GamesController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     async update(@Param('id') id: string, @Body() updateGameDto: any) {
-        return this.gamesService.update(id, updateGameDto);
+        try {
+            console.log("Updating game", id, updateGameDto);
+            return await this.gamesService.update(id, updateGameDto);
+        } catch (e) {
+            console.error("Error updating game", e);
+            throw e;
+        }
     }
 }
