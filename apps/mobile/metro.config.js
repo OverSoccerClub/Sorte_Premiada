@@ -6,7 +6,12 @@ const workspaceRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
 
-config.watchFolders = [workspaceRoot];
+// Only watch necessary directories to avoid conflicts with apps/web build artifacts
+config.watchFolders = [
+    path.resolve(projectRoot),
+    path.resolve(workspaceRoot, 'node_modules'),
+    path.resolve(workspaceRoot, 'packages'),
+];
 
 config.resolver.nodeModulesPaths = [
     path.resolve(projectRoot, 'node_modules'),
