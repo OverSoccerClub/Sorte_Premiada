@@ -26,9 +26,10 @@ export class TicketsController {
         @Query('status') status?: string,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
-        @Query('gameType') gameType?: string
+        @Query('gameType') gameType?: string,
+        @Query('gameId') gameId?: string
     ) {
-        const filters = { status, startDate, endDate, gameType };
+        const filters = { status, startDate, endDate, gameType, gameId };
 
         if (req.user.role === 'ADMIN') {
             return this.ticketsService.findAll(filters);

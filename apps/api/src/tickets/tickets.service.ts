@@ -228,13 +228,14 @@ export class TicketsService {
         });
     }
 
-    async findAll(filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string }) {
+    async findAll(filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string; gameId?: string }) {
         await this.updateExpiredTickets();
 
         const where: Prisma.TicketWhereInput = {};
         if (filters) {
             if (filters.status) where.status = filters.status as any;
             if (filters.gameType) where.gameType = filters.gameType;
+            if (filters.gameId) where.gameId = filters.gameId;
             if (filters.startDate || filters.endDate) {
                 where.createdAt = {};
                 if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);

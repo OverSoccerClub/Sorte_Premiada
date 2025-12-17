@@ -28,8 +28,8 @@ export default function GamesPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground">Jogos Disponíveis</h2>
-                <p className="text-muted-foreground mt-1">Selecione um jogo para iniciar uma nova aposta.</p>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground">Relatório por Jogo</h2>
+                <p className="text-muted-foreground mt-1">Selecione um jogo para visualizar as vendas e apostas realizadas.</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -54,7 +54,7 @@ export default function GamesPage() {
                                     {game.description}
                                 </p>
                                 <div className="flex items-center text-sm font-medium text-emerald-500">
-                                    Jogar Agora <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    Ver Vendas <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </CardContent>
                         </Card>
