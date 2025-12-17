@@ -15,6 +15,7 @@ import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { PrintingModal } from "../../components/PrintingModal";
 
 export default function Game2x500Screen() {
     const router = useRouter();
@@ -218,6 +219,8 @@ export default function Game2x500Screen() {
         }
     };
 
+    const [isPrinting, setIsPrinting] = useState(false);
+
     const handlePrint = async () => {
         if (!gameId) {
             showAlert("Erro", "Jogo não identificado.", "error");
@@ -279,7 +282,28 @@ export default function Game2x500Screen() {
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
 
-            setReceiptVisible(true);
+            // 1. Show Printing Modal
+            setIsPrinting(true);
+
+            // 2. Print (setTimeout for UI update)
+            setTimeout(async () => {
+                try {
+                    await printTicket(
+                        finalNumbers,
+                        ticketData.id,
+                        new Date(), // Current date or createdAt
+                        10.00,
+                        "2x500",
+                        printerType
+                    );
+                } catch (err) {
+                    console.error("Print failed", err);
+                    showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
+                } finally {
+                    setIsPrinting(false);
+                    setReceiptVisible(true);
+                }
+            }, 500);
 
         } catch (error: any) {
             hide();
@@ -562,7 +586,7 @@ export default function Game2x500Screen() {
                 visible={receiptVisible}
                 onClose={handleCloseReceipt}
                 onPrint={handleAutoPrint}
-                autoPrint={true}
+                autoPrint={false}
                 isReprint={false}
                 ticketData={lastTicket}
             />
@@ -578,6 +602,8 @@ export default function Game2x500Screen() {
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
             />
+
+            <PrintingModal visible={isPrinting} />
         </SafeAreaView>
     );
 }
