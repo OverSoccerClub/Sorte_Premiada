@@ -48,205 +48,202 @@ export default function TwoXFiveHundredReportPage() {
         init()
     }, [])
 
+    const fetchTickets = async () => {
+        setLoading(true)
+        try {
+            const token = localStorage.getItem("token")
+
+            const start = new Date(startDate)
+            start.setUTCHours(0, 0, 0, 0)
+
+            const end = new Date(endDate)
+            end.setUTCHours(23, 59, 59, 999)
+
+            let url = `${API_URL}/tickets?gameId=${gameId}&startDate=${start.toISOString()}&endDate=${end.toISOString()}`
+
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+
+            if (res.ok) {
+                let data = await res.json()
+
+                if (selectedCambista !== "all") {
+                    data = data.filter((t: any) => t.userId === selectedCambista)
+                }
+
+                setTickets(data)
+
+                const totalAmount = data.reduce((acc: number, t: any) => acc + Number(t.amount), 0)
+                setTotals({
+                    count: data.length,
+                    amount: totalAmount
+                })
+            }
+        } catch (e) {
+            toast.error("Erro ao carregar vendas")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         if (!gameId) return
         fetchTickets()
-        useEffect(() => {
-            if (!gameId) return
-            fetchTickets()
-        }, [gameId, startDate, endDate, selectedCambista])
+    }, [gameId, startDate, endDate, selectedCambista])
 
-        const fetchTickets = async () => {
-            setLoading(true)
-            try {
-                const token = localStorage.getItem("token")
+    return (
+        <div className="space-y-6">
+            <div>
+                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                        <Ticket className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    Relatório 2x500
+                </h2>
+                <p className="text-muted-foreground mt-1 ml-14">Vendas filtradas por período e cambista.</p>
+            </div>
 
-                const start = new Date(startDate)
-                start.setUTCHours(0, 0, 0, 0)
-
-                const end = new Date(endDate)
-                end.setUTCHours(23, 59, 59, 999)
-
-                let url = `${API_URL}/tickets?gameId=${gameId}&startDate=${start.toISOString()}&endDate=${end.toISOString()}`
-
-                const res = await fetch(url, {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
-
-                if (res.ok) {
-                    let data = await res.json()
-
-                    if (selectedCambista !== "all") {
-                        data = data.filter((t: any) => t.userId === selectedCambista)
-                    }
-
-                    setTickets(data)
-
-                    const totalAmount = data.reduce((acc: number, t: any) => acc + Number(t.amount), 0)
-                    setTotals({
-                        count: data.length,
-                        amount: totalAmount
-                    })
-                }
-            } catch (e) {
-                toast.error("Erro ao carregar vendas")
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        return (
-            <div className="space-y-6">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <Ticket className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        Relatório 2x500
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Vendas filtradas por período e cambista.</p>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Vendido</CardTitle>
-                            <Ticket className="h-4 w-4 text-emerald-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-emerald-500">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totals.amount)}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Bilhetes</CardTitle>
-                            <Ticket className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{totals.count}</div>
-                        </CardContent>
-                    </Card>
-                </div>
-
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-base font-medium">Filtros</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Vendido</CardTitle>
+                        <Ticket className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <div className="flex-1">
-                                <label className="text-sm font-medium mb-1 block">Data Inicial</label>
-                                <div className="relative">
-                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        type="date"
-                                        className="pl-9"
-                                        value={startDate}
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <label className="text-sm font-medium mb-1 block">Data Final</label>
-                                <div className="relative">
-                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        type="date"
-                                        className="pl-9"
-                                        value={endDate}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <label className="text-sm font-medium mb-1 block">Cambista</label>
-                                <Select value={selectedCambista} onValueChange={setSelectedCambista}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Todos" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Todos</SelectItem>
-                                        {cambistas.map(c => (
-                                            <SelectItem key={c.id} value={c.id}>{c.name || c.username}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex items-end">
-                                <Button onClick={fetchTickets} disabled={loading}>
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                                    <span className="ml-2">Atualizar</span>
-                                </Button>
-                            </div>
+                        <div className="text-2xl font-bold text-emerald-500">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totals.amount)}
                         </div>
                     </CardContent>
                 </Card>
-
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Detalhamento de Vendas</CardTitle>
-                        <CardDescription>Lista de bilhetes vendidos com os filtros aplicados.</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Bilhetes</CardTitle>
+                        <Ticket className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Hora</TableHead>
-                                        <TableHead>Cambista</TableHead>
-                                        <TableHead>Números</TableHead>
-                                        <TableHead className="text-right">Valor</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="h-24 text-center">
-                                                <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : tickets.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                                Nenhuma venda encontrada para este período.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        tickets.map((ticket) => (
-                                            <TableRow key={ticket.id}>
-                                                <TableCell>
-                                                    {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                                </TableCell>
-                                                <TableCell className="font-medium">
-                                                    {ticket.user?.name || ticket.user?.username || '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="lowercase font-mono text-xs">
-                                                        {ticket.numbers.join(', ')}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right font-bold text-emerald-600">
-                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                        ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                                                            'bg-gray-50 text-gray-600 ring-gray-500/10'
-                                                        }`}>
-                                                        {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
-                                                    </span>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
+                        <div className="text-2xl font-bold">{totals.count}</div>
                     </CardContent>
                 </Card>
             </div>
-        )
-    }
+
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-medium">Filtros</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex-1">
+                            <label className="text-sm font-medium mb-1 block">Data Inicial</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    type="date"
+                                    className="pl-9"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <label className="text-sm font-medium mb-1 block">Data Final</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    type="date"
+                                    className="pl-9"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <label className="text-sm font-medium mb-1 block">Cambista</label>
+                            <Select value={selectedCambista} onValueChange={setSelectedCambista}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Todos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos</SelectItem>
+                                    {cambistas.map(c => (
+                                        <SelectItem key={c.id} value={c.id}>{c.name || c.username}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex items-end">
+                            <Button onClick={fetchTickets} disabled={loading}>
+                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                                <span className="ml-2">Atualizar</span>
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Detalhamento de Vendas</CardTitle>
+                    <CardDescription>Lista de bilhetes vendidos com os filtros aplicados.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Hora</TableHead>
+                                    <TableHead>Cambista</TableHead>
+                                    <TableHead>Números</TableHead>
+                                    <TableHead className="text-right">Valor</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center">
+                                            <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
+                                        </TableCell>
+                                    </TableRow>
+                                ) : tickets.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                            Nenhuma venda encontrada para este período.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    tickets.map((ticket) => (
+                                        <TableRow key={ticket.id}>
+                                            <TableCell>
+                                                {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                {ticket.user?.name || ticket.user?.username || '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="lowercase font-mono text-xs">
+                                                    {ticket.numbers.join(', ')}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right font-bold text-emerald-600">
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
+                                                    ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
+                                                        'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                                    }`}>
+                                                    {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
