@@ -204,7 +204,6 @@ export default function MegaSenaScreen() {
 
             hide();
 
-            // Setup for Receipt Modal
             setLastTicket({
                 gameName: "Mega Sena",
                 numbers: selectedNumbers,
@@ -214,10 +213,28 @@ export default function MegaSenaScreen() {
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
 
-            setReceiptVisible(true);
-            setSelectedNumbers([]); // Clear selection immediately or after close? 2x500 clears on close. Let's wait.
-            // Actually 2x500 clears on Close.
+            // 1. Show Printing Modal
+            setIsPrinting(true);
 
+            // 2. Print immediately (Text Mode)
+            try {
+                await printTicket(
+                    selectedNumbers,
+                    ticketData.id,
+                    new Date(),
+                    gamePrice,
+                    "Mega Sena",
+                    printerType
+                );
+            } catch (err) {
+                console.error("Print failed", err);
+                showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
+            } finally {
+                // 3. Hide Printing, Show Receipt
+                setIsPrinting(false);
+                setReceiptVisible(true);
+                setSelectedNumbers([]);
+            }
         } catch (error) {
             hide();
             console.error(error);
@@ -396,7 +413,7 @@ export default function MegaSenaScreen() {
                 visible={receiptVisible}
                 onClose={handleCloseReceipt}
                 onPrint={handleAutoPrint}
-                autoPrint={true}
+                autoPrint={false}
                 isReprint={false}
                 ticketData={lastTicket}
             />

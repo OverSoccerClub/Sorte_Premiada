@@ -194,17 +194,34 @@ export default function JogoDoBichoScreen() {
 
             const ticketData = await res.json();
 
-            setLastTicket({
+            const ticketObj = {
                 gameName: `JB - ${modality}`,
                 numbers: ticketData.numbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
-            });
+            };
+            setLastTicket(ticketObj);
 
-            hide();
-            setReceiptVisible(true);
+            // 1. Print Logic
+            setIsPrinting(true);
+            try {
+                await printTicket(
+                    ticketObj.numbers,
+                    ticketObj.id,
+                    new Date(),
+                    gamePrice,
+                    ticketObj.gameName,
+                    printerType
+                );
+            } catch (err) {
+                console.error("Print error", err);
+                showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
+            } finally {
+                setIsPrinting(false);
+                setReceiptVisible(true);
+            }
 
         } catch (error: any) {
             hide();
@@ -379,7 +396,7 @@ export default function JogoDoBichoScreen() {
                 visible={receiptVisible}
                 onClose={handleCloseReceipt}
                 onPrint={handleAutoPrint}
-                autoPrint={true}
+                autoPrint={false}
                 isReprint={false}
                 ticketData={lastTicket}
             />
