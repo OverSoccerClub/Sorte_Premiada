@@ -25,4 +25,11 @@ export class GamesController {
     async findOne(@Param('id') id: string) {
         return this.gamesService.findOne(id);
     }
+
+    @Post(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    async update(@Param('id') id: string, @Body() updateGameDto: any) {
+        return this.gamesService.update(id, updateGameDto);
+    }
 }

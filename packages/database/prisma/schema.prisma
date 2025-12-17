@@ -46,6 +46,7 @@ model Game {
   rules     Json
   draws     Draw[]
   tickets   Ticket[]
+  price     Decimal  @default(5.00)
 }
 
 model Draw {

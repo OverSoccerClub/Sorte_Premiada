@@ -17,4 +17,11 @@ export class GamesService {
     async findOne(id: string) {
         return this.prisma.game.findUnique({ where: { id } });
     }
+
+    async update(id: string, data: Prisma.GameUpdateInput) {
+        return this.prisma.game.update({
+            where: { id },
+            data
+        });
+    }
 }
