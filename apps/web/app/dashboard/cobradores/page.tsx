@@ -149,20 +149,30 @@ export default function CobradoresPage() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Tem certeza que deseja excluir?")) return
-
-        try {
-            const res = await fetch(`${AppConfig.api.baseUrl}/users/${id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (res.ok) {
-                showAlert("Cobrador removido", "success")
-                fetchCobradores()
-            }
-        } catch (e) {
-            console.error(e)
-        }
+        showAlert(
+            "Excluir Cobrador",
+            "Tem certeza que deseja excluir este cobrador? Esta ação não pode ser desfeita.",
+            "warning",
+            true, // showCancel
+            async () => {
+                try {
+                    const res = await fetch(`${AppConfig.api.baseUrl}/users/${id}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                    if (res.ok) {
+                        showAlert("Cobrador removido", "O cobrador foi removido com sucesso.", "success")
+                        fetchCobradores()
+                    } else {
+                        showAlert("Erro", "Não foi possível remover o cobrador.", "error")
+                    }
+                } catch (e: any) {
+                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
+                }
+            },
+            "Sim, Excluir",
+            "Cancelar"
+        )
     }
 
     return (
@@ -325,9 +335,8 @@ export default function CobradoresPage() {
                                                     <SquarePen className="h-4 w-4" />
                                                 </Button>
                                                 <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    data-slot="button"
+                                                    className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                                     onClick={() => handleDelete(user.id)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -335,7 +344,7 @@ export default function CobradoresPage() {
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                ))
                                 {cobradores.length === 0 && !loading && (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
