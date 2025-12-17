@@ -34,7 +34,7 @@ export class TicketsService {
             }
 
             // Determine Draw Date
-            drawDate = this.getNextDrawDate();
+            drawDate = await this.getNextDrawDate(gameId);
 
             // Enforce 4 numbers per ticket
             const NUMBERS_PER_TICKET = 4;
@@ -62,7 +62,7 @@ export class TicketsService {
 
             // Determine Draw Date (Same logic as 2x500 or standard daily draws?)
             // Assuming same schedule for now: 12:00 and 19:00
-            drawDate = this.getNextDrawDate();
+            drawDate = await this.getNextDrawDate(gameId);
 
             const modality = data.gameType.split('-')[1]; // GRUPO, DEZENA, CENTENA, MILHAR
 
@@ -131,26 +131,46 @@ export class TicketsService {
         }
     }
 
-    private getNextDrawDate(): Date {
+    private async getNextDrawDate(gameId: string): Promise<Date> {
+        const game = await this.prisma.game.findUnique({
+            where: { id: gameId },
+            select: { extractionTimes: true }
+        });
+
+        const extractionTimes = game?.extractionTimes && game.extractionTimes.length > 0
+            ? game.extractionTimes
+            : ['12:00', '19:00']; // default fallback
+
+        // Helper to parse time string "HH:MM"
+        const parseTime = (timeStr: string, baseDate: Date) => {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            const date = new Date(baseDate);
+            date.setHours(hours, minutes, 0, 0);
+            return date;
+        };
+
         const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        const day = now.getDate();
+        const CUTOFF_MINUTES = 10;
 
-        // 12:00
-        const morningDraw = new Date(year, month, day, 12, 0, 0);
-        // 19:00
-        const afternoonDraw = new Date(year, month, day, 19, 0, 0);
+        // Sort times just in case
+        extractionTimes.sort();
 
-        if (now < morningDraw) {
-            return morningDraw;
-        } else if (now < afternoonDraw) {
-            return afternoonDraw;
-        } else {
-            // Tomorrow 12:00
-            const tomorrow = new Date(year, month, day + 1, 12, 0, 0);
-            return tomorrow;
+        // Check for today's draws
+        for (const timeStr of extractionTimes) {
+            const drawDate = parseTime(timeStr, now);
+
+            // Calculate cutoff time: Draw Time - 10 minutes
+            const cutoffDate = new Date(drawDate.getTime() - CUTOFF_MINUTES * 60000);
+
+            if (now < cutoffDate) {
+                return drawDate;
+            }
         }
+
+        // If no slot found today, return first slot of tomorrow
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return parseTime(extractionTimes[0], tomorrow);
     }
 
     private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date) {
@@ -208,7 +228,7 @@ export class TicketsService {
         // Default availability: Next Draw?
         // Or we should pass drawDate?
         // Ideally we assume next draw logic implies "Current Selling Cycle".
-        const nextDraw = this.getNextDrawDate();
+        const nextDraw = await this.getNextDrawDate(gameId);
         const soldSet = await this.getSoldNumbers(gameId, nextDraw);
         return Array.from(soldSet);
     }
