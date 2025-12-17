@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Search, Ticket } from "lucide-react"
+import { Loader2, Calendar, Search, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle } from "lucide-react"
 
 export default function TwoXFiveHundredReportPage() {
     const [tickets, setTickets] = useState<any[]>([])
@@ -215,24 +215,37 @@ export default function TwoXFiveHundredReportPage() {
                                     tickets.map((ticket) => (
                                         <TableRow key={ticket.id}>
                                             <TableCell>
-                                                {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <Clock className="w-4 h-4" />
+                                                    {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="font-medium">
-                                                {ticket.user?.name || ticket.user?.username || '-'}
+                                                <div className="flex items-center gap-2">
+                                                    <User className="w-4 h-4 text-emerald-500" />
+                                                    {ticket.user?.name || ticket.user?.username || '-'}
+                                                </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="lowercase font-mono text-xs">
+                                                <div className="flex items-center gap-2 lowercase font-mono text-xs">
+                                                    <Hash className="w-3.5 h-3.5 text-slate-400" />
                                                     {ticket.numbers.map((n: string) => n.toString().padStart(4, '0')).join(', ')}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right font-bold text-emerald-600">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Banknote className="w-3.5 h-3.5 opacity-50" />
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
+                                                </div>
                                             </TableCell>
                                             <TableCell>
-                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
+                                                <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
                                                     ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
                                                         'bg-gray-50 text-gray-600 ring-gray-500/10'
                                                     }`}>
+                                                    {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
+                                                        ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
+                                                            <AlertCircle className="w-3 h-3" />}
                                                     {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
                                                 </span>
                                             </TableCell>
