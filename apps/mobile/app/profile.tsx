@@ -163,7 +163,7 @@ export default function ProfileScreen() {
                         <Text style={tw`mb-2 text-gray-400 text-xs font-bold uppercase`}>Confirmar Senha</Text>
                         <View style={tw`w-full bg-background border border-gray-700 rounded-xl mb-8 flex-row items-center focus:border-primary`}>
                             <TextInput
-                                style={tw`flex-1 p-4 text-white placeholder-gray-600`}
+                                style={tw`flex-1 p-4 text-white`}
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
                                 secureTextEntry={!isConfirmPasswordVisible}

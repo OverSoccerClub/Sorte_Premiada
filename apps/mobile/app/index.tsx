@@ -117,7 +117,7 @@ export default function LoginScreen() {
                     <View style={tw`w-[90%] max-w-[400px] bg-surface p-6 rounded-3xl shadow-2xl border border-gray-800`}>
                         <Text style={tw`text-gray-400 mb-2 font-bold text-xs uppercase tracking-wider`}>Usuário</Text>
                         <TextInput
-                            style={tw`w-full h-14 bg-background border border-gray-700 rounded-xl px-4 text-white placeholder-gray-600 focus:border-primary mb-4`}
+                            style={tw`w-full h-14 bg-background border border-gray-700 rounded-xl px-4 text-white focus:border-primary mb-4`}
                             value={username}
                             onChangeText={setUsername}
                             autoCapitalize="none"
@@ -128,7 +128,7 @@ export default function LoginScreen() {
                         <Text style={tw`text-gray-400 mb-2 font-bold text-xs uppercase tracking-wider`}>Senha</Text>
                         <View style={tw`w-full h-14 bg-background border border-gray-700 rounded-xl mb-6 flex-row items-center focus:border-primary overflow-hidden`}>
                             <TextInput
-                                style={tw`flex-1 h-full px-4 text-white placeholder-gray-600`}
+                                style={tw`flex-1 h-full px-4 text-white`}
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!isPasswordVisible}
