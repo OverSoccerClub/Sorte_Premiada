@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Search, Filter } from "lucide-react"
+import { Loader2, Calendar, Search, Filter, Ticket } from "lucide-react"
 
 export default function JogoDoBichoReportPage() {
     const [tickets, setTickets] = useState<any[]>([])
