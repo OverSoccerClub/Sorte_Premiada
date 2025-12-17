@@ -15,7 +15,7 @@ import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
-import { PrintingModal } from "../../components/PrintingModal";
+
 
 // --- Number Ball Component ---
 const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: boolean, onToggle: () => void }) => {
@@ -78,6 +78,7 @@ export default function MegaSenaScreen() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
     const viewShotRef = useRef(null);
+    const printViewShotRef = useRef<ViewShot>(null);
 
     // ... (rest of state)
 
@@ -159,7 +160,7 @@ export default function MegaSenaScreen() {
                 });
                 if (res.ok) {
                     const games = await res.json();
-                    const game = games.find((g: any) => g.name === "Mega Sena" || g.name === "2x500");
+                    const game = games.find((g: any) => g.name === "Mega Sena");
                     if (game) {
                         setGamePrice(Number(game.price));
                         setGameId(game.id);
@@ -213,30 +214,42 @@ export default function MegaSenaScreen() {
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
 
-            // 1. Show Printing Modal
-            setIsPrinting(true);
+            // 1. Show Standard Loading
+            show("Imprimindo Bilhete...");
 
-            // 2. Print immediately (Text Mode) - Usage of setTimeout to ensure Modal renders first
+            // 2. Wait for Render
             setTimeout(async () => {
                 try {
+                    // 3. Capture Image
+                    let uri = undefined;
+                    try {
+                        if (printViewShotRef.current?.capture) {
+                            uri = await printViewShotRef.current.capture();
+                        }
+                    } catch (capErr) {
+                        console.warn("Capture failed", capErr);
+                    }
+
+                    // 4. Print
                     await printTicket(
                         selectedNumbers,
                         ticketData.id,
                         new Date(),
                         gamePrice,
                         "Mega Sena",
-                        printerType
+                        printerType,
+                        uri
                     );
                 } catch (err) {
                     console.error("Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
                 } finally {
-                    // 3. Hide Printing, Show Receipt
-                    setIsPrinting(false);
+                    hide();
                     setReceiptVisible(true);
                     setSelectedNumbers([]);
                 }
-            }, 500);
+            }, 1000); // 1s wait
+
         } catch (error) {
             hide();
             console.error(error);
@@ -270,11 +283,11 @@ export default function MegaSenaScreen() {
     };
 
 
-    const [isPrinting, setIsPrinting] = useState(false);
+
 
     const handleAutoPrint = async (imageUri?: string) => {
         if (!lastTicket) return;
-        setIsPrinting(true);
+        show("Imprimindo...");
         try {
             const success = await printTicket(
                 lastTicket.numbers,
@@ -291,7 +304,7 @@ export default function MegaSenaScreen() {
         } catch (error) {
             showAlert("Erro", "Erro ao tentar imprimir.", "error");
         } finally {
-            setIsPrinting(false);
+            hide();
         }
     };
 
@@ -309,6 +322,22 @@ export default function MegaSenaScreen() {
                     <Text style={tw`text-center text-emerald-500 text-xs font-bold uppercase tracking-widest`}>Selecione 6 números</Text>
                 </View>
                 <View style={tw`w-10`} />
+            </View>
+
+            {/* Hidden ViewShot for Printing High Quality Ticket */}
+            <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
+                <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                    {lastTicket && (
+                        <TicketPreview
+                            gameName="Mega Sena"
+                            numbers={lastTicket.numbers}
+                            price={lastTicket.price}
+                            date={lastTicket.date}
+                            id={lastTicket.id}
+                            isCapture={true}
+                        />
+                    )}
+                </ViewShot>
             </View>
 
             {/* Grid de Números */}
@@ -420,7 +449,7 @@ export default function MegaSenaScreen() {
                 ticketData={lastTicket}
             />
 
-            <PrintingModal visible={isPrinting} />
+
         </SafeAreaView>
     );
 }

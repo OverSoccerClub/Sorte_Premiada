@@ -14,14 +14,16 @@ import { VersionFooter } from "../../components/VersionFooter";
 import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
+
 import { ReceiptModal } from "../../components/ReceiptModal";
-import { PrintingModal } from "../../components/PrintingModal";
+
 
 export default function Game2x500Screen() {
     const router = useRouter();
     const { token } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
+    const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
@@ -68,6 +70,7 @@ export default function Game2x500Screen() {
                 const game = games.find((g: any) => g.name === "2x500");
                 if (game) {
                     setGameId(game.id);
+                    if (game.price) setGamePrice(Number(game.price));
                     await fetchSoldNumbers(game.id);
                 } else {
                     showAlert("Jogo Indisponível", "Não há um jogo '2x500' ativo no momento.", "error");
@@ -219,7 +222,7 @@ export default function Game2x500Screen() {
         }
     };
 
-    const [isPrinting, setIsPrinting] = useState(false);
+
 
     const handlePrint = async () => {
         if (!gameId) {
@@ -282,28 +285,40 @@ export default function Game2x500Screen() {
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
 
-            // 1. Show Printing Modal
-            setIsPrinting(true);
+            // 1. Show Standard Loading
+            show("Imprimindo Bilhete...");
 
-            // 2. Print (setTimeout for UI update)
+            // 2. Wait for Render (TicketPreview needs to update with lastTicket)
             setTimeout(async () => {
                 try {
+                    // 3. Capture Image
+                    let uri = undefined;
+                    try {
+                        if (printViewShotRef.current?.capture) {
+                            uri = await printViewShotRef.current.capture();
+                        }
+                    } catch (capErr) {
+                        console.warn("Capture failed", capErr);
+                    }
+
+                    // 4. Print
                     await printTicket(
                         finalNumbers,
                         ticketData.id,
-                        new Date(), // Current date or createdAt
+                        new Date(),
                         10.00,
                         "2x500",
-                        printerType
+                        printerType,
+                        uri // Pass the image!
                     );
                 } catch (err) {
                     console.error("Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
                 } finally {
-                    setIsPrinting(false);
+                    hide();
                     setReceiptVisible(true);
                 }
-            }, 500);
+            }, 1000); // 1s to ensure render
 
         } catch (error: any) {
             hide();
@@ -430,6 +445,23 @@ export default function Game2x500Screen() {
             </View>
 
             <View style={tw`flex-1 items-center`}>
+
+                {/* Hidden ViewShot for Printing High Quality Ticket */}
+                <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
+                    <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                        {lastTicket && (
+                            <TicketPreview
+                                gameName="2x500"
+                                numbers={lastTicket.numbers}
+                                price="R$ 10,00"
+                                date={lastTicket.date}
+                                id={lastTicket.id}
+                                isCapture={true} // High contrast / bold for thermal printer
+                            />
+                        )}
+                    </ViewShot>
+                </View>
+
                 <View style={tw`w-[90%] max-w-[400px] flex-1 p-4`}>
 
                     {/* Mode Switch */}
@@ -602,8 +634,6 @@ export default function Game2x500Screen() {
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
             />
-
-            <PrintingModal visible={isPrinting} />
         </SafeAreaView>
     );
 }

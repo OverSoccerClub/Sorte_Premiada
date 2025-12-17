@@ -1,6 +1,6 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Modal, FlatList, Image } from "react-native";
+import ViewShot from "react-native-view-shot";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +14,7 @@ import { TicketPreview } from "../../components/TicketPreview";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
-import { PrintingModal } from "../../components/PrintingModal";
+
 
 // Animal Data
 const ANIMALS = [
@@ -52,6 +52,7 @@ export default function JogoDoBichoScreen() {
     const { token } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
+    const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
@@ -204,28 +205,40 @@ export default function JogoDoBichoScreen() {
             };
             setLastTicket(ticketObj);
 
-            // 1. Print Logic
-            setIsPrinting(true);
+            // 1. Show Standard Loading
+            show("Imprimindo Bilhete...");
 
-            // Use setTimeout to ensure UI updates (Modal Paints) before blocking (Print Command)
+            // 2. Wait for Render
             setTimeout(async () => {
                 try {
+                    // 3. Capture Image
+                    let uri = undefined;
+                    try {
+                        if (printViewShotRef.current?.capture) {
+                            uri = await printViewShotRef.current.capture();
+                        }
+                    } catch (capErr) {
+                        console.warn("Capture failed", capErr);
+                    }
+
+                    // 4. Print
                     await printTicket(
                         ticketObj.numbers,
                         ticketObj.id,
                         new Date(),
                         gamePrice,
                         ticketObj.gameName,
-                        printerType
+                        printerType,
+                        uri
                     );
                 } catch (err) {
-                    console.error("Print error", err);
+                    console.error("Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
                 } finally {
-                    setIsPrinting(false);
+                    hide();
                     setReceiptVisible(true);
                 }
-            }, 500);
+            }, 1000); // 1s wait
 
         } catch (error: any) {
             hide();
@@ -239,11 +252,11 @@ export default function JogoDoBichoScreen() {
         setSelectedNumbers([]);
     };
 
-    const [isPrinting, setIsPrinting] = useState(false);
+
 
     const handleAutoPrint = async (imageUri?: string) => {
         if (!lastTicket) return;
-        setIsPrinting(true);
+        show("Imprimindo...");
         try {
             const success = await printTicket(
                 lastTicket.numbers,
@@ -259,7 +272,7 @@ export default function JogoDoBichoScreen() {
         } catch (error) {
             showAlert("Erro", "Erro ao tentar imprimir.", "error");
         } finally {
-            setIsPrinting(false);
+            hide();
         }
     };
 
@@ -292,6 +305,22 @@ export default function JogoDoBichoScreen() {
                     </Text>
                 </View>
                 <View style={tw`w-10`} />
+            </View>
+
+            {/* Hidden ViewShot for Printing High Quality Ticket */}
+            <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
+                <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                    {lastTicket && (
+                        <TicketPreview
+                            gameName={lastTicket.gameName}
+                            numbers={lastTicket.numbers}
+                            price={lastTicket.price}
+                            date={lastTicket.date}
+                            id={lastTicket.id}
+                            isCapture={true}
+                        />
+                    )}
+                </ViewShot>
             </View>
 
             <View style={tw`flex-1 p-4`}>
@@ -405,7 +434,7 @@ export default function JogoDoBichoScreen() {
                 ticketData={lastTicket}
             />
 
-            <PrintingModal visible={isPrinting} />
+
 
             <CustomAlert
                 visible={alertConfig.visible}
