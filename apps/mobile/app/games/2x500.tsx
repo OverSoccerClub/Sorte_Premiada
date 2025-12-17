@@ -28,6 +28,7 @@ export default function Game2x500Screen() {
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
     const [isLoadingGame, setIsLoadingGame] = useState(true);
+    const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
     const [isLoadingSold, setIsLoadingSold] = useState(false);
 
@@ -279,14 +280,14 @@ export default function Game2x500Screen() {
             setLastTicket({
                 gameName: "2x500",
                 numbers: finalNumbers,
-                price: "R$ 10,00",
+                price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
 
             // 1. Show Standard Loading
-            show("Imprimindo Bilhete...");
+            show("Imprimindo Jeque...");
 
             // 2. Wait for Render (TicketPreview needs to update with lastTicket)
             setTimeout(async () => {
@@ -306,7 +307,7 @@ export default function Game2x500Screen() {
                         finalNumbers,
                         ticketData.id,
                         new Date(),
-                        10.00,
+                        gamePrice,
                         "2x500",
                         printerType,
                         uri // Pass the image!
@@ -343,7 +344,7 @@ export default function Game2x500Screen() {
             lastTicket.numbers,
             lastTicket.id,
             new Date(), // Current date for print or parse from lastTicket.date if needed
-            10.00,
+            gamePrice,
             "2x500",
             printerType,
             imageUri
@@ -453,7 +454,7 @@ export default function Game2x500Screen() {
                             <TicketPreview
                                 gameName="2x500"
                                 numbers={lastTicket.numbers}
-                                price="R$ 10,00"
+                                price={lastTicket.price}
                                 date={lastTicket.date}
                                 id={lastTicket.id}
                                 isCapture={true} // High contrast / bold for thermal printer
