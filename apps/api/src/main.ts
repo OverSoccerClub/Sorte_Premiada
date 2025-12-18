@@ -41,6 +41,12 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: '*',
   });
+  // Filters
+  const { HttpAdapterHost } = require('@nestjs/core');
+  const { AllExceptionsFilter } = require('./all-exceptions.filter');
+  const httpAdapter = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
   console.log(`🚀 API FIX APPLIED: LISTENING ON PORT ${port}`);
