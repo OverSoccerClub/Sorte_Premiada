@@ -18,7 +18,16 @@ export class GamesController {
 
     @Get()
     async findAll() {
-        return this.gamesService.findAll();
+        try {
+            const games = await this.gamesService.findAll();
+            return games.map(game => ({
+                ...game,
+                price: Number(game.price) // Ensure Decimal is converted to Number
+            }));
+        } catch (error) {
+            console.error("Error fetching games:", error);
+            throw error;
+        }
     }
 
     @Get(':id')

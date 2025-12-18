@@ -165,7 +165,7 @@ export default function DashboardPage() {
                         <CardDescription className="text-muted-foreground">Receita dos últimos 7 dias</CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[300px] w-full">
+                        <div className="h-[300px] w-full" style={{ height: 300 }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={stats.chartData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />

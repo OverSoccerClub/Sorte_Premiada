@@ -11,6 +11,7 @@ config.watchFolders = [
     path.resolve(projectRoot),
     path.resolve(workspaceRoot, 'node_modules'),
     path.resolve(workspaceRoot, 'packages'),
+    path.resolve(workspaceRoot),
 ];
 
 config.resolver.nodeModulesPaths = [

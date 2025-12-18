@@ -12,6 +12,7 @@ import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { StatusBar } from "expo-status-bar";
 import { VersionFooter } from "../../components/VersionFooter";
 import { TicketPreview } from "../../components/TicketPreview";
+import { TicketPrintLayout } from "../../components/TicketPrintLayout";
 import { AppConfig } from "../../constants/AppConfig";
 import { printTicket } from "../../services/printing.service";
 
@@ -451,13 +452,13 @@ export default function Game2x500Screen() {
                 <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
                     <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
                         {lastTicket && (
-                            <TicketPreview
+                            <TicketPrintLayout
                                 gameName="2x500"
                                 numbers={lastTicket.numbers}
                                 price={lastTicket.price}
                                 date={lastTicket.date}
-                                id={lastTicket.id}
-                                isCapture={true} // High contrast / bold for thermal printer
+                                ticketId={lastTicket.id}
+                                drawDate={lastTicket.drawDate}
                             />
                         )}
                     </ViewShot>
@@ -567,11 +568,12 @@ export default function Game2x500Screen() {
             {/* Footer */}
             <View style={tw`p-4 border-t border-gray-800 bg-surface`}>
                 <TouchableOpacity
-                    style={tw`w-full bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/30`}
+                    style={[tw`w-full p-4 rounded-xl items-center shadow-lg`, !gameId ? tw`bg-gray-700` : tw`bg-emerald-600 shadow-emerald-600/30`]}
                     onPress={handleReview}
+                    disabled={!gameId || isLoadingGame}
                 >
-                    <Text style={tw`text-white font-bold text-xl uppercase tracking-wide`}>
-                        {isAutoPick ? "Gerar Aposta" : "Continuar"}
+                    <Text style={[tw`font-bold text-xl uppercase tracking-wide`, !gameId ? tw`text-gray-500` : tw`text-white`]}>
+                        {isLoadingGame ? "Carregando..." : (!gameId ? "Jogo Indisponível" : (isAutoPick ? "Gerar Aposta" : "Continuar"))}
                     </Text>
                 </TouchableOpacity>
             </View>

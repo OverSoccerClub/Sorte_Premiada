@@ -6,6 +6,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import tw from '../lib/tailwind';
 import { TicketPreview } from './TicketPreview';
+import { TicketPrintLayout } from './TicketPrintLayout';
 
 interface ReceiptModalProps {
     visible: boolean;
@@ -124,13 +125,13 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     {/* Position absolute off-screen or behind to avoid visual clutter but keep renderable */}
                     <View style={{ position: 'absolute', opacity: 0, zIndex: -10, left: -1000 }}>
                         <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
-                            <TicketPreview
+                            <TicketPrintLayout
                                 gameName={ticketData.gameName}
                                 numbers={ticketData.numbers}
                                 price={ticketData.price}
                                 date={ticketData.date}
-                                id={ticketData.id}
-                                isCapture={true} // Applies scaleX: 1.5
+                                ticketId={ticketData.id}
+                                drawDate={ticketData.drawDate}
                             />
                         </ViewShot>
                     </View>
