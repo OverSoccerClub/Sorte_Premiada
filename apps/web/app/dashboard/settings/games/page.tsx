@@ -290,7 +290,7 @@ export default function GameSettingsPage() {
                                 <div className="grid grid-cols-3 gap-2">
                                     {extractionTimes.map((time) => (
                                         <div key={time} className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
-                                            <span className="font-mono font-medium">{time}</span>
+                                            <span className="font-mono font-bold text-base text-slate-700 dark:text-slate-100">{time}</span>
                                             <Button
                                                 data-slot="button"
                                                 className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
