@@ -108,7 +108,6 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                 <ScrollView
                     style={tw`w-full max-h-[90%]`}
                     contentContainerStyle={tw`pb-8`}
-                    showsVerticalScrollIndicator={false}
                 >
                     <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>
                         {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}

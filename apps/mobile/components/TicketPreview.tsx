@@ -36,8 +36,8 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
     // Modal Preview Mode
     return (
         <View style={tw`bg-gray-100 items-center justify-center p-4 rounded-xl`}>
-            {/* Wrapper to simulate paper background */}
-            <View style={[tw`overflow-hidden bg-white shadow-lg`, { width: 384, transform: [{ scale: 0.8 }] }]}>
+            {/* Wrapper to simulate paper background - Scaled down to 0.65 to fit small screens */}
+            <View style={[tw`overflow-hidden bg-white shadow-lg`, { width: 384, transform: [{ scale: 0.65 }], marginVertical: -60 }]}>
                 <TicketPrintLayout
                     gameName={gameName}
                     numbers={numbers}
