@@ -146,15 +146,12 @@ export const TicketPrintLayout = ({
             {/* Barcode e QR Code */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`overflow-hidden items-center justify-center mb-1`}>
-                    {ticketId ? (
-                        <Barcode
-                            value={hash || '000000000000'}
-                            format="CODE128"
-                            text={hash || ticketId.substring(0, 8)}
-                            height={50}
-                            maxWidth={300} // Wider barcode
-                        />
-                    ) : null}
+                    {/* Barcode Removed to prevent crash specific to some Android versions/SVG libs */}
+                    <View style={tw`h-12 w-full items-center justify-center border border-gray-300 rounded mb-1 px-2`}>
+                        <Text style={tw`font-bold text-xs text-black tracking-widest`}>
+                            {hash || ticketId?.substring(0, 12) || '000000000000'}
+                        </Text>
+                    </View>
                 </View>
 
                 <View style={tw`flex-row items-end justify-between w-full px-4 mt-2`}>
