@@ -70,6 +70,7 @@ model Ticket {
   amount    Decimal
   status    TicketStatus @default(PENDING)
   drawDate  DateTime?    // For 2x500: Scheduled Draw Time
+  hash      String?      // Unique hash for barcode/validation
   createdAt DateTime @default(now())
 }
 
