@@ -200,6 +200,7 @@ export default function JogoDoBichoScreen() {
                 numbers: ticketData.numbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
+                hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             };
@@ -317,6 +318,7 @@ export default function JogoDoBichoScreen() {
                             price={lastTicket.price}
                             date={lastTicket.date}
                             id={lastTicket.id}
+                            hash={lastTicket.hash}
                             isCapture={true}
                         />
                     )}

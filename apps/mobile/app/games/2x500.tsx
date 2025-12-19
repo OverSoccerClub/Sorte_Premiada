@@ -283,6 +283,7 @@ export default function Game2x500Screen() {
                 numbers: finalNumbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
+                hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
             });
@@ -459,6 +460,7 @@ export default function Game2x500Screen() {
                                 date={lastTicket.date}
                                 ticketId={lastTicket.id}
                                 drawDate={lastTicket.drawDate}
+                                hash={lastTicket.hash}
                             />
                         )}
                     </ViewShot>
