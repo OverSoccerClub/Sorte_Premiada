@@ -130,7 +130,7 @@ export default function Dashboard() {
                             onPress={() => handleGamePress(game.id, game.name)}
                             activeOpacity={0.8}
                         >
-                            <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 transform rotate-3`}>
+                            <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 rotate-3`}>
                                 <Ionicons name={game.icon as any} size={32} color="white" />
                             </View>
                             <Text style={tw`font-bold text-lg text-white`}>{game.name}</Text>
