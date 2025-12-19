@@ -7,6 +7,7 @@ export interface Ticket {
     amount: string;
     status: 'PENDING' | 'PAID' | 'CANCELLED' | 'WON' | 'LOST' | 'EXPIRED';
     drawDate?: string;
+    hash?: string;
     createdAt: string;
 }
 

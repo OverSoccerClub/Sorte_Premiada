@@ -16,6 +16,7 @@ interface ReceiptModalProps {
         numbers: number[];
         price: string;
         id: string;
+        hash?: string;
         date: string;
         drawDate?: string;
     } | null;
@@ -117,6 +118,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                             price={ticketData.price}
                             date={ticketData.date}
                             id={ticketData.id}
+                            hash={ticketData.hash}
                             isCapture={false} // Normal aspect ratio for screen
                         />
                     </View>
@@ -131,6 +133,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                                 price={ticketData.price}
                                 date={ticketData.date}
                                 ticketId={ticketData.id}
+                                hash={ticketData.hash}
                                 drawDate={ticketData.drawDate}
                             />
                         </ViewShot>

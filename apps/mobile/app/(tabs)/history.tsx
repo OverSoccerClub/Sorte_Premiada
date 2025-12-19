@@ -323,6 +323,7 @@ export default function HistoryScreen() {
                     numbers: selectedTicket.numbers,
                     price: `R$ ${Number(selectedTicket.amount).toFixed(2).replace('.', ',')}`,
                     id: selectedTicket.id,
+                    hash: selectedTicket.hash,
                     date: new Date(selectedTicket.createdAt).toLocaleString(),
                     drawDate: selectedTicket.drawDate ? new Date(selectedTicket.drawDate).toLocaleString() : undefined
                 } : null}
