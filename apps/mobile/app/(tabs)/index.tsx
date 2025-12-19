@@ -136,6 +136,21 @@ export default function Dashboard() {
                             <Text style={tw`font-bold text-lg text-white`}>{game.name}</Text>
                         </TouchableOpacity>
                     ))}
+
+                    {/* Botão de Validação */}
+                    <TouchableOpacity
+                        style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3`}
+                        onPress={() => router.push("/validate")}
+                        activeOpacity={0.8}
+                    >
+                        <View style={tw`bg-emerald-500/20 p-2 rounded-full`}>
+                            <Ionicons name="scan-outline" size={24} color="#10b981" />
+                        </View>
+                        <View>
+                            <Text style={tw`font-bold text-lg text-white`}>Conferir Bilhete</Text>
+                            <Text style={tw`text-xs text-gray-400`}>Use a câmera para validar premiações</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
 

@@ -113,6 +113,7 @@ export class TicketsService {
                 amount: data.amount,
                 status: data.status || 'PENDING',
                 drawDate: drawDate, // Save the scheduled draw date
+                hash: Math.floor(100000000000 + Math.random() * 900000000000).toString(), // Generate 12-digit unique hash
                 // gameId is optional now
                 ...(data.game?.connect?.id ? { gameId: data.game.connect.id } : {}),
             };
