@@ -146,11 +146,11 @@ export const TicketPrintLayout = ({
             {/* Barcode e QR Code */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`overflow-hidden items-center justify-center mb-1`}>
-                    {ticketId && ticketId.length > 0 ? (
+                    {ticketId ? (
                         <Barcode
-                            value={hash || (ticketId && ticketId.length > 0 ? ticketId.replace(/-/g, '') : '000000000000')}
+                            value={hash || '000000000000'}
                             format="CODE128"
-                            text={hash || (ticketId ? ticketId.replace(/-/g, '') : '000000000000')}
+                            text={hash || ticketId.substring(0, 8)}
                             height={50}
                             maxWidth={300} // Wider barcode
                         />
