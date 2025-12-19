@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2 } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 
@@ -137,6 +137,61 @@ export default function GameSettingsPage() {
     }
 
 
+    // Prize Editing State
+    const [prizesModalOpen, setPrizesModalOpen] = useState(false)
+    const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
+
+    // Prize Functions
+    const openPrizesModal = (game: any) => {
+        setSelectedGame(game)
+        const currentPrizes = game.rules?.prizes || {}
+        setPrizeValues({
+            milhar: currentPrizes.milhar || "10000",
+            centena: currentPrizes.centena || "100",
+            dezena: currentPrizes.dezena || "10"
+        })
+        setPrizesModalOpen(true)
+    }
+
+    const savePrizes = async () => {
+        if (!selectedGame) return
+        setSaving(true)
+        try {
+            const token = localStorage.getItem("token")
+
+            // Merge existing rules with new prizes
+            const updatedRules = {
+                ...(selectedGame.rules || {}),
+                prizes: {
+                    milhar: Number(prizeValues.milhar),
+                    centena: Number(prizeValues.centena),
+                    dezena: Number(prizeValues.dezena)
+                }
+            }
+
+            const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ rules: updatedRules })
+            })
+
+            if (res.ok) {
+                toast.success("Premiação atualizada com sucesso")
+                fetchGames()
+                setPrizesModalOpen(false)
+            } else {
+                toast.error("Erro ao salvar premiação")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        } finally {
+            setSaving(false)
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div>
@@ -146,7 +201,7 @@ export default function GameSettingsPage() {
                     </div>
                     Configuração de Jogos
                 </h2>
-                <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda e horários de extração.</p>
+                <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda, horários e premiações.</p>
             </div>
 
             <Card>
@@ -231,6 +286,15 @@ export default function GameSettingsPage() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
+                                                            className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                                            onClick={() => openPrizesModal(game)}
+                                                            title="Configurar Prêmios"
+                                                        >
+                                                            <DollarSign className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
                                                             className="text-muted-foreground hover:text-emerald-600"
                                                             onClick={() => openScheduleModal(game)}
                                                             title="Gerenciar Horários"
@@ -277,7 +341,7 @@ export default function GameSettingsPage() {
                             </div>
                             <Button onClick={addTime} disabled={!newTime}>
                                 <Plus className="w-4 h-4 mr-2" />
-                                Adicionar
+                                Add
                             </Button>
                         </div>
 
@@ -292,7 +356,6 @@ export default function GameSettingsPage() {
                                         <div key={time} className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
                                             <span className="font-mono font-bold text-base text-slate-700 dark:text-slate-100">{time}</span>
                                             <Button
-                                                data-slot="button"
                                                 className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                                 onClick={() => removeTime(time)}
                                             >
@@ -309,6 +372,51 @@ export default function GameSettingsPage() {
                         <Button onClick={saveSchedule} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
                             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                             Salvar Horários
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={prizesModalOpen} onOpenChange={setPrizesModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Premiação - {selectedGame?.name}</DialogTitle>
+                        <CardDescription>Defina os valores de premiação para cada acerto.</CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Prêmio Milhar (Acerto de 4 dígitos)</Label>
+                            <Input
+                                type="number"
+                                value={prizeValues.milhar}
+                                onChange={(e) => setPrizeValues({ ...prizeValues, milhar: e.target.value })}
+                                placeholder="Ex: 10000"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Prêmio Centena (Acerto de 3 dígitos)</Label>
+                            <Input
+                                type="number"
+                                value={prizeValues.centena}
+                                onChange={(e) => setPrizeValues({ ...prizeValues, centena: e.target.value })}
+                                placeholder="Ex: 100"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Prêmio Dezena (Acerto de 2 dígitos)</Label>
+                            <Input
+                                type="number"
+                                value={prizeValues.dezena}
+                                onChange={(e) => setPrizeValues({ ...prizeValues, dezena: e.target.value })}
+                                placeholder="Ex: 10"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setPrizesModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={savePrizes} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
+                            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar Prêmios
                         </Button>
                     </DialogFooter>
                 </DialogContent>
