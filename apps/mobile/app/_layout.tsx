@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -8,25 +9,91 @@ import { ActivityIndicator, View } from "react-native";
 
 import { AuthProvider } from "../context/AuthContext";
 import { PrinterProvider } from "../context/PrinterContext";
-import { LoadingProvider } from "../context/LoadingContext";
+import { LoadingProvider, useLoading } from "../context/LoadingContext";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { CustomAlert, AlertType } from "../components/CustomAlert";
 
 import { usePosTracking } from "../hooks/usePosTracking";
+import { UpdaterService, VersionInfo } from "../services/updater.service";
 
-import { useEffect } from "react";
-import { UpdaterService } from "../services/updater.service";
-// Helper component to use hook inside provider
-function PosTracker() {
+// Component responsible for Initializations (POS Tracking, Updates, etc)
+function AppInit() {
     usePosTracking();
+    const { show, hide } = useLoading();
+
+    const [alertConfig, setAlertConfig] = useState<{
+        visible: boolean;
+        title: string;
+        message: string;
+        type: AlertType;
+        showCancel?: boolean;
+        onConfirm?: () => void;
+        confirmText?: string;
+    }>({
+        visible: false,
+        title: "",
+        message: "",
+        type: "info",
+    });
+
     useEffect(() => {
-        // Check for updates shortly after app load
-        // Using a small timeout to let UI settle
-        const timer = setTimeout(() => {
-            UpdaterService.checkForUpdates();
-        }, 2000);
-        return () => clearTimeout(timer);
+        let isMounted = true;
+
+        const checkUpdates = async () => {
+            // Delay slightly to let app render first
+            await new Promise(r => setTimeout(r, 1000));
+
+            if (!isMounted) return;
+
+            show("Verificando atualizações...");
+
+            try {
+                const updateInfo = await UpdaterService.checkForUpdates();
+
+                if (!isMounted) return;
+                hide();
+
+                if (updateInfo) {
+                    setAlertConfig({
+                        visible: true,
+                        title: "Nova Versão Disponível",
+                        message: `A versão ${updateInfo.version} está pronta para instalar.${updateInfo.notes ? '\n\n' + updateInfo.notes : ''}\n\nDeseja atualizar agora?`,
+                        type: "success",
+                        showCancel: !updateInfo.force,
+                        confirmText: "ATUALIZAR",
+                        onConfirm: () => {
+                            UpdaterService.downloadUpdate(updateInfo.apkUrl);
+                            // Keep alert open or show 'Downloading'? 
+                            // Usually native browser opens, so we can close alert or keep it.
+                            setAlertConfig(prev => ({ ...prev, visible: false }));
+                        }
+                    });
+                } else {
+                    // Silent success - no update needed
+                }
+            } catch (err) {
+                hide();
+                console.warn("Update check error (silent to user):", err);
+            }
+        };
+
+        checkUpdates();
+
+        return () => { isMounted = false; };
     }, []);
-    return null;
+
+    return (
+        <CustomAlert
+            visible={alertConfig.visible}
+            title={alertConfig.title}
+            message={alertConfig.message}
+            type={alertConfig.type}
+            showCancel={alertConfig.showCancel}
+            onConfirm={alertConfig.onConfirm}
+            confirmText={alertConfig.confirmText}
+            onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+        />
+    );
 }
 
 export default function RootLayout() {
@@ -49,9 +116,9 @@ export default function RootLayout() {
     return (
         <LoadingProvider>
             <AuthProvider>
-                <PosTracker />
                 <PrinterProvider>
                     <SafeAreaProvider>
+                        <AppInit />
                         <Stack screenOptions={{ headerShown: false }}>
                             <Stack.Screen name="index" />
                             <Stack.Screen name="(tabs)" />

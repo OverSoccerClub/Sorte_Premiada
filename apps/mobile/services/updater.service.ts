@@ -5,7 +5,7 @@ import { Alert, Platform } from 'react-native';
 const UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/SORTE_PREMIADA';
 const VERSION_FILE_URL = `${UPDATE_URL}/version.json`;
 
-interface VersionInfo {
+export interface VersionInfo {
     version: string;
     build: string;
     apkUrl: string;
@@ -14,8 +14,8 @@ interface VersionInfo {
 }
 
 export const UpdaterService = {
-    async checkForUpdates(isManualCheck = false) {
-        if (Platform.OS !== 'android') return;
+    async checkForUpdates(): Promise<VersionInfo | null> {
+        if (Platform.OS !== 'android') return null;
 
         try {
             console.log('Checking for updates at:', VERSION_FILE_URL);
@@ -28,7 +28,9 @@ export const UpdaterService = {
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch version info: ${response.status}`);
+                // Silent fail
+                console.warn(`Update check failed with status: ${response.status}`);
+                return null;
             }
 
             const remoteData: VersionInfo = await response.json();
@@ -41,35 +43,13 @@ export const UpdaterService = {
             const hasUpdate = this.compareVersions(remoteData.version, currentVersion, remoteData.build, currentBuild);
 
             if (hasUpdate) {
-                Alert.alert(
-                    'Nova Versão Disponível',
-                    `A versão ${remoteData.version} está disponível.${remoteData.notes ? '\n\n' + remoteData.notes : ''}\n\nDeseja atualizar agora?`,
-                    [
-                        {
-                            text: 'Cancelar',
-                            style: 'cancel',
-                            onPress: () => {
-                                if (remoteData.force) {
-                                    // If forced, maybe exit app or preventing usage? 
-                                    // For now just close alert.
-                                }
-                            }
-                        },
-                        {
-                            text: 'Atualizar',
-                            onPress: () => this.downloadUpdate(remoteData.apkUrl)
-                        },
-                    ],
-                    { cancelable: !remoteData.force }
-                );
-            } else if (isManualCheck) {
-                Alert.alert('Tudo Certo', 'Você já está usando a versão mais recente.');
+                return remoteData;
             }
+
+            return null;
         } catch (error) {
             console.error('Update check failed:', error);
-            if (isManualCheck) {
-                Alert.alert('Erro', 'Não foi possível verificar atualizações.');
-            }
+            return null;
         }
     },
 
@@ -84,13 +64,10 @@ export const UpdaterService = {
     },
 
     compareVersions(remoteVer: string, localVer: string, remoteBuild: string, localBuild: string): boolean {
-        // Simple comparison logic
         // 1. Compare semantic version strings
         if (remoteVer !== localVer) {
-            return remoteVer > localVer; // Very basic string comparison (works for '1.0.1' > '1.0.0' but careful with '1.10' vs '1.2')
-            // In reality, stick to build numbers for absolute certainty
+            return remoteVer > localVer;
         }
-
         // 2. If versions equal, compare build numbers
         return parseInt(remoteBuild) > parseInt(localBuild);
     }
