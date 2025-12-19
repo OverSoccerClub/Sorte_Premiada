@@ -393,39 +393,44 @@ export default function MegaSenaScreen() {
                 visible={modalVisible}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
-                    <View style={tw`w-[90%] max-w-[400px] items-center`}>
-                        <Text style={tw`text-white font-bold text-lg mb-6 uppercase tracking-widest`}>Confira sua Aposta</Text>
+                <View style={tw`flex-1 bg-black/90`}>
+                    <ScrollView
+                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 py-10`}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View style={tw`w-[90%] max-w-[400px] items-center`}>
+                            <Text style={tw`text-white font-bold text-lg mb-6 uppercase tracking-widest text-center`}>Confira sua Aposta</Text>
 
-                        <View style={tw`w-full mb-8 shadow-2xl shadow-black`}>
-                            <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9, result: "tmpfile" }} style={{ backgroundColor: 'white' }}>
-                                <TicketPreview
-                                    gameName="Mega Sena"
-                                    numbers={selectedNumbers}
-                                    price={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}
-                                />
-                            </ViewShot>
+                            <View style={tw`w-full mb-8 shadow-2xl shadow-black items-center`}>
+                                <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9, result: "tmpfile" }} style={{ backgroundColor: 'white' }}>
+                                    <TicketPreview
+                                        gameName="Mega Sena"
+                                        numbers={selectedNumbers}
+                                        price={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}
+                                    />
+                                </ViewShot>
+                            </View>
+
+                            <View style={tw`w-full gap-3 pb-8`}>
+                                <TouchableOpacity
+                                    style={tw`w-full bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/40 border border-emerald-500`}
+                                    onPress={handlePrint}
+                                >
+                                    <View style={tw`flex-row items-center`}>
+                                        <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold text-lg uppercase`}>Confirmar e Imprimir</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={tw`w-full bg-gray-800 p-4 rounded-xl items-center border border-gray-700`}
+                                    onPress={() => setModalVisible(false)}
+                                >
+                                    <Text style={tw`text-gray-300 font-bold text-lg`}>Voltar</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-
-                        <View style={tw`w-full gap-3`}>
-                            <TouchableOpacity
-                                style={tw`w-full bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/40 border border-emerald-500`}
-                                onPress={handlePrint}
-                            >
-                                <View style={tw`flex-row items-center`}>
-                                    <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
-                                    <Text style={tw`text-white font-bold text-lg uppercase`}>Imprimir Bilhete</Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={tw`w-full bg-gray-800 p-4 rounded-xl items-center border border-gray-700`}
-                                onPress={() => setModalVisible(false)}
-                            >
-                                <Text style={tw`text-gray-300 font-bold text-lg`}>Voltar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    </ScrollView>
                 </View>
             </Modal>
 
