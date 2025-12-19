@@ -142,24 +142,24 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     {/* Actions */}
                     <View style={tw`mt-4 gap-2`}>
                         <View style={tw`flex-row gap-2`}>
-                            {onPrint && (
-                                <TouchableOpacity
-                                    style={tw`flex-1 bg-emerald-600 p-3 rounded-xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
-                                    onPress={handlePrintPayload}
-                                    disabled={isPrinting || isSharing}
-                                >
-                                    {isPrinting ? (
-                                        <ActivityIndicator color="white" size="small" />
-                                    ) : (
-                                        <>
-                                            <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
-                                            <Text style={tw`text-white font-bold text-base`}>
-                                                {isReprint ? "Reimprimir" : "Imprimir"}
-                                            </Text>
-                                        </>
-                                    )}
-                                </TouchableOpacity>
-                            )}
+
+                            <TouchableOpacity
+                                style={tw`flex-1 bg-emerald-600 p-3 rounded-xl flex-row justify-center items-center shadow-lg shadow-emerald-500/30`}
+                                onPress={handlePrintPayload}
+                                disabled={isPrinting || isSharing || !onPrint}
+                            >
+                                {isPrinting ? (
+                                    <ActivityIndicator color="white" size="small" />
+                                ) : (
+                                    <>
+                                        <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold text-base`}>
+                                            {isReprint ? "REIMPRIMIR" : "IMPRIMIR"}
+                                        </Text>
+                                    </>
+                                )}
+                            </TouchableOpacity>
+
 
                             <TouchableOpacity
                                 style={tw`${onPrint ? 'flex-1' : 'w-full'} bg-green-600 p-3 rounded-xl flex-row justify-center items-center shadow-lg shadow-green-500/30`}
