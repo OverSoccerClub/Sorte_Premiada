@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sorte Premiada",
+    "name": "Fezinha do Dia",
     "slug": "sorte-premiada",
     "version": "1.1.0",
     "runtimeVersion": {
@@ -21,7 +21,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#1e293b"
       },
       "permissions": [
