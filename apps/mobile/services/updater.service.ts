@@ -2,7 +2,7 @@ import * as Application from 'expo-application';
 import * as Linking from 'expo-linking';
 import { Alert, Platform } from 'react-native';
 
-const UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/SORTE_PREMIADA';
+const UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_do_dia';
 const VERSION_FILE_URL = `${UPDATE_URL}/version.json`;
 
 export interface VersionInfo {

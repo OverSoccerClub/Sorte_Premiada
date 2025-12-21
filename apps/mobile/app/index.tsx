@@ -109,7 +109,7 @@ export default function LoginScreen() {
                             <MaterialCommunityIcons name="clover" size={40} color="#50C878" />
                         </View>
                         <Text style={tw`text-3xl font-extrabold text-white tracking-tighter`}>
-                            SORTE <Text style={tw`text-primary`}>PREMIADA</Text>
+                            Fezinha <Text style={tw`text-primary`}>do Dia</Text>
                         </Text>
                         <Text style={tw`text-gray-400 text-sm tracking-widest uppercase mt-1`}>Cambista Edition</Text>
                     </View>
