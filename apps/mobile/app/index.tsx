@@ -72,7 +72,7 @@ export default function LoginScreen() {
             confirmText: "Contatar Suporte",
             onConfirm: () => {
                 // Open WhatsApp with pre-filled message
-                const message = "Olá, estou precisando recuperar minha senha no app Sorte Premiada.";
+                const message = "Olá, estou precisando recuperar minha senha no app Fezinha do Dia.";
                 const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
 
                 Linking.openURL(url).catch(() => {

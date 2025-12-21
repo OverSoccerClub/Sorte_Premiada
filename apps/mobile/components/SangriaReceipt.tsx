@@ -40,7 +40,7 @@ export function SangriaReceipt({
             {/* Header */}
             <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2`}>
                 <Ionicons name="wallet-outline" size={isCapture ? 32 : 28} color="#000" style={tw`mb-1`} />
-                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_900Black' }]}>SORTE PREMIADA</Text>
+                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_900Black' }]}>Fezinha do Dia</Text>
                 <Text style={[tw`${isCapture ? 'text-xs' : 'text-[10px]'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_700Bold' }]}>Sangria / Recolhimento</Text>
             </View>
 

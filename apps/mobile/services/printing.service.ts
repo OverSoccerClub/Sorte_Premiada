@@ -95,7 +95,7 @@ export const printTicket = async (
             </style>
           </head>
           <body>
-            <h1>SORTE PREMIADA</h1>
+            <h1>Fezinha do Dia</h1>
             <div>COMPROVANTE DE APOSTA</div>
             <div class="dashed"></div>
             
@@ -165,7 +165,7 @@ export const printTicket = async (
     receipt += CENTER;
 
     // Header
-    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "SORTE PREMIADA" + BOLD_OFF + NORMAL + "\n";
+    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "Fezinha do Dia" + BOLD_OFF + NORMAL + "\n";
     receipt += CENTER + "COMPROVANTE DE APOSTA\n";
 
     // Separator

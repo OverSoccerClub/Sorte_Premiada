@@ -2,7 +2,7 @@
   "expo": {
     "name": "Fezinha do Dia",
     "slug": "sorte-premiada",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "runtimeVersion": {
       "policy": "appVersion"
     },

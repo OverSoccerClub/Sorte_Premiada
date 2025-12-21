@@ -11,8 +11,11 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Sorte Premiada",
+  title: "Fezinha do Dia",
   description: "Sistema de Apostas",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

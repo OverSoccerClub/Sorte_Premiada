@@ -1,5 +1,5 @@
 export const AppConfig = {
-    name: "Sorte Premiada",
+    name: "Fezinha do Dia",
     version: "1.0.0",
     api: {
         baseUrl: "https://pos-jogos-api.uawtgc.easypanel.host",
