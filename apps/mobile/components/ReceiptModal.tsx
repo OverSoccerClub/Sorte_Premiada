@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import tw from '../lib/tailwind';
 import { TicketPreview } from './TicketPreview';
 import { TicketPrintLayout } from './TicketPrintLayout';
+import { useAuth } from '../context/AuthContext';
 
 interface ReceiptModalProps {
     visible: boolean;
@@ -27,6 +28,7 @@ interface ReceiptModalProps {
 
 export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint, isReprint = false }: ReceiptModalProps) {
     const viewShotRef = useRef<ViewShot>(null);
+    const { user } = useAuth(); // Get logged user
     const [isSharing, setIsSharing] = useState(false);
     const [isPrinting, setIsPrinting] = useState(false);
 
@@ -123,6 +125,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                             id={ticketData.id}
                             hash={ticketData.hash}
                             isCapture={false} // Normal aspect ratio for screen
+                            vendorName={user?.name || user?.username || "Vendedor"}
                         />
                     </View>
 
@@ -137,6 +140,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                                 ticketId={ticketData.id}
                                 hash={ticketData.hash}
                                 drawDate={ticketData.drawDate}
+                                vendorName={user?.name || user?.username || "Vendedor"}
                             />
                         </ViewShot>
                     </View>

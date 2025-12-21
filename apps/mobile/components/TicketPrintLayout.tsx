@@ -3,7 +3,7 @@ import { View, Text, Image } from 'react-native';
 import tw from '../lib/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
-import Barcode from 'react-native-barcode-svg';
+import { Barcode } from './Barcode'; // Import custom component
 
 interface TicketPrintLayoutProps {
     gameName: string;
@@ -13,6 +13,7 @@ interface TicketPrintLayoutProps {
     ticketId: string;
     terminalId?: string;
     vendorId?: string;
+    vendorName?: string; // New prop
     drawDate?: string;
     hash?: string;
 }
@@ -38,6 +39,7 @@ export const TicketPrintLayout = ({
     ticketId,
     terminalId = "----------",
     vendorId = "567890",
+    vendorName = "Vendedor", // Default
     drawDate,
     hash
 }: TicketPrintLayoutProps) => {
@@ -52,7 +54,7 @@ export const TicketPrintLayout = ({
                 <View style={tw`border-2 border-gray-800 rounded-xl p-2 px-6 flex-row items-center justify-center`}>
                     <Ionicons name="leaf-outline" size={36} color="#333" style={tw`mr-2`} />
                     <View>
-                        <Text style={[tw`text-3xl font-bold text-gray-800`, { fontFamily: 'serif' }]}>FEZINHA</Text>
+                        <Text style={tw`text-3xl font-bold text-gray-800`}>FEZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-1`}>
                             <Ionicons name="calendar" size={12} color="#333" style={tw`mr-1`} />
                             <Text style={tw`text-xs font-bold text-gray-800 uppercase`}>De Hoje</Text>
@@ -76,7 +78,7 @@ export const TicketPrintLayout = ({
                                 <Text style={tw`font-bold text-[10px] text-black self-start mb-1 ml-2`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
                                     <View style={tw`items-center`}>
-                                        <Text style={[tw`text-4xl text-black tracking-widest`, { fontFamily: 'serif' }]}>
+                                        <Text style={tw`text-4xl text-black font-bold tracking-widest`}>
                                             {num.toString().padStart(4, '0').split('').join(' ')}
                                         </Text>
                                         <View style={tw`flex-row w-full justify-between px-1`}>
@@ -117,7 +119,7 @@ export const TicketPrintLayout = ({
                 <View style={tw`items-center mb-1`}>
                     <View style={tw`flex-row gap-4`}>
                         {[1, 5, 8, 6, 5, 6].map((n, i) => (
-                            <Text key={i} style={[tw`text-3xl font-bold text-black`, { fontFamily: 'serif' }]}>{n}</Text>
+                            <Text key={i} style={tw`text-3xl font-bold text-black`}>{n}</Text>
                         ))}
                     </View>
                     <View style={tw`flex-row gap-4`}>
@@ -139,17 +141,23 @@ export const TicketPrintLayout = ({
             <View style={tw`mb-2 px-4`}>
                 <Text style={tw`text-[10px] text-black font-bold`}>Bilhete Número: {ticketId.substring(0, 4)} - Série: 001</Text>
                 <Text style={tw`text-[10px] text-black font-bold`}>Preço da Aposta: {price}</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Terminal número: {terminalId}   Vendedor: {vendorId}</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Data da aposta: {date}</Text>
+                <Text style={tw`text-[10px] text-black font-bold`}>Terminal: {terminalId}   Vendedor: {vendorName}</Text>
+                <Text style={tw`text-[10px] text-black font-bold`}>Data da Aposta: {date}</Text>
+                <Text style={tw`text-[10px] text-black font-bold`}>Extração: {drawDate || "Hoje 19H"}</Text>
             </View>
 
             {/* Barcode e QR Code */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`overflow-hidden items-center justify-center mb-1`}>
-                    {/* Barcode Removed to prevent crash specific to some Android versions/SVG libs */}
-                    <View style={tw`h-12 w-full items-center justify-center border border-gray-300 rounded mb-1 px-2`}>
-                        <Text style={tw`font-bold text-xs text-black tracking-widest`}>
-                            {hash || ticketId?.substring(0, 12) || '000000000000'}
+                    {/* Barcode Component Custom */}
+                    <View style={tw`items-center justify-center mb-1 px-2`}>
+                        <Barcode
+                            value={hash || ticketId || '000000000000'}
+                            width={300}
+                            height={50}
+                        />
+                        <Text style={tw`font-bold text-[10px] text-black tracking-widest mt-1`}>
+                            {hash || ticketId?.substring(0, 12)}
                         </Text>
                     </View>
                 </View>

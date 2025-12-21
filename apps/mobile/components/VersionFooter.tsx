@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import * as Application from 'expo-application';
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import tw from "../lib/tailwind";
 import { AppConfig } from "../constants/AppConfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { UpdatesService } from "../services/updates.service";
+import { UpdaterService } from "../services/updater.service";
 import { CustomAlert, AlertType } from "./CustomAlert";
 
 export function VersionFooter() {
@@ -25,6 +27,69 @@ export function VersionFooter() {
         const minLoadPromise = new Promise(resolve => setTimeout(resolve, 1000));
 
         try {
+            // 1. Check for NATIVE APK update first
+            const nativeUpdate = await UpdaterService.checkForUpdates();
+
+            if (nativeUpdate) {
+                setAlertConfig({
+                    visible: true,
+                    title: "Nova Versão Disponível",
+                    message: `Versão ${nativeUpdate.version} disponível (Sua: ${Application.nativeApplicationVersion}). Deseja atualizar?\n\n${nativeUpdate.notes || ''}`,
+                    type: "success",
+                    showCancel: !nativeUpdate.force,
+                    confirmText: "Baixar Agora",
+                    cancelText: "Depois",
+                    onConfirm: async () => {
+                        // DO NOT close alert immediately. Transition directly to Downloading state.
+
+                        // 1. Show downloading state
+                        setAlertConfig({
+                            visible: true,
+                            title: "Baixando...",
+                            message: "Iniciando download... 0%",
+                            type: "info",
+                            showCancel: false,
+                        });
+
+                        try {
+                            await UpdaterService.downloadUpdate(nativeUpdate.apkUrl, (progress) => {
+                                const percent = Math.round(progress * 100);
+                                setAlertConfig(prev => ({
+                                    ...prev,
+                                    title: "Baixando...", // Keep title consistent
+                                    message: `Baixando atualização... ${percent}%`,
+                                    type: "info",
+                                    showCancel: false
+                                }));
+                            });
+                            // If download finishes and intent is launched, we can close the alert or leave it
+                            // Usually intent takes over. Let's close it after a brief success msg.
+                            setAlertConfig({
+                                visible: true,
+                                title: "Instalando",
+                                message: "O instalador do Android será aberto. Siga as instruções.",
+                                type: "success",
+                                showCancel: false,
+                                confirmText: "OK",
+                                onConfirm: hideAlert
+                            });
+                        } catch (err: any) {
+                            setAlertConfig({
+                                visible: true,
+                                title: "Falha na Atualização",
+                                message: err.message || "Erro desconhecido ao baixar.",
+                                type: "error",
+                                showCancel: false,
+                                confirmText: "OK",
+                                onConfirm: hideAlert
+                            });
+                        }
+                    }
+                });
+                return;
+            }
+
+            // 2. If no native update, check for OTA (Code) update
             const hasUpdate = await UpdatesService.checkForUpdate();
             await minLoadPromise;
 
@@ -37,12 +102,9 @@ export function VersionFooter() {
                     showCancel: true,
                     confirmText: "Atualizar",
                     onConfirm: async () => {
-                        hideAlert();
-                        // Show downloading alert? Or just loading?
-                        // Let's do a simple blocking loading or just alert.
-                        // Ideally we'd show progress but expo-updates simple fetch doesn't broadcast progress easily here.
-                        // We will just wait.
+                        setAlertConfig(prev => ({ ...prev, visible: false })); // Close confirm
                         setIsChecking(true); // Keep spinner
+
                         try {
                             const fetched = await UpdatesService.fetchUpdate();
                             if (fetched) {
@@ -60,6 +122,7 @@ export function VersionFooter() {
                                 setAlertConfig({ visible: true, title: "Erro", message: "Falha ao baixar atualização.", type: "error" });
                             }
                         } catch (e) {
+                            console.error(e);
                             setAlertConfig({ visible: true, title: "Erro", message: "Erro ao baixar.", type: "error" });
                         } finally {
                             setIsChecking(false);

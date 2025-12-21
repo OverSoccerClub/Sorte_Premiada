@@ -12,9 +12,10 @@ interface TicketPreviewProps {
     id?: string;
     isCapture?: boolean;
     hash?: string;
+    vendorName?: string; // New prop
 }
 
-export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "PREVIEW", isCapture = false, hash }: TicketPreviewProps) {
+export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "PREVIEW", isCapture = false, hash, vendorName }: TicketPreviewProps) {
 
     // If capturing (generating image for printing), we render it "raw" for ViewShot.
     // If previewing (modal), we scale it down to fit the screen nicely.
@@ -29,6 +30,7 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                 ticketId={id}
                 drawDate={drawDate}
                 hash={hash}
+                vendorName={vendorName}
             />
         );
     }
@@ -46,6 +48,7 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                     ticketId={id}
                     drawDate={drawDate}
                     hash={hash}
+                    vendorName={vendorName}
                 />
             </View>
         </View>
