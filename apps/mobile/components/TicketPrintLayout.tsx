@@ -49,13 +49,13 @@ export const TicketPrintLayout = ({
 
     return (
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
-        // Increased base padding to ensure content isn't cut off
         // Adjusted scaleY to 0.85. To make QR square, we need to inverse scale Y for it (~1.18).
+        // User reported it's stretched VERTICALLY. So we remove the 1.18 inverse to let it be squashed (0.85) to counteract printer stretch.
         <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
-            {/* Header - Logo Simulada - TICKET ICON & WIDER */}
+            {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
             <View style={tw`items-center mb-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
-                    <Ionicons name="ticket-outline" size={42} color="#000" style={tw`mr-3`} />
+                    <Ionicons name="leaf-outline" size={42} color="#000" style={tw`mr-3`} />
                     <View style={tw`items-center`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FÉZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
@@ -171,16 +171,15 @@ export const TicketPrintLayout = ({
                             width={370}
                             height={90}
                         />
-                        <Text style={tw`font-bold text-[14px] text-black tracking-[4px] mt-1`}>
+                        <Text style={tw`font-bold text-[9px] text-black tracking-[4px] mt-1`}>
                             {ticketId}
                         </Text>
                     </View>
                 </View>
 
-                {/* QR Code Centered and Large - Counter Scale applied to make it square */}
-                {/* Global scaleY is 0.85. Inverse is ~1.176 */}
-                {/* Increased size to 150 as requested (wider) */}
-                <View style={[tw`items-center justify-center w-full mt-2`, { transform: [{ scaleY: 1.18 }] }]}>
+                {/* QR Code Centered and Large - NO TRANSFORM (inherit 0.85 squash) */}
+                {/* Removed scaleY 1.18 to let it be squashed to fix 'vertical stretch' reported by user */}
+                <View style={tw`items-center justify-center w-full mt-2`}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
                     </View>
