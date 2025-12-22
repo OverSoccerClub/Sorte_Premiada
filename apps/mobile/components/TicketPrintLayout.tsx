@@ -149,15 +149,15 @@ export const TicketPrintLayout = ({
             {/* Barcode e QR Code */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`overflow-hidden items-center justify-center mb-1`}>
-                    {/* Barcode Component Custom */}
-                    <View style={tw`items-center justify-center mb-1 px-2`}>
+                    {/* Barcode Component Custom - Optimized for 58mm */}
+                    <View style={tw`items-center justify-center mb-1 px-1 bg-white`}>
                         <Barcode
-                            value={hash || ticketId || '000000000000'}
-                            width={300}
-                            height={50}
+                            value={ticketId || '000000000000'} // Use ID instead of Hash (Hash is too long for linear barcode)
+                            width={360} // Max width for 384px paper with small padding
+                            height={80} // Taller for easier scanning
                         />
-                        <Text style={tw`font-bold text-[10px] text-black tracking-widest mt-1`}>
-                            {hash || ticketId?.substring(0, 12)}
+                        <Text style={tw`font-bold text-[12px] text-black tracking-widest mt-1`}>
+                            {ticketId}
                         </Text>
                     </View>
                 </View>
