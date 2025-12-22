@@ -53,8 +53,8 @@ export const TicketPrintLayout = ({
         // User reported it's stretched VERTICALLY. So we remove the 1.18 inverse to let it be squashed (0.85) to counteract printer stretch.
         <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
             {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
-            <View style={tw`items-center mb-1`}>
-                <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
+            <View style={tw`items-center mb-1 w-full px-1`}>
+                <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
                     <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-6`} />
                     <View style={tw`items-center`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FEZINHA</Text>
@@ -115,7 +115,7 @@ export const TicketPrintLayout = ({
             {/* Segunda Chance */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
-                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>CHANCE EXTRA</Text>
+                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>SEGUNDA CHANCE</Text>
                     <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA SÁBADO - 16H15MIN</Text>
                 </View>
 
