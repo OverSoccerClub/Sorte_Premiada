@@ -50,13 +50,15 @@ export const TicketPrintLayout = ({
     return (
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
         // Increased base padding to ensure content isn't cut off
+        // Adjusted scaleY to 0.85. To make QR square, we need to inverse scale Y for it (~1.18).
+        // Increased base padding to ensure content isn't cut off
         <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
-            {/* Header - Logo Simulada - LARGER */}
+            {/* Header - Logo Simulada - LARGER & WIDER */}
             <View style={tw`items-center mb-1`}>
-                <View style={tw`border-[3px] border-black rounded-xl p-2 px-8 flex-row items-center justify-center`}>
+                <View style={tw`border-[3px] border-black rounded-xl p-2 px-6 flex-row items-center justify-center`}>
                     <Ionicons name="leaf-outline" size={42} color="#000" style={tw`mr-3`} />
-                    <View>
-                        <Text style={tw`text-4xl font-black text-black leading-tight`}>FEZINHA</Text>
+                    <View style={tw`items-center`}>
+                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.1 }] }]}>FÉZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
                             <Ionicons name="calendar-sharp" size={14} color="#000" style={tw`mr-1`} />
                             <Text style={tw`text-sm font-black text-black uppercase`}>DE HOJE</Text>
@@ -134,17 +136,17 @@ export const TicketPrintLayout = ({
                 </Text>
             </View>
 
-            {/* Detalhes do Bilhete - LARGER FONTS */}
+            {/* Detalhes do Bilhete - EVEN LARGER FONTS */}
             <View style={tw`mb-2 px-2`}>
                 <View style={tw`flex-row justify-between`}>
-                    <Text style={tw`text-[11px] text-black font-bold`}>Bilhete: {ticketId.substring(0, 4)}</Text>
-                    <Text style={tw`text-[11px] text-black font-bold`}>Série: 001</Text>
+                    <Text style={tw`text-[13px] text-black font-black`}>Bilhete: {ticketId.substring(0, 4)}</Text>
+                    <Text style={tw`text-[13px] text-black font-black`}>Série: 001</Text>
                 </View>
-                <Text style={tw`text-[11px] text-black font-bold`}>Preço: {price}</Text>
-                <Text style={tw`text-[11px] text-black font-bold`}>Terminal: {terminalId}</Text>
-                <Text style={tw`text-[11px] text-black font-bold`}>Vendedor: {vendorName}</Text>
-                <Text style={tw`text-[11px] text-black font-bold`}>Data: {date}</Text>
-                <Text style={tw`text-[11px] text-black font-bold`}>Extração: {drawDate || "Hoje 19H"}</Text>
+                <Text style={tw`text-[13px] text-black font-black`}>Preço: {price}</Text>
+                <Text style={tw`text-[13px] text-black font-black`}>Terminal: {terminalId}</Text>
+                <Text style={tw`text-[13px] text-black font-black`}>Vendedor: {vendorName}</Text>
+                <Text style={tw`text-[13px] text-black font-black`}>Data: {date}</Text>
+                <Text style={tw`text-[13px] text-black font-black`}>Extração: {drawDate || "Hoje 19H"}</Text>
             </View>
 
             {/* Barcode e QR Code - MAXIMIZED */}
@@ -163,8 +165,9 @@ export const TicketPrintLayout = ({
                     </View>
                 </View>
 
-                {/* QR Code Centered and Large */}
-                <View style={tw`items-center justify-center w-full mt-2`}>
+                {/* QR Code Centered and Large - Counter Scale applied to make it square */}
+                {/* Global scaleY is 0.85. Inverse is ~1.176 */}
+                <View style={[tw`items-center justify-center w-full mt-2`, { transform: [{ scaleY: 1.18 }] }]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={130} />
                     </View>
