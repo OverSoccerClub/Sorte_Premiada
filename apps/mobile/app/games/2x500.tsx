@@ -582,40 +582,45 @@ export default function Game2x500Screen() {
 
             {/* Modal & Alerts */}
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleBackFromModal}>
-                <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
-                    <View style={tw`w-full`}>
-                        <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAÇÃO</Text>
+                <View style={tw`flex-1 bg-black/90`}>
+                    <ScrollView
+                        contentContainerStyle={tw`flex-grow justify-center items-center p-4`}
+                        showsVerticalScrollIndicator={true}
+                    >
+                        <View style={tw`w-full max-w-[400px]`}>
+                            <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAÇÃO</Text>
 
-                        <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl`}>
-                            <TicketPreview
-                                gameName="2x500"
-                                numbers={selectedNumbers}
-                                price="R$ 10,00"
-                            />
-                            {isAutoPick && (
-                                <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
-                                    <Text style={tw`text-white font-bold text-xs uppercase`}>Surpresinha</Text>
-                                </View>
-                            )}
-                        </View>
-
-                        <TouchableOpacity
-                            style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95`}
-                            onPress={handlePrint}
-                        >
-                            <View style={tw`flex-row items-center`}>
-                                <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
-                                <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
+                            <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl items-center`}>
+                                <TicketPreview
+                                    gameName="2x500"
+                                    numbers={selectedNumbers}
+                                    price="R$ 10,00"
+                                />
+                                {isAutoPick && (
+                                    <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
+                                        <Text style={tw`text-white font-bold text-xs uppercase`}>Surpresinha</Text>
+                                    </View>
+                                )}
                             </View>
-                        </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95`}
-                            onPress={handleBackFromModal}
-                        >
-                            <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <TouchableOpacity
+                                style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
+                                onPress={handlePrint}
+                            >
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
+                                    <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
+                                </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95 w-full mb-4`}
+                                onPress={handleBackFromModal}
+                            >
+                                <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
                 </View>
             </Modal>
 

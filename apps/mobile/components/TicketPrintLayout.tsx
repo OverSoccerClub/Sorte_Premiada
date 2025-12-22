@@ -80,7 +80,7 @@ export const TicketPrintLayout = ({
                                 <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
                                     <View style={tw`items-center w-full`}>
-                                        <Text style={tw`text-5xl text-black font-black tracking-widest`}>
+                                        <Text style={tw`text-4xl text-black font-black tracking-widest`}>
                                             {num.toString().padStart(4, '0').split('').join(' ')}
                                         </Text>
                                         <View style={tw`flex-row w-full justify-between px-2`}>
