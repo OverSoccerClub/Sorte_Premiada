@@ -143,7 +143,7 @@ export function VersionFooter() {
             }
         } catch (error) {
             await minLoadPromise;
-            setAlertConfig({ visible: true, title: "Erro", message: "Não foi possível verificar atualizações.", type: "error" });
+            setAlertConfig({ visible: true, title: "Erro", message: (error as any).message || "Não foi possível verificar atualizações.", type: "error" });
         } finally {
             setIsChecking(false);
         }
