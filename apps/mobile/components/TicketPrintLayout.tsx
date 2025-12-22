@@ -150,12 +150,12 @@ export const TicketPrintLayout = ({
             {/* Barcode e QR Code - MAXIMIZED */}
             <View style={tw`items-center mb-4`}>
                 <View style={tw`overflow-hidden items-center justify-center mb-2`}>
-                    {/* Barcode Component Custom - Optimized for 58mm */}
+                    {/* Barcode Component Custom - Fully Optimized */}
                     <View style={tw`items-center justify-center mb-1 px-0 bg-white`}>
                         <Barcode
                             value={ticketId || '000000000000'}
-                            width={370} // Slightly wider
-                            height={90} // Taller
+                            width={370}
+                            height={90}
                         />
                         <Text style={tw`font-bold text-[14px] text-black tracking-[4px] mt-1`}>
                             {ticketId}
@@ -163,19 +163,14 @@ export const TicketPrintLayout = ({
                     </View>
                 </View>
 
-                <View style={tw`flex-row items-center justify-between w-full px-2 mt-1`}>
-                    <View style={tw`flex-1 mr-2`}>
-                        <Text style={tw`text-right text-[11px] font-bold text-black leading-tight`}>
-                            Baixe o App{'\n'}para conferir{'\n'}sua aposta
-                        </Text>
-                        <Text style={tw`text-right font-black text-[12px] text-black mt-1`}>
-                            fezinhadehoje.com.br
-                        </Text>
+                {/* QR Code Centered and Large */}
+                <View style={tw`items-center justify-center w-full mt-2`}>
+                    <View style={tw`border-[3px] border-black p-1 bg-white`}>
+                        <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={130} />
                     </View>
-                    <View style={tw`border-2 border-black p-1 bg-white ml-2`}>
-                        {/* Larger QR Code */}
-                        <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={90} />
-                    </View>
+                    <Text style={tw`text-center font-bold text-[10px] text-black mt-1`}>
+                        fezinhadehoje.com.br
+                    </Text>
                 </View>
             </View>
 
