@@ -57,7 +57,7 @@ export const TicketPrintLayout = ({
                 <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
                     <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-6`} />
                     <View style={tw`items-center`}>
-                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FÉZINHA</Text>
+                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FEZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
                             <Ionicons name="calendar-sharp" size={14} color="#000" style={tw`mr-1`} />
                             <Text style={tw`text-sm font-black text-black uppercase`}>DE HOJE</Text>
@@ -81,12 +81,13 @@ export const TicketPrintLayout = ({
                                 <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
                                     <View style={tw`items-center w-full`}>
-                                        <Text style={tw`text-4xl text-black font-black tracking-widest`}>
+                                        {/* Federal Style Numbers: Serif, Large, Bold */}
+                                        <Text style={[tw`text-5xl text-black font-bold tracking-widest`, { fontFamily: 'serif' }]}>
                                             {num.toString().padStart(4, '0').split('').join(' ')}
                                         </Text>
                                         <View style={tw`flex-row w-full justify-between px-2`}>
                                             {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                                <Text key={i} style={tw`text-[9px] text-black w-5 text-center font-bold`}>
+                                                <Text key={i} style={[tw`text-[10px] text-black w-6 text-center font-bold uppercase`, { fontFamily: 'serif' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
                                             ))}
