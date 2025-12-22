@@ -15,6 +15,7 @@ export function VersionFooter() {
     const [alertConfig, setAlertConfig] = useState<{
         visible: boolean; title: string; message: string; type: AlertType;
         showCancel?: boolean; onConfirm?: () => void; confirmText?: string; cancelText?: string;
+        useAppIcon?: boolean;
     }>({ visible: false, title: "", message: "", type: "info" });
 
     const hideAlert = () => setAlertConfig(prev => ({ ...prev, visible: false }));
@@ -49,6 +50,7 @@ export function VersionFooter() {
                             message: "Iniciando download... 0%",
                             type: "info",
                             showCancel: false,
+                            useAppIcon: true
                         });
 
                         try {
@@ -59,7 +61,8 @@ export function VersionFooter() {
                                     title: "Baixando...", // Keep title consistent
                                     message: `Baixando atualização... ${percent}%`,
                                     type: "info",
-                                    showCancel: false
+                                    showCancel: false,
+                                    useAppIcon: true
                                 }));
                             });
                             // If download finishes and intent is launched, we can close the alert or leave it
@@ -71,7 +74,8 @@ export function VersionFooter() {
                                 type: "success",
                                 showCancel: false,
                                 confirmText: "OK",
-                                onConfirm: hideAlert
+                                onConfirm: hideAlert,
+                                useAppIcon: true
                             });
                         } catch (err: any) {
                             setAlertConfig({
@@ -154,11 +158,11 @@ export function VersionFooter() {
             >
                 <View style={tw`flex-row items-center mb-1 opacity-50`}>
                     <MaterialCommunityIcons name="clover" size={12} color="#50C878" style={tw`mr-1`} />
-                    <Text style={tw`text-gray-400 font-bold text-[10px] tracking-widest`}>Fezinha do Dia</Text>
+                    <Text style={tw`text-gray-400 font-bold text-[10px] tracking-widest`}>Fezinha de Hoje</Text>
                 </View>
 
                 <View style={tw`flex-row items-center gap-2`}>
-                    <Text style={tw`text-gray-700 text-[8px]`}>Versão {AppConfig.version}</Text>
+                    <Text style={tw`text-gray-700 text-[8px]`}>Versão {Application.nativeApplicationVersion}</Text>
                     {isChecking && <ActivityIndicator size="small" color="#50C878" style={{ transform: [{ scale: 0.5 }] }} />}
                 </View>
             </TouchableOpacity>
@@ -173,6 +177,7 @@ export function VersionFooter() {
                 onConfirm={alertConfig.onConfirm}
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
+                useAppIcon={alertConfig.useAppIcon}
             />
         </>
     );

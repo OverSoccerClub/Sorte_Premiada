@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, Modal, Animated } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Animated, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../lib/tailwind";
 
@@ -15,6 +15,7 @@ export interface CustomAlertProps {
     onConfirm?: () => void;
     confirmText?: string;
     cancelText?: string;
+    useAppIcon?: boolean;
 }
 
 export const CustomAlert = ({
@@ -26,7 +27,8 @@ export const CustomAlert = ({
     showCancel = false,
     onConfirm,
     confirmText = "Entendido",
-    cancelText = "Cancelar"
+    cancelText = "Cancelar",
+    useAppIcon = false
 }: CustomAlertProps) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -95,8 +97,16 @@ export const CustomAlert = ({
                         { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
                     ]}
                 >
-                    <View style={tw`w-16 h-16 ${colorClass} rounded-full justify-center items-center mb-4 shadow-lg shadow-${colorClass.replace('bg-', '')}/50 border-4 border-surface -mt-10`}>
-                        <Ionicons name={iconName} size={32} color="white" />
+                    <View style={tw`w-16 h-16 ${colorClass} rounded-full justify-center items-center mb-4 shadow-lg shadow-${colorClass.replace('bg-', '')}/50 border-4 border-surface -mt-10 overflow-hidden`}>
+                        {useAppIcon ? (
+                            <Image
+                                source={require('../assets/icon.png')}
+                                style={{ width: '100%', height: '100%' }}
+                                resizeMode="cover"
+                            />
+                        ) : (
+                            <Ionicons name={iconName} size={32} color="white" />
+                        )}
                     </View>
                     <Text style={tw`text-lg font-bold text-white text-center mb-2`}>{title}</Text>
                     <Text style={tw`text-gray-400 text-center mb-6 leading-5 text-sm`}>{message}</Text>

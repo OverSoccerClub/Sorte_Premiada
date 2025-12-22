@@ -3,7 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { Alert, Platform, Linking } from 'react-native';
 
-const UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_do_dia';
+const UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje';
 const VERSION_FILE_URL = `${UPDATE_URL}/version.json`;
 
 export interface VersionInfo {

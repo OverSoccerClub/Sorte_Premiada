@@ -85,7 +85,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                 .map(n => n.toString().padStart(is2x500 ? 4 : 2, '0'))
                 .join(is2x500 ? '  ' : ' ');
 
-            const message = `🍀 *Fezinha do Dia* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 ID: ${ticketData.id.slice(0, 8)}...\n\n✨ Boa Sorte! ✨`;
+            const message = `🍀 *Fezinha de Hoje* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 ID: ${ticketData.id.slice(0, 8)}...\n\n✨ Boa Sorte! ✨`;
 
             // 3. Copy to Clipboard
             await Clipboard.setStringAsync(message);
