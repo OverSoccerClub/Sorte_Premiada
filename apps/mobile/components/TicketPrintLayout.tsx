@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 import tw from '../lib/tailwind';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { Barcode } from './Barcode'; // Import custom component
 
@@ -55,7 +55,7 @@ export const TicketPrintLayout = ({
             {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
             <View style={tw`items-center mb-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
-                    <Ionicons name="leaf-outline" size={42} color="#000" style={tw`mr-3`} />
+                    <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-3`} />
                     <View style={tw`items-center`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FÉZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
@@ -114,7 +114,7 @@ export const TicketPrintLayout = ({
             {/* Segunda Chance */}
             <View style={tw`items-center mb-2`}>
                 <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
-                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>SEGUNDA CHANCE</Text>
+                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>CHANCE EXTRA</Text>
                     <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA SÁBADO - 16H15MIN</Text>
                 </View>
 
@@ -177,9 +177,9 @@ export const TicketPrintLayout = ({
                     </View>
                 </View>
 
-                {/* QR Code Centered and Large - NO TRANSFORM (inherit 0.85 squash) */}
-                {/* Removed scaleY 1.18 to let it be squashed to fix 'vertical stretch' reported by user */}
-                <View style={tw`items-center justify-center w-full mt-2`}>
+                {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
+                {/* ScaleY 0.70 to counteract strong printer stretch */}
+                <View style={[tw`items-center justify-center w-full mt-2`, { transform: [{ scaleY: 0.70 }] }]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
                     </View>
