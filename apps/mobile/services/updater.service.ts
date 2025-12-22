@@ -35,7 +35,16 @@ export const UpdaterService = {
                 throw new Error(`Falha ao verificar versÃ£o (${response.status})`);
             }
 
-            const remoteData: VersionInfo = await response.json();
+            const text = await response.text();
+            // Strip BOM if present (some servers/editors add it)
+            const cleanText = text.replace(/^\uFEFF/, '').trim();
+
+            let remoteData: VersionInfo;
+            try {
+                remoteData = JSON.parse(cleanText);
+            } catch (e: any) {
+                throw new Error(`Erro ao ler JSON: ${e.message}`);
+            }
 
             // Use nativeApplicationVersion for display/compare
             // Fallback to "1.0.0" is risky if native module fails, but better than crash
