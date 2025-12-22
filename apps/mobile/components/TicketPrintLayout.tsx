@@ -55,7 +55,7 @@ export const TicketPrintLayout = ({
             {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
             <View style={tw`items-center mb-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
-                    <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-3`} />
+                    <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-6`} />
                     <View style={tw`items-center`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FÉZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
