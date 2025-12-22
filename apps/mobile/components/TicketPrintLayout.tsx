@@ -81,13 +81,13 @@ export const TicketPrintLayout = ({
                                 <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
                                     <View style={tw`items-center w-full`}>
-                                        {/* Federal Style Numbers: Serif, Large, Bold */}
-                                        <Text style={[tw`text-5xl text-black font-bold tracking-widest`, { fontFamily: 'serif' }]}>
+                                        {/* Federal Style Numbers: Serif, Large (Reduced), Bold */}
+                                        <Text style={[tw`text-4xl text-black font-bold tracking-widest`, { fontFamily: 'serif' }]}>
                                             {num.toString().padStart(4, '0').split('').join(' ')}
                                         </Text>
                                         <View style={tw`flex-row w-full justify-between px-2`}>
                                             {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                                <Text key={i} style={[tw`text-[10px] text-black w-6 text-center font-bold uppercase`, { fontFamily: 'serif' }]}>
+                                                <Text key={i} style={[tw`text-[8px] text-black w-6 text-center font-bold uppercase`, { fontFamily: 'serif' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
                                             ))}
