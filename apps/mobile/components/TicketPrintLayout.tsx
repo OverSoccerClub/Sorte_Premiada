@@ -51,14 +51,13 @@ export const TicketPrintLayout = ({
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
         // Increased base padding to ensure content isn't cut off
         // Adjusted scaleY to 0.85. To make QR square, we need to inverse scale Y for it (~1.18).
-        // Increased base padding to ensure content isn't cut off
         <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
-            {/* Header - Logo Simulada - LARGER & WIDER */}
+            {/* Header - Logo Simulada - NEW ICON & WIDER */}
             <View style={tw`items-center mb-1`}>
-                <View style={tw`border-[3px] border-black rounded-xl p-2 px-6 flex-row items-center justify-center`}>
-                    <Ionicons name="leaf-outline" size={42} color="#000" style={tw`mr-3`} />
+                <View style={tw`border-[3px] border-black rounded-xl p-2 px-4 flex-row items-center justify-center`}>
+                    <Ionicons name="trophy-outline" size={42} color="#000" style={tw`mr-3`} />
                     <View style={tw`items-center`}>
-                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.1 }] }]}>FÉZINHA</Text>
+                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FÉZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
                             <Ionicons name="calendar-sharp" size={14} color="#000" style={tw`mr-1`} />
                             <Text style={tw`text-sm font-black text-black uppercase`}>DE HOJE</Text>
@@ -136,17 +135,30 @@ export const TicketPrintLayout = ({
                 </Text>
             </View>
 
-            {/* Detalhes do Bilhete - EVEN LARGER FONTS */}
-            <View style={tw`mb-2 px-2`}>
-                <View style={tw`flex-row justify-between`}>
-                    <Text style={tw`text-[13px] text-black font-black`}>Bilhete: {ticketId.substring(0, 4)}</Text>
-                    <Text style={tw`text-[13px] text-black font-black`}>Série: 001</Text>
+            {/* Detalhes do Bilhete - NEW GROUPED LAYOUT */}
+            <View style={tw`mb-2 px-1`}>
+                <Text style={tw`text-center font-black text-[12px] text-black mb-1 mt-1 uppercase border-t-2 border-dashed border-black pt-1`}>
+                    INFORMAÇÕES DO BILHETE
+                </Text>
+
+                {/* Row 1: Bilhete | Série | Preço */}
+                <View style={tw`flex-row justify-between mb-1`}>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {ticketId.substring(0, 4)}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Série: 001</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Preço: {price}</Text>
                 </View>
-                <Text style={tw`text-[13px] text-black font-black`}>Preço: {price}</Text>
-                <Text style={tw`text-[13px] text-black font-black`}>Terminal: {terminalId}</Text>
-                <Text style={tw`text-[13px] text-black font-black`}>Vendedor: {vendorName}</Text>
-                <Text style={tw`text-[13px] text-black font-black`}>Data: {date}</Text>
-                <Text style={tw`text-[13px] text-black font-black`}>Extração: {drawDate || "Hoje 19H"}</Text>
+
+                {/* Row 2: Terminal | Vendedor */}
+                <View style={tw`flex-row justify-between mb-1`}>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Terminal: {terminalId}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Vendedor: {vendorName}</Text>
+                </View>
+
+                {/* Row 3: Data | Extração */}
+                <View style={tw`flex-row justify-between mb-1`}>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Data: {date}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Ext: {drawDate || "Hoje 19H"}</Text>
+                </View>
             </View>
 
             {/* Barcode e QR Code - MAXIMIZED */}
