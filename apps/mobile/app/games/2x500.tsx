@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, ActivityInd
 import ViewShot from "react-native-view-shot";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import * as Device from 'expo-device';
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
@@ -21,7 +22,7 @@ import { ReceiptModal } from "../../components/ReceiptModal";
 
 export default function Game2x500Screen() {
     const router = useRouter();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
     const printViewShotRef = useRef<ViewShot>(null);
@@ -461,6 +462,8 @@ export default function Game2x500Screen() {
                                 ticketId={lastTicket.id}
                                 drawDate={lastTicket.drawDate}
                                 hash={lastTicket.hash}
+                                vendorName={user?.name || user?.username || "Vendedor"}
+                                terminalId={Device.deviceName || Device.modelName || "Terminal"}
                             />
                         )}
                     </ViewShot>
