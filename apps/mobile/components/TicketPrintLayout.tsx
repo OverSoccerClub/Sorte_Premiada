@@ -48,49 +48,51 @@ export const TicketPrintLayout = ({
     const sortedNumbers = [...numbers].sort((a, b) => a - b);
 
     return (
-        <View style={[tw`bg-white w-[384px] p-2`, { transform: [{ scaleY: 0.8 }] }]}>
-            {/* Header - Logo Simulada */}
-            <View style={tw`items-center mb-2`}>
-                <View style={tw`border-2 border-gray-800 rounded-xl p-2 px-6 flex-row items-center justify-center`}>
-                    <Ionicons name="leaf-outline" size={36} color="#333" style={tw`mr-2`} />
+        // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
+        // Increased base padding to ensure content isn't cut off
+        <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
+            {/* Header - Logo Simulada - LARGER */}
+            <View style={tw`items-center mb-1`}>
+                <View style={tw`border-[3px] border-black rounded-xl p-2 px-8 flex-row items-center justify-center`}>
+                    <Ionicons name="leaf-outline" size={42} color="#000" style={tw`mr-3`} />
                     <View>
-                        <Text style={tw`text-3xl font-bold text-gray-800`}>FEZINHA</Text>
-                        <View style={tw`flex-row items-center justify-end -mt-1`}>
-                            <Ionicons name="calendar" size={12} color="#333" style={tw`mr-1`} />
-                            <Text style={tw`text-xs font-bold text-gray-800 uppercase`}>De Hoje</Text>
+                        <Text style={tw`text-4xl font-black text-black leading-tight`}>FEZINHA</Text>
+                        <View style={tw`flex-row items-center justify-end -mt-2`}>
+                            <Ionicons name="calendar-sharp" size={14} color="#000" style={tw`mr-1`} />
+                            <Text style={tw`text-sm font-black text-black uppercase`}>DE HOJE</Text>
                         </View>
                     </View>
                 </View>
                 {/* Info Sorteio */}
-                <Text style={tw`text-center font-bold text-black text-[10px] mt-1 uppercase`}>
+                <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
                     SORTEIO {ticketId.substring(0, 4)} - {drawDate || date.split(' ')[0]} - 19H
                 </Text>
             </View>
 
             {/* Fezinhas (Números) 2x2 Grid */}
-            <View style={tw`flex-row flex-wrap justify-between mb-2 px-2`}>
+            <View style={tw`flex-row flex-wrap justify-between mb-1 px-1`}>
                 {numbers.length > 0 ? (
                     // Always show 4 slots (or fewer if fewer selected) in a grid
                     Array.from({ length: 4 }).map((_, idx) => {
                         const num = numbers[idx];
                         return (
-                            <View key={idx} style={tw`w-[48%] mb-4 items-center`}>
-                                <Text style={tw`font-bold text-[10px] text-black self-start mb-1 ml-2`}>Fezinha {idx + 1}</Text>
+                            <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-200 rounded p-1`}>
+                                <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
-                                    <View style={tw`items-center`}>
-                                        <Text style={tw`text-4xl text-black font-bold tracking-widest`}>
+                                    <View style={tw`items-center w-full`}>
+                                        <Text style={tw`text-5xl text-black font-black tracking-widest`}>
                                             {num.toString().padStart(4, '0').split('').join(' ')}
                                         </Text>
-                                        <View style={tw`flex-row w-full justify-between px-1`}>
+                                        <View style={tw`flex-row w-full justify-between px-2`}>
                                             {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                                <Text key={i} style={tw`text-[8px] text-black w-4 text-center`}>
+                                                <Text key={i} style={tw`text-[9px] text-black w-5 text-center font-bold`}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
                                             ))}
                                         </View>
                                     </View>
                                 ) : (
-                                    <View style={tw`h-10`} /> // Spacer for empty slots if any
+                                    <View style={tw`h-12`} /> // Spacer
                                 )}
                             </View>
                         );
@@ -99,80 +101,80 @@ export const TicketPrintLayout = ({
             </View>
 
             {/* Linha Tracejada + Ganhos */}
-            <View style={tw`border-b border-dashed border-gray-400 mb-2 mx-4`} />
+            <View style={tw`border-b-2 border-dashed border-black mb-2 mx-2`} />
 
-            <Text style={tw`text-center font-bold text-[9px] text-black mb-1 uppercase`}>
+            <Text style={tw`text-center font-bold text-[11px] text-black mb-1 uppercase`}>
                 VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:
             </Text>
-            <Text style={tw`text-center font-bold text-[10px] text-black mb-3 border-b border-black pb-1`}>
-                MILHAR - R$ 1.000,00  CENTENA: R$ 100,00 - DEZENA: R$ 10
+            <Text style={tw`text-center font-black text-[12px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
+                MILHAR: R$ 1.000,00 • CENTENA: R$ 100,00
             </Text>
 
             {/* Segunda Chance */}
-            <View style={tw`items-center mb-4`}>
-                <View style={tw`bg-black rounded-full py-1 px-8 mb-1 items-center w-full`}>
-                    <Text style={tw`text-white text-center font-bold text-lg uppercase`}>SEGUNDA CHANCE</Text>
-                    <Text style={tw`text-white text-center text-[8px] uppercase`}>SORTEIO EXTRA SÁBADO, DIA XX/XX/XX - 16H15MIN</Text>
+            <View style={tw`items-center mb-2`}>
+                <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
+                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>SEGUNDA CHANCE</Text>
+                    <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA SÁBADO - 16H15MIN</Text>
                 </View>
 
                 {/* Números Segunda Chance (Mock) */}
                 <View style={tw`items-center mb-1`}>
-                    <View style={tw`flex-row gap-4`}>
+                    <View style={tw`flex-row gap-5`}>
                         {[1, 5, 8, 6, 5, 6].map((n, i) => (
-                            <Text key={i} style={tw`text-3xl font-bold text-black`}>{n}</Text>
-                        ))}
-                    </View>
-                    <View style={tw`flex-row gap-4`}>
-                        {[1, 5, 8, 6, 5, 6].map((n, i) => (
-                            <Text key={i} style={tw`text-[8px] text-black w-4 text-center`}>{numberToText(n)}</Text>
+                            <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
                         ))}
                     </View>
                 </View>
 
-                <Text style={tw`text-center font-bold text-[10px] text-black`}>
-                    PRÊMIO EXTRA DA SEGUNDA CHANCE - R$ 5.000,00
+                <Text style={tw`text-center font-bold text-[11px] text-black`}>
+                    PRÊMIO EXTRA - R$ 5.000,00
                 </Text>
                 <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
                     ACERTANDO TODOS OS NÚMEROS NA ORDEM
                 </Text>
             </View>
 
-            {/* Detalhes do Bilhete */}
-            <View style={tw`mb-2 px-4`}>
-                <Text style={tw`text-[10px] text-black font-bold`}>Bilhete Número: {ticketId.substring(0, 4)} - Série: 001</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Preço da Aposta: {price}</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Terminal: {terminalId}   Vendedor: {vendorName}</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Data da Aposta: {date}</Text>
-                <Text style={tw`text-[10px] text-black font-bold`}>Extração: {drawDate || "Hoje 19H"}</Text>
+            {/* Detalhes do Bilhete - LARGER FONTS */}
+            <View style={tw`mb-2 px-2`}>
+                <View style={tw`flex-row justify-between`}>
+                    <Text style={tw`text-[11px] text-black font-bold`}>Bilhete: {ticketId.substring(0, 4)}</Text>
+                    <Text style={tw`text-[11px] text-black font-bold`}>Série: 001</Text>
+                </View>
+                <Text style={tw`text-[11px] text-black font-bold`}>Preço: {price}</Text>
+                <Text style={tw`text-[11px] text-black font-bold`}>Terminal: {terminalId}</Text>
+                <Text style={tw`text-[11px] text-black font-bold`}>Vendedor: {vendorName}</Text>
+                <Text style={tw`text-[11px] text-black font-bold`}>Data: {date}</Text>
+                <Text style={tw`text-[11px] text-black font-bold`}>Extração: {drawDate || "Hoje 19H"}</Text>
             </View>
 
-            {/* Barcode e QR Code */}
-            <View style={tw`items-center mb-2`}>
-                <View style={tw`overflow-hidden items-center justify-center mb-1`}>
+            {/* Barcode e QR Code - MAXIMIZED */}
+            <View style={tw`items-center mb-4`}>
+                <View style={tw`overflow-hidden items-center justify-center mb-2`}>
                     {/* Barcode Component Custom - Optimized for 58mm */}
-                    <View style={tw`items-center justify-center mb-1 px-1 bg-white`}>
+                    <View style={tw`items-center justify-center mb-1 px-0 bg-white`}>
                         <Barcode
-                            value={ticketId || '000000000000'} // Use ID instead of Hash (Hash is too long for linear barcode)
-                            width={360} // Max width for 384px paper with small padding
-                            height={80} // Taller for easier scanning
+                            value={ticketId || '000000000000'}
+                            width={370} // Slightly wider
+                            height={90} // Taller
                         />
-                        <Text style={tw`font-bold text-[12px] text-black tracking-widest mt-1`}>
+                        <Text style={tw`font-bold text-[14px] text-black tracking-[4px] mt-1`}>
                             {ticketId}
                         </Text>
                     </View>
                 </View>
 
-                <View style={tw`flex-row items-end justify-between w-full px-4 mt-2`}>
-                    <View style={tw`flex-1`}>
-                        <Text style={tw`text-center text-[10px] font-bold text-black leading-3`}>
-                            Baixe o App{'\n'}para{'\n'}conferir a{'\n'}sua aposta
+                <View style={tw`flex-row items-center justify-between w-full px-2 mt-1`}>
+                    <View style={tw`flex-1 mr-2`}>
+                        <Text style={tw`text-right text-[11px] font-bold text-black leading-tight`}>
+                            Baixe o App{'\n'}para conferir{'\n'}sua aposta
                         </Text>
-                        <Text style={tw`text-center font-bold text-[10px] text-black mt-2`}>
-                            www.fezinhadehoje.com.br
+                        <Text style={tw`text-right font-black text-[12px] text-black mt-1`}>
+                            fezinhadehoje.com.br
                         </Text>
                     </View>
-                    <View>
-                        <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={70} />
+                    <View style={tw`border-2 border-black p-1 bg-white ml-2`}>
+                        {/* Larger QR Code */}
+                        <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={90} />
                     </View>
                 </View>
             </View>
