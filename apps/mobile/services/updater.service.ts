@@ -31,9 +31,8 @@ export const UpdaterService = {
             });
 
             if (!response.ok) {
-                // Silent fail
                 console.warn(`Update check failed with status: ${response.status}`);
-                return null;
+                throw new Error(`Falha ao verificar versÃ£o (${response.status})`);
             }
 
             const remoteData: VersionInfo = await response.json();
@@ -54,7 +53,7 @@ export const UpdaterService = {
             return null;
         } catch (error) {
             console.error('Update check failed:', error);
-            return null;
+            throw error; // Re-throw to be caught by UI
         }
     },
 
@@ -141,11 +140,19 @@ export const UpdaterService = {
     },
 
     compareVersions(remoteVer: string, localVer: string, remoteBuild: string, localBuild: string): boolean {
-        // 1. Compare semantic version strings
-        if (remoteVer !== localVer) {
-            return remoteVer > localVer;
+        // 1. Compare semantic version strings logic (Robust)
+        const v1 = remoteVer.split('.').map(Number);
+        const v2 = localVer.split('.').map(Number);
+
+        for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+            const num1 = v1[i] || 0;
+            const num2 = v2[i] || 0;
+            if (num1 > num2) return true;
+            if (num1 < num2) return false;
         }
-        // 2. If versions equal, compare build numbers
+
+        // 2. If semantic versions are strict equal, check build number
+        // (Only if remote is strictly greater)
         return parseInt(remoteBuild) > parseInt(localBuild);
     }
 };
