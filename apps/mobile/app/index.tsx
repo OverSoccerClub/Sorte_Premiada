@@ -28,6 +28,7 @@ export default function LoginScreen() {
         onConfirm?: () => void;
         confirmText?: string;
         cancelText?: string;
+        useAppIcon?: boolean;
     }>({
         visible: false,
         title: "",
@@ -70,6 +71,7 @@ export default function LoginScreen() {
             showCancel: true,
             cancelText: "Fechar",
             confirmText: "Contatar Suporte",
+            useAppIcon: true,
             onConfirm: () => {
                 // Open WhatsApp with pre-filled message
                 const message = "Olá, estou precisando recuperar minha senha no app Fezinha de Hoje.";
@@ -109,7 +111,7 @@ export default function LoginScreen() {
                             <MaterialCommunityIcons name="clover" size={40} color="#50C878" />
                         </View>
                         <Text style={tw`text-3xl font-extrabold text-white tracking-tighter`}>
-                            Fezinha <Text style={tw`text-primary`}>do Dia</Text>
+                            Fezinha <Text style={tw`text-primary`}>de Hoje</Text>
                         </Text>
                         <Text style={tw`text-gray-400 text-sm tracking-widest uppercase mt-1`}>Cambista Edition</Text>
                     </View>
@@ -181,6 +183,7 @@ export default function LoginScreen() {
                 onConfirm={alertConfig.onConfirm}
                 confirmText={alertConfig.confirmText}
                 cancelText={alertConfig.cancelText}
+                useAppIcon={alertConfig.useAppIcon}
             />
         </SafeAreaView>
     );

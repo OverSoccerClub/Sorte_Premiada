@@ -17,7 +17,7 @@ export const LoadingOverlay = () => {
                     {/* Logo / Icon */}
                     <View style={tw`bg-white/10 p-4 rounded-full mb-6`}>
                         <Image
-                            source={require('../assets/adaptive-icon.png')}
+                            source={require('../assets/icon.png')}
                             style={{ width: 64, height: 64 }}
                             resizeMode="contain"
                         />

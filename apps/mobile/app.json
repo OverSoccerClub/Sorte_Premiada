@@ -35,7 +35,7 @@
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "package": "com.anonymous.sortepremiada",
-            "versionCode": 9
+            "versionCode": 10
         },
         "web": {
             "favicon": "./assets/favicon.png"

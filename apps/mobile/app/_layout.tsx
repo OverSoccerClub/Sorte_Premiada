@@ -29,6 +29,7 @@ function AppInit() {
         showCancel?: boolean;
         onConfirm?: () => void;
         confirmText?: string;
+        useAppIcon?: boolean;
     }>({
         visible: false,
         title: "",
@@ -61,6 +62,7 @@ function AppInit() {
                         type: "success",
                         showCancel: !updateInfo.force,
                         confirmText: "ATUALIZAR",
+                        useAppIcon: true,
                         onConfirm: () => {
                             UpdaterService.downloadUpdate(updateInfo.apkUrl);
                             // Keep alert open or show 'Downloading'? 
@@ -91,6 +93,7 @@ function AppInit() {
             showCancel={alertConfig.showCancel}
             onConfirm={alertConfig.onConfirm}
             confirmText={alertConfig.confirmText}
+            useAppIcon={alertConfig.useAppIcon}
             onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
         />
     );
