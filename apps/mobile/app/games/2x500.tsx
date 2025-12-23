@@ -250,14 +250,20 @@ export default function Game2x500Screen() {
                 // OR I can update payload here if I wanted, but Service fix handles it.
             };
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
             const res = await fetch(`${API_URL}/tickets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -327,7 +333,14 @@ export default function Game2x500Screen() {
         } catch (error: any) {
             hide();
             setTimeout(() => {
-                showAlert("Erro", error.message || "Erro desconhecido.", "error");
+                const isTimeout = error.name === 'AbortError';
+                const errorMessage = isTimeout
+                    ? "O servidor demorou muito para responder. Verifique sua conexão ou tente novamente."
+                    : (error.message || "Erro desconhecido.");
+
+                setTimeout(() => {
+                    showAlert("Erro", errorMessage, "error");
+                }, 300);
             }, 300);
         }
     };
