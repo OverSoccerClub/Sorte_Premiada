@@ -20,4 +20,4 @@ echo "✅ Migrations applied successfully!"
 cd /app/apps/api
 
 echo "🌱 Starting NestJS App..."
-node dist/src/main
+node dist/apps/api/src/main
