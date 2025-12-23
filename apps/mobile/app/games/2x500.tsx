@@ -290,7 +290,7 @@ export default function Game2x500Screen() {
             });
 
             // 1. Show Standard Loading
-            show("Imprimindo Jeque...");
+            show("Imprimindo Bilhete...");
 
             // 2. Wait for Render (TicketPreview needs to update with lastTicket)
             setTimeout(async () => {
