@@ -79,7 +79,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
             }
 
             // 2. Format Text
-            const is2x500 = ticketData.gameName === "2x500";
+            const is2x500 = ticketData.gameName === "2x500" || ticketData.gameName === "2x1000";
             const formattedNums = ticketData.numbers
                 .sort((a, b) => a - b)
                 .map(n => n.toString().padStart(is2x500 ? 4 : 2, '0'))

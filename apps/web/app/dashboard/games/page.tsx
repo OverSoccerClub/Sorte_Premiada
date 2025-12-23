@@ -8,8 +8,8 @@ import { ArrowRight, Ticket } from "lucide-react"
 const games = [
     {
         id: "2x500",
-        name: "2x500",
-        description: "Clássico 2x500. Sorteios diários.",
+        name: "2x1000",
+        description: "Clássico 2x1000. Sorteios diários.",
         href: "/dashboard/games/2x500",
         color: "bg-emerald-500",
         status: "Ativo"

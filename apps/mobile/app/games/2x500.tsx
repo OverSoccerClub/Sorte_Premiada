@@ -434,7 +434,7 @@ export default function Game2x500Screen() {
                     <Ionicons name="arrow-back" size={24} color="#94a3b8" />
                 </TouchableOpacity>
                 <View style={tw`flex-1`}>
-                    <Text style={tw`text-xl font-bold text-center text-white`}>2x500</Text>
+                    <Text style={tw`text-xl font-bold text-center text-white`}>2x1000</Text>
                     <Text style={tw`text-center text-emerald-500 text-xs font-bold uppercase tracking-widest`}>
                         {isLoadingGame ? "Carregando..." : (soldNumbers.size > 0 ? `${soldNumbers.size} Vendidos` : "Jogo Ativo")}
                     </Text>

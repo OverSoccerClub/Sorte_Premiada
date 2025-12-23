@@ -13,7 +13,7 @@ import { CustomAlert } from "../../components/CustomAlert";
 const { height } = Dimensions.get("window");
 
 const games = [
-    { id: "2x500", name: "2x500", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
+    { id: "2x500", name: "2x1000", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
     { id: "jb", name: "Jogo do Bicho", color: "bg-amber-600", icon: "paw-outline", borderColor: "border-amber-500/30" },
 ];
 

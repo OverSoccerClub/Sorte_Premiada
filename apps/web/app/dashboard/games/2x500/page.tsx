@@ -99,7 +99,7 @@ export default function TwoXFiveHundredReportPage() {
                     <div className="p-2 bg-emerald-500/10 rounded-lg">
                         <Ticket className="w-8 h-8 text-emerald-500" />
                     </div>
-                    Relatório 2x500
+                    Relatório 2x1000
                 </h2>
                 <p className="text-muted-foreground mt-1 ml-14">Vendas filtradas por período e cambista.</p>
             </div>
