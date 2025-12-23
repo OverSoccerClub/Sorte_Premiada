@@ -308,8 +308,23 @@ export class FinanceService {
                 return;
             }
 
-            const summary = await this.getSummary(userId);
-            const currentTotal = Number(summary.totalSales); // Assuming totalSales is what we track against limit
+
+            // Direct query to avoid recursion with getSummary
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const salesAgg = await this.prisma.ticket.aggregate({
+                where: {
+                    userId,
+                    createdAt: { gte: startOfDay, lte: endOfDay },
+                    status: { not: 'CANCELLED' }
+                },
+                _sum: { amount: true }
+            });
+
+            const currentTotal = Number(salesAgg._sum.amount || 0);
 
             if (currentTotal + amountToAdd > Number(user.salesLimit)) {
                 throw new BadRequestException(`Limite de vendas diário atingido (R$ ${user.salesLimit}). Contate o supervisor.`);
