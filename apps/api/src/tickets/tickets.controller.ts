@@ -41,4 +41,10 @@ export class TicketsController {
     async getAvailability(@Param('gameId') gameId: string) {
         return this.ticketsService.getAvailability(gameId);
     }
+
+    @Get('validate/:id')
+    @UseGuards(JwtAuthGuard)
+    async validate(@Param('id') id: string) {
+        return this.ticketsService.validateTicket(id);
+    }
 }

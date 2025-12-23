@@ -291,4 +291,66 @@ export class TicketsService {
             orderBy: { createdAt: 'desc' }
         });
     }
+
+
+    async validateTicket(ticketId: string) {
+        const ticket = await this.prisma.ticket.findFirst({
+            where: {
+                OR: [
+                    { id: ticketId },
+                    { hash: ticketId } // Support lookup by hash if needed, though Barcode uses ID
+                ]
+            },
+            include: {
+                game: true,
+                user: { select: { name: true, username: true } }
+            }
+        });
+
+        if (!ticket) {
+            throw new BadRequestException("Bilhete não encontrado.");
+        }
+
+        // Check if draw has happened
+        const now = new Date();
+        const drawDate = ticket.drawDate ? new Date(ticket.drawDate) : new Date();
+        const isPastDraw = now > drawDate;
+
+        let status = 'PENDING';
+        let message = 'Aguardando sorteio.';
+        let prizeAmount = 0;
+
+        if (!isPastDraw) {
+            return {
+                status: 'PENDING',
+                message: `Sorteio agendado para ${drawDate.toLocaleString()}`,
+                ticket
+            };
+        }
+
+        // TODO: Here we would check the official results if available in the DB
+        // For now, if we don't have results integration, we might just return the ticket status
+        // If the ticket status is already updated by a background job (which seems to be missing or manual), return it.
+
+        if (ticket.status === 'WON') {
+            return {
+                status: 'WON',
+                message: 'Bilhete Premiado!',
+                ticket
+            };
+        } else if (ticket.status === 'LOST') {
+            return {
+                status: 'LOST',
+                message: 'Não foi dessa vez.',
+                ticket
+            };
+        } else {
+            // If status is PENDING but draw passed, it might be waiting for processed results
+            return {
+                status: 'PENDING_RESULT',
+                message: 'Aguardando apuração do resultado.',
+                ticket
+            };
+        }
+    }
 }

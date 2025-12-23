@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
+import React, { useState } from 'react';
+import { View, Text, Modal, ActivityIndicator, TouchableOpacity, Button } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import tw from '../../lib/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { TicketsService } from '../../services/tickets.service';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ValidateTicketScreen() {
     const [permission, requestPermission] = useCameraPermissions();
@@ -11,6 +13,7 @@ export default function ValidateTicketScreen() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
     const router = useRouter();
+    const { token } = useAuth();
 
     if (!permission) {
         return <View />;
@@ -26,29 +29,36 @@ export default function ValidateTicketScreen() {
     }
 
     const handleBarCodeScanned = async ({ type, data }: { type: string, data: string }) => {
+        // Prevent multiple scans
+        if (scanned || loading) return;
+
         setScanned(true);
         setLoading(true);
 
         try {
-            // TODO: Replace with real API call
-            // const res = await fetch(`${API_URL}/tickets/${data}/validate`);
-            // const data = await res.json();
+            console.log(`[Scanner] Type: ${type}, Data: ${data}`);
 
-            // Mock simulation
-            console.log(`Bar code with type ${type} and data ${data} has been scanned!`);
+            // Extract ID if URL
+            let ticketId = data;
+            if (data.includes('sorteio/')) {
+                const parts = data.split('sorteio/');
+                if (parts.length > 1) {
+                    ticketId = parts[1];
+                }
+            }
 
-            // Simulate API delay
-            setTimeout(() => {
-                setResult({
-                    status: 'PENDING', // or WON, LOST
-                    amount: 0,
-                    message: 'Bilhete aguardando sorteio.'
-                });
-                setLoading(false);
-            }, 1000);
+            // Call API
+            const validation = await TicketsService.validate(token!, ticketId);
 
+            if (validation.success) {
+                setResult(validation.data);
+            } else {
+                setResult({ error: true, message: validation.message });
+            }
         } catch (error) {
-            setResult({ error: true, message: 'Erro ao validar bilhete.' });
+            console.error(error);
+            setResult({ error: true, message: 'Erro ao processar bilhete.' });
+        } finally {
             setLoading(false);
         }
     };

@@ -60,5 +60,27 @@ export const TicketsService = {
             console.error("[TicketsService] Error:", error);
             return [];
         }
+    },
+
+    validate: async (token: string, ticketIdOrHash: string): Promise<{ success: boolean; data?: any; message?: string }> => {
+        try {
+            const url = `${AppConfig.api.baseUrl}/tickets/validate/${ticketIdOrHash}`;
+            console.log("[TicketsService] Validating:", url);
+
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const json = await res.json();
+
+            if (!res.ok) {
+                return { success: false, message: json.message || "Erro ao validar bilhete" };
+            }
+
+            return { success: true, data: json };
+        } catch (error) {
+            console.error("[TicketsService] Validate Error:", error);
+            return { success: false, message: "Erro de conexão" };
+        }
     }
 };
