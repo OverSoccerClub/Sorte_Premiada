@@ -215,7 +215,16 @@ export default function FinanceScreen() {
                     <Ionicons name="arrow-back" size={24} color="#94a3b8" />
                 </TouchableOpacity>
                 <View>
-                    <Text style={tw`text-2xl font-bold text-white`}>Financeiro</Text>
+                    <TouchableOpacity onLongPress={async () => {
+                        const info = await FinanceService.getDebugInfo(token!);
+                        if (info) {
+                            Alert.alert("Debug Info", JSON.stringify(info, null, 2));
+                        } else {
+                            Alert.alert("Debug", "Falha ao obter info.");
+                        }
+                    }}>
+                        <Text style={tw`text-2xl font-bold text-white`}>Financeiro</Text>
+                    </TouchableOpacity>
                     <Text style={tw`text-gray-400 text-sm`}>Gestão de caixa diário</Text>
                 </View>
             </View>

@@ -42,4 +42,9 @@ export class FinanceController {
     verifyClose(@Param('id') id: string, @Body() body: { status: 'VERIFIED' | 'REJECTED' }, @Request() req: any) {
         return this.financeService.verifyDailyClose(id, req.user.userId, body.status);
     }
+    @UseGuards(JwtAuthGuard)
+    @Get('debug-info')
+    getDebugInfo(@Request() req: any) {
+        return this.financeService.getDebugInfo(req.user.userId);
+    }
 }

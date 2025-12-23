@@ -326,4 +326,35 @@ export class FinanceService {
             return true;
         }
     }
+    async getDebugInfo(userId: string) {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const lastTickets = await this.prisma.ticket.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            take: 5
+        });
+
+        const dailyTickets = await this.prisma.ticket.findMany({
+            where: {
+                userId,
+                createdAt: { gte: startOfDay, lte: endOfDay }
+            }
+        });
+
+        return {
+            serverTime: new Date(),
+            serverTimeISO: new Date().toISOString(),
+            startOfDay,
+            endOfDay,
+            userId,
+            lastTicketsCount: lastTickets.length,
+            dailyTicketsCount: dailyTickets.length,
+            lastTickets,
+            dailyTicketsSample: dailyTickets.slice(0, 3)
+        };
+    }
 }

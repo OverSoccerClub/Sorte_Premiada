@@ -90,4 +90,16 @@ export const FinanceService = {
             return null;
         }
     }
+    async getDebugInfo(token: string): Promise<any> {
+        try {
+            const res = await fetch(`${AppConfig.api.baseUrl}/finance/debug-info`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) return await res.json();
+            return null;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    }
 };
