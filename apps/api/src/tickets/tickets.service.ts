@@ -26,11 +26,11 @@ export class TicketsService {
 
         let drawDate: Date | undefined;
 
-        // 2x500 Special Logic
-        if (data.gameType === '2x500') {
+        // 2x1000 Special Logic
+        if (data.gameType === '2x1000') {
             const gameId = data.game?.connect?.id;
             if (!gameId) {
-                throw new Error("Game ID is required for 2x500 game type");
+                throw new Error("Game ID is required for 2x1000 game type");
             }
 
             // Determine Draw Date

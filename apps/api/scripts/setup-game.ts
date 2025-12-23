@@ -21,7 +21,7 @@ async function main() {
     console.log("Logged in!");
 
     // 2. Create Game
-    console.log("Creating 2x500 Game...");
+    console.log("Creating 2x1000 Game...");
     const gameRes = await fetch(`${API_URL}/games`, {
         method: 'POST',
         headers: {
@@ -29,7 +29,7 @@ async function main() {
             'Authorization': `Bearer ${access_token}`
         },
         body: JSON.stringify({
-            name: '2x500',
+            name: '2x1000',
             rules: { numbers: 4, range: 10000 }
         })
     });

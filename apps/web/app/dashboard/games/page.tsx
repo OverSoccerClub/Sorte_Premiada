@@ -7,10 +7,10 @@ import { ArrowRight, Ticket } from "lucide-react"
 
 const games = [
     {
-        id: "2x500",
+        id: "2x1000",
         name: "2x1000",
         description: "Clássico 2x1000. Sorteios diários.",
-        href: "/dashboard/games/2x500",
+        href: "/dashboard/games/2x1000",
         color: "bg-emerald-500",
         status: "Ativo"
     },

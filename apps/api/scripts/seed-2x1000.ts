@@ -4,7 +4,7 @@ import { PrismaClient } from '@repo/database';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log("Seeding 2x500 game...");
+    console.log("Seeding 2x1000 game...");
     const fixedId = "11111111-1111-1111-1111-111111111111";
 
     try {
@@ -13,7 +13,7 @@ async function main() {
             update: {},
             create: {
                 id: fixedId,
-                name: '2x500',
+                name: '2x1000',
                 rules: { numbers: 4, range: 10000 },
             },
         });

@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
 import { Loader2, Calendar, Search, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle } from "lucide-react"
 
-export default function TwoXFiveHundredReportPage() {
+export default function TwoXOneThousandReportPage() {
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [gameId, setGameId] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export default function TwoXFiveHundredReportPage() {
 
                 if (gamesRes.ok) {
                     const games = await gamesRes.json()
-                    const game = games.find((g: any) => g.name === "2x500")
+                    const game = games.find((g: any) => g.name === "2x1000")
                     if (game) setGameId(game.id)
                 }
 

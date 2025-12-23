@@ -89,7 +89,7 @@ export const FinanceService = {
             console.error("Error closing day", e);
             return null;
         }
-    }
+    },
     async getDebugInfo(token: string): Promise<any> {
         try {
             const res = await fetch(`${AppConfig.api.baseUrl}/finance/debug-info`, {

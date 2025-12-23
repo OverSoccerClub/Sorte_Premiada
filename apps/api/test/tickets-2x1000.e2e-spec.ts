@@ -4,7 +4,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-describe('Tickets 2x500 (e2e)', () => {
+describe('Tickets 2x1000 (e2e)', () => {
     let app: INestApplication;
     let authToken: string;
     let gameId: string;
@@ -26,13 +26,13 @@ describe('Tickets 2x500 (e2e)', () => {
         authToken = loginResponse.body.access_token;
         expect(authToken).toBeDefined();
 
-        // 2. Create 2x500 Game
+        // 2. Create 2x1000 Game
         const gameResponse = await request(app.getHttpServer())
             .post('/games')
             .set('Authorization', `Bearer ${authToken}`)
             .send({
-                name: 'Test 2x500 Game',
-                rules: { type: '2x500' }
+                name: 'Test 2x1000 Game',
+                rules: { type: '2x1000' }
             })
             .expect(201);
 
@@ -51,7 +51,7 @@ describe('Tickets 2x500 (e2e)', () => {
             .set('Authorization', `Bearer ${authToken}`)
             .send({
                 gameId,
-                gameType: '2x500',
+                gameType: '2x1000',
                 numbers,
                 amount: 10
             })
@@ -67,7 +67,7 @@ describe('Tickets 2x500 (e2e)', () => {
             .set('Authorization', `Bearer ${authToken}`)
             .send({
                 gameId,
-                gameType: '2x500',
+                gameType: '2x1000',
                 numbers,
                 amount: 10
             })
@@ -80,7 +80,7 @@ describe('Tickets 2x500 (e2e)', () => {
             .set('Authorization', `Bearer ${authToken}`)
             .send({
                 gameId,
-                gameType: '2x500',
+                gameType: '2x1000',
                 amount: 10
                 // numbers missing -> auto pick
             })
@@ -100,7 +100,7 @@ describe('Tickets 2x500 (e2e)', () => {
             .set('Authorization', `Bearer ${authToken}`)
             .send({
                 gameId,
-                gameType: '2x500',
+                gameType: '2x1000',
                 numbers: [],
                 amount: 10
             })

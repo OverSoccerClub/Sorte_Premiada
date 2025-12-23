@@ -1,4 +1,4 @@
-# Build Release Script - Optimized
+# Build Release Script - Professional Edition
 # Usage: .\build_release.ps1 [-Clean]
 
 param (
@@ -6,10 +6,22 @@ param (
 )
 
 $ErrorActionPreference = "Stop"
+$Script:ValidationFailed = $false
 
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "   GERADOR DE APK - FEZINHA DO DIA" -ForegroundColor Cyan
-Write-Host "==========================================" -ForegroundColor Cyan
+function Write-Step {
+    param([string]$Message, [string]$Color = "Cyan")
+    Write-Host "`n[$([DateTime]::Now.ToString('HH:mm:ss'))] $Message" -ForegroundColor $Color
+}
+
+function Show-Progress {
+    param([string]$Activity, [string]$Status, [int]$Percent)
+    Write-Progress -Activity $Activity -Status $Status -PercentComplete $Percent
+}
+
+Clear-Host
+Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host "      GERADOR DE APK - FEZINHA DO DIA v2.0" -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
 
 # 1. Configuration
 $appJsonPath = ".\app.json"
@@ -19,90 +31,93 @@ $androidDir = ".\android"
 $apkOutput = "$androidDir\app\build\outputs\apk\release\app-release.apk"
 $finalApkName = "FezinhadeHoje.apk"
 
-# 2. Sync Version
-Write-Host "`n[1/5] Sincronizando versões..." -ForegroundColor Yellow
+try {
+    # 2. Sync Version
+    Show-Progress -Activity "Gerando APK" -Status "Sincronizando Versões..." -PercentComplete 10
+    Write-Step "1/5 Sincronizando versões..." -Color "Yellow"
 
-if (-not (Test-Path $appJsonPath)) {
-    Write-Error "app.json não encontrado!"
-}
+    if (-not (Test-Path $appJsonPath)) { throw "app.json não encontrado!" }
 
-$appConfig = Get-Content $appJsonPath -Raw | ConvertFrom-Json
-$version = $appConfig.expo.version
-$buildCode = $appConfig.expo.android.versionCode
+    $appConfig = Get-Content $appJsonPath -Raw | ConvertFrom-Json
+    $version = $appConfig.expo.version
+    $buildCode = $appConfig.expo.android.versionCode
 
-Write-Host "   Versão App: $version"
-Write-Host "   Build Code: $buildCode"
+    Write-Host "   -> Versão: $version (Build $buildCode)" -ForegroundColor Gray
 
-$versionData = @{
-    version = $version
-    build   = [string]$buildCode
-    apkUrl  = $finalApkName
-    force   = $true
-}
+    $versionData = @{
+        version = $version
+        build   = [string]$buildCode
+        apkUrl  = $finalApkName
+        force   = $true
+    }
+    $versionData | ConvertTo-Json -Depth 2 | Out-File $versionJsonPath -Encoding utf8
+    
+    # 3. Environment Check
+    Show-Progress -Activity "Gerando APK" -Status "Verificando Ambiente..." -PercentComplete 20
+    Write-Step "2/5 Verificando Ambiente..." -Color "Yellow"
+    
+    if (-not (Test-Path "$androidDir\local.properties")) {
+        Write-Warning "local.properties não encontrado. Tentando criar..."
+        "sdk.dir=C:\\Users\\natal\\AppData\\Local\\Android\\Sdk" | Out-File -Encoding ascii "$androidDir\local.properties"
+    }
 
-$versionData | ConvertTo-Json -Depth 2 | Out-File $versionJsonPath -Encoding utf8
-Write-Host "   version.json atualizado." -ForegroundColor Green
+    # 4. Prebuild
+    Show-Progress -Activity "Gerando APK" -Status "Executando Expo Prebuild..." -PercentComplete 30
+    Write-Step "3/5 Executando Prebuild..." -Color "Yellow"
 
-# 3. Prebuild
-Write-Host "`n[2/5] executando Prebuild..." -ForegroundColor Yellow
+    $prebuildCmd = "npx expo prebuild --platform android"
+    if ($Clean) { 
+        $prebuildCmd += " --clean" 
+        Write-Host "   -> Modo Limpo (Clean) Ativado" -ForegroundColor Magenta
+    }
+    
+    cmd /c $prebuildCmd
+    if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
 
-if ($Clean) {
-    Write-Host "   Modo Limpo ativado (--clean)..." -ForegroundColor Magenta
-    cmd /c "npx expo prebuild --platform android --clean"
-}
-else {
-    Write-Host "   Modo Incremental (Rápido)..." -ForegroundColor Cyan
-    # Check if we need to install dependencies first or if prebuild handles it
-    cmd /c "npx expo prebuild --platform android"
-}
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Falha no Prebuild."
-}
-
-# 4. Gradle Assembly
-Write-Host "`n[3/5] Compilando APK (Gradle)..." -ForegroundColor Yellow
-Set-Location $androidDir
-
-# Optimizations for Gradle
-$gradleArgs = "assembleRelease"
-if (-not $Clean) {
-    $gradleArgs += " --build-cache --parallel"
-}
-
-Invoke-Expression "./gradlew $gradleArgs"
-
-if ($LASTEXITCODE -ne 0) {
+    # 5. Gradle Assembly
+    Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60
+    Write-Step "4/5 Compilando APK (Gradle)..." -Color "Yellow"
+    
+    Set-Location $androidDir
+    $gradleArgs = "assembleRelease"
+    if (-not $Clean) { $gradleArgs += " --parallel" } # Removed --build-cache to be safer
+    
+    # Capture output to show only if error, but stream basic info? 
+    # For now, let it flow but user asked for progress bar. Gradle has its own bar usually.
+    # We will trust Gradle's output but keep our main progress bar active ?
+    # Actually, PowerShell pauses Write-Progress when external command runs.
+    
+    cmd /c "gradlew $gradleArgs -x lint"
+    
+    if ($LASTEXITCODE -ne 0) { 
+        Set-Location ..
+        throw "Falha na compilação do Gradle." 
+    }
     Set-Location ..
-    Write-Error "Falha na compilação do Gradle."
+
+    # 6. Artifact Management
+    Show-Progress -Activity "Gerando APK" -Status "Finalizando Artefatos..." -PercentComplete 90
+    Write-Step "5/5 Processando artefatos..." -Color "Yellow"
+
+    if (-not (Test-Path $distDir)) { New-Item -ItemType Directory -Path $distDir | Out-Null }
+
+    if (Test-Path $apkOutput) {
+        Copy-Item $apkOutput -Destination "$distDir\$finalApkName" -Force
+        Copy-Item $versionJsonPath -Destination "$distDir\version.json" -Force
+        
+        Show-Progress -Activity "Gerando APK" -Status "Concluído" -PercentComplete 100
+        Write-Step "SUCESSO! APK Gerado:" -Color "Green"
+        Write-Host "   -> $(Resolve-Path "$distDir\$finalApkName")" -ForegroundColor White
+    }
+    else {
+        throw "APK não encontrado em $apkOutput"
+    }
+
+}
+catch {
+    Write-Progress -Activity "Gerando APK" -Completed
+    Write-Host "`n[ERRO CRÍTICO] $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
 }
 
-Set-Location ..
-
-# 5. Artifact Management
-Write-Host "`n[4/5] Processando artefatos..." -ForegroundColor Yellow
-
-if (-not (Test-Path $distDir)) {
-    New-Item -ItemType Directory -Path $distDir | Out-Null
-}
-
-if (Test-Path $apkOutput) {
-    $destinationApk = "$distDir\$finalApkName"
-    $destinationJson = "$distDir\version.json"
-
-    Copy-Item $apkOutput -Destination $destinationApk -Force
-    Copy-Item $versionJsonPath -Destination $destinationJson -Force
-
-    Write-Host "   APK: $destinationApk" -ForegroundColor Green
-    Write-Host "   JSON: $destinationJson" -ForegroundColor Green
-}
-else {
-    Write-Error "APK não foi gerado no caminho esperado: $apkOutput"
-}
-
-# Summary
-Write-Host "`n==========================================" -ForegroundColor Cyan
-Write-Host "   SUCESSO! BUILD FINALIZADO" -ForegroundColor Green
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "Tempo estimado economizado: Muito."
-Get-Date
+Write-Progress -Activity "Gerando APK" -Completed
