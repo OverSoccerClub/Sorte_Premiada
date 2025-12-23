@@ -226,6 +226,31 @@ export default function FinanceScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#50C878" />}
             >
                 <View style={tw`w-[90%] max-w-[400px]`}>
+                    {/* Sales Limit Progress */}
+                    <View style={tw`bg-surface p-4 rounded-xl border border-gray-800 mb-6`}>
+                        <View style={tw`flex-row justify-between mb-2`}>
+                            <Text style={tw`text-gray-400 text-xs uppercase`}>Limite de Vendas Diário</Text>
+                            <Text style={tw`text-gray-400 text-xs`}>
+                                {Math.min(((summary?.totalSales || 0) / (summary?.salesLimit || 1000)) * 100, 100).toFixed(1)}%
+                            </Text>
+                        </View>
+                        <View style={tw`h-2 bg-gray-700 rounded-full overflow-hidden mb-2`}>
+                            <View
+                                style={[
+                                    tw`h-full rounded-full`,
+                                    {
+                                        width: `${Math.min(((summary?.totalSales || 0) / (summary?.salesLimit || 1000)) * 100, 100)}%`,
+                                        backgroundColor: (summary?.totalSales || 0) >= (summary?.salesLimit || 1000) ? '#ef4444' : '#10b981'
+                                    }
+                                ]}
+                            />
+                        </View>
+                        <View style={tw`flex-row justify-between`}>
+                            <Text style={tw`text-white font-bold`}>{formatCurrency(summary?.totalSales || 0)}</Text>
+                            <Text style={tw`text-gray-400`}>de {formatCurrency(summary?.salesLimit || 1000)}</Text>
+                        </View>
+                    </View>
+
                     {/* Summary Cards */}
                     <View style={tw`flex-row flex-wrap justify-between gap-y-3 mb-6`}>
                         <TouchableOpacity

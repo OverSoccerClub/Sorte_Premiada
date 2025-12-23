@@ -20,6 +20,7 @@ model User {
   role      Role     @default(CAMBISTA)
   salesLimit Decimal? @default(1000.00) // Limite diário de vendas (padrão 1000 se não definido)
   limitOverrideExpiresAt DateTime? // Data até quando o limite é ignorado ou estendido
+  accountabilityLimitHours Int? @default(24) // Tempo limite (em horas) para prestar contas após o início das vendas
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tickets      Ticket[]

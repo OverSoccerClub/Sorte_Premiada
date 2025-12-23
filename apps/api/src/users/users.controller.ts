@@ -80,10 +80,11 @@ export class UsersController {
     @Patch(':id/limit')
     @UseGuards(RolesGuard)
     @Roles('ADMIN')
-    async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string }) {
+    async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string, accountabilityLimitHours?: number }) {
         const data: Prisma.UserUpdateInput = {};
         if (body.salesLimit !== undefined) data.salesLimit = body.salesLimit;
         if (body.limitOverrideExpiresAt !== undefined) data.limitOverrideExpiresAt = body.limitOverrideExpiresAt;
+        if (body.accountabilityLimitHours !== undefined) data.accountabilityLimitHours = body.accountabilityLimitHours;
 
         return this.usersService.update(id, data);
     }

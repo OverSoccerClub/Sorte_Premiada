@@ -250,12 +250,57 @@ export class FinanceService {
             throw new BadRequestException("O caixa anterior ainda não foi conferido pelo supervisor.");
         }
 
-        // 3. Check Sales Limit
+        // 3. New Accountability Time Limit Check
+        // Logic: Find the FIRST transaction that happened AFTER the last verified close (or after user creation if none).
+        // If that transaction is older than user.accountabilityLimitHours, then BLOCK.
+
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: { salesLimit: true, limitOverrideExpiresAt: true }
+            select: { salesLimit: true, limitOverrideExpiresAt: true, accountabilityLimitHours: true, createdAt: true }
         });
 
+        const limitHours = user?.accountabilityLimitHours ?? 24; // Default 24h
+
+        // Find the specific cutoff time. If the oldest un-closed transaction is OLDER than this, we block.
+        const cutoffTime = new Date();
+        cutoffTime.setHours(cutoffTime.getHours() - limitHours);
+
+        // We need to find the oldest transaction that is NOT part of a verified daily close.
+        // Simplified approach: Look for any transaction created before cutoffTime that is PENDING or NOT in a close?
+        // Actually, if we follow the rule: "Closed Pending" is blocked by step 2.
+        // So we only care about "Open" transactions.
+        // We need to find if there is any transaction OLDER than cutoffTime that hasn't been closed/verified.
+        // But since we block "Pending" closes, we just need to check if there are any transactions *regardless of close status* (but wait, verified ones are fine).
+        // Correct logic: Find the Latest VERIFIED Close. Any transaction after that is "Open" or "Pending".
+        // If the *first* of those transactions is older than Limit, block.
+
+        const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
+            where: { closedByUserId: userId, status: 'VERIFIED' },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : user?.createdAt;
+
+        // Find the first transaction after the last verified close
+        const oldestOpenTransaction = await this.prisma.transaction.findFirst({
+            where: {
+                userId: userId,
+                createdAt: { gt: lastVerifiedDate } // strictly after
+            },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        if (oldestOpenTransaction) {
+            // We have open transactions. Check if the first one is too old.
+            if (oldestOpenTransaction.createdAt < cutoffTime) {
+                const limitDate = new Date(oldestOpenTransaction.createdAt);
+                limitDate.setHours(limitDate.getHours() + limitHours);
+
+                throw new BadRequestException(`Bloqueio por falta de prestação de contas. Suas vendas iniciaram em ${oldestOpenTransaction.createdAt.toLocaleString()} e o limite de ${limitHours}h expirou em ${limitDate.toLocaleString()}. Feche o caixa imediatamente.`);
+            }
+        }
+
+        // 4. Check Sales Limit
         if (user && user.salesLimit) {
             // Check override
             if (user.limitOverrideExpiresAt && user.limitOverrideExpiresAt > new Date()) {

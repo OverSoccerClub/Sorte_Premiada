@@ -154,20 +154,7 @@ export default function Dashboard() {
                     </View>
                 </TouchableOpacity>
 
-                {/* Botão de Prestação de Contas */}
-                <TouchableOpacity
-                    style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3`}
-                    onPress={() => router.push("/cashier")}
-                    activeOpacity={0.8}
-                >
-                    <View style={tw`bg-blue-500/20 p-2 rounded-full`}>
-                        <Ionicons name="wallet-outline" size={24} color="#3b82f6" />
-                    </View>
-                    <View>
-                        <Text style={tw`font-bold text-lg text-white`}>Prestação de Contas</Text>
-                        <Text style={tw`text-xs text-gray-400`}>Fechamento de caixa e financeiro</Text>
-                    </View>
-                </TouchableOpacity>
+
             </ScrollView>
 
 

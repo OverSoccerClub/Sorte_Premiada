@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, DollarSign } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, DollarSign, Clock } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const formSchema = z.object({
@@ -22,6 +22,7 @@ const formSchema = z.object({
     email: z.union([z.string().email({ message: "Email inválido." }), z.literal('')]),
     areaId: z.string().optional(),
     salesLimit: z.coerce.number().min(0).optional(),
+    accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
 })
 
 interface Area {
@@ -48,6 +49,7 @@ export default function CambistasPage() {
             email: "",
             areaId: undefined,
             salesLimit: 1000,
+            accountabilityLimitHours: 24,
         },
     })
 
@@ -100,6 +102,7 @@ export default function CambistasPage() {
                 password: "", // Password is optional on edit
                 areaId: cambista.areaId || undefined,
                 salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
+                accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
             })
         } else {
             setEditingId(null)
@@ -110,6 +113,7 @@ export default function CambistasPage() {
                 password: "",
                 areaId: undefined,
                 salesLimit: 1000,
+                accountabilityLimitHours: 24,
             })
         }
         setIsDialogOpen(true)
@@ -305,22 +309,41 @@ export default function CambistasPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="salesLimit"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Limite Diário de Vendas (R$)</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="salesLimit"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Limite Diário (R$)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="accountabilityLimitHours"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Prazo Prest. Contas (h)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input type="number" step="1" placeholder="24" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="password"
