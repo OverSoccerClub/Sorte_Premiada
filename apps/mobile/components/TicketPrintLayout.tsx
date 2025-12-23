@@ -55,7 +55,7 @@ export const TicketPrintLayout = ({
             {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
-                    <MaterialCommunityIcons name="clover" size={42} color="#000" style={tw`mr-6`} />
+                    <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-5`, { transform: [{ scaleY: 0.9 }] }]} />
                     <View style={tw`items-center`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FEZINHA</Text>
                         <View style={tw`flex-row items-center justify-end -mt-2`}>
@@ -72,10 +72,10 @@ export const TicketPrintLayout = ({
 
             {/* Fezinhas (Números) 2x2 Grid */}
             <View style={tw`flex-row flex-wrap justify-between mb-1 px-1`}>
-                {numbers.length > 0 ? (
+                {sortedNumbers.length > 0 ? (
                     // Always show 4 slots (or fewer if fewer selected) in a grid
                     Array.from({ length: 4 }).map((_, idx) => {
-                        const num = numbers[idx];
+                        const num = sortedNumbers[idx];
                         return (
                             <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-200 rounded p-1`}>
                                 <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>

@@ -3,15 +3,18 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionType } from '@prisma/client';
 
+enum DailyCloseStatus {
+    PENDING = 'PENDING',
+    VERIFIED = 'VERIFIED',
+    REJECTED = 'REJECTED'
+}
+
 @Injectable()
 export class FinanceService {
     constructor(private prisma: PrismaService) { }
 
     async createTransaction(userId: string, data: CreateTransactionDto) {
-        const isClosed = await this.isDayClosed(userId);
-        if (isClosed) {
-            throw new BadRequestException("O caixa do dia já foi fechado. Não é possível adicionar novas movimentações.");
-        }
+        await this.validateSalesEligibility(userId); // Validate limit and box status
 
         let cobradorId = undefined;
         if (data.cobradorId) {
@@ -108,11 +111,16 @@ export class FinanceService {
             b.createdAt.getTime() - a.createdAt.getTime()
         );
 
-        const isClosed = await this.isDayClosed(userId);
+        const isClosed = await this.validateSalesEligibility(userId).then(() => false).catch(() => true);
+
+        // Fetch User Limit
+        const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { salesLimit: true, limitOverrideExpiresAt: true } });
 
         return {
             date: new Date(),
             isClosed,
+            salesLimit: user?.salesLimit ? Number(user.salesLimit) : null,
+            limitOverrideExpiresAt: user?.limitOverrideExpiresAt,
             totalSales,
             totalCredits,
             totalDebits,
@@ -151,6 +159,23 @@ export class FinanceService {
     async closeDay(userId: string) {
         const summary = await this.getSummary(userId);
 
+        // Check if already closed today
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const existingClose = await this.prisma.dailyClose.findFirst({
+            where: {
+                closedByUserId: userId,
+                createdAt: { gte: startOfDay, lte: endOfDay }
+            }
+        });
+
+        if (existingClose) {
+            throw new BadRequestException("O caixa de hoje já foi fechado.");
+        }
+
         // Create DailyClose Record
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
@@ -159,29 +184,101 @@ export class FinanceService {
                 totalDebits: summary.totalDebits,
                 finalBalance: summary.finalBalance,
                 closedByUserId: userId,
-                netBalance: summary.finalBalance, // Net balance same as final for now unless commission logic added
+                netBalance: summary.finalBalance,
+                status: 'PENDING', // Default to PENDING
             },
         });
 
         return dailyClose;
     }
 
-    async isDayClosed(userId: string): Promise<boolean> {
+    async findAllPendingCloses() {
+        return this.prisma.dailyClose.findMany({
+            where: { status: 'PENDING' },
+            include: { closedByUser: true },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async verifyDailyClose(closeId: string, adminId: string, status: 'VERIFIED' | 'REJECTED') {
+        const dailyClose = await this.prisma.dailyClose.update({
+            where: { id: closeId },
+            data: {
+                status: status,
+                verifiedByUserId: adminId,
+                verifiedAt: new Date()
+            }
+        });
+        return dailyClose;
+    }
+
+    // New Validation Logic replacing isDayClosed
+    async validateSalesEligibility(userId: string, amountToAdd: number = 0): Promise<void> {
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
 
-        const closeRecord = await this.prisma.dailyClose.findFirst({
+        // 1. Check if TODAY is closed
+        const todayClose = await this.prisma.dailyClose.findFirst({
             where: {
                 closedByUserId: userId,
-                createdAt: {
-                    gte: startOfDay,
-                    lte: endOfDay,
-                },
+                createdAt: { gte: startOfDay, lte: endOfDay },
             },
         });
 
-        return !!closeRecord;
+        if (todayClose) {
+            throw new BadRequestException("O caixa do dia de hoje já está fechado.");
+        }
+
+        // 2. Check if YESTERDAY (or last closed session) is PENDING verification
+        // Logic: Find the *latest* DailyClose. If it exists and is PENDING, block.
+        // Unless we only block if it's strictly "Yesterday"? 
+        // Requirement: "no dia seguinte ele tenha como vender normalmente com o caixa dele conferido"
+        // So if specific previous day is not verified, block.
+        // Let's implement strict "Latest Close must be Verified" policy for safety.
+
+        const lastClose = await this.prisma.dailyClose.findFirst({
+            where: { closedByUserId: userId },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        if (lastClose && lastClose.status === 'PENDING') {
+            // Check if it's from a previous day (not just closed moments ago today, though today is already handled above)
+            // Actually, if today is closed, we already threw. So lastClose must be from past.
+            // If it is PENDING, we block.
+            throw new BadRequestException("O caixa anterior ainda não foi conferido pelo supervisor.");
+        }
+
+        // 3. Check Sales Limit
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { salesLimit: true, limitOverrideExpiresAt: true }
+        });
+
+        if (user && user.salesLimit) {
+            // Check override
+            if (user.limitOverrideExpiresAt && user.limitOverrideExpiresAt > new Date()) {
+                // Limit is overridden/unlocked, skip check
+                return;
+            }
+
+            const summary = await this.getSummary(userId);
+            const currentTotal = Number(summary.totalSales); // Assuming totalSales is what we track against limit
+
+            if (currentTotal + amountToAdd > Number(user.salesLimit)) {
+                throw new BadRequestException(`Limite de vendas diário atingido (R$ ${user.salesLimit}). Contate o supervisor.`);
+            }
+        }
+    }
+
+    // Deprecated or alias to new logic if needed by other services (e.g. TicketsService)
+    async isDayClosed(userId: string): Promise<boolean> {
+        try {
+            await this.validateSalesEligibility(userId);
+            return false;
+        } catch (e) {
+            return true;
+        }
     }
 }

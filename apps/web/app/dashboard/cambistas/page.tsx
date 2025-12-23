@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, DollarSign } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const formSchema = z.object({
@@ -21,6 +21,7 @@ const formSchema = z.object({
     password: z.string().optional(),
     email: z.union([z.string().email({ message: "Email inválido." }), z.literal('')]),
     areaId: z.string().optional(),
+    salesLimit: z.coerce.number().min(0).optional(),
 })
 
 interface Area {
@@ -46,6 +47,7 @@ export default function CambistasPage() {
             password: "",
             email: "",
             areaId: undefined,
+            salesLimit: 1000,
         },
     })
 
@@ -97,6 +99,7 @@ export default function CambistasPage() {
                 email: cambista.email || "",
                 password: "", // Password is optional on edit
                 areaId: cambista.areaId || undefined,
+                salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
             })
         } else {
             setEditingId(null)
@@ -106,6 +109,7 @@ export default function CambistasPage() {
                 email: "",
                 password: "",
                 areaId: undefined,
+                salesLimit: 1000,
             })
         }
         setIsDialogOpen(true)
@@ -297,6 +301,22 @@ export default function CambistasPage() {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="salesLimit"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">Limite Diário de Vendas (R$)</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                </div>
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}

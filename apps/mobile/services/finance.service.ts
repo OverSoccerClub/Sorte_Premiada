@@ -28,6 +28,8 @@ export interface FinanceSummary {
         createdAt: string;
     }[];
     isClosed: boolean;
+    salesLimit?: number;
+    limitOverrideExpiresAt?: string;
 }
 
 export const FinanceService = {

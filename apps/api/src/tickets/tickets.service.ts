@@ -16,9 +16,9 @@ export class TicketsService {
         // Check if day is closed
         const userId = data.user?.connect?.id;
         if (userId) {
-            const isClosed = await this.financeService.isDayClosed(userId);
-            if (isClosed) {
-                throw new BadRequestException("O caixa do dia já foi fechado. Não é possível realizar novas vendas.");
+            if (userId) {
+                // Validate Sales Eligibility (Limit & Previous Box Status)
+                await this.financeService.validateSalesEligibility(userId, Number(data.amount || 0));
             }
         }
 

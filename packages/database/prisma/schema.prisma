@@ -18,6 +18,8 @@ model User {
   usernameExpiresAt DateTime?
   securityPinExpiresAt DateTime?
   role      Role     @default(CAMBISTA)
+  salesLimit Decimal? @default(1000.00) // Limite diário de vendas (padrão 1000 se não definido)
+  limitOverrideExpiresAt DateTime? // Data até quando o limite é ignorado ou estendido
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tickets      Ticket[]
@@ -112,6 +114,9 @@ model DailyClose {
   netBalance      Decimal  @default(0)
   closedByUserId  String
   closedByUser    User     @relation(fields: [closedByUserId], references: [id])
+  status          DailyCloseStatus @default(PENDING)
+  verifiedByUserId String?
+  verifiedAt      DateTime?
   createdAt       DateTime @default(now())
 }
 
@@ -138,4 +143,10 @@ model PosTerminal {
   appVersion    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+enum DailyCloseStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }

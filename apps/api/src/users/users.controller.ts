@@ -76,4 +76,15 @@ export class UsersController {
     remove(@Param('id') id: string) {
         return this.usersService.remove(id);
     }
+
+    @Patch(':id/limit')
+    @UseGuards(RolesGuard)
+    @Roles('ADMIN')
+    async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string }) {
+        const data: Prisma.UserUpdateInput = {};
+        if (body.salesLimit !== undefined) data.salesLimit = body.salesLimit;
+        if (body.limitOverrideExpiresAt !== undefined) data.limitOverrideExpiresAt = body.limitOverrideExpiresAt;
+
+        return this.usersService.update(id, data);
+    }
 }
