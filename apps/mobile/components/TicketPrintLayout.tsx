@@ -80,18 +80,19 @@ export const TicketPrintLayout = ({
                             <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-200 rounded p-1`}>
                                 <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
                                 {num !== undefined ? (
-                                    <View style={tw`items-center w-full`}>
-                                        {/* Federal Style Numbers: Serif, Large (Reduced), Bold */}
-                                        <Text style={[tw`text-4xl text-black font-bold tracking-widest`, { fontFamily: 'serif' }]}>
-                                            {num.toString().padStart(4, '0').split('').join(' ')}
-                                        </Text>
-                                        <View style={tw`flex-row w-full justify-between px-2`}>
-                                            {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                                <Text key={i} style={[tw`text-[8px] text-black w-6 text-center font-bold uppercase`, { fontFamily: 'serif' }]}>
+                                    <View style={tw`flex-row justify-between w-full px-4`}>
+                                        {num.toString().padStart(4, '0').split('').map((digit, i) => (
+                                            <View key={i} style={tw`items-center`}>
+                                                {/* Digit */}
+                                                <Text style={[tw`text-4xl text-black font-bold mb-0`, { fontFamily: 'serif' }]}>
+                                                    {digit}
+                                                </Text>
+                                                {/* Caption */}
+                                                <Text style={[tw`text-[8px] text-black text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
-                                            ))}
-                                        </View>
+                                            </View>
+                                        ))}
                                     </View>
                                 ) : (
                                     <View style={tw`h-12`} /> // Spacer
@@ -188,6 +189,6 @@ export const TicketPrintLayout = ({
                 </View>
             </View>
 
-        </View>
+        </View >
     );
 };
