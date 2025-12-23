@@ -34,6 +34,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
         console.error('GLOBAL EXCEPTION CAUGHT:', exception);
 
-        httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+        const response = ctx.getResponse();
+
+        // Manually set CORS headers for error responses to ensure the browser sees the actual error (401/500)
+        // instead of a generic CORS error
+        if (response.header) {
+            response.header('Access-Control-Allow-Origin', '*');
+            response.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+            response.header('Access-Control-Allow-Headers', '*');
+        }
+
+        httpAdapter.reply(response, responseBody, httpStatus);
     }
 }

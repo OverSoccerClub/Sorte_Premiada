@@ -11,6 +11,7 @@ import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Loc
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -196,6 +197,9 @@ export default function CobradoresPage() {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{editingUser ? 'Editar Cobrador' : 'Novo Cobrador'}</DialogTitle>
+                        <DialogDescription>
+                            Preencha os dados abaixo para {editingUser ? 'atualizar' : 'cadastrar'} um cobrador no sistema.
+                        </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input placeholder="Nome Completo" value={name} onChange={e => setName(e.target.value)} required />

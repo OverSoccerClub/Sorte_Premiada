@@ -34,12 +34,17 @@ async function bootstrap() {
     console.error('Seeding failed:', e);
   }
 
-  console.log('🚀 API FIX APPLIED: CORS UPDATE - Origin: TRUE');
+  console.log('🚀 API FIX APPLIED: CORS UPDATE - Origin: ALL');
   app.enableCors({
-    origin: true,
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow all origins in dev or specific pattern in prod
+      // For now, origin: true/true handles it, but let's be explicit if needed
+      callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: '*',
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization,x-client-id,x-client-version',
+    exposedHeaders: 'Authorization',
   });
   // Filters
   const { HttpAdapterHost } = require('@nestjs/core');

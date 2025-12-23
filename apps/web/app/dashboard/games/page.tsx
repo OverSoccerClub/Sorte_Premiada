@@ -58,7 +58,11 @@ export default function GamesPage() {
 
     const fetchGames = async () => {
         try {
-            const response = await fetch(`${API_URL}/games`)
+            const response = await fetch(`${API_URL}/games`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                }
+            })
             if (!response.ok) throw new Error("Falha ao buscar jogos")
             const data = await response.json()
             setGames(data)
