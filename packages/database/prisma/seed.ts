@@ -17,33 +17,30 @@ async function main() {
     });
     console.log({ admin });
 
-    const game2x500 = await prisma.game.upsert({
-        where: { id: 'game-2x500-default' }, // ID must be UUID-like or valid. Schema says @default(uuid()). I can provide a fixed string if it valid? uuid is string.
-        // Actually, upsert needs a unique field. 'id' is @id.
-        // But I don't know the ID if it was auto-generated.
-        // I can't upsert by 'name' because it's not unique in schema (unless I missed it).
-        // I'll try to findFirst by name, if not create.
+    const game2x1000 = await prisma.game.upsert({
+        where: { id: '1e18bd40-d875-42a6-b0c8-8dc2e260d098' },
         update: {},
         create: {
-            name: '2x500',
-            rules: { numbers: 4, range: 10000 },
+            id: '1e18bd40-d875-42a6-b0c8-8dc2e260d098',
+            name: '2x1000',
+            rules: { type: 'RAPID', numbers: 4, range: 10000 },
+            price: 10.00,
+            extractionTimes: ["08:15", "11:30", "16:00"]
         },
     });
-    // Wait, upsert requires a unique constraint. ID is unique.
-    // If I use a fixed UUID, it works.
-    // Let's use a fixed UUID for the default game.
-    const fixedId = "11111111-1111-1111-1111-111111111111";
+    console.log({ game2x1000 });
 
-    const game = await prisma.game.upsert({
-        where: { id: fixedId },
+    const gameJB = await prisma.game.upsert({
+        where: { id: 'jb-default-game-id' },
         update: {},
         create: {
-            id: fixedId,
-            name: '2x500',
-            rules: { numbers: 4, range: 10000 },
+            id: 'jb-default-game-id',
+            name: 'Jogo do Bicho',
+            rules: { type: 'BICHO' },
+            price: 10.00,
         },
     });
-    console.log({ game });
+    console.log({ gameJB });
 }
 
 main()

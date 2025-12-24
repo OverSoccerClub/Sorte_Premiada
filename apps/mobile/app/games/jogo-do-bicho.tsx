@@ -90,12 +90,15 @@ export default function JogoDoBichoScreen() {
             });
             if (res.ok) {
                 const games = await res.json();
-                const game = games.find((g: any) => g.name === "Jogo do Bicho");
+                const game = games.find((g: any) =>
+                    g.name.toLowerCase().includes("bicho") ||
+                    g.rules?.type === "BICHO"
+                );
                 if (game) {
                     setGameId(game.id);
                     if (game.price) setGamePrice(Number(game.price));
                 } else {
-                    showAlert("Jogo Indisponível", "Jodo do Bicho não encontrado.", "error");
+                    showAlert("Jogo Indisponível", "Jogo do Bicho não encontrado no sistema.", "error");
                 }
             }
         } catch (error) {

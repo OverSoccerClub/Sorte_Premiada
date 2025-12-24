@@ -29,6 +29,7 @@ export default function Game2x500Screen() {
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
+    const [gameName, setGameName] = useState<string>("Jogo 2x500");
     const [isLoadingGame, setIsLoadingGame] = useState(true);
     const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
@@ -70,13 +71,21 @@ export default function Game2x500Screen() {
             });
             if (res.ok) {
                 const games = await res.json();
-                const game = games.find((g: any) => g.name === "2x500");
+                // Find by name variants or type if possible
+                const game = games.find((g: any) =>
+                    g.name === "2x500" ||
+                    g.name === "2x1000" ||
+                    (g.rules?.type === "RAPID" && g.name.includes("2x"))
+                );
                 if (game) {
                     setGameId(game.id);
+                    setGameName(game.name);
                     if (game.price) setGamePrice(Number(game.price));
+                    // Update header name dynamically if it matches
+                    // We'll use the name from the API
                     await fetchSoldNumbers(game.id);
                 } else {
-                    showAlert("Jogo Indisponível", "Não há um jogo '2x500' ativo no momento.", "error");
+                    showAlert("Jogo Indisponível", "Não há um jogo compatível ativo no momento.", "error");
                     setIsLoadingGame(false);
                 }
             }
@@ -447,7 +456,9 @@ export default function Game2x500Screen() {
                     <Ionicons name="arrow-back" size={24} color="#94a3b8" />
                 </TouchableOpacity>
                 <View style={tw`flex-1`}>
-                    <Text style={tw`text-xl font-bold text-center text-white`}>2x1000</Text>
+                    <Text style={tw`text-xl font-bold text-center text-white`}>
+                        {gameName}
+                    </Text>
                     <Text style={tw`text-center text-emerald-500 text-xs font-bold uppercase tracking-widest`}>
                         {isLoadingGame ? "Carregando..." : (soldNumbers.size > 0 ? `${soldNumbers.size} Vendidos` : "Jogo Ativo")}
                     </Text>
