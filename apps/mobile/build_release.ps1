@@ -56,12 +56,7 @@ try {
     Show-Progress -Activity "Gerando APK" -Status "Verificando Ambiente..." -PercentComplete 20
     Write-Step "2/5 Verificando Ambiente..." -Color "Yellow"
     
-    if (-not (Test-Path "$androidDir\local.properties")) {
-        Write-Warning "local.properties não encontrado. Tentando criar..."
-        "sdk.dir=C:\\Users\\natal\\AppData\\Local\\Android\\Sdk" | Out-File -Encoding ascii "$androidDir\local.properties"
-    }
-
-    # 4. Prebuild
+    # Prebuild
     Show-Progress -Activity "Gerando APK" -Status "Executando Expo Prebuild..." -PercentComplete 30
     Write-Step "3/5 Executando Prebuild..." -Color "Yellow"
 
@@ -73,6 +68,12 @@ try {
     
     cmd /c $prebuildCmd
     if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
+
+    # Garantir local.properties APÓS o prebuild (que limpa a pasta)
+    if (-not (Test-Path "$androidDir\local.properties")) {
+        Write-Warning "local.properties não encontrado após prebuild. Criando..."
+        "sdk.dir=C:\\Users\\natal\\AppData\\Local\\Android\\Sdk" | Out-File -Encoding ascii "$androidDir\local.properties"
+    }
 
     # 5. Gradle Assembly
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60
