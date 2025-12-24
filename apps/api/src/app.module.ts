@@ -12,6 +12,8 @@ import { FinanceModule } from './finance/finance.module';
 import { AreasModule } from './areas/areas.module';
 import { DevicesModule } from './devices/devices.module';
 import { DrawsModule } from './draws/draws.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -29,7 +31,10 @@ import { DrawsModule } from './draws/draws.module';
     FinanceModule,
     AreasModule,
     DevicesModule,
+    DevicesModule,
     DrawsModule,
+    ScheduleModule.forRoot(),
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

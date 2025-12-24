@@ -7,8 +7,27 @@ import { Prisma } from '@repo/database';
 export class DrawsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(data: Prisma.DrawCreateInput) {
-        return this.prisma.draw.create({ data });
+    async create(data: any) {
+        return this.prisma.$transaction(async (tx) => {
+            // Se for passado um gameId, incrementamos a série
+            if (data.gameId || (data.game && data.game.connect && data.game.connect.id)) {
+                const gameId = data.gameId || data.game.connect.id;
+
+                const game = await tx.game.update({
+                    where: { id: gameId },
+                    data: { lastSeries: { increment: 1 } }
+                });
+
+                return tx.draw.create({
+                    data: {
+                        ...data,
+                        series: game.lastSeries
+                    }
+                });
+            }
+
+            return tx.draw.create({ data });
+        });
     }
 
     async findAll() {

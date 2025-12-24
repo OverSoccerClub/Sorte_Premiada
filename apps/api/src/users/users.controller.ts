@@ -11,6 +11,12 @@ import * as bcrypt from 'bcrypt';
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
+    @Patch('push-token')
+    @UseGuards(JwtAuthGuard)
+    async updatePushToken(@User() user, @Body('pushToken') pushToken: string) {
+        return this.usersService.updatePushToken(user.id, pushToken);
+    }
+
     @Get('profile')
     getProfile(@Request() req: any) {
         console.log('UsersController: getProfile called', req.user);

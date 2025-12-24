@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter, useSegments } from "expo-router";
 import { AppConfig } from "../constants/AppConfig";
 import { useLoading } from "./LoadingContext";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 
 interface User {
     id: string;
@@ -31,10 +32,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const segments = useSegments();
 
+    // Push Notifications
+    const { expoPushToken } = usePushNotifications();
+
     // Check if user is logged in (mock for now, or use AsyncStorage)
     useEffect(() => {
         // TODO: Load token from AsyncStorage and fetch profile
     }, []);
+
+    // Sync Push Token with Backend
+    useEffect(() => {
+        const syncPushToken = async () => {
+            if (token && expoPushToken) {
+                try {
+                    console.log("Enviando Push Token para o backend:", expoPushToken);
+                    const API_URL = AppConfig.api.baseUrl;
+                    await fetch(`${API_URL}/users/push-token`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ pushToken: expoPushToken })
+                    });
+                } catch (e) {
+                    console.error("Erro ao sincronizar push token:", e);
+                }
+            }
+        };
+        syncPushToken();
+    }, [token, expoPushToken]);
 
     const signIn = async (username: string, pass: string) => {
         show("Autenticando..."); // Show global loading

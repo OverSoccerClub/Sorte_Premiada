@@ -109,6 +109,13 @@ export class UsersService {
         });
     }
 
+    async updatePushToken(id: string, pushToken: string): Promise<User> {
+        return this.prisma.user.update({
+            where: { id },
+            data: { pushToken },
+        });
+    }
+
     private generateMatricula(): string {
         // 6 random digits
         return Math.floor(100000 + Math.random() * 900000).toString();

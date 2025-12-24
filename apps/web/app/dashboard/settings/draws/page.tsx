@@ -176,6 +176,7 @@ export default function DrawsSettingsPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Série</TableHead>
                                     <TableHead>Data / Hora</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Números Sorteados</TableHead>
@@ -198,6 +199,11 @@ export default function DrawsSettingsPage() {
                                 ) : (
                                     draws.map(draw => (
                                         <TableRow key={draw.id}>
+                                            <TableCell>
+                                                <Badge variant="outline" className="font-mono bg-slate-50">
+                                                    #{draw.series?.toString().padStart(4, '0') || '---'}
+                                                </Badge>
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-1.5 text-foreground font-medium">
                                                     <Calendar className="w-4 h-4 text-emerald-500" />

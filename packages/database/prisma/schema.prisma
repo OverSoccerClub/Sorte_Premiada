@@ -12,6 +12,7 @@ model User {
   id        String   @id @default(uuid())
   name      String?
   username  String   @unique
+  pushToken String?  // Token para notificações push (Expo)
   email     String?  @unique
   password  String
   securityPin String?  // 4-digit PIN for Cobradores
@@ -51,6 +52,7 @@ model Game {
   tickets   Ticket[]
   price     Decimal  @default(5.00)
   extractionTimes String[] @default([])
+  lastSeries Int @default(0)
 }
 
 model Draw {
@@ -59,6 +61,7 @@ model Draw {
   game      Game     @relation(fields: [gameId], references: [id])
   numbers   Int[]
   drawDate  DateTime
+  series    Int?     // Número sequencial do sorteio
   createdAt DateTime @default(now())
 }
 

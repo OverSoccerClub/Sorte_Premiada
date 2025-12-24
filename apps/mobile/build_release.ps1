@@ -88,6 +88,9 @@ try {
     # We will trust Gradle's output but keep our main progress bar active ?
     # Actually, PowerShell pauses Write-Progress when external command runs.
     
+    # Otimização de Memória para evitar OOM (Out of Metaspace)
+    $env:GRADLE_OPTS = "-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"
+    
     cmd /c "gradlew $gradleArgs -x lint"
     
     if ($LASTEXITCODE -ne 0) { 

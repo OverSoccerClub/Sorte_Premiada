@@ -13,9 +13,10 @@ interface TicketPrintLayoutProps {
     ticketId: string;
     terminalId?: string;
     vendorId?: string;
-    vendorName?: string; // New prop
+    vendorName?: string;
     drawDate?: string;
     hash?: string;
+    series?: number; // New prop
 }
 
 // Helper para converter números em texto (simplificado para 0-99 para o layout)
@@ -41,7 +42,8 @@ export const TicketPrintLayout = ({
     vendorId = "567890",
     vendorName = "Vendedor", // Default
     drawDate,
-    hash
+    hash,
+    series
 }: TicketPrintLayoutProps) => {
 
     // Ordenar números
@@ -146,7 +148,7 @@ export const TicketPrintLayout = ({
                 {/* Row 1: Bilhete | Série | Preço */}
                 <View style={tw`flex-row justify-between mb-1`}>
                     <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {ticketId.substring(0, 4)}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Série: 001</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {series?.toString().padStart(4, '0') || '----'}</Text>
                     <Text style={tw`text-[12px] text-black font-bold`}>Preço: {price}</Text>
                 </View>
 

@@ -34,6 +34,7 @@ export default function Game2x500Screen() {
     const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
     const [isLoadingSold, setIsLoadingSold] = useState(false);
+    const [drawSeries, setDrawSeries] = useState<number | undefined>(undefined);
 
     // Selection State
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -81,8 +82,19 @@ export default function Game2x500Screen() {
                     setGameId(game.id);
                     setGameName(game.name);
                     if (game.price) setGamePrice(Number(game.price));
-                    // Update header name dynamically if it matches
-                    // We'll use the name from the API
+
+                    // Buscar o sorteio ativo para pegar a série
+                    const drawsRes = await fetch(`${API_URL}/draws?gameId=${game.id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (drawsRes.ok) {
+                        const draws = await drawsRes.json();
+                        const nextDraw = draws.find((d: any) => new Date(d.drawDate) > new Date());
+                        if (nextDraw && nextDraw.series) {
+                            setDrawSeries(nextDraw.series);
+                        }
+                    }
+
                     await fetchSoldNumbers(game.id);
                 } else {
                     showAlert("Jogo Indisponível", "Não há um jogo compatível ativo no momento.", "error");
@@ -301,7 +313,8 @@ export default function Game2x500Screen() {
                 id: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
+                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                series: drawSeries
             });
 
             // 1. Show Standard Loading
@@ -488,6 +501,7 @@ export default function Game2x500Screen() {
                                 hash={lastTicket.hash}
                                 vendorName={user?.name || user?.username || "Vendedor"}
                                 terminalId={Device.deviceName || Device.modelName || "Terminal"}
+                                series={lastTicket.series}
                             />
                         )}
                     </ViewShot>
@@ -622,6 +636,7 @@ export default function Game2x500Screen() {
                                     gameName="2x500"
                                     numbers={selectedNumbers}
                                     price="R$ 10,00"
+                                    series={drawSeries}
                                 />
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
