@@ -13,8 +13,8 @@ export class UsersController {
 
     @Patch('push-token')
     @UseGuards(JwtAuthGuard)
-    async updatePushToken(@User() user, @Body('pushToken') pushToken: string) {
-        return this.usersService.updatePushToken(user.id, pushToken);
+    async updatePushToken(@Request() req: any, @Body('pushToken') pushToken: string) {
+        return this.usersService.updatePushToken(req.user.userId, pushToken); // userId vem do JWT strategy
     }
 
     @Get('profile')
