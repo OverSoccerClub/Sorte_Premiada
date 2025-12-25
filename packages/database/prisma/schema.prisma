@@ -53,6 +53,7 @@ model Game {
   price     Decimal  @default(5.00)
   extractionTimes String[] @default([])
   lastSeries Int @default(0)
+  extractionSeries ExtractionSeries[]
 }
 
 model Draw {
@@ -63,6 +64,16 @@ model Draw {
   drawDate  DateTime
   series    Int?     // Número sequencial do sorteio
   createdAt DateTime @default(now())
+}
+
+model ExtractionSeries {
+  id        String   @id @default(uuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  time      String   // Formato "HH:mm"
+  lastSeries Int     @default(0)
+
+  @@unique([gameId, time])
 }
 
 model Ticket {
