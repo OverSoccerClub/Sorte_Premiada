@@ -59,5 +59,8 @@
     "semver": "^7.7.3",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "react-native-reanimated": "~3.16.1"
+  }
 }
