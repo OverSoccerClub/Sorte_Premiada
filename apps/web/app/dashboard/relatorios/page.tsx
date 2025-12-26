@@ -133,6 +133,30 @@ export default function RelatoriosPage() {
                         <Calendar className="w-4 h-4" />
                         Conferência de Caixa
                     </Button>
+                    <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => window.location.href = "/dashboard/relatorios/daily-closes"}
+                    >
+                        <Calendar className="w-4 h-4" />
+                        Fechamentos
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => window.location.href = "/dashboard/relatorios/notifications"}
+                    >
+                        <FileText className="w-4 h-4" />
+                        Notificações
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => window.location.href = "/dashboard/relatorios/transactions"}
+                    >
+                        <Download className="w-4 h-4" />
+                        Exportar Transações
+                    </Button>
                 </div>
             </div>
 
