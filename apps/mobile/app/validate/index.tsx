@@ -57,7 +57,7 @@ export default function ValidateTicketScreen() {
             }
         } catch (error) {
             console.error(error);
-            setResult({ error: true, message: 'Erro ao processar bilhete.' });
+            setResult({ error: true, message: error.response?.data?.message || 'Erro ao processar bilhete.' });
         } finally {
             setLoading(false);
         }
@@ -89,9 +89,7 @@ export default function ValidateTicketScreen() {
                 onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                 barcodeScannerSettings={{
                     barcodeTypes: [
-                        "code128", "code39", "code93", "ean13", "ean8",
-                        "upc_a", "upc_e", "itf14", "qr", "pdf417",
-                        "aztec", "datamatrix"
+                        "qr", "pdf417", "ean13", "code128", "code39", "interleaved2of5", "itf14", "codabar", "upc_a", "upc_e", "aztec", "datamatrix", "code93"
                     ],
                 }}
             >

@@ -234,7 +234,7 @@ export default function MegaSenaScreen() {
                     // 4. Print
                     await printTicket(
                         selectedNumbers,
-                        ticketData.id,
+                        ticketData.hash || ticketData.id, // Use Hash for better barcode, fallback to ID
                         new Date(),
                         gamePrice,
                         "Mega Sena",

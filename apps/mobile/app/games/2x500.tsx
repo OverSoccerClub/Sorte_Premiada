@@ -336,7 +336,7 @@ export default function Game2x500Screen() {
                     // 4. Print
                     await printTicket(
                         finalNumbers,
-                        ticketData.id,
+                        ticketData.hash || ticketData.id,
                         new Date(),
                         gamePrice,
                         "2x500",

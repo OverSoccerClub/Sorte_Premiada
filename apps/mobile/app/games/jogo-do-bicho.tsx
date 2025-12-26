@@ -227,11 +227,11 @@ export default function JogoDoBichoScreen() {
 
                     // 4. Print
                     await printTicket(
-                        ticketObj.numbers,
-                        ticketObj.id,
+                        selectedNumbers,
+                        ticketData.hash || ticketData.id,
                         new Date(),
                         gamePrice,
-                        ticketObj.gameName,
+                        `BICHO - ${modality}`,
                         printerType,
                         uri
                     );
