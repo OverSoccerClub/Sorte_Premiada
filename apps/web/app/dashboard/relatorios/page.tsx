@@ -249,7 +249,7 @@ export default function RelatoriosPage() {
             </Card >
 
             {
-                (tickets?.length || 0) > 0 && (
+                ((tickets?.length || 0) > 0 || (granularSummary?.length || 0) > 0) && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Card className="bg-emerald-500 text-white border-none shadow-lg shadow-emerald-500/20">
