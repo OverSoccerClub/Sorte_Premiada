@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, ActivityIndicator, TouchableOpacity, Button } from 'react-native';
+import { View, Text, Modal, ActivityIndicator, TouchableOpacity, Button, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import tw from '../../lib/tailwind';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ export default function ValidateTicketScreen() {
     const [scanned, setScanned] = useState(false);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
+    const [manualCode, setManualCode] = useState('');
     const router = useRouter();
     const { token } = useAuth();
 
@@ -28,24 +29,23 @@ export default function ValidateTicketScreen() {
         );
     }
 
-    const handleBarCodeScanned = async ({ type, data }: { type: string, data: string }) => {
-        // Prevent multiple scans
-        if (scanned || loading) return;
+    const validateTicket = async (code: string) => {
+        if (loading) return;
 
-        setScanned(true);
         setLoading(true);
+        setScanned(true); // Open modal
 
         try {
-            console.log(`[Scanner] Type: ${type}, Data: ${data}`);
-
             // Extract ID if URL
-            let ticketId = data;
-            if (data.includes('sorteio/')) {
-                const parts = data.split('sorteio/');
+            let ticketId = code;
+            if (code.includes('sorteio/')) {
+                const parts = code.split('sorteio/');
                 if (parts.length > 1) {
                     ticketId = parts[1];
                 }
             }
+
+            console.log(`[Validation] Validating code: ${ticketId}`);
 
             // Call API
             const validation = await TicketsService.validate(token!, ticketId);
@@ -63,9 +63,23 @@ export default function ValidateTicketScreen() {
         }
     };
 
+    const handleBarCodeScanned = ({ type, data }: { type: string, data: string }) => {
+        if (scanned || loading) return;
+        console.log(`[Scanner] Scanned Type: ${type}, Data: ${data}`);
+        validateTicket(data);
+    };
+
+    const handleManualSubmit = () => {
+        if (manualCode.trim().length > 0) {
+            Keyboard.dismiss();
+            validateTicket(manualCode.trim());
+        }
+    };
+
     const resetScan = () => {
         setScanned(false);
         setResult(null);
+        setManualCode('');
     };
 
     return (
@@ -74,27 +88,66 @@ export default function ValidateTicketScreen() {
                 style={tw`flex-1`}
                 onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                 barcodeScannerSettings={{
-                    barcodeTypes: ["code128", "code39", "qr"],
+                    barcodeTypes: [
+                        "code128", "code39", "code93", "ean13", "ean8",
+                        "upc_a", "upc_e", "itf14", "qr", "pdf417",
+                        "aztec", "datamatrix"
+                    ],
                 }}
             >
-                <View style={tw`flex-1 bg-transparent flex-row relative`}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={tw`flex-1`}
+                >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View style={tw`flex-1 bg-transparent flex-row relative`}>
 
-                    {/* Overlay Visual */}
-                    <View style={tw`absolute top-0 bottom-0 left-0 right-0 justify-center items-center`}>
-                        <View style={tw`w-64 h-40 border-2 border-green-500 rounded-lg bg-transparent`} />
-                        <Text style={tw`text-white mt-4 font-bold bg-black/50 px-4 py-1 rounded`}>
-                            Posicione o código de barras aqui
-                        </Text>
-                    </View>
+                            {/* Overlay Visual - Enlarged */}
+                            <View style={tw`absolute top-0 bottom-0 left-0 right-0 justify-center items-center`}>
+                                <View style={tw`w-[90%] h-40 border-2 border-green-500 rounded-lg bg-transparent`} />
+                                <Text style={tw`text-white mt-4 font-bold bg-black/50 px-4 py-1 rounded`}>
+                                    Posicione o código de barras
+                                </Text>
+                            </View>
 
-                    <TouchableOpacity
-                        style={tw`absolute top-10 left-4 p-2 bg-black/50 rounded-full`}
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="close" size={24} color="white" />
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                style={tw`absolute top-10 left-4 p-2 bg-black/50 rounded-full z-10`}
+                                onPress={() => router.back()}
+                            >
+                                <Ionicons name="close" size={24} color="white" />
+                            </TouchableOpacity>
 
-                </View>
+                            {/* Manual Entry Section */}
+                            <View style={tw`absolute bottom-10 left-4 right-4 bg-white/90 p-4 rounded-xl shadow-lg`}>
+                                <Text style={tw`text-gray-700 font-bold mb-2`}>Ou digite o código do bilhete:</Text>
+                                <View style={tw`flex-row gap-2`}>
+                                    <TextInput
+                                        style={tw`flex-1 bg-white border border-gray-300 rounded px-3 py-2 text-lg`}
+                                        placeholder="Ex: 123456"
+                                        value={manualCode}
+                                        onChangeText={setManualCode}
+                                        keyboardType="default"
+                                        autoCapitalize="none"
+                                        returnKeyType="go"
+                                        onSubmitEditing={handleManualSubmit}
+                                    />
+                                    <TouchableOpacity
+                                        style={tw`bg-emerald-600 px-4 justify-center rounded`}
+                                        onPress={handleManualSubmit}
+                                        disabled={loading}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <Ionicons name="arrow-forward" size={24} color="white" />
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                        </View>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
             </CameraView>
 
             {/* Result Modal */}
@@ -139,3 +192,4 @@ export default function ValidateTicketScreen() {
         </View>
     );
 }
+
