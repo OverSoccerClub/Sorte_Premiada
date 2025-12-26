@@ -164,7 +164,7 @@ export class ReportsService {
 
         const skip = (page - 1) * limit;
 
-        const [tickets, total, rawSummary] = await Promise.all([
+        const [tickets, total, rawSummary, cambistasForStatus, dailyCloses] = await Promise.all([
             this.prisma.ticket.findMany({
                 where,
                 include: {
@@ -184,6 +184,18 @@ export class ReportsService {
                 _sum: { amount: true },
                 _count: { id: true },
             }),
+            // Fetch users in this report to check isActive
+            this.prisma.user.findMany({
+                where: cambistaId && cambistaId !== 'all' ? { id: cambistaId } : { role: 'CAMBISTA' },
+                select: { id: true, name: true, username: true, isActive: true }
+            }),
+            // Fetch daily closes in this period
+            this.prisma.dailyClose.findMany({
+                where: {
+                    createdAt: { gte: startDate, lte: endDate },
+                    ...(cambistaId && cambistaId !== 'all' ? { closedByUserId: cambistaId } : {})
+                }
+            })
         ]);
 
         // Map summary to be more friendly
@@ -194,10 +206,60 @@ export class ReportsService {
             totalAmount: Number(s._sum.amount || 0)
         }));
 
+        // Granular Summary: Group by Date (Day), User, Game
+        // We'll perform this in-memory for better flexibility with Cashier Status
+        const ticketsForGranular = await this.prisma.ticket.findMany({
+            where,
+            include: {
+                user: { select: { id: true, username: true, name: true, isActive: true } },
+                game: { select: { id: true, name: true } }
+            }
+        });
+
+        const granularMap = new Map<string, any>();
+        ticketsForGranular.forEach(t => {
+            const dateStr = t.createdAt.toISOString().split('T')[0];
+            const userId = t.userId;
+            const gameId = t.gameId || 'manual';
+            const key = `${dateStr}_${userId}_${gameId}`;
+
+            if (!granularMap.has(key)) {
+                // Find DailyClose for this user and date
+                const close = dailyCloses.find(c =>
+                    c.closedByUserId === userId &&
+                    c.createdAt.toISOString().split('T')[0] === dateStr
+                );
+
+                let status = 'ABERTO';
+                if (!t.user?.isActive) status = 'BLOQUEADO';
+                else if (close) {
+                    status = close.status === 'VERIFIED' ? 'CONFERIDO' : 'FECHADO';
+                }
+
+                granularMap.set(key, {
+                    date: dateStr,
+                    userId,
+                    user: t.user,
+                    gameId,
+                    gameName: t.game?.name || t.gameType,
+                    amount: 0,
+                    count: 0,
+                    status
+                });
+            }
+
+            const item = granularMap.get(key);
+            item.amount += Number(t.amount);
+            item.count += 1;
+        });
+
+        const granularSummary = Array.from(granularMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+
         return {
             tickets,
             total,
             summary,
+            granularSummary,
             page,
             limit,
             totalPages: Math.ceil(total / limit)
