@@ -218,7 +218,7 @@ export default function CambistasPage() {
             "Excluir Cambista",
             "Tem certeza que deseja excluir este cambista? Esta ação não pode ser desfeita.",
             "warning",
-            true, // showCancel
+            true,
             async () => {
                 try {
                     const token = localStorage.getItem("token")
