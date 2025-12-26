@@ -281,14 +281,13 @@ export class ReportsService {
             where: { status: { not: 'CANCELLED' } }
         });
 
-        // Active Cambistas (Sold a ticket in the last 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        // Active Cambistas (Sold a ticket in the last 30 minutes)
+        const thirtyMinsAgo = new Date(now.getTime() - 30 * 60 * 1000);
 
         const activeCambistasCount = await this.prisma.ticket.groupBy({
             by: ['userId'],
             where: {
-                createdAt: { gte: thirtyDaysAgo },
+                createdAt: { gte: thirtyMinsAgo },
                 status: { not: 'CANCELLED' }
             }
         });
@@ -320,6 +319,83 @@ export class ReportsService {
                 amount: Number(dailySales._sum.amount || 0)
             });
         }
+
+        // --- NEW METRICS ---
+
+        // 1. Status Breakdown (This Month)
+        const statusGroups = await this.prisma.ticket.groupBy({
+            by: ['status'],
+            where: {
+                createdAt: { gte: startOfMonth },
+                status: { not: 'CANCELLED' }
+            },
+            _count: { id: true }
+        });
+
+        const statusBreakdown = statusGroups.map(sg => ({
+            status: sg.status,
+            count: sg._count.id
+        }));
+
+        // 2. Revenue By Game (This Month)
+        const revenueByGameRaw = await this.prisma.ticket.groupBy({
+            by: ['gameType'],
+            where: {
+                createdAt: { gte: startOfMonth },
+                status: { not: 'CANCELLED' }
+            },
+            _sum: { amount: true }
+        });
+
+        const revenueByGame = revenueByGameRaw.map(rg => ({
+            game: rg.gameType,
+            amount: Number(rg._sum.amount || 0)
+        })).sort((a, b) => b.amount - a.amount);
+
+        // 3. Hourly Sales (Today)
+        const todaysTickets = await this.prisma.ticket.findMany({
+            where: {
+                createdAt: { gte: startOfDay },
+                status: { not: 'CANCELLED' }
+            },
+            select: { createdAt: true, amount: true }
+        });
+
+        const hourlyMap = new Map<number, number>();
+        for (let i = 0; i < 24; i++) hourlyMap.set(i, 0);
+
+        todaysTickets.forEach(t => {
+            const hour = new Date(t.createdAt).getHours();
+            hourlyMap.set(hour, (hourlyMap.get(hour) || 0) + Number(t.amount));
+        });
+
+        const hourlySales = Array.from(hourlyMap.entries()).map(([hour, amount]) => ({
+            hour: `${hour.toString().padStart(2, '0')}:00`,
+            amount
+        }));
+
+        // 4. Profit Metrics (This Month)
+        const monthlySalesAgg = await this.prisma.ticket.aggregate({
+            where: {
+                createdAt: { gte: startOfMonth },
+                status: { not: 'CANCELLED' }
+            },
+            _sum: { amount: true }
+        });
+
+        const monthlyDebitsAgg = await this.prisma.transaction.aggregate({
+            where: {
+                createdAt: { gte: startOfMonth },
+                type: 'DEBIT'
+            },
+            _sum: { amount: true }
+        });
+
+        const monthlyRevenue = Number(monthlySalesAgg._sum.amount || 0);
+        const monthlyPayout = Number(monthlyDebitsAgg._sum.amount || 0);
+        const netProfit = monthlyRevenue - monthlyPayout;
+
+        // --- END NEW METRICS ---
 
         // Monthly Ranking (Top Cambistas This Month)
         // Aggregating and then sorting in memory to be safer across different DB/Prisma versions
@@ -402,7 +478,16 @@ export class ReportsService {
             activeCambistas: activeCambistasCount.length,
             recentSales,
             chartData,
-            ranking: rankingEntries
+            ranking: rankingEntries,
+            // New fields
+            statusBreakdown,
+            revenueByGame,
+            hourlySales,
+            profitMetrics: {
+                monthlyRevenue,
+                monthlyPayout,
+                netProfit
+            }
         };
     }
     async getSalesByArea(startDate: Date, endDate: Date) {

@@ -4,8 +4,8 @@ import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash, BarChart3 } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash, BarChart3, PieChart as PieChartIcon, Activity, Wallet, Percent } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -40,6 +40,23 @@ interface DashboardStats {
         date: string;
         amount: number;
     }[];
+    statusBreakdown: {
+        status: string;
+        count: number;
+    }[];
+    revenueByGame: {
+        game: string;
+        amount: number;
+    }[];
+    hourlySales: {
+        hour: string;
+        amount: number;
+    }[];
+    profitMetrics: {
+        monthlyRevenue: number;
+        monthlyPayout: number;
+        netProfit: number;
+    };
 }
 
 export default function DashboardPage() {
@@ -86,42 +103,52 @@ export default function DashboardPage() {
 
     const statCards = [
         {
-            title: "Vendas Totais",
-            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(stats.totalSales)),
+            title: "Vendas (Mês)",
+            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics.monthlyRevenue),
             icon: DollarSign,
-            description: "Receita acumulada",
+            description: "Faturamento bruto mensal",
             trend: "up",
             color: "text-emerald-400",
             bg: "bg-emerald-500/10"
         },
         {
-            title: "Cambistas Ativos",
-            value: stats.activeCambistas,
-            icon: Users,
-            description: "Equipe de vendas",
+            title: "Lucro Líquido",
+            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics.netProfit),
+            icon: Wallet,
+            description: "Vendas - Prêmios/Debitos",
             trend: "up",
             color: "text-blue-400",
             bg: "bg-blue-500/10"
         },
         {
-            title: "Bilhetes Vendidos",
-            value: stats.ticketsSold,
-            icon: Ticket,
-            description: "Total de apostas",
+            title: "Cambistas Online",
+            value: stats.activeCambistas,
+            icon: Activity,
+            description: "Ativos nos últimos 30min",
             trend: "up",
-            color: "text-purple-400",
-            bg: "bg-purple-500/10"
+            color: "text-orange-400",
+            bg: "bg-orange-500/10"
         },
         {
             title: "Ticket Médio",
             value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.averageTicket),
-            icon: TrendingUp,
+            icon: Percent,
             description: "Média por aposta",
             trend: "up",
-            color: "text-orange-400",
-            bg: "bg-orange-500/10"
+            color: "text-purple-400",
+            bg: "bg-purple-500/10"
         }
     ]
+
+    const STATUS_COLORS = {
+        'WON': '#10b981',    // Emerald
+        'LOST': '#ef4444',   // Red
+        'PENDING': '#f59e0b', // Amber
+        'CANCELLED': '#6b7280', // Gray
+        'EXPIRED': '#374151'   // Slate
+    };
+
+    const CHART_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899'];
 
     const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: any[], label?: string | number | Date }) => {
         if (active && payload && payload.length) {
@@ -177,22 +204,28 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border-border bg-card shadow-sm">
+                {/* Evolution Area Chart */}
+                <Card className="col-span-1 md:col-span-4 border-border bg-card shadow-sm h-full">
                     <CardHeader>
                         <CardTitle className="text-foreground flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5 text-emerald-500" />
-                            Evolução de Vendas
+                            <TrendingUp className="w-5 h-5 text-emerald-500" />
+                            Tendência de Vendas
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground">Receita dos últimos 7 dias</CardDescription>
+                        <CardDescription className="text-muted-foreground">Volume de apostas nas últimas 24 horas</CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[300px] w-full" style={{ height: 300 }}>
+                        <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={stats.chartData}>
+                                <AreaChart data={stats.hourlySales}>
+                                    <defs>
+                                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
                                     <XAxis
-                                        dataKey="date"
-                                        tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                                        dataKey="hour"
                                         stroke="#94a3b8"
                                         fontSize={12}
                                         tickLine={false}
@@ -205,15 +238,104 @@ export default function DashboardPage() {
                                         axisLine={false}
                                         tickFormatter={(value) => `R$${value}`}
                                     />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: '#334155', opacity: 0.2 }} />
-                                    <Bar dataKey="amount" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#10b981' }}
+                                    />
+                                    <Area type="monotone" dataKey="amount" stroke="#10b981" fillOpacity={1} fill="url(#colorSales)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Status Breakdown Pie Chart */}
+                <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm h-full">
+                    <CardHeader>
+                        <CardTitle className="text-foreground flex items-center gap-2">
+                            <PieChartIcon className="w-5 h-5 text-emerald-500" />
+                            Status dos Bilhetes (Mês)
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground">Distribuição de prêmios e apurações</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center justify-center pt-0">
+                        <div className="h-[240px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={stats.statusBreakdown}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="count"
+                                        nameKey="status"
+                                    >
+                                        {stats.statusBreakdown.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status as keyof typeof STATUS_COLORS] || '#8884d8'} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 w-full mt-2">
+                            {stats.statusBreakdown.slice(0, 4).map((item) => (
+                                <div key={item.status} className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: STATUS_COLORS[item.status as keyof typeof STATUS_COLORS] }} />
+                                    <span className="text-xs text-muted-foreground font-medium uppercase">{item.status}: {item.count}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mt-6">
+                {/* Revenue by Game Horizontal Bars */}
+                <Card className="col-span-1 md:col-span-4 border-border bg-card shadow-sm h-full">
+                    <CardHeader>
+                        <CardTitle className="text-foreground flex items-center gap-2">
+                            <BarChart3 className="w-5 h-5 text-emerald-500" />
+                            Receita por Jogo (Mês)
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground">Volume financeiro por modalidade</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart layout="vertical" data={stats.revenueByGame} margin={{ left: 40 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
+                                    <XAxis type="number" stroke="#94a3b8" fontSize={12} hide />
+                                    <YAxis
+                                        dataKey="game"
+                                        type="category"
+                                        stroke="#94a3b8"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        width={100}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                        formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+                                    />
+                                    <Bar dataKey="amount" radius={[0, 4, 4, 0]} barSize={25}>
+                                        {stats.revenueByGame.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                        ))}
+                                    </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="col-span-3 border-border bg-card shadow-sm h-full">
+                {/* Seller Ranking */}
+                <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm h-full">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Trophy className="w-5 h-5 text-yellow-500" />
