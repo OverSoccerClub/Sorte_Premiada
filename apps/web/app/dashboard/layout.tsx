@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
@@ -18,6 +18,7 @@ const sidebarGroups = [
         title: "Cadastros",
         items: [
             { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
+            { icon: User, label: "Usuários", href: "/dashboard/users" },
             { icon: Wallet, label: "Cobradores", href: "/dashboard/cobradores" },
         ]
     },

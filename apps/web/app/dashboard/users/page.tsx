@@ -12,48 +12,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, ShieldAlert, ShieldCheck, Ban, CheckCircle2, Shield } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
-
-const ACCOUNTABILITY_ALARM_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
     username: z.string().min(3, { message: "Usuário deve ter pelo menos 3 caracteres." }),
     password: z.string().optional(),
     email: z.union([z.string().email({ message: "Email inválido." }), z.literal('')]),
-    areaId: z.string().optional(),
-    salesLimit: z.coerce.number().min(0).optional(),
-    accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
+    role: z.enum(["ADMIN", "SUPERVISOR", "GERENTE"], {
+        required_error: "Selecione um nível de acesso.",
+    }),
     isActive: z.boolean().default(true),
 })
 
-interface Area {
-    id: string
-    name: string
-    city: string
-    state: string
-}
-
-export default function CambistasPage() {
-    const [cambistas, setCambistas] = useState<any[]>([])
-    const [areas, setAreas] = useState<Area[]>([])
+export default function UsersPage() {
+    const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [audioEnabled, setAudioEnabled] = useState(false)
     const { showAlert } = useAlert()
-
-    // Sound effect for accountability
-    useEffect(() => {
-        if (!audioEnabled) return
-
-        const hasExpired = cambistas.some(c => c.accountability?.isExpired)
-        if (hasExpired) {
-            const audio = new Audio(ACCOUNTABILITY_ALARM_URL)
-            audio.play().catch(e => console.error("Audio play failed", e))
-        }
-    }, [cambistas, audioEnabled])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -62,29 +40,12 @@ export default function CambistasPage() {
             username: "",
             password: "",
             email: "",
-            areaId: undefined,
-            salesLimit: 1000,
-            accountabilityLimitHours: 24,
+            role: "SUPERVISOR",
             isActive: true,
         },
     })
 
-    const fetchAreas = async () => {
-        try {
-            const token = localStorage.getItem("token")
-            const res = await fetch(`${API_URL}/areas`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setAreas(data)
-            }
-        } catch (error) {
-            console.error("Failed to fetch areas", error)
-        }
-    }
-
-    const fetchCambistas = async () => {
+    const fetchUsers = async () => {
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/users`, {
@@ -92,11 +53,11 @@ export default function CambistasPage() {
             })
             if (res.ok) {
                 const data = await res.json()
-                // Filter only CAMBISTAS
-                const cambistasOnly = data.filter((user: any) => user.role === "CAMBISTA")
-                setCambistas(cambistasOnly)
+                // Filter only ADMIN, SUPERVISOR, GERENTE
+                const adminsOnly = data.filter((user: any) => ["ADMIN", "SUPERVISOR", "GERENTE"].includes(user.role))
+                setUsers(adminsOnly)
             } else {
-                showAlert("Erro", "Não foi possível carregar a lista de cambistas.", "error")
+                showAlert("Erro", "Não foi possível carregar a lista de usuários.", "error")
             }
         } catch (error) {
             showAlert("Erro de Conexão", "Verifique sua conexão e tente novamente.", "error")
@@ -106,22 +67,19 @@ export default function CambistasPage() {
     }
 
     useEffect(() => {
-        fetchCambistas()
-        fetchAreas()
+        fetchUsers()
     }, [])
 
-    const handleOpenDialog = (cambista?: any) => {
-        if (cambista) {
-            setEditingId(cambista.id)
+    const handleOpenDialog = (user?: any) => {
+        if (user) {
+            setEditingId(user.id)
             form.reset({
-                name: cambista.name || "",
-                username: cambista.username,
-                email: cambista.email || "",
+                name: user.name || "",
+                username: user.username,
+                email: user.email || "",
                 password: "", // Password is optional on edit
-                areaId: cambista.areaId || undefined,
-                salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
-                accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
-                isActive: cambista.isActive ?? true,
+                role: user.role,
+                isActive: user.isActive ?? true,
             })
         } else {
             setEditingId(null)
@@ -130,9 +88,7 @@ export default function CambistasPage() {
                 username: "",
                 email: "",
                 password: "",
-                areaId: undefined,
-                salesLimit: 1000,
-                accountabilityLimitHours: 24,
+                role: "SUPERVISOR",
                 isActive: true,
             })
         }
@@ -149,7 +105,7 @@ export default function CambistasPage() {
             const method = editingId ? "PATCH" : "POST"
 
             // Remove password if empty on edit to avoid overwriting with empty string
-            const bodyData: any = { ...values, role: "CAMBISTA" }
+            const bodyData: any = { ...values }
             if (editingId && !values.password) {
                 delete bodyData.password
             }
@@ -165,44 +121,45 @@ export default function CambistasPage() {
 
             if (res.ok) {
                 setIsDialogOpen(false)
-                fetchCambistas()
+                fetchUsers()
                 showAlert(
                     "Sucesso!",
-                    editingId ? "Os dados do cambista foram atualizados." : "Novo cambista cadastrado com sucesso!",
+                    editingId ? "Os dados do usuário foram atualizados." : "Novo usuário cadastrado com sucesso!",
                     "success"
                 )
             } else {
-                showAlert("Erro", "Não foi possível salvar as alterações.", "error")
+                const errorData = await res.json().catch(() => ({}))
+                showAlert("Erro", errorData.message || "Não foi possível salvar as alterações.", "error")
             }
         } catch (error) {
             showAlert("Erro", "Ocorreu um erro ao enviar o formulário.", "error")
         }
     }
 
-    const handleToggleBlock = async (cambista: any) => {
-        const action = cambista.isActive ? "bloquear" : "desbloquear"
+    const handleToggleBlock = async (user: any) => {
+        const action = user.isActive ? "bloquear" : "desbloquear"
         showAlert(
-            `${action.charAt(0).toUpperCase() + action.slice(1)} Cambista`,
-            `Tem certeza que deseja ${action} o cambista ${cambista.name || cambista.username}?`,
-            cambista.isActive ? "warning" : "info",
+            `${action.charAt(0).toUpperCase() + action.slice(1)} Usuário`,
+            `Tem certeza que deseja ${action} o usuário ${user.name || user.username}?`,
+            user.isActive ? "warning" : "info",
             true,
             async () => {
                 try {
                     const token = localStorage.getItem("token")
-                    const res = await fetch(`${API_URL}/users/${cambista.id}`, {
+                    const res = await fetch(`${API_URL}/users/${user.id}`, {
                         method: "PATCH",
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${token}`,
                         },
-                        body: JSON.stringify({ isActive: !cambista.isActive }),
+                        body: JSON.stringify({ isActive: !user.isActive }),
                     })
 
                     if (res.ok) {
-                        fetchCambistas()
-                        showAlert("Sucesso", `O cambista foi ${action === "bloquear" ? "bloqueado" : "desbloqueado"} com sucesso.`, "success")
+                        fetchUsers()
+                        showAlert("Sucesso", `O usuário foi ${action === "bloquear" ? "bloqueado" : "desbloqueado"} com sucesso.`, "success")
                     } else {
-                        showAlert("Erro", `Não foi possível ${action} o cambista.`, "error")
+                        showAlert("Erro", `Não foi possível ${action} o usuário.`, "error")
                     }
                 } catch (error) {
                     showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
@@ -215,8 +172,8 @@ export default function CambistasPage() {
 
     const handleDelete = async (id: string) => {
         showAlert(
-            "Excluir Cambista",
-            "Tem certeza que deseja excluir este cambista? Esta ação não pode ser desfeita.",
+            "Excluir Usuário",
+            "Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.",
             "warning",
             true, // showCancel
             async () => {
@@ -228,10 +185,10 @@ export default function CambistasPage() {
                     })
 
                     if (res.ok) {
-                        fetchCambistas()
-                        showAlert("Removido", "O cambista foi removido com sucesso.", "success")
+                        fetchUsers()
+                        showAlert("Removido", "O usuário foi removido com sucesso.", "success")
                     } else {
-                        showAlert("Erro", "Não foi possível remover o cambista.", "error")
+                        showAlert("Erro", "Não foi possível remover o usuário.", "error")
                     }
                 } catch (error) {
                     showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
@@ -242,29 +199,27 @@ export default function CambistasPage() {
         )
     }
 
-    // function removed
-
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <Users className="w-8 h-8 text-emerald-500" />
+                        <div className="p-2 bg-blue-500/10 rounded-lg">
+                            <Shield className="w-8 h-8 text-blue-500" />
                         </div>
-                        Cambistas
+                        Usuários Administrativos
                     </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Gerencie sua equipe de vendas e monitore o desempenho.</p>
+                    <p className="text-muted-foreground mt-1 ml-14">Gerencie administradores, supervisores e gerentes.</p>
                 </div>
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button
                             onClick={() => handleOpenDialog()}
-                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20"
+                            className="bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-900/20"
                         >
                             <Plus className="mr-2 h-4 w-4" />
-                            Novo Cambista
+                            Novo Usuário
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] bg-popover border-border">
@@ -272,22 +227,22 @@ export default function CambistasPage() {
                             <DialogTitle className="flex items-center gap-2 text-foreground">
                                 {editingId ? (
                                     <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <SquarePen className="w-5 h-5 text-emerald-500" />
+                                        <div className="p-2 bg-blue-500/10 rounded-lg">
+                                            <SquarePen className="w-5 h-5 text-blue-500" />
                                         </div>
-                                        Editar Cambista
+                                        Editar Usuário
                                     </>
                                 ) : (
                                     <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <UserPlus className="w-5 h-5 text-emerald-500" />
+                                        <div className="p-2 bg-blue-500/10 rounded-lg">
+                                            <UserPlus className="w-5 h-5 text-blue-500" />
                                         </div>
-                                        Adicionar Novo Cambista
+                                        Adicionar Novo Usuário
                                     </>
                                 )}
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
-                                {editingId ? "Atualize os dados do vendedor." : "Crie uma conta para um novo vendedor."}
+                                {editingId ? "Atualize os dados do usuário." : "Crie uma conta para um novo administrador ou gerente."}
                             </DialogDescription>
                         </DialogHeader>
                         <Form {...form}>
@@ -301,7 +256,7 @@ export default function CambistasPage() {
                                             <FormControl>
                                                 <div className="relative">
                                                     <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="João da Silva" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    <Input placeholder="Nome do usuário" className="pl-9 bg-muted/50 border-input" {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -317,7 +272,7 @@ export default function CambistasPage() {
                                             <FormControl>
                                                 <div className="relative">
                                                     <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="joaosilva" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    <Input placeholder="usuario.admin" className="pl-9 bg-muted/50 border-input" {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -333,7 +288,7 @@ export default function CambistasPage() {
                                             <FormControl>
                                                 <div className="relative">
                                                     <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="joao@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    <Input placeholder="email@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -342,64 +297,27 @@ export default function CambistasPage() {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="areaId"
+                                    name="role"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-foreground">Praça (Área)</FormLabel>
+                                            <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <SelectValue placeholder="Selecione uma praça" />
+                                                        <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <SelectValue placeholder="Selecione o nível" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {areas.map((area) => (
-                                                        <SelectItem key={area.id} value={area.id}>
-                                                            {area.city} - {area.name}
-                                                        </SelectItem>
-                                                    ))}
+                                                    <SelectItem value="ADMIN">Administrador (ADMIN)</SelectItem>
+                                                    <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                                                    <SelectItem value="GERENTE">Gerente</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="salesLimit"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-foreground">Limite Diário (R$)</FormLabel>
-                                                <FormControl>
-                                                    <div className="relative">
-                                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="accountabilityLimitHours"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-foreground">Prazo Prest. Contas (h)</FormLabel>
-                                                <FormControl>
-                                                    <div className="relative">
-                                                        <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input type="number" step="1" placeholder="24" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
                                 <FormField
                                     control={form.control}
                                     name="password"
@@ -424,7 +342,7 @@ export default function CambistasPage() {
                                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                                         Cancelar
                                     </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white">
                                         {form.formState.isSubmitting ? (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         ) : (
@@ -443,22 +361,13 @@ export default function CambistasPage() {
                 <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle>Equipe de Vendas</CardTitle>
-                            <CardDescription>Lista de todos os cambistas cadastrados no sistema.</CardDescription>
+                            <CardTitle>Usuários do Sistema</CardTitle>
+                            <CardDescription>Lista de administradores e gestores do sistema.</CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setAudioEnabled(!audioEnabled)}
-                                className={audioEnabled ? "bg-amber-50 text-amber-600 border-amber-200" : ""}
-                            >
-                                {audioEnabled ? <Bell className="h-4 w-4 mr-2" /> : <BellOff className="h-4 w-4 mr-2" />}
-                                Alerta Sonoro
-                            </Button>
                             <div className="relative w-64">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Buscar cambista..." className="pl-9 bg-muted/50 border-border" />
+                                <Input placeholder="Buscar usuário..." className="pl-9 bg-muted/50 border-border" />
                             </div>
                             <Button variant="outline" size="icon">
                                 <Filter className="h-4 w-4 text-slate-500" />
@@ -469,75 +378,52 @@ export default function CambistasPage() {
                 <CardContent>
                     {loading ? (
                         <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
                         </div>
                     ) : (
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-muted/50">
                                     <TableHead className="w-[300px]">Nome</TableHead>
-                                    <TableHead>Praça</TableHead>
+                                    <TableHead>Nível de Acesso</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Role</TableHead>
                                     <TableHead className="text-right">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {cambistas.map((cambista) => {
-                                    // Logic to check if blocked by time
-                                    // This is a simplified frontend check, real check is on backend
-                                    // But we can show a hint if we had the last transaction date here.
-                                    // Since we don't have all data, we trust isActive for manual block.
-                                    const isManuallyBlocked = cambista.isActive === false;
+                                {users.map((user) => {
+                                    const isManuallyBlocked = user.isActive === false;
 
                                     return (
-                                        <TableRow key={cambista.id} className="hover:bg-muted/50 transition-colors">
+                                        <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
-                                                        {cambista.username.substring(0, 2)}
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-blue-100 text-blue-600 ring-blue-500/20'}`}>
+                                                        {user.username.substring(0, 2)}
                                                     </div>
                                                     <div>
                                                         <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                            <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
-                                                            {cambista.name || cambista.username}
+                                                            <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-blue-500'}`} />
+                                                            {user.name || user.username}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground flex items-center gap-1">
                                                             <Mail className="w-3 h-3" />
-                                                            {cambista.email || "Sem email"}
+                                                            {user.email || "Sem email"}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                {cambista.area ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <MapPin className="h-3 w-3 text-emerald-500" />
-                                                        <span className="text-foreground font-medium">{cambista.area.city}</span>
-                                                        <span className="text-muted-foreground text-xs">({cambista.area.name})</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-muted-foreground text-xs italic flex items-center gap-1">
-                                                        <MapPin className="h-3 w-3 text-slate-400" />
-                                                        Sem praça
-                                                    </span>
-                                                )}
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
+                                                    <Shield className="w-3.5 h-3.5" />
+                                                    {user.role}
+                                                </span>
                                             </TableCell>
                                             <TableCell>
                                                 {isManuallyBlocked ? (
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
                                                         <Ban className="w-3.5 h-3.5" />
                                                         Bloqueado
-                                                    </span>
-                                                ) : cambista.accountability?.isExpired ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5 animate-pulse">
-                                                        <AlertTriangle className="w-3.5 h-3.5" />
-                                                        Expirado
-                                                    </span>
-                                                ) : cambista.accountability?.status === 'EXPIRING' ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 gap-1.5">
-                                                        <Clock className="w-3.5 h-3.5" />
-                                                        Vence em {Math.max(0, cambista.accountability.hoursRemaining).toFixed(1)}h
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
@@ -546,43 +432,36 @@ export default function CambistasPage() {
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                                    {cambista.role}
-                                                </div>
-                                            </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
-                                                            onClick={() => handleToggleBlock(cambista)}
-                                                            title={isManuallyBlocked ? "Desbloquear Cambista" : "Bloquear Cambista"}
-                                                        >
-                                                            {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                            onClick={() => handleOpenDialog(cambista)}
-                                                            title="Editar"
-                                                        >
-                                                            <SquarePen className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => handleDelete(cambista.id)}
-                                                            title="Excluir"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                        onClick={() => handleToggleBlock(user)}
+                                                        title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
+                                                    >
+                                                        {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                        onClick={() => handleOpenDialog(user)}
+                                                        title="Editar"
+                                                    >
+                                                        <SquarePen className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        onClick={() => handleDelete(user.id)}
+                                                        title="Excluir"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     );
