@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle, Clock } from "lucide-react"
+import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle, Clock, Printer } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -165,6 +165,10 @@ export default function CashConferencePage() {
     }
 
 
+    const handlePrint = () => {
+        window.print()
+    }
+
     const formatCurrency = (value: number | string) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value))
     }
@@ -245,7 +249,17 @@ export default function CashConferencePage() {
             {summary && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                    <div className="flex justify-between items-center">
+                    {/* Header para Impressão */}
+                    <div className="hidden print:block border-b border-zinc-200 pb-4 mb-4">
+                        <h2 className="text-2xl font-bold">Relatório de Conferência de Caixa</h2>
+                        <div className="flex gap-6 mt-2 text-sm text-zinc-600">
+                            <span>Cambista: <strong>{cambistas.find(c => c.id === selectedCambista)?.name || selectedCambista}</strong></span>
+                            <span>Data: <strong>{format(new Date(summary.date), "dd/MM/yyyy")}</strong></span>
+                            <span>Status: <strong>{summary.status === 'VERIFIED' ? 'CONFERIDO' : summary.status === 'PENDING' ? 'AGUARDANDO CONFERÊNCIA' : 'ABERTO'}</strong></span>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center no-print">
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status do Caixa:</span>
                             {summary.status === 'OPEN' && (
@@ -267,15 +281,26 @@ export default function CashConferencePage() {
                                 </span>
                             )}
                         </div>
-                        {(summary.status === 'OPEN' || summary.status === 'PENDING') && (
+                        <div className="flex gap-2">
                             <Button
-                                onClick={handleCloseCashier}
-                                className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
+                                onClick={handlePrint}
+                                variant="outline"
+                                className="bg-white hover:bg-zinc-100 text-zinc-900 border-zinc-200 shadow-sm"
                             >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                {summary.status === 'PENDING' ? 'Conferir e Liberar Caixa' : 'Fechar Caixa e Liberar'}
+                                <Printer className="mr-2 h-4 w-4" />
+                                Imprimir
                             </Button>
-                        )}
+
+                            {(summary.status === 'OPEN' || summary.status === 'PENDING') && (
+                                <Button
+                                    onClick={handleCloseCashier}
+                                    className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
+                                >
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    {summary.status === 'PENDING' ? 'Conferir e Liberar Caixa' : 'Fechar Caixa e Liberar'}
+                                </Button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

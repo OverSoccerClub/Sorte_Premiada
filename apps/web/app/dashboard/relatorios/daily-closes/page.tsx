@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Download, CalendarCheck, Search, Filter, Eye, ArrowUpCircle, ArrowDownCircle, CheckCircle2, Clock, AlertTriangle } from "lucide-react"
+import { Download, CalendarCheck, Search, Filter, Eye, ArrowUpCircle, ArrowDownCircle, CheckCircle2, Clock, AlertTriangle, Printer } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -102,6 +102,10 @@ export default function DailyClosesPage() {
         fetchCloses()
     }, [])
 
+    const handlePrint = () => {
+        window.print()
+    }
+
     const formatCurrency = (value: number | string) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value))
     }
@@ -172,6 +176,20 @@ export default function DailyClosesPage() {
             </Card>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20 no-print">
+                    <CardTitle className="text-base uppercase tracking-wider font-bold">Histórico de Fechamentos</CardTitle>
+                    <Button onClick={handlePrint} variant="outline" size="sm" className="gap-2 bg-white">
+                        <Printer className="w-4 h-4" /> Imprimir Lista
+                    </Button>
+                </CardHeader>
+
+                {/* Print Header */}
+                <div className="hidden print:block mb-6 border-b pb-4">
+                    <h1 className="text-2xl font-bold">Relatório de Fechamentos Diários</h1>
+                    <p className="text-sm">Período: {format(new Date(startDate), "dd/MM/yyyy")} até {format(new Date(endDate), "dd/MM/yyyy")}</p>
+                    {selectedCambista !== "all" && <p className="text-sm">Cambista: {cambistas.find(c => c.id === selectedCambista)?.name}</p>}
+                </div>
+
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
@@ -238,7 +256,7 @@ export default function DailyClosesPage() {
             {/* Details Modal */}
             <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                    <DialogHeader className="no-print">
                         <DialogTitle className="flex items-center gap-2">
                             <Search className="w-5 h-5 text-emerald-500" />
                             Detalhamento de Caixa
@@ -248,6 +266,13 @@ export default function DailyClosesPage() {
                         </DialogDescription>
                     </DialogHeader>
 
+                    {/* Print Only Header for Modal */}
+                    <div className="hidden print:block border-b pb-4 mb-4">
+                        <h2 className="text-xl font-bold">Extrato Detalhado de Caixa</h2>
+                        <p className="text-sm">Cambista: {selectedClose?.closedByUser?.name || selectedClose?.closedByUser?.username}</p>
+                        <p className="text-sm">Data: {selectedClose && format(new Date(selectedClose.date || selectedClose.createdAt), "dd/MM/yyyy")}</p>
+                    </div>
+
                     {loadingDetail ? (
                         <div className="py-20 flex justify-center items-center gap-2 text-muted-foreground">
                             <Clock className="w-6 h-6 animate-pulse" />
@@ -255,6 +280,11 @@ export default function DailyClosesPage() {
                         </div>
                     ) : detailSummary ? (
                         <div className="space-y-6 pt-4">
+                            <div className="flex justify-end no-print">
+                                <Button onClick={handlePrint} variant="outline" size="sm" className="gap-2 bg-white text-zinc-900 border-zinc-200 shadow-sm">
+                                    <Printer className="w-4 h-4" /> Imprimir Extrato
+                                </Button>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div className="p-4 bg-muted/50 rounded-lg border border-border">
                                     <div className="text-xs font-medium text-muted-foreground uppercase mb-1">Vendas</div>

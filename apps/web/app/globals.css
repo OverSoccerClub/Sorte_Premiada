@@ -162,3 +162,49 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  aside, 
+  header,
+  footer,
+  .sidebar-root,
+  button:not(.print-only) {
+    display: none !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-header {
+    display: block !important;
+    margin-bottom: 20px;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .Card, .card {
+    border: 1px solid #eee !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .text-white, .text-emerald-100 {
+    color: black !important;
+  }
+  
+  .bg-emerald-600, .bg-red-600, .bg-sky-600, .bg-foreground {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    color: black !important;
+  }
+}
