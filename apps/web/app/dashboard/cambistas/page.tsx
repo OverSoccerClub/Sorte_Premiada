@@ -240,6 +240,40 @@ export default function CambistasPage() {
         )
     }
 
+    const handleForceClose = async (cambista: any) => {
+        showAlert(
+            "Fechar Caixa",
+            `Deseja fechar o caixa do cambista ${cambista.name || cambista.username} e marcar como conferido?`,
+            "info",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token")
+                    const res = await fetch(`${API_URL}/finance/close/${cambista.id}/admin`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ autoVerify: true })
+                    })
+
+                    if (res.ok) {
+                        fetchCambistas()
+                        showAlert("Sucesso", "Caixa fechado e conferido com sucesso.", "success")
+                    } else {
+                        const err = await res.text()
+                        showAlert("Erro", `Falha ao fechar caixa: ${err}`, "error")
+                    }
+                } catch (e) {
+                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
+                }
+            },
+            "Confirmar",
+            "Cancelar"
+        )
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -599,37 +633,3 @@ export default function CambistasPage() {
         </div>
     )
 }
-
-    const handleForceClose = async (cambista: any) => {
-        showAlert(
-            "Fechar Caixa",
-            `Deseja fechar o caixa do cambista ${cambista.name || cambista.username} e marcar como conferido?`,
-            "info",
-            true,
-            async () => {
-                try {
-                    const token = localStorage.getItem("token")
-                    const res = await fetch(`${API_URL}/finance/close/${cambista.id}/admin`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ autoVerify: true })
-                    })
-
-                    if (res.ok) {
-                        fetchCambistas()
-                        showAlert("Sucesso", "Caixa fechado e conferido com sucesso.", "success")
-                    } else {
-                        const err = await res.text()
-                        showAlert("Erro", `Falha ao fechar caixa: ${err}`, "error")
-                    }
-                } catch (e) {
-                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
-                }
-            },
-            "Confirmar",
-            "Cancelar"
-        )
-    }

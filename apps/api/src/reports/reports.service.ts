@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionType } from '@prisma/client';
+import { objectsToCsv } from './csv.util';
 
 @Injectable()
 export class ReportsService {
@@ -289,5 +290,102 @@ export class ReportsService {
             cambistasCount: area.cambistasMap.size,
             cambistas: Array.from(area.cambistasMap.values()).sort((a: any, b: any) => b.sales - a.sales)
         })).sort((a, b) => b.totalSales - a.totalSales);
+    }
+
+    // New report methods
+    async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string) {
+        const where: any = {};
+        if (startDate || endDate) {
+            const gte = startDate ? startDate : new Date(0);
+            const lte = endDate ? endDate : new Date();
+            where.createdAt = { gte, lte };
+        }
+        if (userId) where.closedByUserId = userId;
+        if (status) where.status = status;
+
+        const results = await this.prisma.dailyClose.findMany({
+            where,
+            include: { closedByUser: true },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // If verifiedByUser details are requested, resolve them separately (schema has only verifiedByUserId)
+        return Promise.all(results.map(async r => {
+            const verifiedBy = r.verifiedByUserId ? await this.prisma.user.findUnique({ where: { id: r.verifiedByUserId }, select: { id: true, username: true, name: true } }) : null;
+            return { ...r, verifiedBy };
+        }));
+    }
+
+    async getPendingCloses() {
+        return this.prisma.dailyClose.findMany({ where: { status: 'PENDING' }, include: { closedByUser: true }, orderBy: { createdAt: 'desc' } });
+    }
+
+    async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string) {
+        const where: any = {};
+        if (startDate || endDate) {
+            const gte = startDate ? startDate : new Date(0);
+            const lte = endDate ? endDate : new Date();
+            where.createdAt = { gte, lte };
+        }
+        if (userId) where.userId = userId;
+
+        const transactions = await this.prisma.transaction.findMany({ where, orderBy: { createdAt: 'desc' }, include: { user: { select: { username: true, name: true } } } });
+
+        const rows = transactions.map(t => ({
+            id: t.id,
+            createdAt: t.createdAt?.toISOString(),
+            userId: t.userId,
+            username: t.user?.username || '',
+            description: t.description || '',
+            amount: t.amount,
+            type: t.type
+        }));
+
+        return objectsToCsv(rows);
+    }
+
+    async getTicketsByDraw(drawId?: string, startDate?: Date, endDate?: Date) {
+        const where: any = {};
+        if (drawId) where.drawId = drawId;
+        if (startDate || endDate) {
+            const gte = startDate ? startDate : new Date(0);
+            const lte = endDate ? endDate : new Date();
+            where.createdAt = { gte, lte };
+        }
+
+        return this.prisma.ticket.findMany({ where, include: { user: { select: { username: true, name: true } }, game: true }, orderBy: { createdAt: 'desc' } });
+    }
+
+    async getTopSellers(limit: number = 10, startDate?: Date, endDate?: Date) {
+        const where: any = { status: { not: 'CANCELLED' } };
+        if (startDate || endDate) {
+            const gte = startDate ? startDate : new Date(0);
+            const lte = endDate ? endDate : new Date();
+            where.createdAt = { gte, lte };
+        }
+
+        const sellers = await this.prisma.ticket.groupBy({
+            by: ['userId'],
+            where,
+            _sum: { amount: true },
+            _count: { id: true },
+            orderBy: { _sum: { amount: 'desc' } },
+            take: limit
+        });
+
+        return Promise.all(sellers.map(async s => {
+            const user = await this.prisma.user.findUnique({ where: { id: s.userId }, select: { username: true, name: true } });
+            return { ...s, username: user?.username, name: user?.name };
+        }));
+    }
+
+    async getActiveUsers(days: number = 30) {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        const groups = await this.prisma.ticket.groupBy({ by: ['userId'], where: { createdAt: { gte: since }, status: { not: 'CANCELLED' } } });
+        const userIds = groups.map(g => g.userId);
+
+        return this.prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, username: true, name: true, email: true } });
     }
 }

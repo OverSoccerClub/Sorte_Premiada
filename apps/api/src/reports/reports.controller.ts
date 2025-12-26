@@ -1,9 +1,10 @@
-import { Controller, Get, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, UseGuards, Query, Res } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@repo/database';
+import type { Response } from 'express';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -50,5 +51,58 @@ export class ReportsController {
         @Query('date') date: string,
     ) {
         return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date());
+    }
+
+    @Get('daily-closes')
+    async getDailyCloses(
+        @Query('startDate') startDate: string,
+        @Query('endDate') endDate: string,
+        @Query('userId') userId: string,
+        @Query('status') status: string,
+    ) {
+        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status);
+    }
+
+    @Get('pending-closes')
+    async getPendingCloses() {
+        return this.reportsService.getPendingCloses();
+    }
+
+    @Get('transactions/export')
+    async exportTransactions(
+        @Query('startDate') startDate: string,
+        @Query('endDate') endDate: string,
+        @Query('userId') userId: string,
+        @Res() res: Response,
+    ) {
+        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="transactions_${Date.now()}.csv"`);
+        res.send(csv);
+    }
+
+    @Get('tickets-by-draw')
+    async getTicketsByDraw(
+        @Query('drawId') drawId: string,
+        @Query('startDate') startDate: string,
+        @Query('endDate') endDate: string,
+    ) {
+        return this.reportsService.getTicketsByDraw(drawId, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined);
+    }
+
+    @Get('top-sellers')
+    async getTopSellers(
+        @Query('limit') limit?: string,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+    ) {
+        const l = limit ? Number(limit) : 10;
+        return this.reportsService.getTopSellers(l, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined);
+    }
+
+    @Get('active-users')
+    async getActiveUsers(@Query('days') days?: string) {
+        const d = days ? Number(days) : 30;
+        return this.reportsService.getActiveUsers(d);
     }
 }
