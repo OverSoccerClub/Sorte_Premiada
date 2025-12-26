@@ -184,7 +184,7 @@ export default function RelatoriosPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         <div className="space-y-2">
                             <Label>Selecione o Jogo</Label>
                             <Select value={selectedGame} onValueChange={setSelectedGame}>
@@ -236,9 +236,9 @@ export default function RelatoriosPage() {
                         <Button
                             onClick={() => handleSearch(true)}
                             disabled={loading}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-900/10"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-900/10 w-full"
                         >
-                            {loading ? "Gerando..." : "Gerar Relatório"}
+                            {loading ? "Pesquisando..." : "Pesquisar"}
                         </Button>
                     </div >
                 </CardContent >
