@@ -79,16 +79,21 @@ export default function DashboardPage() {
                     const data = await res.json()
                     setStats(data)
                 } else {
-                    toast.error("Erro ao carregar estatísticas")
+                    // toast.error("Erro ao carregar estatísticas") // Silently fail on background refresh or handle differently
                 }
             } catch (error) {
-                toast.error("Erro de conexão")
+                // toast.error("Erro de conexão")
             } finally {
                 setLoading(false)
             }
         }
 
         fetchStats()
+
+        // Auto-refresh every 10 seconds
+        const intervalId = setInterval(fetchStats, 10000)
+
+        return () => clearInterval(intervalId)
     }, [])
 
     if (loading) {
@@ -465,8 +470,13 @@ export default function DashboardPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
-                                                    <Hash className="w-3 h-3" />
-                                                    {sale.numbers.join(' - ')}
+                                                    <Ticket className="w-3 h-3" />
+                                                    {sale.numbers
+                                                        .map(n => parseInt(n)) // Convert to number for sorting
+                                                        .sort((a, b) => a - b) // Sort numbers ascending
+                                                        .map(n => n.toString().padStart(4, '0')) // Pad with zeros
+                                                        .join(' - ')
+                                                    }
                                                 </div>
                                             </td>
                                             <td className="px-10 py-4 text-center">
