@@ -102,6 +102,11 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+          <div className="mt-8 pt-6 border-t border-slate-700/50 text-center">
+            <span className="text-xs text-slate-500 font-medium tracking-wider uppercase">
+              Versão {AppConfig.version}
+            </span>
+          </div>
         </CardContent>
       </Card>
     </div>
