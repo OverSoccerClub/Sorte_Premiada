@@ -1,11 +1,10 @@
 "use client"
-
 import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck } from "lucide-react"
+import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -15,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 
 interface Transaction {
     id: string
@@ -38,6 +38,7 @@ export default function CashConferencePage() {
     const [cambistas, setCambistas] = useState<any[]>([])
     const [summary, setSummary] = useState<FinanceSummary | null>(null)
     const [loading, setLoading] = useState(false)
+    const { showAlert } = useAlert()
 
     // Filters
     const [selectedCambista, setSelectedCambista] = useState<string>("")
@@ -103,6 +104,49 @@ export default function CashConferencePage() {
             setLoading(false)
         }
     }
+
+    const handleCloseCashier = async () => {
+        if (!selectedCambista) return
+
+        const cambista = cambistas.find(c => c.id === selectedCambista)
+        const name = cambista?.name || cambista?.username || 'Selecionado'
+
+        showAlert(
+            "Fechar Caixa e Liberar",
+            `Confirma que conferiu todos os valores e deseja fechar o caixa de ${name}? Isso irá zerar o caixa para novas vendas.`,
+            "info",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token")
+                    const res = await fetch(`${API_URL}/finance/close/${selectedCambista}/admin`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ autoVerify: true })
+                    })
+
+                    if (res.ok) {
+                        toast.success("Caixa fechado e conferido com sucesso!")
+                        // Refresh summary to show reset state or just clear it? 
+                        // Usually implies a reset so maybe we should reload or clear.
+                        // Let's reload to be sure.
+                        handleSearch()
+                    } else {
+                        const err = await res.text()
+                        toast.error(`Falha ao fechar caixa: ${err}`)
+                    }
+                } catch (e) {
+                    toast.error("Não foi possível conectar ao servidor.")
+                }
+            },
+            "Confirmar Fechamento",
+            "Cancelar"
+        )
+    }
+
 
     const formatCurrency = (value: number | string) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value))
@@ -175,6 +219,17 @@ export default function CashConferencePage() {
 
             {summary && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                    <div className="flex justify-end">
+                        <Button
+                            onClick={handleCloseCashier}
+                            className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
+                        >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Fechar Caixa e Liberar
+                        </Button>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <Card className="bg-card border-border shadow-sm">
                             <CardContent className="pt-6">

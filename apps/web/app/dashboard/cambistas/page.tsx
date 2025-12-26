@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, DollarSign, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const ACCOUNTABILITY_ALARM_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
@@ -240,39 +240,7 @@ export default function CambistasPage() {
         )
     }
 
-    const handleForceClose = async (cambista: any) => {
-        showAlert(
-            "Fechar Caixa",
-            `Deseja fechar o caixa do cambista ${cambista.name || cambista.username} e marcar como conferido?`,
-            "info",
-            true,
-            async () => {
-                try {
-                    const token = localStorage.getItem("token")
-                    const res = await fetch(`${API_URL}/finance/close/${cambista.id}/admin`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ autoVerify: true })
-                    })
-
-                    if (res.ok) {
-                        fetchCambistas()
-                        showAlert("Sucesso", "Caixa fechado e conferido com sucesso.", "success")
-                    } else {
-                        const err = await res.text()
-                        showAlert("Erro", `Falha ao fechar caixa: ${err}`, "error")
-                    }
-                } catch (e) {
-                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
-                }
-            },
-            "Confirmar",
-            "Cancelar"
-        )
-    }
+    // function removed
 
     return (
         <div className="space-y-6">
@@ -584,43 +552,35 @@ export default function CambistasPage() {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-sky-600 hover:text-sky-700 hover:bg-sky-50"
-                                                        onClick={() => handleForceClose(cambista)}
-                                                        title="Fechar Caixa"
-                                                    >
-                                                        <DollarSign className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
-                                                        onClick={() => handleToggleBlock(cambista)}
-                                                        title={isManuallyBlocked ? "Desbloquear Cambista" : "Bloquear Cambista"}
-                                                    >
-                                                        {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                        onClick={() => handleOpenDialog(cambista)}
-                                                        title="Editar"
-                                                    >
-                                                        <SquarePen className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                        onClick={() => handleDelete(cambista.id)}
-                                                        title="Excluir"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                            onClick={() => handleToggleBlock(cambista)}
+                                                            title={isManuallyBlocked ? "Desbloquear Cambista" : "Bloquear Cambista"}
+                                                        >
+                                                            {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                            onClick={() => handleOpenDialog(cambista)}
+                                                            title="Editar"
+                                                        >
+                                                            <SquarePen className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => handleDelete(cambista.id)}
+                                                            title="Excluir"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
                                             </TableCell>
                                         </TableRow>
                                     );
