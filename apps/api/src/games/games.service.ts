@@ -11,17 +11,53 @@ export class GamesService {
     }
 
     async findAll() {
-        return this.prisma.game.findMany();
+        return this.prisma.game.findMany({
+            include: { extractionSeries: true }
+        });
     }
 
     async findOne(id: string) {
-        return this.prisma.game.findUnique({ where: { id } });
+        return this.prisma.game.findUnique({
+            where: { id },
+            include: { extractionSeries: true }
+        });
     }
 
-    async update(id: string, data: Prisma.GameUpdateInput) {
-        return this.prisma.game.update({
+    async update(id: string, data: any) {
+        // Separe extractionSeries data if present in data
+        const { extractionSeries, ...gameData } = data;
+
+        // Update the game basic info
+        const updatedGame = await this.prisma.game.update({
             where: { id },
-            data
+            data: gameData
         });
+
+        // If updated extractionSeries are provided, upsert them
+        if (extractionSeries && Array.isArray(extractionSeries)) {
+            for (const series of extractionSeries) {
+                // Ensure we have time and lastSeries
+                if (series.time && series.lastSeries !== undefined) {
+                    await this.prisma.extractionSeries.upsert({
+                        where: {
+                            gameId_time: {
+                                gameId: id,
+                                time: series.time
+                            }
+                        },
+                        update: {
+                            lastSeries: Number(series.lastSeries)
+                        },
+                        create: {
+                            gameId: id,
+                            time: series.time,
+                            lastSeries: Number(series.lastSeries)
+                        }
+                    });
+                }
+            }
+        }
+
+        return updatedGame;
     }
 }

@@ -23,8 +23,9 @@ export default function GameSettingsPage() {
     // Schedule Editing State
     const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
     const [selectedGame, setSelectedGame] = useState<any>(null)
-    const [extractionTimes, setExtractionTimes] = useState<string[]>([])
+    const [extractionTimes, setExtractionTimes] = useState<{ time: string, series: number }[]>([])
     const [newTime, setNewTime] = useState("")
+    const [newSeries, setNewSeries] = useState("")
 
     useEffect(() => {
         fetchGames()
@@ -88,24 +89,45 @@ export default function GameSettingsPage() {
     // Schedule Functions
     const openScheduleModal = (game: any) => {
         setSelectedGame(game)
-        setExtractionTimes(game.extractionTimes || [])
+
+        // Map existing string times to objects with series
+        // If extractionSeries exists (from backend include), use it to populate series
+        const existingSeriesMap = new Map()
+        if (game.extractionSeries) {
+            game.extractionSeries.forEach((s: any) => existingSeriesMap.set(s.time, s.lastSeries))
+        }
+
+        const times = (game.extractionTimes || []).map((t: string) => ({
+            time: t,
+            series: existingSeriesMap.get(t) || 0
+        }))
+
+        setExtractionTimes(times)
         setScheduleModalOpen(true)
     }
 
     const addTime = () => {
         if (!newTime) return
-        if (extractionTimes.includes(newTime)) {
+        if (extractionTimes.some(t => t.time === newTime)) {
             toast.warning("Horário já existe")
             return
         }
         // Simple validation or sorting could go here
-        const sorted = [...extractionTimes, newTime].sort()
+        const sorted = [...extractionTimes, { time: newTime, series: Number(newSeries) || 0 }].sort((a, b) => a.time.localeCompare(b.time))
         setExtractionTimes(sorted)
         setNewTime("")
+        setNewSeries("")
     }
 
     const removeTime = (time: string) => {
-        setExtractionTimes(extractionTimes.filter(t => t !== time))
+        setExtractionTimes(extractionTimes.filter(t => t.time !== time))
+    }
+
+    const updateSeries = (time: string, series: string) => {
+        const newSeriesVal = Number(series)
+        setExtractionTimes(extractionTimes.map(t =>
+            t.time === time ? { ...t, series: newSeriesVal } : t
+        ))
     }
 
     const saveSchedule = async () => {
@@ -113,13 +135,23 @@ export default function GameSettingsPage() {
         setSaving(true)
         try {
             const token = localStorage.getItem("token")
+
+            // Send both the string array (extractionTimes) and the series detail (extractionSeries)
+            const payload = {
+                extractionTimes: extractionTimes.map(t => t.time),
+                extractionSeries: extractionTimes.map(t => ({
+                    time: t.time,
+                    lastSeries: t.series
+                }))
+            }
+
             const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
                 method: 'POST', // Using POST/PATCH typically updates
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ extractionTimes })
+                body: JSON.stringify(payload)
             })
 
             if (res.ok) {
@@ -339,6 +371,16 @@ export default function GameSettingsPage() {
                                     onChange={(e) => setNewTime(e.target.value)}
                                 />
                             </div>
+                            <div className="grid gap-1.5 w-[100px]">
+                                <Label htmlFor="series">Série Inicial</Label>
+                                <Input
+                                    id="series"
+                                    type="number"
+                                    placeholder="0"
+                                    value={newSeries}
+                                    onChange={(e) => setNewSeries(e.target.value)}
+                                />
+                            </div>
                             <Button onClick={addTime} disabled={!newTime}>
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add
@@ -351,13 +393,30 @@ export default function GameSettingsPage() {
                                     Nenhum horário adicionado.
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-3 gap-2">
-                                    {extractionTimes.map((time) => (
-                                        <div key={time} className="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
-                                            <span className="font-mono font-bold text-base text-slate-700 dark:text-slate-100">{time}</span>
+                                <div className="grid gap-2">
+                                    <div className="grid grid-cols-[1fr_80px_40px] gap-2 px-2 text-xs font-medium text-muted-foreground mb-1">
+                                        <span>Horário</span>
+                                        <span>Série Atual</span>
+                                        <span></span>
+                                    </div>
+                                    {extractionTimes.map((item) => (
+                                        <div key={item.time} className="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
+                                            <div className="flex-1 font-mono font-bold text-base text-slate-700 dark:text-slate-100 flex items-center gap-2">
+                                                <Clock className="w-4 h-4 text-emerald-500" />
+                                                {item.time}
+                                            </div>
+                                            <div className="w-[80px]">
+                                                <Input
+                                                    type="number"
+                                                    className="h-8 text-right font-mono"
+                                                    value={item.series}
+                                                    onChange={(e) => updateSeries(item.time, e.target.value)}
+                                                    placeholder="0"
+                                                />
+                                            </div>
                                             <Button
                                                 className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                onClick={() => removeTime(time)}
+                                                onClick={() => removeTime(item.time)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
