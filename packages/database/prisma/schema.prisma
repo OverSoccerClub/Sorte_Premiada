@@ -32,6 +32,7 @@ model User {
   posTerminalsAsLast    PosTerminal[] @relation("PosLastUser")
   areaId       String?
   area         Area?    @relation(fields: [areaId], references: [id])
+  isActive     Boolean  @default(true) // Controla bloqueio manual do cambista
 }
 
 model Area {

@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, Prisma } from '@repo/database';
+import { FinanceService } from '../finance/finance.service';
 
 @Injectable()
 export class UsersService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        @Inject(forwardRef(() => FinanceService))
+        private financeService: FinanceService
+    ) { }
 
     async findOne(username: string): Promise<User | null> {
         return this.prisma.user.findUnique({
@@ -42,7 +47,7 @@ export class UsersService {
         });
     }
 
-    async findAll(username?: string): Promise<User[]> {
+    async findAll(username?: string): Promise<any[]> {
         let users = await this.prisma.user.findMany({
             where: username ? { username } : undefined,
             include: { area: true },
@@ -50,7 +55,9 @@ export class UsersService {
 
         // Check for expiry and rotate if needed (only for COBRADORES)
         const now = new Date();
-        const updates = users.map(async (user) => {
+        const results = users.map(async (user) => {
+            let userToReturn = { ...user } as any;
+
             if (user.role === 'COBRADOR') {
                 let needsUpdate = false;
                 const updateData: Prisma.UserUpdateInput = {};
@@ -71,19 +78,23 @@ export class UsersService {
 
                 if (needsUpdate) {
                     // Update user in DB
-                    const updatedUser = await this.prisma.user.update({
+                    userToReturn = await this.prisma.user.update({
                         where: { id: user.id },
                         data: updateData,
                         include: { area: true }
                     });
-                    // Update the user object in the list
-                    return updatedUser;
                 }
             }
-            return user;
+
+            // Always add accountability info for CAMBISTAS
+            if (user.role === 'CAMBISTA') {
+                userToReturn.accountability = await this.financeService.getAccountabilityInfo(user.id);
+            }
+
+            return userToReturn;
         });
 
-        return Promise.all(updates);
+        return Promise.all(results);
     }
 
     async findById(id: string): Promise<User | null> {
