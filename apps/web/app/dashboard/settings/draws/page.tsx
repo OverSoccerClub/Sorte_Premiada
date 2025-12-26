@@ -192,14 +192,14 @@ export default function DrawsSettingsPage() {
                                             <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                         </TableCell>
                                     </TableRow>
-                                ) : draws.length === 0 ? (
+                                ) : (draws || []).length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                                             Nenhum sorteio encontrado.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    draws.map(draw => (
+                                    (draws || []).map(draw => (
                                         <TableRow key={draw.id}>
                                             <TableCell>
                                                 <Badge variant="outline" className="font-mono bg-slate-50">

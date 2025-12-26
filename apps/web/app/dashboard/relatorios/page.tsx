@@ -98,11 +98,11 @@ export default function RelatoriosPage() {
 
             if (res.ok) {
                 const data = await res.json()
-                setTickets(data.tickets)
-                setTotal(data.total)
-                setSummary(data.summary)
-                setTotalPages(data.totalPages)
-                if (data.tickets.length === 0 && page === 1) {
+                setTickets(data.tickets || [])
+                setTotal(data.total || 0)
+                setSummary(data.summary || [])
+                setTotalPages(data.totalPages || 1)
+                if ((data.tickets?.length || 0) === 0 && (resetPage ? 1 : page) === 1) {
                     toast.info("Nenhuma venda encontrada no período.")
                 }
             } else {
@@ -117,7 +117,7 @@ export default function RelatoriosPage() {
     }
 
     const calculateTotal = () => {
-        return summary.reduce((acc, s) => acc + s.totalAmount, 0)
+        return (summary || []).reduce((acc, s) => acc + (s.totalAmount || 0), 0)
     }
 
     return (
@@ -245,7 +245,7 @@ export default function RelatoriosPage() {
             </Card >
 
             {
-                tickets.length > 0 && (
+                (tickets?.length || 0) > 0 && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Card className="bg-emerald-500 text-white border-none shadow-lg shadow-emerald-500/20">
@@ -276,10 +276,10 @@ export default function RelatoriosPage() {
                                 <CardContent className="pt-6">
                                     <div className="text-muted-foreground text-sm font-medium mb-1">Resumo por Jogo</div>
                                     <div className="space-y-2 mt-2">
-                                        {summary.map(s => (
+                                        {(summary || []).map(s => (
                                             <div key={s.gameId} className="flex justify-between text-sm">
                                                 <span className="text-muted-foreground">{s.gameName}:</span>
-                                                <span className="font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(s.totalAmount)}</span>
+                                                <span className="font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(s.totalAmount || 0)}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -310,7 +310,7 @@ export default function RelatoriosPage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {tickets.map((ticket) => (
+                                        {(tickets || []).map((ticket) => (
                                             <TableRow key={ticket.id} className="hover:bg-muted/50 transition-colors">
                                                 <TableCell className="font-medium text-foreground">
                                                     {format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}

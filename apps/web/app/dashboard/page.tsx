@@ -200,10 +200,10 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-8">
-                            {stats.recentSales.length === 0 ? (
+                            {(stats.recentSales || []).length === 0 ? (
                                 <div className="text-center py-8 text-muted-foreground">Nenhuma venda recente.</div>
                             ) : (
-                                stats.recentSales.map((sale, i) => (
+                                (stats.recentSales || []).map((sale, i) => (
                                     <div key={sale.id} className="flex items-center">
                                         <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center">
                                             <User className="h-5 w-5 text-slate-400" />
