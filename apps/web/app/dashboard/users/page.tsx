@@ -204,8 +204,8 @@ export default function UsersPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <Shield className="w-8 h-8 text-blue-500" />
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Shield className="w-8 h-8 text-emerald-500" />
                         </div>
                         Usuários Administrativos
                     </h2>
@@ -216,7 +216,7 @@ export default function UsersPage() {
                     <DialogTrigger asChild>
                         <Button
                             onClick={() => handleOpenDialog()}
-                            className="bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-900/20"
+                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Novo Usuário
@@ -227,15 +227,15 @@ export default function UsersPage() {
                             <DialogTitle className="flex items-center gap-2 text-foreground">
                                 {editingId ? (
                                     <>
-                                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                                            <SquarePen className="w-5 h-5 text-blue-500" />
+                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                            <SquarePen className="w-5 h-5 text-emerald-500" />
                                         </div>
                                         Editar Usuário
                                     </>
                                 ) : (
                                     <>
-                                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                                            <UserPlus className="w-5 h-5 text-blue-500" />
+                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                            <UserPlus className="w-5 h-5 text-emerald-500" />
                                         </div>
                                         Adicionar Novo Usuário
                                     </>
@@ -342,7 +342,7 @@ export default function UsersPage() {
                                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                                         Cancelar
                                     </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white">
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                                         {form.formState.isSubmitting ? (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         ) : (
@@ -378,7 +378,7 @@ export default function UsersPage() {
                 <CardContent>
                     {loading ? (
                         <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
                         </div>
                     ) : (
                         <Table>
@@ -398,12 +398,12 @@ export default function UsersPage() {
                                         <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-blue-100 text-blue-600 ring-blue-500/20'}`}>
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
                                                         {user.username.substring(0, 2)}
                                                     </div>
                                                     <div>
                                                         <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                            <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-blue-500'}`} />
+                                                            <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
                                                             {user.name || user.username}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground flex items-center gap-1">
@@ -437,7 +437,7 @@ export default function UsersPage() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                        className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
                                                         onClick={() => handleToggleBlock(user)}
                                                         title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
                                                     >
@@ -446,7 +446,7 @@ export default function UsersPage() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                                                         onClick={() => handleOpenDialog(user)}
                                                         title="Editar"
                                                     >

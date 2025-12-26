@@ -4,9 +4,12 @@ import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard } from "lucide-react"
+import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 
 interface DashboardStats {
     totalSales: number;
@@ -17,11 +20,20 @@ interface DashboardStats {
         id: string;
         amount: string;
         createdAt: string;
+        gameName: string;
+        numbers: string[];
         user: {
+            id: string;
             username: string;
             name: string | null;
-            email: string | null;
-        }
+        };
+        cambistaDailyTotal: number;
+    }[];
+    ranking: {
+        userId: string;
+        name: string;
+        amount: number;
+        count: number;
     }[];
     chartData: {
         date: string;
@@ -32,6 +44,9 @@ interface DashboardStats {
 export default function DashboardPage() {
     const [stats, setStats] = useState<DashboardStats | null>(null)
     const [loading, setLoading] = useState(true)
+    const [filterGame, setFilterGame] = useState("all")
+    const [searchTerm, setSearchTerm] = useState("")
+    const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc")
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -191,40 +206,155 @@ export default function DashboardPage() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 border-border bg-card shadow-sm">
+
+                <Card className="col-span-3 border-border bg-card shadow-sm h-full">
                     <CardHeader>
-                        <CardTitle className="text-foreground">Vendas Recentes</CardTitle>
-                        <CardDescription className="text-muted-foreground">
-                            Últimas 5 transações realizadas.
+                        <CardTitle className="flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-yellow-500" />
+                            Ranking de Vendedores (Hoje)
+                        </CardTitle>
+                        <CardDescription>
+                            Cambistas com maior volume de vendas hoje.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-8">
-                            {(stats.recentSales || []).length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">Nenhuma venda recente.</div>
-                            ) : (
-                                (stats.recentSales || []).map((sale, i) => (
-                                    <div key={sale.id} className="flex items-center">
-                                        <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center">
-                                            <User className="h-5 w-5 text-slate-400" />
-                                        </div>
-                                        <div className="ml-4 space-y-1">
-                                            <p className="text-sm font-medium leading-none text-foreground">{sale.user.name || sale.user.username}</p>
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(sale.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                            </p>
-                                        </div>
-                                        <div className="ml-auto font-medium text-emerald-500">
-                                            +{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(sale.amount))}
+                        <div className="space-y-6">
+                            {(stats.ranking || []).map((rank, index) => (
+                                <div key={rank.userId} className="flex items-center group">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 text-foreground font-bold mr-4 relative">
+                                        {index === 0 && <Medal className="w-5 h-5 text-yellow-500 absolute -top-2 -left-2 drop-shadow-sm" />}
+                                        {index === 1 && <Medal className="w-5 h-5 text-slate-400 absolute -top-2 -left-2 drop-shadow-sm" />}
+                                        {index === 2 && <Medal className="w-5 h-5 text-amber-700 absolute -top-2 -left-2 drop-shadow-sm" />}
+                                        {index + 1}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold truncate text-foreground group-hover:text-emerald-500 transition-colors">
+                                            {rank.name}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <span className="flex items-center">
+                                                <Ticket className="w-3 h-3 mr-1" />
+                                                {rank.count} apostas
+                                            </span>
                                         </div>
                                     </div>
-                                ))
-                            )}
+                                    <div className="text-right">
+                                        <div className="text-sm font-bold text-foreground">
+                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(rank.amount)}
+                                        </div>
+                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">Saldo do Dia</div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            <Card className="border-border bg-card shadow-sm overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <CardTitle className="text-xl flex items-center gap-2">
+                                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                                Vendas Automáticas em Tempo Real
+                            </CardTitle>
+                            <CardDescription>
+                                Últimas vendas processadas no sistema.
+                            </CardDescription>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Buscar cambista..."
+                                    className="pl-9 w-[200px] h-9 bg-background"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <Select value={filterGame} onValueChange={setFilterGame}>
+                                <SelectTrigger className="w-[150px] h-9 bg-background">
+                                    <div className="flex items-center gap-2">
+                                        <Filter className="w-4 h-4 text-muted-foreground" />
+                                        <SelectValue placeholder="Jogo" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos os Jogos</SelectItem>
+                                    <SelectItem value="JOGO_DO_BICHO">Bicho</SelectItem>
+                                    <SelectItem value="2x1000">2x1000</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
+                                <tr>
+                                    <th className="px-6 py-4 font-semibold">Data/Hora</th>
+                                    <th className="px-6 py-4 font-semibold">Cambista</th>
+                                    <th className="px-6 py-4 font-semibold">Jogo</th>
+                                    <th className="px-6 py-4 font-semibold">Números</th>
+                                    <th className="px-10 py-4 font-semibold text-center">Valor</th>
+                                    <th className="px-6 py-4 font-semibold text-right">Total Cambista (Hoje)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {(stats.recentSales || [])
+                                    .filter(s => filterGame === "all" || s.gameName?.toUpperCase().includes(filterGame))
+                                    .filter(s => !searchTerm || (s.user.name || s.user.username).toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .map((sale) => (
+                                        <tr key={sale.id} className="hover:bg-muted/20 transition-colors group">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex flex-col">
+                                                    <span className="text-foreground font-medium">
+                                                        {new Date(sale.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                    </span>
+                                                    <span className="text-[10px] text-muted-foreground">
+                                                        {new Date(sale.createdAt).toLocaleDateString('pt-BR')}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 font-bold text-xs ring-1 ring-emerald-500/20">
+                                                        {sale.user.username.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <span className="font-semibold text-foreground">{sale.user.name || sale.user.username}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 uppercase font-medium">
+                                                    {sale.gameName}
+                                                </Badge>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                                                    <Hash className="w-3 h-3" />
+                                                    {sale.numbers.join(' - ')}
+                                                </div>
+                                            </td>
+                                            <td className="px-10 py-4 text-center">
+                                                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full font-bold">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(sale.amount))}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="text-sm font-bold text-foreground">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.cambistaDailyTotal)}
+                                                </div>
+                                                <div className="text-[10px] text-muted-foreground uppercase">Saldo acumulado</div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

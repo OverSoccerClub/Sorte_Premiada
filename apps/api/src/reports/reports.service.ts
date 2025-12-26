@@ -325,6 +325,65 @@ export class ReportsService {
             });
         }
 
+        // Daily Ranking (Top Cambistas Today)
+        const todayRanking = await this.prisma.ticket.groupBy({
+            by: ['userId'],
+            where: {
+                createdAt: { gte: startOfDay },
+                status: { not: 'CANCELLED' }
+            },
+            _sum: { amount: true },
+            _count: { id: true },
+            orderBy: { _sum: { amount: 'desc' } },
+            take: 10
+        });
+
+        const rankingEntries = await Promise.all(
+            todayRanking.map(async (entry) => {
+                const user = await this.prisma.user.findUnique({
+                    where: { id: entry.userId },
+                    select: { name: true, username: true }
+                });
+                return {
+                    userId: entry.userId,
+                    name: user?.name || user?.username,
+                    amount: Number(entry._sum.amount || 0),
+                    count: entry._count.id
+                };
+            })
+        );
+
+        // Recent Sales Enriched
+        const recentSalesRaw = await this.prisma.ticket.findMany({
+            take: 10,
+            orderBy: { createdAt: 'desc' },
+            where: { status: { not: 'CANCELLED' } },
+            include: {
+                user: { select: { id: true, username: true, name: true, email: true } },
+                game: { select: { name: true } }
+            }
+        });
+
+        // For each recent sale, get the daily total of that cambista
+        const recentSales = await Promise.all(
+            recentSalesRaw.map(async (sale) => {
+                const cambistaDailyTotal = await this.prisma.ticket.aggregate({
+                    where: {
+                        userId: sale.userId,
+                        createdAt: { gte: startOfDay },
+                        status: { not: 'CANCELLED' }
+                    },
+                    _sum: { amount: true }
+                });
+
+                return {
+                    ...sale,
+                    gameName: sale.game?.name || sale.gameType,
+                    cambistaDailyTotal: Number(cambistaDailyTotal._sum.amount || 0)
+                };
+            })
+        );
+
         return {
             totalSales: Number(totalSalesAggregate._sum.amount || 0),
             ticketsSold: totalSalesAggregate._count.id,
@@ -333,7 +392,8 @@ export class ReportsService {
                 : 0,
             activeCambistas: activeCambistasCount.length,
             recentSales,
-            chartData
+            chartData,
+            ranking: rankingEntries
         };
     }
     async getSalesByArea(startDate: Date, endDate: Date) {
