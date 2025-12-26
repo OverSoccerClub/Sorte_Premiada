@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api"
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash } from "lucide-react"
+import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash, BarChart3 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
@@ -179,7 +179,10 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4 border-border bg-card shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-foreground">Evolução de Vendas</CardTitle>
+                        <CardTitle className="text-foreground flex items-center gap-2">
+                            <BarChart3 className="w-5 h-5 text-emerald-500" />
+                            Evolução de Vendas
+                        </CardTitle>
                         <CardDescription className="text-muted-foreground">Receita dos últimos 7 dias</CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
