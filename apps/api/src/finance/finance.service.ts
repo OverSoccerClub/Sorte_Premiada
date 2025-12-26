@@ -174,6 +174,23 @@ export class FinanceService {
         });
 
         if (existingClose) {
+            if (existingClose.status === 'VERIFIED') {
+                // If verified, we allow re-closing (updating) to include new sales.
+                // Reset status to PENDING so it can be verified again.
+                return this.prisma.dailyClose.update({
+                    where: { id: existingClose.id },
+                    data: {
+                        totalSales: summary.totalSales,
+                        totalCredits: summary.totalCredits,
+                        totalDebits: summary.totalDebits,
+                        finalBalance: summary.finalBalance,
+                        netBalance: summary.finalBalance,
+                        status: 'PENDING',
+                        verifiedByUserId: null,
+                        verifiedAt: null
+                    }
+                });
+            }
             throw new BadRequestException("O caixa de hoje já foi fechado.");
         }
 
@@ -306,7 +323,7 @@ export class FinanceService {
             },
         });
 
-        if (todayClose) {
+        if (todayClose && todayClose.status !== 'VERIFIED') {
             throw new BadRequestException("O caixa do dia de hoje já está fechado.");
         }
 
