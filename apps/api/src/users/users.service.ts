@@ -89,6 +89,20 @@ export class UsersService {
             // Always add accountability info for CAMBISTAS
             if (user.role === 'CAMBISTA') {
                 userToReturn.accountability = await this.financeService.getAccountabilityInfo(user.id);
+
+                // Add current day cashier status
+                const startOfDay = new Date();
+                startOfDay.setHours(0, 0, 0, 0);
+                const endOfDay = new Date();
+                endOfDay.setHours(23, 59, 59, 999);
+
+                const dailyClose = await this.prisma.dailyClose.findFirst({
+                    where: {
+                        closedByUserId: user.id,
+                        createdAt: { gte: startOfDay, lte: endOfDay }
+                    }
+                });
+                userToReturn.cashierStatus = dailyClose ? dailyClose.status : 'OPEN';
             }
 
             return userToReturn;

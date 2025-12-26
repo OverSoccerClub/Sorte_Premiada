@@ -72,6 +72,17 @@ export class ReportsService {
             b.createdAt.getTime() - a.createdAt.getTime()
         );
 
+        // Get DailyClose status
+        const dailyClose = await this.prisma.dailyClose.findFirst({
+            where: {
+                closedByUserId: userId,
+                createdAt: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+        });
+
         return {
             date,
             totalSales,
@@ -79,6 +90,8 @@ export class ReportsService {
             totalDebits,
             finalBalance,
             transactions: allTransactions,
+            status: dailyClose ? dailyClose.status : 'OPEN',
+            dailyCloseId: dailyClose?.id,
         };
     }
 

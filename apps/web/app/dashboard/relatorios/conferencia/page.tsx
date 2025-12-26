@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle } from "lucide-react"
+import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle, Clock } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -32,6 +32,8 @@ interface FinanceSummary {
     totalDebits: number
     finalBalance: number
     transactions: Transaction[]
+    status: 'OPEN' | 'PENDING' | 'VERIFIED'
+    dailyCloseId?: string
 }
 
 export default function CashConferencePage() {
@@ -106,43 +108,58 @@ export default function CashConferencePage() {
     }
 
     const handleCloseCashier = async () => {
-        if (!selectedCambista) return
+        if (!selectedCambista || !summary) return
 
         const cambista = cambistas.find(c => c.id === selectedCambista)
         const name = cambista?.name || cambista?.username || 'Selecionado'
 
+        const isPending = summary.status === 'PENDING'
+        const title = isPending ? "Conferir e Liberar Caixa" : "Fechar Caixa e Liberar"
+        const message = isPending
+            ? `Confirma que conferiu os valores e deseja liberar o caixa de ${name}?`
+            : `Confirma que conferiu todos os valores e deseja fechar o caixa de ${name}? Isso irá zerar o caixa para novas vendas.`
+
         showAlert(
-            "Fechar Caixa e Liberar",
-            `Confirma que conferiu todos os valores e deseja fechar o caixa de ${name}? Isso irá zerar o caixa para novas vendas.`,
+            title,
+            message,
             "info",
             true,
             async () => {
                 try {
                     const token = localStorage.getItem("token")
-                    const res = await fetch(`${API_URL}/finance/close/${selectedCambista}/admin`, {
-                        method: 'POST',
+
+                    let url = `${API_URL}/finance/close/${selectedCambista}/admin`
+                    let method = 'POST'
+                    let body = JSON.stringify({ autoVerify: true })
+
+                    if (isPending && summary.dailyCloseId) {
+                        url = `${API_URL}/finance/close/${summary.dailyCloseId}/verify`
+                        body = JSON.stringify({ status: 'VERIFIED' })
+                    }
+
+                    const res = await fetch(url, {
+                        method,
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: `Bearer ${token}`,
                         },
-                        body: JSON.stringify({ autoVerify: true })
+                        body
                     })
 
                     if (res.ok) {
-                        toast.success("Caixa fechado e conferido com sucesso!")
-                        // Refresh summary to show reset state or just clear it? 
-                        // Usually implies a reset so maybe we should reload or clear.
-                        // Let's reload to be sure.
+                        toast.success("O caixa foi fechado com sucesso e as vendas liberadas!")
                         handleSearch()
+                        // Also update the cambista list to reflect the new status
+                        fetchCambistas()
                     } else {
                         const err = await res.text()
-                        toast.error(`Falha ao fechar caixa: ${err}`)
+                        toast.error(`Falha ao processar: ${err}`)
                     }
                 } catch (e) {
                     toast.error("Não foi possível conectar ao servidor.")
                 }
             },
-            "Confirmar Fechamento",
+            isPending ? "Confirmar Liberação" : "Confirmar Fechamento",
             "Cancelar"
         )
     }
@@ -182,7 +199,15 @@ export default function CashConferencePage() {
                                 <SelectContent>
                                     {cambistas.map((c) => (
                                         <SelectItem key={c.id} value={c.id}>
-                                            {c.name || c.username}
+                                            <div className="flex items-center justify-between w-full gap-4">
+                                                <span>{c.name || c.username}</span>
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold border uppercase
+                                                    ${c.cashierStatus === 'OPEN' ? 'border-amber-500/30 text-amber-500 bg-amber-500/5' :
+                                                        c.cashierStatus === 'PENDING' ? 'border-blue-500/30 text-blue-500 bg-blue-500/5' :
+                                                            'border-emerald-500/30 text-emerald-500 bg-emerald-500/5'}`}>
+                                                    {c.cashierStatus === 'OPEN' ? 'Aberto' : c.cashierStatus === 'PENDING' ? 'Pendente' : 'Conferido'}
+                                                </span>
+                                            </div>
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -220,14 +245,37 @@ export default function CashConferencePage() {
             {summary && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                    <div className="flex justify-end">
-                        <Button
-                            onClick={handleCloseCashier}
-                            className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
-                        >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Fechar Caixa e Liberar
-                        </Button>
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status do Caixa:</span>
+                            {summary.status === 'OPEN' && (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 gap-1.5">
+                                    <AlertCircle className="w-4 h-4" />
+                                    ABERTO / AGUARDANDO FECHAMENTO
+                                </span>
+                            )}
+                            {summary.status === 'PENDING' && (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 gap-1.5">
+                                    <Clock className="w-4 h-4" />
+                                    FECHADO / PENDENTE CONFERÊNCIA
+                                </span>
+                            )}
+                            {summary.status === 'VERIFIED' && (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 gap-1.5">
+                                    <CheckCircle className="w-4 h-4" />
+                                    FECHADO / CONFERIDO E LIBERADO
+                                </span>
+                            )}
+                        </div>
+                        {(summary.status === 'OPEN' || summary.status === 'PENDING') && (
+                            <Button
+                                onClick={handleCloseCashier}
+                                className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
+                            >
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                {summary.status === 'PENDING' ? 'Conferir e Liberar Caixa' : 'Fechar Caixa e Liberar'}
+                            </Button>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
