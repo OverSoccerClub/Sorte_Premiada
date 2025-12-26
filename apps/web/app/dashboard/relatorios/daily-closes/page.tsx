@@ -35,12 +35,12 @@ export default function DailyClosesPage() {
     const fetchCambistas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch(`${API_URL}/users`, {
+            const res = await fetch(`${API_URL}/users?role=CAMBISTA`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
                 const data = await res.json()
-                setCambistas(data.filter((u: any) => u.role === "CAMBISTA"))
+                setCambistas(data)
             }
         } catch (err) {
             console.error(err)

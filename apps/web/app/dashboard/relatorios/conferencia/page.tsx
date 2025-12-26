@@ -53,7 +53,7 @@ export default function CashConferencePage() {
     const fetchCambistas = async () => {
         try {
             const token = localStorage.getItem("token")
-            const res = await fetch(`${API_URL}/users`, {
+            const res = await fetch(`${API_URL}/users?role=CAMBISTA`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
