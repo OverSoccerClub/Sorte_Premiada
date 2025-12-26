@@ -271,6 +271,9 @@ export class ReportsService {
         const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
 
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
         // Total Sales (All time)
         const totalSalesAggregate = await this.prisma.ticket.aggregate({
             _sum: { amount: true },
@@ -318,11 +321,11 @@ export class ReportsService {
             });
         }
 
-        // Daily Ranking (Top Cambistas Today)
-        const todayRanking = await this.prisma.ticket.groupBy({
+        // Monthly Ranking (Top Cambistas This Month)
+        const monthRanking = await this.prisma.ticket.groupBy({
             by: ['userId'],
             where: {
-                createdAt: { gte: startOfDay },
+                createdAt: { gte: startOfMonth },
                 status: { not: 'CANCELLED' }
             },
             _sum: { amount: true },
@@ -332,7 +335,7 @@ export class ReportsService {
         });
 
         const rankingEntries = await Promise.all(
-            todayRanking.map(async (entry) => {
+            monthRanking.map(async (entry) => {
                 const user = await this.prisma.user.findUnique({
                     where: { id: entry.userId },
                     select: { name: true, username: true }

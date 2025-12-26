@@ -211,10 +211,10 @@ export default function DashboardPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Trophy className="w-5 h-5 text-yellow-500" />
-                            Ranking de Vendedores (Hoje)
+                            Ranking de Vendedores (Mês Atual)
                         </CardTitle>
                         <CardDescription>
-                            Cambistas com maior volume de vendas hoje.
+                            Cambistas com maior volume de vendas este mês.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -242,7 +242,7 @@ export default function DashboardPage() {
                                         <div className="text-sm font-bold text-foreground">
                                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(rank.amount)}
                                         </div>
-                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">Saldo do Dia</div>
+                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">Saldo do Mês</div>
                                     </div>
                                 </div>
                             ))}
