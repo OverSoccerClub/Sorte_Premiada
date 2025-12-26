@@ -271,8 +271,8 @@ export class ReportsService {
         const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
 
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        startOfMonth.setHours(0, 0, 0, 0);
+        const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 0, 0, 0));
+        startOfMonth.setHours(0, 0, 0, 0); // Extra precaution for local queries if needed
 
         // Total Sales (All time)
         const totalSalesAggregate = await this.prisma.ticket.aggregate({
@@ -322,29 +322,39 @@ export class ReportsService {
         }
 
         // Monthly Ranking (Top Cambistas This Month)
-        const monthRanking = await this.prisma.ticket.groupBy({
+        // Aggregating and then sorting in memory to be safer across different DB/Prisma versions
+        const monthRankingRaw = await this.prisma.ticket.groupBy({
             by: ['userId'],
             where: {
                 createdAt: { gte: startOfMonth },
                 status: { not: 'CANCELLED' }
             },
             _sum: { amount: true },
-            _count: { id: true },
-            orderBy: { _sum: { amount: 'desc' } },
-            take: 10
+            _count: { id: true }
         });
 
+        // Filter out groups with zero amount and sort in memory
+        const sortedRanking = monthRankingRaw
+            .map(r => ({
+                userId: r.userId,
+                amount: Number(r._sum.amount || 0),
+                count: r._count.id
+            }))
+            .filter(r => r.amount > 0)
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 10);
+
         const rankingEntries = await Promise.all(
-            monthRanking.map(async (entry) => {
+            sortedRanking.map(async (entry) => {
                 const user = await this.prisma.user.findUnique({
                     where: { id: entry.userId },
                     select: { name: true, username: true }
                 });
                 return {
                     userId: entry.userId,
-                    name: user?.name || user?.username,
-                    amount: Number(entry._sum.amount || 0),
-                    count: entry._count.id
+                    name: user?.name || user?.username || "Usuário desconhecido",
+                    amount: entry.amount,
+                    count: entry.count
                 };
             })
         );
