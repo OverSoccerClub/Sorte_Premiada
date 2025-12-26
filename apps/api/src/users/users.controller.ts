@@ -47,15 +47,8 @@ export class UsersController {
 
     @Get()
     @UseGuards(RolesGuard)
-    // @Roles('ADMIN')
-    async findAll(@Query('username') username?: string) {
-        const users = await this.usersService.findAll(username);
-        // console.log('UsersController: findAll called. Users found:', users.length);
-        if (!username) { // Only log counts for full list to avoid spam on individual checks
-            // console.log('Roles found:', users.map(u => u.role));
-            const cambistaCount = users.filter(u => (u.role as any) === 'CAMBISTA' || (u.role as any) === 'cambista').length;
-            // console.log('Users with matching role count:', cambistaCount);
-        }
+    async findAll(@Query('username') username?: string, @Query('role') role?: string) {
+        const users = await this.usersService.findAll(username, role);
         return users;
     }
 

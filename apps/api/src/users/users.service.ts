@@ -47,9 +47,13 @@ export class UsersService {
         });
     }
 
-    async findAll(username?: string): Promise<any[]> {
+    async findAll(username?: string, role?: string): Promise<any[]> {
+        const where: Prisma.UserWhereInput = {};
+        if (username) where.username = username;
+        if (role) where.role = role as any;
+
         let users = await this.prisma.user.findMany({
-            where: username ? { username } : undefined,
+            where,
             include: { area: true },
         });
 
