@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 interface DashboardStats {
     totalSales: number;
@@ -47,6 +48,8 @@ export default function DashboardPage() {
     const [filterGame, setFilterGame] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
     const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc")
+    const [currentPage, setCurrentPage] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState(10)
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -260,7 +263,7 @@ export default function DashboardPage() {
                                 Vendas Automáticas em Tempo Real
                             </CardTitle>
                             <CardDescription>
-                                Últimas vendas processadas no sistema.
+                                Vendas processadas no sistema hoje.
                             </CardDescription>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
@@ -303,10 +306,14 @@ export default function DashboardPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
-                                {(stats.recentSales || [])
-                                    .filter(s => filterGame === "all" || s.gameName?.toUpperCase().includes(filterGame))
-                                    .filter(s => !searchTerm || (s.user.name || s.user.username).toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((sale) => (
+                                {(() => {
+                                    const filtered = (stats.recentSales || [])
+                                        .filter(s => filterGame === "all" || s.gameName?.toUpperCase().includes(filterGame))
+                                        .filter(s => !searchTerm || (s.user.name || s.user.username).toLowerCase().includes(searchTerm.toLowerCase()));
+
+                                    const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+                                    return paginated.map((sale) => (
                                         <tr key={sale.id} className="hover:bg-muted/20 transition-colors group">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col">
@@ -349,9 +356,64 @@ export default function DashboardPage() {
                                                 <div className="text-[10px] text-muted-foreground uppercase">Saldo acumulado</div>
                                             </td>
                                         </tr>
-                                    ))}
+                                    ));
+                                })()}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/30">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Exibir</span>
+                            <Select value={String(itemsPerPage)} onValueChange={(v) => { setItemsPerPage(Number(v)); setCurrentPage(1); }}>
+                                <SelectTrigger className="w-[80px] h-8 bg-background">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="5">5</SelectItem>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="15">15</SelectItem>
+                                    <SelectItem value="20">20</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
+                                    <SelectItem value="100">100</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <span className="text-sm text-muted-foreground">por página</span>
+                        </div>
+
+                        {(() => {
+                            const filtered = (stats.recentSales || [])
+                                .filter(s => filterGame === "all" || s.gameName?.toUpperCase().includes(filterGame))
+                                .filter(s => !searchTerm || (s.user.name || s.user.username).toLowerCase().includes(searchTerm.toLowerCase()));
+                            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+                            return (
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                        className="h-8"
+                                    >
+                                        Anterior
+                                    </Button>
+                                    <div className="text-sm font-medium">
+                                        Página {currentPage} de {Math.max(1, totalPages)}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                        className="h-8"
+                                    >
+                                        Próxima
+                                    </Button>
+                                </div>
+                            );
+                        })()}
                     </div>
                 </CardContent>
             </Card>

@@ -359,11 +359,14 @@ export class ReportsService {
             })
         );
 
-        // Recent Sales Enriched
+        // Recent Sales Enriched (Today's Sales)
         const recentSalesRaw = await this.prisma.ticket.findMany({
-            take: 10,
+            take: 500, // Today's limit
             orderBy: { createdAt: 'desc' },
-            where: { status: { not: 'CANCELLED' } },
+            where: {
+                status: { not: 'CANCELLED' },
+                createdAt: { gte: startOfDay }
+            },
             include: {
                 user: { select: { id: true, username: true, name: true, email: true } },
                 game: { select: { name: true } }
