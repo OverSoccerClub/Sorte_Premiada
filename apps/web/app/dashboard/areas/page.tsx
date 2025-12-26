@@ -34,7 +34,7 @@ export default function AreasPage() {
     const [areas, setAreas] = useState<Area[]>([])
     const [loading, setLoading] = useState(true)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const { showAlert } = useAlert()
+    const { showAlert, hideAlert } = useAlert()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -130,6 +130,7 @@ export default function AreasPage() {
                         method: "DELETE",
                         headers: { Authorization: `Bearer ${token}` },
                     })
+                    hideAlert()
 
                     if (res.ok) {
                         fetchAreas()

@@ -42,7 +42,7 @@ export default function CambistasPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [audioEnabled, setAudioEnabled] = useState(false)
-    const { showAlert } = useAlert()
+    const { showAlert, hideAlert } = useAlert()
 
     // Sound effect for accountability
     useEffect(() => {
@@ -197,6 +197,7 @@ export default function CambistasPage() {
                         },
                         body: JSON.stringify({ isActive: !cambista.isActive }),
                     })
+                    hideAlert()
 
                     if (res.ok) {
                         fetchCambistas()
@@ -226,6 +227,7 @@ export default function CambistasPage() {
                         method: "DELETE",
                         headers: { Authorization: `Bearer ${token}` },
                     })
+                    hideAlert()
 
                     if (res.ok) {
                         fetchCambistas()

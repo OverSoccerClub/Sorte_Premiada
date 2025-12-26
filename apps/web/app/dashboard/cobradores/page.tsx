@@ -42,7 +42,7 @@ interface Cobrador {
 export default function CobradoresPage() {
     const { token } = useAuth()
     const router = useRouter()
-    const { showAlert } = useAlert()
+    const { showAlert, hideAlert } = useAlert()
 
     const [cobradores, setCobradores] = useState<Cobrador[]>([])
     const [loading, setLoading] = useState(true)
@@ -161,6 +161,7 @@ export default function CobradoresPage() {
                         method: 'DELETE',
                         headers: { Authorization: `Bearer ${token}` }
                     })
+                    hideAlert()
                     if (res.ok) {
                         showAlert("Cobrador removido", "O cobrador foi removido com sucesso.", "success")
                         fetchCobradores()

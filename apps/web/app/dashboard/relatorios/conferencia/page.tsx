@@ -40,7 +40,7 @@ export default function CashConferencePage() {
     const [cambistas, setCambistas] = useState<any[]>([])
     const [summary, setSummary] = useState<FinanceSummary | null>(null)
     const [loading, setLoading] = useState(false)
-    const { showAlert } = useAlert()
+    const { showAlert, hideAlert } = useAlert()
 
     // Filters
     const [selectedCambista, setSelectedCambista] = useState<string>("")
@@ -145,6 +145,7 @@ export default function CashConferencePage() {
                         },
                         body
                     })
+                    hideAlert()
 
                     if (res.ok) {
                         toast.success("O caixa foi fechado com sucesso e as vendas liberadas!")
