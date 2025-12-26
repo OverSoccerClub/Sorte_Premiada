@@ -69,11 +69,19 @@ try {
     cmd /c $prebuildCmd
     if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
 
-    # Garantir local.properties APÓS o prebuild (que limpa a pasta)
-    if (-not (Test-Path "$androidDir\local.properties")) {
-        Write-Warning "local.properties não encontrado após prebuild. Criando..."
-        "sdk.dir=C:\\Users\\natal\\AppData\\Local\\Android\\Sdk" | Out-File -Encoding ascii "$androidDir\local.properties"
-    }
+    # Garantir local.properties APÓS o prebuild
+    Write-Step "Configurando SDK Path..." -Color "Gray"
+    $sdkPath = "C:/Users/natal/AppData/Local/Android/Sdk"
+    $env:ANDROID_HOME = "C:/Users/natal/AppData/Local/Android/Sdk"
+    [System.IO.File]::WriteAllText("$androidDir\local.properties", "sdk.dir=$sdkPath", [System.Text.Encoding]::ASCII)
+
+    # PATCH: Corrigir settings.gradle para apontar para o autolinking correto no monorepo
+    Write-Step "Aplicando patch no settings.gradle..." -Color "Cyan"
+    $settingsPath = "$androidDir\settings.gradle"
+    $settingsContent = Get-Content $settingsPath -Raw
+    # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
+    $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
+    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, [System.Text.Encoding]::ASCII)
 
     # 5. Gradle Assembly
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60
@@ -81,17 +89,13 @@ try {
     
     Set-Location $androidDir
     $gradleArgs = "assembleRelease"
-    if (-not $Clean) { $gradleArgs += " --parallel" } # Removed --build-cache to be safer
     
-    # Capture output to show only if error, but stream basic info? 
-    # For now, let it flow but user asked for progress bar. Gradle has its own bar usually.
-    # We will trust Gradle's output but keep our main progress bar active ?
-    # Actually, PowerShell pauses Write-Progress when external command runs.
+    # Otimização de Memória e Envs
+    $env:GRADLE_OPTS = "-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"
     
-    # Otimização de Memória para evitar OOM (Out of Metaspace)
-    $env:GRADLE_OPTS = "-Xmx3072m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"
-    
-    cmd /c "gradlew $gradleArgs -x lint"
+    # Executar com propriedades de SDK explícitas
+    Write-Step "Iniciando compilação final..." -Color "Cyan"
+    cmd /c "gradlew $gradleArgs -x lint -Pandroid.sdk.dir=$sdkPath"
     
     if ($LASTEXITCODE -ne 0) { 
         Set-Location ..

@@ -31,6 +31,14 @@ export class FinanceController {
         return this.financeService.closeDay(req.user.userId);
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @Post('close/:userId/admin')
+    closeDayForUser(@Param('userId') userId: string, @Body() body: { autoVerify?: boolean }, @Request() req: any) {
+        const autoVerify = body?.autoVerify ?? true;
+        return this.financeService.closeDayForUser(userId, req.user.userId, autoVerify);
+    }
+
     @UseGuards(JwtAuthGuard) // Add Roles('ADMIN') if possible, but minimal for now
     @Get('pending-closes')
     getPendingCloses() {

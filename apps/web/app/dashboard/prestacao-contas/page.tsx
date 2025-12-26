@@ -53,7 +53,14 @@ export default function VerificationPage() {
             })
 
             if (res.ok) {
-                showAlert("Sucesso", `Caixa ${status === 'VERIFIED' ? 'verificado' : 'rejeitado'} com sucesso.`, "success")
+                const data = await res.json().catch(() => null)
+                if (status === 'VERIFIED' && data?.unblocked) {
+                    showAlert("Sucesso", "Caixa verificado e vendas liberadas para o cambista.", "success")
+                } else if (status === 'VERIFIED') {
+                    showAlert("Aprovado", "Caixa verificado. Nota: o cambista ainda pode estar bloqueado por outros critérios.", "info")
+                } else {
+                    showAlert("Sucesso", "Caixa rejeitado com sucesso.", "success")
+                }
                 fetchPendingCloses()
             } else {
                 showAlert("Erro", "Não foi possível atualizar o status.", "error")

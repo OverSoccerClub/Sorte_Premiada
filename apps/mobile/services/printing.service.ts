@@ -1,6 +1,6 @@
 import { BLEPrinter as BLEPrinterOriginal } from 'react-native-thermal-receipt-printer-image-qr';
 import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system';
 
 const BLEPrinter = BLEPrinterOriginal as any;
 

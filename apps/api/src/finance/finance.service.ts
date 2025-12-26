@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionType } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 enum DailyCloseStatus {
     PENDING = 'PENDING',
@@ -11,7 +12,7 @@ enum DailyCloseStatus {
 
 @Injectable()
 export class FinanceService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private notificationsService: NotificationsService) { }
 
     async createTransaction(userId: string, data: CreateTransactionDto) {
         await this.validateSalesEligibility(userId); // Validate limit and box status
@@ -192,6 +193,51 @@ export class FinanceService {
         return dailyClose;
     }
 
+    // Admin: close a day for a specific user and optionally auto-verify
+    async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true) {
+        // Prevent duplicate close for the target user's today
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const existingClose = await this.prisma.dailyClose.findFirst({
+            where: { closedByUserId: targetUserId, createdAt: { gte: startOfDay, lte: endOfDay } }
+        });
+
+        if (existingClose) {
+            throw new BadRequestException("O caixa de hoje já foi fechado para este usuário.");
+        }
+
+        // Build a summary for the target user
+        const summary = await this.getSummary(targetUserId);
+
+        const dailyClose = await this.prisma.dailyClose.create({
+            data: {
+                totalSales: summary.totalSales,
+                totalCredits: summary.totalCredits,
+                totalDebits: summary.totalDebits,
+                finalBalance: summary.finalBalance,
+                closedByUserId: targetUserId,
+                netBalance: summary.finalBalance,
+                status: autoVerify ? 'VERIFIED' : 'PENDING',
+                verifiedByUserId: autoVerify ? adminId : null,
+                verifiedAt: autoVerify ? new Date() : null,
+            }
+        });
+
+        if (autoVerify) {
+            // Try to send notification and confirm unblocked state
+            try {
+                await this.verifyDailyClose(dailyClose.id, adminId, 'VERIFIED');
+            } catch (e) {
+                console.warn('closeDayForUser: verify step failed', e?.message ?? e);
+            }
+        }
+
+        return dailyClose;
+    }
+
     async findAllPendingCloses() {
         return this.prisma.dailyClose.findMany({
             where: { status: 'PENDING' },
@@ -209,6 +255,34 @@ export class FinanceService {
                 verifiedAt: new Date()
             }
         });
+        // After marking as VERIFIED, verify that sales eligibility is no longer blocked.
+        if (status === 'VERIFIED') {
+            let unblocked = true;
+            try {
+                await this.validateSalesEligibility(dailyClose.closedByUserId);
+            } catch (e) {
+                unblocked = false;
+                // keep it non-fatal for the API; just log for operator visibility
+                console.warn('verifyDailyClose: user still blocked after verification', { userId: dailyClose.closedByUserId, error: e?.message ?? e });
+            }
+
+            // return the DB object plus a transient flag indicating whether sales are now unblocked
+            if (unblocked) {
+                try {
+                    const user = await this.prisma.user.findUnique({ where: { id: dailyClose.closedByUserId }, select: { pushToken: true, username: true } });
+                    if (user?.pushToken) {
+                        const title = 'Fechamento conferido';
+                        const body = 'Seu caixa foi conferido e suas vendas foram liberadas.';
+                        await this.notificationsService.sendPushNotification([user.pushToken], title, body, { type: 'close_verified', userId: dailyClose.closedByUserId });
+                    }
+                } catch (e) {
+                    console.warn('verifyDailyClose: failed to send notification', e?.message ?? e);
+                }
+            }
+
+            return { ...dailyClose, unblocked } as any;
+        }
+
         return dailyClose;
     }
 

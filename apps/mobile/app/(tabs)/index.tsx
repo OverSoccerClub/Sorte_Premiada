@@ -108,7 +108,7 @@ export default function Dashboard() {
                     <Ionicons name="lock-closed" size={24} color="#f97316" style={tw`mr-3`} />
                     <View style={tw`flex-1`}>
                         <Text style={tw`text-orange-500 font-bold`}>Caixa Fechado</Text>
-                        <Text style={tw`text-orange-400/80 text-xs`}>Vendas bloqueadas até amanhã.</Text>
+                        <Text style={tw`text-orange-400/80 text-xs`}>Vendas bloqueadas até conferência pelo supervisor.</Text>
                     </View>
                 </View>
             )}

@@ -553,6 +553,15 @@ export default function CambistasPage() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
+                                                        className="h-8 w-8 p-0 text-sky-600 hover:text-sky-700 hover:bg-sky-50"
+                                                        onClick={() => handleForceClose(cambista)}
+                                                        title="Fechar Caixa"
+                                                    >
+                                                        <DollarSign className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
                                                         className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
                                                         onClick={() => handleToggleBlock(cambista)}
                                                         title={isManuallyBlocked ? "Desbloquear Cambista" : "Bloquear Cambista"}
@@ -590,3 +599,37 @@ export default function CambistasPage() {
         </div>
     )
 }
+
+    const handleForceClose = async (cambista: any) => {
+        showAlert(
+            "Fechar Caixa",
+            `Deseja fechar o caixa do cambista ${cambista.name || cambista.username} e marcar como conferido?`,
+            "info",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token")
+                    const res = await fetch(`${API_URL}/finance/close/${cambista.id}/admin`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ autoVerify: true })
+                    })
+
+                    if (res.ok) {
+                        fetchCambistas()
+                        showAlert("Sucesso", "Caixa fechado e conferido com sucesso.", "success")
+                    } else {
+                        const err = await res.text()
+                        showAlert("Erro", `Falha ao fechar caixa: ${err}`, "error")
+                    }
+                } catch (e) {
+                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
+                }
+            },
+            "Confirmar",
+            "Cancelar"
+        )
+    }
