@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@react-native-community/cli": "^20.0.2",
-    "@react-native/metro-config": "^0.83.0",
+    "@react-native/metro-config": "^0.76.5",
     "@types/react": "~19.1.10",
     "semver": "^7.7.3",
     "typescript": "~5.9.2"

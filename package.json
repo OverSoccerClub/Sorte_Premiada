@@ -24,9 +24,5 @@
     "packages/*"
   ],
   "version": "1.0.0",
-  "dependencies": {
-    "expo": "~54.0.25",
-    "react": "18.3.1",
-    "react-native": "0.76.6"
-  }
+  "dependencies": {}
 }
