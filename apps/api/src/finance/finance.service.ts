@@ -375,52 +375,54 @@ export class FinanceService {
             lastTickets,
             dailyTicketsSample: dailyTickets.slice(0, 3)
         };
+    }
+
     async getAccountabilityInfo(userId: string) {
-            const user = await this.prisma.user.findUnique({
-                where: { id: userId },
-                select: { accountabilityLimitHours: true, createdAt: true }
-            });
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { accountabilityLimitHours: true, createdAt: true }
+        });
 
-            const limitHours = user?.accountabilityLimitHours ?? 24;
+        const limitHours = user?.accountabilityLimitHours ?? 24;
 
-            const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
-                where: { closedByUserId: userId, status: 'VERIFIED' },
-                orderBy: { createdAt: 'desc' }
-            });
+        const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
+            where: { closedByUserId: userId, status: 'VERIFIED' },
+            orderBy: { createdAt: 'desc' }
+        });
 
-            const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : user?.createdAt;
+        const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : user?.createdAt;
 
-            const oldestOpenTransaction = await this.prisma.transaction.findFirst({
-                where: {
-                    userId: userId,
-                    createdAt: { gt: lastVerifiedDate }
-                },
-                orderBy: { createdAt: 'asc' }
-            });
+        const oldestOpenTransaction = await this.prisma.transaction.findFirst({
+            where: {
+                userId: userId,
+                createdAt: { gt: lastVerifiedDate }
+            },
+            orderBy: { createdAt: 'asc' }
+        });
 
-            if (!oldestOpenTransaction) {
-                return {
-                    status: 'OK',
-                    hoursRemaining: null,
-                    isExpired: false,
-                    oldestOpenTransactionDate: null,
-                    limitHours
-                };
-            }
-
-            const now = new Date();
-            const limitDate = new Date(oldestOpenTransaction.createdAt);
-            limitDate.setHours(limitDate.getHours() + limitHours);
-
-            const diffMs = limitDate.getTime() - now.getTime();
-            const hoursRemaining = diffMs / (1000 * 60 * 60);
-
+        if (!oldestOpenTransaction) {
             return {
-                status: hoursRemaining < 0 ? 'EXPIRED' : (hoursRemaining < 2 ? 'EXPIRING' : 'OK'),
-                hoursRemaining,
-                isExpired: hoursRemaining < 0,
-                oldestOpenTransactionDate: oldestOpenTransaction.createdAt,
+                status: 'OK',
+                hoursRemaining: null,
+                isExpired: false,
+                oldestOpenTransactionDate: null,
                 limitHours
             };
         }
+
+        const now = new Date();
+        const limitDate = new Date(oldestOpenTransaction.createdAt);
+        limitDate.setHours(limitDate.getHours() + limitHours);
+
+        const diffMs = limitDate.getTime() - now.getTime();
+        const hoursRemaining = diffMs / (1000 * 60 * 60);
+
+        return {
+            status: hoursRemaining < 0 ? 'EXPIRED' : (hoursRemaining < 2 ? 'EXPIRING' : 'OK'),
+            hoursRemaining,
+            isExpired: hoursRemaining < 0,
+            oldestOpenTransactionDate: oldestOpenTransaction.createdAt,
+            limitHours
+        };
     }
+}
