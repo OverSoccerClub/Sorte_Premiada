@@ -206,7 +206,12 @@ export class FinanceService {
         });
 
         if (existingClose) {
-            throw new BadRequestException("O caixa de hoje já foi fechado para este usuário.");
+            // Idempotency: If already closed but pending, and autoVerify is requested, verify it.
+            if (existingClose.status === 'PENDING' && autoVerify) {
+                return this.verifyDailyClose(existingClose.id, adminId, 'VERIFIED');
+            }
+            // If already verified or just pending (and autoVerify is false), return it without error.
+            return existingClose;
         }
 
         // Build a summary for the target user
