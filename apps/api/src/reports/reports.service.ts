@@ -388,4 +388,34 @@ export class ReportsService {
 
         return this.prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, username: true, name: true, email: true } });
     }
+
+    async getNotificationLogs(startDate?: Date, endDate?: Date, status?: string, userId?: string) {
+        const where: any = {};
+        if (startDate || endDate) {
+            const gte = startDate ? startDate : new Date(0);
+            const lte = endDate ? endDate : new Date();
+            where.createdAt = { gte, lte };
+        }
+        if (status) where.status = status;
+        if (userId) where.userId = userId;
+
+        return this.prisma.notificationLog.findMany({ where, orderBy: { createdAt: 'desc' }, include: { user: { select: { id: true, username: true, name: true } } } });
+    }
+
+    async exportNotificationLogsCsv(startDate?: Date, endDate?: Date, status?: string, userId?: string) {
+        const logs = await this.getNotificationLogs(startDate, endDate, status, userId);
+        const rows = logs.map(l => ({
+            id: l.id,
+            createdAt: l.createdAt?.toISOString(),
+            pushToken: l.pushToken,
+            title: l.title,
+            body: l.body,
+            status: l.status,
+            userId: l.userId || '',
+            username: l.user?.username || '',
+            response: JSON.stringify(l.response || {}),
+        }));
+
+        return objectsToCsv(rows);
+    }
 }

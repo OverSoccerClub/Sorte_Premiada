@@ -28,6 +28,7 @@ model User {
   transactions Transaction[]
   transactionsCollected Transaction[] @relation("TransactionCobrador")
   dailyCloses  DailyClose[]
+  notificationLogs NotificationLog[]
   posTerminalsAsCurrent PosTerminal[] @relation("PosCurrentUser")
   posTerminalsAsLast    PosTerminal[] @relation("PosLastUser")
   areaId       String?
@@ -165,4 +166,22 @@ enum DailyCloseStatus {
   PENDING
   VERIFIED
   REJECTED
+}
+
+model NotificationLog {
+  id         String   @id @default(uuid())
+  pushToken  String
+  title      String
+  body       String
+  data       Json?
+  status     NotificationStatus @default(SENT)
+  response   Json?
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
 }

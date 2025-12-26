@@ -105,4 +105,28 @@ export class ReportsController {
         const d = days ? Number(days) : 30;
         return this.reportsService.getActiveUsers(d);
     }
+
+    @Get('notifications')
+    async getNotificationLogs(
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+        @Query('status') status?: string,
+        @Query('userId') userId?: string,
+    ) {
+        return this.reportsService.getNotificationLogs(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId);
+    }
+
+    @Get('notifications/export')
+    async exportNotificationLogs(
+        @Query('startDate') startDate: string,
+        @Query('endDate') endDate: string,
+        @Query('status') status: string,
+        @Query('userId') userId: string,
+        @Res() res: Response,
+    ) {
+        const csv = await this.reportsService.exportNotificationLogsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="notification_logs_${Date.now()}.csv"`);
+        res.send(csv);
+    }
 }
