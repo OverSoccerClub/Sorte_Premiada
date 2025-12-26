@@ -22,8 +22,18 @@ export class ReportsController {
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('cambistaId') cambistaId?: string,
+        @Query('gameId') gameId?: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
     ) {
-        return this.reportsService.getSalesByDate(new Date(startDate), new Date(endDate), cambistaId);
+        return this.reportsService.getSalesByDate(
+            new Date(startDate),
+            new Date(endDate),
+            cambistaId,
+            gameId,
+            page ? Number(page) : 1,
+            limit ? Number(limit) : 20
+        );
     }
 
     @Get('sales-by-area')

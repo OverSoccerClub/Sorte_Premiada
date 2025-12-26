@@ -136,7 +136,14 @@ export class ReportsService {
         return enrichedSales;
     }
 
-    async getSalesByDate(startDate: Date, endDate: Date, cambistaId?: string) {
+    async getSalesByDate(
+        startDate: Date,
+        endDate: Date,
+        cambistaId?: string,
+        gameId?: string,
+        page: number = 1,
+        limit: number = 20
+    ) {
         const where: any = {
             createdAt: {
                 gte: startDate,
@@ -147,19 +154,54 @@ export class ReportsService {
             }
         };
 
-        if (cambistaId) {
+        if (cambistaId && cambistaId !== 'all') {
             where.userId = cambistaId;
         }
 
-        return this.prisma.ticket.findMany({
-            where,
-            include: {
-                user: { select: { username: true, name: true } },
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
+        if (gameId && gameId !== 'all') {
+            where.gameId = gameId;
+        }
+
+        const skip = (page - 1) * limit;
+
+        const [tickets, total, rawSummary] = await Promise.all([
+            this.prisma.ticket.findMany({
+                where,
+                include: {
+                    user: { select: { id: true, username: true, name: true } },
+                    game: { select: { name: true } },
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                skip,
+                take: limit,
+            }),
+            this.prisma.ticket.count({ where }),
+            this.prisma.ticket.groupBy({
+                by: ['gameId', 'gameType'],
+                where,
+                _sum: { amount: true },
+                _count: { id: true },
+            }),
+        ]);
+
+        // Map summary to be more friendly
+        const summary = rawSummary.map(s => ({
+            gameId: s.gameId,
+            gameName: s.gameType, // fallback to gameType
+            count: s._count.id,
+            totalAmount: Number(s._sum.amount || 0)
+        }));
+
+        return {
+            tickets,
+            total,
+            summary,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        };
     }
 
     async getDashboardStats() {

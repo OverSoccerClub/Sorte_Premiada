@@ -17,41 +17,33 @@ import { toast } from "sonner"
 
 export default function RelatoriosPage() {
     const [cambistas, setCambistas] = useState<any[]>([])
+    const [games, setGames] = useState<any[]>([])
     const [tickets, setTickets] = useState<any[]>([])
+    const [total, setTotal] = useState(0)
+    const [summary, setSummary] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
-
 
     // Filters
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
+    const [selectedGame, setSelectedGame] = useState<string>("all")
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(20)
+    const [totalPages, setTotalPages] = useState(1)
 
     const fetchCambistas = async () => {
         const token = localStorage.getItem("token")
         try {
-            const res = await fetch(`${API_URL}/users`, {
+            const res = await fetch(`${API_URL}/users?role=CAMBISTA`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
 
-            const status = res.status
-            let data: any = null
-
             if (res.ok) {
-                data = await res.json()
-                // Robust filtering
-                const cambistasOnly = data.filter((u: any) => {
-                    if (!u.role) return false;
-                    const r = String(u.role).toUpperCase();
-                    return r === "CAMBISTA";
-                })
-
-                if (cambistasOnly.length === 0) {
-                    toast.warning(`Nenhum cambista encontrado. Total: ${data.length}`)
-                }
-
-                setCambistas(cambistasOnly)
+                const data = await res.json()
+                setCambistas(data)
             } else {
-                toast.error(`Erro API: ${status}`)
+                toast.error(`Erro ao buscar cambistas: ${res.status}`)
             }
         } catch (error: any) {
             console.error(error)
@@ -59,24 +51,45 @@ export default function RelatoriosPage() {
         }
     }
 
+    const fetchGames = async () => {
+        const token = localStorage.getItem("token")
+        try {
+            const res = await fetch(`${API_URL}/games`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setGames(data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     useEffect(() => {
         fetchCambistas()
+        fetchGames()
     }, [])
 
-    const handleSearch = async () => {
+    useEffect(() => {
+        handleSearch()
+    }, [page, limit])
+
+    const handleSearch = async (resetPage = false) => {
+        if (resetPage) setPage(1)
         setLoading(true)
         try {
             const token = localStorage.getItem("token")
 
-            // Adjust dates to cover full day in UTC or Local?
-            // API expects Date objects. Let's send ISO strings.
-            // Ideally: startDate T00:00:00, endDate T23:59:59
             const startStr = new Date(startDate + 'T00:00:00').toISOString()
             const endStr = new Date(endDate + 'T23:59:59').toISOString()
 
-            let url = `${API_URL}/reports/sales-by-date?startDate=${startStr}&endDate=${endStr}`
+            let url = `${API_URL}/reports/sales-by-date?startDate=${startStr}&endDate=${endStr}&page=${resetPage ? 1 : page}&limit=${limit}`
             if (selectedCambista && selectedCambista !== "all") {
                 url += `&cambistaId=${selectedCambista}`
+            }
+            if (selectedGame && selectedGame !== "all") {
+                url += `&gameId=${selectedGame}`
             }
 
             const res = await fetch(url, {
@@ -85,8 +98,11 @@ export default function RelatoriosPage() {
 
             if (res.ok) {
                 const data = await res.json()
-                setTickets(data)
-                if (data.length === 0) {
+                setTickets(data.tickets)
+                setTotal(data.total)
+                setSummary(data.summary)
+                setTotalPages(data.totalPages)
+                if (data.tickets.length === 0 && page === 1) {
                     toast.info("Nenhuma venda encontrada no período.")
                 }
             } else {
@@ -101,7 +117,7 @@ export default function RelatoriosPage() {
     }
 
     const calculateTotal = () => {
-        return tickets.reduce((acc, t) => acc + Number(t.amount), 0)
+        return summary.reduce((acc, s) => acc + s.totalAmount, 0)
     }
 
     return (
@@ -170,6 +186,22 @@ export default function RelatoriosPage() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         <div className="space-y-2">
+                            <Label>Selecione o Jogo</Label>
+                            <Select value={selectedGame} onValueChange={setSelectedGame}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Todos os jogos" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos os jogos</SelectItem>
+                                    {games.map((g) => (
+                                        <SelectItem key={g.id} value={g.id}>
+                                            {g.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
                             <Label>Selecione o Cambista</Label>
                             <Select value={selectedCambista} onValueChange={setSelectedCambista}>
                                 <SelectTrigger>
@@ -202,7 +234,7 @@ export default function RelatoriosPage() {
                             />
                         </div>
                         <Button
-                            onClick={handleSearch}
+                            onClick={() => handleSearch(true)}
                             disabled={loading}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-900/10"
                         >
@@ -232,7 +264,7 @@ export default function RelatoriosPage() {
                                 <CardContent className="pt-6">
                                     <div className="text-muted-foreground text-sm font-medium mb-1">Qtd. Bilhetes</div>
                                     <div className="text-3xl font-bold text-foreground">
-                                        {tickets.length}
+                                        {total}
                                     </div>
                                     <div className="mt-4 flex items-center text-xs text-muted-foreground bg-muted w-fit px-2 py-1 rounded">
                                         <TicketIcon className="w-3 h-3 mr-1" />
@@ -242,13 +274,14 @@ export default function RelatoriosPage() {
                             </Card>
                             <Card className="bg-card border-border">
                                 <CardContent className="pt-6">
-                                    <div className="text-muted-foreground text-sm font-medium mb-1">Comissão Estimada</div>
-                                    <div className="text-3xl font-bold text-foreground">
-                                        -
-                                    </div>
-                                    <div className="mt-4 flex items-center text-xs text-muted-foreground bg-muted w-fit px-2 py-1 rounded">
-                                        <FileText className="w-3 h-3 mr-1" />
-                                        Configurar %
+                                    <div className="text-muted-foreground text-sm font-medium mb-1">Resumo por Jogo</div>
+                                    <div className="space-y-2 mt-2">
+                                        {summary.map(s => (
+                                            <div key={s.gameId} className="flex justify-between text-sm">
+                                                <span className="text-muted-foreground">{s.gameName}:</span>
+                                                <span className="font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(s.totalAmount)}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -290,7 +323,7 @@ export default function RelatoriosPage() {
                                                         <span className="text-muted-foreground">{ticket.user?.name || ticket.user?.username}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground">{ticket.gameType}</TableCell>
+                                                <TableCell className="text-muted-foreground">{ticket.game?.name || ticket.gameType}</TableCell>
                                                 <TableCell className="font-mono text-xs max-w-[200px] truncate" title={ticket.numbers.join(', ')}>
                                                     {ticket.numbers.join(', ')}
                                                 </TableCell>
@@ -313,6 +346,46 @@ export default function RelatoriosPage() {
                                     </TableBody>
                                 </Table>
                             </CardContent>
+                            <div className="flex items-center justify-between px-4 py-4 border-t border-border bg-muted/30">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">Exibir</span>
+                                    <Select value={String(limit)} onValueChange={(v) => { setLimit(Number(v)); setPage(1); }}>
+                                        <SelectTrigger className="w-[70px] h-8">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="5">5</SelectItem>
+                                            <SelectItem value="10">10</SelectItem>
+                                            <SelectItem value="15">15</SelectItem>
+                                            <SelectItem value="20">20</SelectItem>
+                                            <SelectItem value="50">50</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <span className="text-sm text-muted-foreground">por página</span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                                        disabled={page === 1}
+                                    >
+                                        Anterior
+                                    </Button>
+                                    <div className="text-sm font-medium">
+                                        Página {page} de {totalPages}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={page === totalPages || totalPages === 0}
+                                    >
+                                        Próxima
+                                    </Button>
+                                </div>
+                            </div>
                         </Card>
                     </div>
                 )
