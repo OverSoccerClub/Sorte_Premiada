@@ -309,23 +309,44 @@ export class ReportsService {
     async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string) {
         const where: any = {};
         if (startDate || endDate) {
-            const gte = startDate ? startDate : new Date(0);
-            const lte = endDate ? endDate : new Date();
-            where.createdAt = { gte, lte };
+            const start = startDate ? new Date(startDate) : new Date(0);
+            start.setHours(0, 0, 0, 0);
+
+            const end = endDate ? new Date(endDate) : new Date();
+            end.setHours(23, 59, 59, 999);
+
+            where.createdAt = { gte: start, lte: end };
         }
         if (userId) where.closedByUserId = userId;
         if (status) where.status = status;
 
         const results = await this.prisma.dailyClose.findMany({
             where,
-            include: { closedByUser: true },
+            include: {
+                closedByUser: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                    }
+                }
+            },
             orderBy: { createdAt: 'desc' }
         });
 
-        // If verifiedByUser details are requested, resolve them separately (schema has only verifiedByUserId)
+        // Resolve verifiedByUser details and return full model
         return Promise.all(results.map(async r => {
             const verifiedBy = r.verifiedByUserId ? await this.prisma.user.findUnique({ where: { id: r.verifiedByUserId }, select: { id: true, username: true, name: true } }) : null;
-            return { ...r, verifiedBy };
+            return {
+                ...r,
+                totalSales: Number(r.totalSales),
+                totalCredits: Number(r.totalCredits),
+                totalDebits: Number(r.totalDebits),
+                finalBalance: Number(r.finalBalance),
+                netBalance: Number(r.netBalance),
+                totalCommission: Number(r.totalCommission),
+                verifiedBy
+            };
         }));
     }
 
