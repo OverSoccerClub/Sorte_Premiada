@@ -2,7 +2,7 @@
     "expo": {
         "name": "Fezinha de Hoje",
         "slug": "sorte-premiada",
-        "version": "1.1.49",
+        "version": "1.1.52",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -30,18 +30,25 @@
                 "android.permission.BLUETOOTH_ADMIN",
                 "android.permission.BLUETOOTH_CONNECT",
                 "android.permission.BLUETOOTH_SCAN",
-                "android.permission.ACCESS_FINE_LOCATION"
+                "android.permission.ACCESS_FINE_LOCATION",
+                "android.permission.CAMERA"
             ],
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "package": "com.anonymous.sortepremiada",
-            "versionCode": 52
+            "versionCode": 55
         },
         "web": {
             "favicon": "./assets/favicon.png"
         },
         "plugins": [
             "expo-router",
+            [
+                "expo-camera",
+                {
+                    "cameraPermission": "Permitir acesso à câmera para ler bilhetes."
+                }
+            ],
             [
                 "expo-build-properties",
                 {

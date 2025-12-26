@@ -105,6 +105,19 @@ export class TicketsService {
             // Basic validation, can be improved
         }
 
+        // FIX: Ensure drawDate is calculated for ALL game types if not already set
+        if (!drawDate) {
+            const gameId = data.game?.connect?.id;
+            if (gameId) {
+                try {
+                    drawDate = await this.getNextDrawDate(gameId);
+                    console.log(`[TicketsService] Calculated default drawDate for game ${gameId}: ${drawDate.toISOString()}`);
+                } catch (e) {
+                    console.warn(`[TicketsService] Could not calculate next draw date for game ${gameId}: ${e}`);
+                }
+            }
+        }
+
         try {
             const createData = {
                 userId: data.user.connect.id,
