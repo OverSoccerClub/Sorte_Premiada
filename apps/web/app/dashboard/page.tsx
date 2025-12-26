@@ -104,7 +104,7 @@ export default function DashboardPage() {
     const statCards = [
         {
             title: "Vendas (Mês)",
-            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics.monthlyRevenue),
+            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics?.monthlyRevenue || 0),
             icon: DollarSign,
             description: "Faturamento bruto mensal",
             trend: "up",
@@ -113,7 +113,7 @@ export default function DashboardPage() {
         },
         {
             title: "Lucro Líquido",
-            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics.netProfit),
+            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics?.netProfit || 0),
             icon: Wallet,
             description: "Vendas - Prêmios/Debitos",
             trend: "up",
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                     <CardContent className="pl-2">
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={stats.hourlySales}>
+                                <AreaChart data={stats.hourlySales || []}>
                                     <defs>
                                         <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
-                                        data={stats.statusBreakdown}
+                                        data={stats.statusBreakdown || []}
                                         cx="50%"
                                         cy="50%"
                                         innerRadius={60}
@@ -272,7 +272,7 @@ export default function DashboardPage() {
                                         dataKey="count"
                                         nameKey="status"
                                     >
-                                        {stats.statusBreakdown.map((entry, index) => (
+                                        {(stats.statusBreakdown || []).map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status as keyof typeof STATUS_COLORS] || '#8884d8'} />
                                         ))}
                                     </Pie>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                             </ResponsiveContainer>
                         </div>
                         <div className="grid grid-cols-2 gap-4 w-full mt-2">
-                            {stats.statusBreakdown.slice(0, 4).map((item) => (
+                            {(stats.statusBreakdown || []).slice(0, 4).map((item) => (
                                 <div key={item.status} className="flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: STATUS_COLORS[item.status as keyof typeof STATUS_COLORS] }} />
                                     <span className="text-xs text-muted-foreground font-medium uppercase">{item.status}: {item.count}</span>
@@ -307,7 +307,7 @@ export default function DashboardPage() {
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart layout="vertical" data={stats.revenueByGame} margin={{ left: 40 }}>
+                                <BarChart layout="vertical" data={stats.revenueByGame || []} margin={{ left: 40 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
                                     <XAxis type="number" stroke="#94a3b8" fontSize={12} hide />
                                     <YAxis
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                                         formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
                                     />
                                     <Bar dataKey="amount" radius={[0, 4, 4, 0]} barSize={25}>
-                                        {stats.revenueByGame.map((entry, index) => (
+                                        {(stats.revenueByGame || []).map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                         ))}
                                     </Bar>
