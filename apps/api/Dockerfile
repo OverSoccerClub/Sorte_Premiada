@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 
 # Install all dependencies
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Generate Prisma Client
 RUN npx turbo run db:generate
