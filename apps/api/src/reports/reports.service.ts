@@ -290,13 +290,6 @@ export class ReportsService {
             }
         });
 
-        // Recent Sales
-        const recentSales = await this.prisma.ticket.findMany({
-            take: 5,
-            orderBy: { createdAt: 'desc' },
-            where: { status: { not: 'CANCELLED' } },
-            include: { user: { select: { username: true, name: true, email: true } } }
-        });
 
         // Chart Data (Last 7 days)
         const chartData = [];
