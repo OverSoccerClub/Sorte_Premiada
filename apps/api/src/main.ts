@@ -36,14 +36,10 @@ async function bootstrap() {
 
   console.log('🚀 API FIX APPLIED: CORS UPDATE - Origin: ALL');
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Allow all origins in dev or specific pattern in prod
-      // For now, origin: true/true handles it, but let's be explicit if needed
-      callback(null, true);
-    },
+    origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization,x-client-id,x-client-version',
+    allowedHeaders: '*',
     exposedHeaders: 'Authorization',
   });
   // Filters

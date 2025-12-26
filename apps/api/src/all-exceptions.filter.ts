@@ -39,9 +39,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         // Manually set CORS headers for error responses to ensure the browser sees the actual error (401/500)
         // instead of a generic CORS error
         if (response.header) {
-            response.header('Access-Control-Allow-Origin', '*');
+            const requestOrigin = ctx.getRequest().headers.origin || '*';
+            response.header('Access-Control-Allow-Origin', requestOrigin);
             response.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
             response.header('Access-Control-Allow-Headers', '*');
+            response.header('Access-Control-Allow-Credentials', 'true');
         }
 
         httpAdapter.reply(response, responseBody, httpStatus);
