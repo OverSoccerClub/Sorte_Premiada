@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/
 import { FinanceService } from './finance.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '@repo/database';
 
 @Controller('finance')
 export class FinanceController {
