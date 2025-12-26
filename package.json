@@ -11,6 +11,7 @@
     "ios": "expo run:ios"
   },
   "devDependencies": {
+    "expo-modules-autolinking": "2.0.8",
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",
     "typescript": "5.9.2"
@@ -18,11 +19,12 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "ajv": "8.17.1"
+  }
 }

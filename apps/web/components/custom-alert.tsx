@@ -1,9 +1,9 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { CheckCircle, AlertCircle, TriangleAlert, X } from "lucide-react"
+import { CheckCircle, AlertCircle, TriangleAlert, Info, X } from "lucide-react"
 
-export type AlertType = "success" | "error" | "warning"
+export type AlertType = "success" | "error" | "warning" | "info"
 
 export interface CustomAlertProps {
     visible: boolean
@@ -65,6 +65,12 @@ export function CustomAlert({
         iconTextClass = "text-amber-500"
         iconBorderClass = "border-amber-500/50"
         buttonClass = "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-900/20"
+    } else if (type === "info") {
+        Icon = Info
+        iconBgClass = "bg-blue-500/20"
+        iconTextClass = "text-blue-500"
+        iconBorderClass = "border-blue-500/50"
+        buttonClass = "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-900/20"
     }
 
     const handleConfirm = () => {
