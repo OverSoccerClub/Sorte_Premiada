@@ -31,15 +31,15 @@ export default function ConsultarBilhetePage() {
             // Assuming we have a dedicated endpoint or using a generic one.
             // The plan mentioned creating logic.
             // For now, let's use the mobile validation endpoint or similar if open.
-            // Mobile uses: POST /tickets/validate { ticketId }
+            // Mobile uses: GET /tickets/validate/:id
+            // The backend controller is @Get('validate/:id')
 
-            const res = await fetch(`${API_URL}/tickets/validate`, {
-                method: "POST",
+            const res = await fetch(`${API_URL}/tickets/validate/${ticketId.trim()}`, {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ ticketId: ticketId.trim() })
+                }
             })
 
             if (res.ok) {

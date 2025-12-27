@@ -73,11 +73,13 @@ try {
     Write-Step "Configurando SDK Path..." -Color "Gray"
     $sdkPath = "C:/Users/natal/AppData/Local/Android/Sdk"
     $env:ANDROID_HOME = "C:/Users/natal/AppData/Local/Android/Sdk"
-    [System.IO.File]::WriteAllText("$androidDir\local.properties", "sdk.dir=$sdkPath", [System.Text.Encoding]::ASCII)
+    
+    $absAndroidDir = Resolve-Path $androidDir
+    [System.IO.File]::WriteAllText("$absAndroidDir\local.properties", "sdk.dir=$sdkPath", [System.Text.Encoding]::ASCII)
 
     # PATCH: Corrigir settings.gradle para apontar para o autolinking correto no monorepo
     Write-Step "Aplicando patch no settings.gradle..." -Color "Cyan"
-    $settingsPath = "$androidDir\settings.gradle"
+    $settingsPath = "$absAndroidDir\settings.gradle"
     $settingsContent = Get-Content $settingsPath -Raw
     # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
     $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
@@ -87,7 +89,7 @@ try {
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60
     Write-Step "4/5 Compilando APK (Gradle)..." -Color "Yellow"
     
-    Set-Location $androidDir
+    Set-Location $absAndroidDir
     $gradleArgs = "assembleRelease"
     
     # Otimização de Memória e Envs

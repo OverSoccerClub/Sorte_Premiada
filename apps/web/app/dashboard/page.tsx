@@ -220,7 +220,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent className="pl-2">
                         <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <AreaChart data={stats.hourlySales || []}>
                                     <defs>
                                         <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
@@ -265,7 +265,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center pt-0">
                         <div className="h-[240px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <PieChart>
                                     <Pie
                                         data={stats.statusBreakdown.map(item => ({
@@ -328,7 +328,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                 <BarChart layout="vertical" data={stats.revenueByGame || []} margin={{ left: 40 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
                                     <XAxis type="number" stroke="#94a3b8" fontSize={12} hide />
