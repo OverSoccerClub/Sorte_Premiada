@@ -56,6 +56,14 @@ model Game {
   extractionTimes String[] @default([])
   lastSeries Int @default(0)
   extractionSeries ExtractionSeries[]
+  
+  // Configuração Segunda Chance (Sorteio Semanal/Sábado)
+  secondChanceEnabled Boolean @default(false)
+  secondChanceRangeStart Int?  // e.g. 122300
+  secondChanceRangeEnd   Int?  // e.g. 125500
+  secondChanceWeekday    Int?  @default(6) // 0=Dom, 6=Sáb
+  secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
+  lastSecondChanceSeries Int @default(0)
 }
 
 model Draw {
@@ -90,6 +98,8 @@ model Ticket {
   status    TicketStatus @default(PENDING)
   drawDate  DateTime?    // For 2x500: Scheduled Draw Time
   hash      String?      // Unique hash for barcode/validation
+  secondChanceNumber Int? // Número da Sorte / Segunda Chance
+  secondChanceDrawDate DateTime?
   createdAt DateTime @default(now())
 }
 

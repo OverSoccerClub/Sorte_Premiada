@@ -212,7 +212,9 @@ export default function MegaSenaScreen() {
                 id: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
+                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                secondChanceNumber: ticketData.secondChanceNumber,
+                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined
             });
 
             // 1. Show Standard Loading
@@ -337,6 +339,8 @@ export default function MegaSenaScreen() {
                             id={lastTicket.id}
                             hash={lastTicket.hash}
                             isCapture={true}
+                            secondChanceNumber={lastTicket.secondChanceNumber}
+                            secondChanceDrawDate={lastTicket.secondChanceDrawDate}
                         />
                     )}
                 </ViewShot>

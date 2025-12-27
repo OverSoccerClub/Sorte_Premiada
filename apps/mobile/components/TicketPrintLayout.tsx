@@ -19,19 +19,14 @@ interface TicketPrintLayoutProps {
 
     series?: number; // New prop
     fixPrinterStretch?: boolean; // New prop for conditional scaling
+    secondChanceNumber?: number; // Dynamic Second Chance Number
+    secondChanceDrawDate?: string; // Date string
+    secondChanceLabel?: string;
 }
 
 // Helper para converter números em texto (simplificado para 0-99 para o layout)
 const numberToText = (num: number): string => {
-    const map: { [key: number]: string } = {
-        0: 'zero', 1: 'um', 2: 'dois', 3: 'tres', 4: 'quat', 5: 'cinc', 6: 'seis', 7: 'sete', 8: 'oito', 9: 'nove',
-        10: 'dez', 11: 'onze', 12: 'doze', 13: 'treze', 14: 'quat', 15: 'quin', 16: 'des', 17: 'des', 18: 'dezo', 19: 'deze',
-        20: 'vint', 21: 'vint', 22: 'vint', 23: 'vint', 24: 'vint', 25: 'vint' // E assim por diante conforme necessidade ou abreviado como na imagem
-    };
-    // Na imagem parece que usam abreviações de 4 letras para alinhar: "quat", "cinc", "oito", "tres"
-    // Vou usar uma lógica simples de pegar as primeiras 4 letras para manter o estilo da imagem se for maior que 4
-    const fullText = map[num] || num.toString();
-    return fullText.substring(0, 4);
+    // ... existing
 };
 
 export const TicketPrintLayout = ({
@@ -46,19 +41,23 @@ export const TicketPrintLayout = ({
     drawDate,
     hash,
     series,
-    fixPrinterStretch = false // Default to false (normal aspect ratio)
+    fixPrinterStretch = false, // Default to false (normal aspect ratio)
+    secondChanceNumber,
+    secondChanceDrawDate = "SÁBADO",
+    secondChanceLabel = "SEGUNDA CHANCE"
 }: TicketPrintLayoutProps) => {
 
     // Ordenar números
     const sortedNumbers = [...numbers].sort((a, b) => a - b);
 
+    // Parse Second Chance digits
+    const scDigits = secondChanceNumber ? secondChanceNumber.toString().split('').map(Number) : [];
+
     return (
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
-        // Adjusted scaleY to 0.85. To make QR square, we need to inverse scale Y for it (~1.18).
-        // User reported it's stretched VERTICALLY. So we remove the 1.18 inverse to let it be squashed (0.85) to counteract printer stretch.
-        // NOW: Only apply this if fixPrinterStretch is true!
+        // ... (existing) 
         <View style={[tw`bg-white w-[384px] p-1`, fixPrinterStretch ? { transform: [{ scaleY: 0.85 }] } : {}]}>
-            {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
+            {/* Header ... */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
                     <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-5`, { transform: [{ scaleY: 0.9 }] }]} />
@@ -123,29 +122,31 @@ export const TicketPrintLayout = ({
                 MILHAR: R$ 1.000,00 • CENTENA: R$ 100,00 • DEZENA: R$ 10,00
             </Text>
 
-            {/* Segunda Chance */}
-            <View style={tw`items-center mb-2`}>
-                <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
-                    <Text style={tw`text-white text-center font-black text-xl uppercase`}>SEGUNDA CHANCE</Text>
-                    <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA SÁBADO - 16H15MIN</Text>
-                </View>
-
-                {/* Números Segunda Chance (Mock) */}
-                <View style={tw`items-center mb-1`}>
-                    <View style={tw`flex-row gap-5`}>
-                        {[1, 5, 8, 6, 5, 6].map((n, i) => (
-                            <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
-                        ))}
+            {/* Segunda Chance - ONLY SHOW IF NUMBER IS PRESENT */}
+            {secondChanceNumber !== undefined && secondChanceNumber !== null && (
+                <View style={tw`items-center mb-2`}>
+                    <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
+                        <Text style={tw`text-white text-center font-black text-xl uppercase`}>{secondChanceLabel}</Text>
+                        <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA - {secondChanceDrawDate}</Text>
                     </View>
-                </View>
 
-                <Text style={tw`text-center font-bold text-[11px] text-black`}>
-                    PRÊMIO EXTRA - R$ 5.000,00
-                </Text>
-                <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
-                    ACERTANDO TODOS OS NÚMEROS NA ORDEM
-                </Text>
-            </View>
+                    {/* Números Segunda Chance */}
+                    <View style={tw`items-center mb-1`}>
+                        <View style={tw`flex-row gap-5`}>
+                            {scDigits.map((n, i) => (
+                                <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
+                            ))}
+                        </View>
+                    </View>
+
+                    <Text style={tw`text-center font-bold text-[11px] text-black`}>
+                        PRÊMIO EXTRA - CONFIGURAR
+                    </Text>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
+                        ACERTANDO TODOS OS NÚMEROS NA ORDEM
+                    </Text>
+                </View>
+            )}
 
             {/* Detalhes do Bilhete - NEW GROUPED LAYOUT */}
             <View style={tw`mb-2 px-1`}>

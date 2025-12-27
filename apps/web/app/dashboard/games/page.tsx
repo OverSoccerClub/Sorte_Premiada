@@ -31,6 +31,11 @@ interface Game {
     description?: string
     href?: string
     color?: string
+    secondChanceEnabled?: boolean
+    secondChanceRangeStart?: number
+    secondChanceRangeEnd?: number
+    secondChanceDrawTime?: string
+    secondChanceWeekday?: number
 }
 
 const GAME_METADATA: Record<string, { description: string, href: string, color: string, status: string }> = {
@@ -55,6 +60,13 @@ export default function GamesPage() {
     const [newName, setNewName] = useState("")
     const [isSaving, setIsSaving] = useState(false)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+    // State for Second Chance
+    const [scEnabled, setScEnabled] = useState(false)
+    const [scStart, setScStart] = useState("")
+    const [scEnd, setScEnd] = useState("")
+    const [scTime, setScTime] = useState("")
+    const [scWeekday, setScWeekday] = useState("6")
 
     const fetchGames = async () => {
         try {
@@ -81,6 +93,14 @@ export default function GamesPage() {
     const handleEditClick = (game: Game) => {
         setEditingGame(game)
         setNewName(game.name)
+
+        // Populate Second Chance
+        setScEnabled(game.secondChanceEnabled || false)
+        setScStart(game.secondChanceRangeStart?.toString() || "")
+        setScEnd(game.secondChanceRangeEnd?.toString() || "")
+        setScTime(game.secondChanceDrawTime || "19:00")
+        setScWeekday(game.secondChanceWeekday?.toString() || "6") // Default Saturday
+
         setIsDialogOpen(true)
     }
 
@@ -89,23 +109,33 @@ export default function GamesPage() {
 
         setIsSaving(true)
         try {
+            const payload: any = {
+                name: newName,
+                secondChanceEnabled: scEnabled,
+                secondChanceDrawTime: scTime,
+                secondChanceWeekday: parseInt(scWeekday)
+            };
+
+            if (scStart) payload.secondChanceRangeStart = parseInt(scStart);
+            if (scEnd) payload.secondChanceRangeEnd = parseInt(scEnd);
+
             const response = await fetch(`${API_URL}/games/${editingGame.id}`, {
                 method: "POST", // O controller usa @Post(':id') para update
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem('token')}` // Assumindo auth via token no localStorage
                 },
-                body: JSON.stringify({ name: newName })
+                body: JSON.stringify(payload)
             })
 
             if (!response.ok) throw new Error("Falha ao atualizar jogo")
 
-            toast.success("Nome do jogo atualizado com sucesso")
+            toast.success("Jogo atualizado com sucesso")
             setIsDialogOpen(false)
             fetchGames() // Recarrega a lista
         } catch (error) {
             console.error(error)
-            toast.error("Erro ao atualizar nome do jogo")
+            toast.error("Erro ao atualizar jogo")
         } finally {
             setIsSaving(false)
         }
@@ -200,14 +230,16 @@ export default function GamesPage() {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>Editar Nome do Jogo</DialogTitle>
+                        <DialogTitle>Editar Configurações do Jogo</DialogTitle>
                         <DialogDescription>
-                            Faça alterações no nome do jogo aqui. Clique em salvar quando terminar.
+                            Ajuste os parâmetros do jogo e funcionalidade de Segunda Chance.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+
+                    <div className="grid gap-6 py-4">
+                        {/* Basic Info */}
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="name" className="text-right">
                                 Nome
@@ -219,10 +251,83 @@ export default function GamesPage() {
                                 className="col-span-3"
                             />
                         </div>
+
+                        {/* Divider */}
+                        <div className="border-t border-border/50" />
+
+                        {/* Second Chance Config */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <Ticket className="w-5 h-5" /> Segunda Chance
+                            </h3>
+
+                            <div className="flex items-center gap-3 ml-1">
+                                <input
+                                    type="checkbox"
+                                    id="scEnabled"
+                                    checked={scEnabled}
+                                    onChange={(e) => setScEnabled(e.target.checked)}
+                                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                />
+                                <Label htmlFor="scEnabled" className="cursor-pointer">Habilitar Sorteio Extra (Segunda Chance)</Label>
+                            </div>
+
+                            {scEnabled && (
+                                <div className="grid grid-cols-2 gap-4 ml-1 p-4 bg-muted/40 rounded-lg border border-border/50">
+                                    <div>
+                                        <Label htmlFor="scWeekday">Dia do Sorteio</Label>
+                                        <select
+                                            id="scWeekday"
+                                            value={scWeekday}
+                                            onChange={(e) => setScWeekday(e.target.value)}
+                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <option value="6">Sábado</option>
+                                            <option value="0">Domingo</option>
+                                            <option value="1">Segunda</option>
+                                            <option value="2">Terça</option>
+                                            <option value="3">Quarta</option>
+                                            <option value="4">Quinta</option>
+                                            <option value="5">Sexta</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="scTime">Horário (HH:mm)</Label>
+                                        <Input
+                                            id="scTime"
+                                            value={scTime}
+                                            onChange={(e) => setScTime(e.target.value)}
+                                            placeholder="19:00"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="scStart">Range Inicial</Label>
+                                        <Input
+                                            id="scStart"
+                                            value={scStart}
+                                            onChange={(e) => setScStart(e.target.value)}
+                                            placeholder="Ex: 122300"
+                                            type="number"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="scEnd">Range Final</Label>
+                                        <Input
+                                            id="scEnd"
+                                            value={scEnd}
+                                            onChange={(e) => setScEnd(e.target.value)}
+                                            placeholder="Ex: 125500"
+                                            type="number"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-                        <Button onClick={handleSave} disabled={isSaving}>
+                        <Button onClick={handleSave} disabled={isSaving} className="bg-emerald-600 hover:bg-emerald-700">
                             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Salvar Alterações
                         </Button>

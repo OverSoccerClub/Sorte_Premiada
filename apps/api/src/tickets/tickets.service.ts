@@ -169,6 +169,34 @@ export class TicketsService {
                 hash: this.generateTicketCode(8),
                 gameId: gameId,
             };
+
+            // --- SECOND CHANCE LOGIC ---
+            if (game.secondChanceEnabled && game.secondChanceRangeStart && game.secondChanceRangeEnd) {
+                try {
+                    const scDrawDate = this.getNextSecondChanceDate(
+                        game.secondChanceWeekday ?? 6,
+                        game.secondChanceDrawTime || '19:00'
+                    );
+
+                    const scNumber = await this.generateUniqueSecondChanceNumber(
+                        gameId,
+                        scDrawDate,
+                        game.secondChanceRangeStart,
+                        game.secondChanceRangeEnd
+                    );
+
+                    createData['secondChanceDrawDate'] = scDrawDate;
+                    createData['secondChanceNumber'] = scNumber;
+
+                    console.log(`[TicketsService] Second Chance Assigned: ${scNumber} for ${scDrawDate.toISOString()}`);
+                } catch (scError) {
+                    console.error("[TicketsService] Failed to generate Second Chance number:", scError);
+                    // Decide: Fail ticket creation or allow without second chance?
+                    // User said "precisamos criar uma logica...", implies it's required if enabled.
+                    throw new BadRequestException("Não foi possível gerar o número da sorte/segunda chance. Tente novamente.");
+                }
+            }
+
             console.log("DEBUG PRISMA DATA:", JSON.stringify(createData, null, 2));
 
             return await this.prisma.ticket.create({
@@ -439,5 +467,61 @@ export class TicketsService {
                 ticket
             };
         }
+    }
+
+    private getNextSecondChanceDate(weekday: number, timeStr: string): Date {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const now = new Date();
+        const next = new Date();
+        next.setHours(hours, minutes, 0, 0);
+
+        const currentDay = now.getDay(); // 0=Sun, 6=Sat
+        let daysUntil = (weekday - currentDay + 7) % 7;
+
+        // If today is the day
+        if (daysUntil === 0) {
+            // If time has passed today, move to next week
+            if (now > next) {
+                daysUntil = 7;
+            }
+        }
+
+        next.setDate(now.getDate() + daysUntil);
+        // Reset time again to ensure correctness after date math
+        next.setHours(hours, minutes, 0, 0);
+
+        return next;
+    }
+
+    private async generateUniqueSecondChanceNumber(
+        gameId: string,
+        drawDate: Date,
+        start: number,
+        end: number
+    ): Promise<number> {
+        const range = end - start + 1;
+        if (range <= 0) throw new Error("Invalid Second Chance range");
+
+        // Try up to 10 times to find a unique random number
+        for (let i = 0; i < 10; i++) {
+            const randomOffset = Math.floor(Math.random() * range);
+            const candidate = start + randomOffset;
+
+            // Check uniqueness
+            const exists = await this.prisma.ticket.findFirst({
+                where: {
+                    gameId: gameId,
+                    secondChanceDrawDate: drawDate,
+                    secondChanceNumber: candidate,
+                    status: { not: 'CANCELLED' } // Ignore cancelled tickets? Usually yes, we can reuse number.
+                }
+            });
+
+            if (!exists) {
+                return candidate;
+            }
+        }
+
+        throw new Error("Unable to generate unique Second Chance number after multiple attempts.");
     }
 }

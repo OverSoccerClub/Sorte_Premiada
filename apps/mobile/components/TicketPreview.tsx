@@ -14,9 +14,11 @@ interface TicketPreviewProps {
     hash?: string;
     vendorName?: string; // New prop
     series?: number; // New prop
+    secondChanceNumber?: number; // New prop
+    secondChanceDrawDate?: string; // New prop
 }
 
-export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "PREVIEW", isCapture = false, hash, vendorName, series }: TicketPreviewProps) {
+export function TicketPreview({ gameName, numbers, price, date = new Date().toLocaleString(), drawDate, id = "PREVIEW", isCapture = false, hash, vendorName, series, secondChanceNumber, secondChanceDrawDate }: TicketPreviewProps) {
 
     // If capturing (generating image for printing), we render it "raw" for ViewShot.
     // If previewing (modal), we scale it down to fit the screen nicely.
@@ -34,6 +36,8 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                 vendorName={vendorName}
                 series={series}
                 fixPrinterStretch={true} // Apply stretch fix for printing
+                secondChanceNumber={secondChanceNumber}
+                secondChanceDrawDate={secondChanceDrawDate}
             />
         );
     }
@@ -55,6 +59,8 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                     vendorName={vendorName}
                     series={series}
                     fixPrinterStretch={false} // Normal aspect ratio for screen
+                    secondChanceNumber={secondChanceNumber}
+                    secondChanceDrawDate={secondChanceDrawDate}
                 />
             </View>
         </View>

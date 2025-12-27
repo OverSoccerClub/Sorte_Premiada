@@ -174,6 +174,29 @@ export default function ConsultarBilhetePage() {
                             </div>
                         </div>
 
+                        {/* Second Chance Section */}
+                        {result.ticket.secondChanceNumber && (
+                            <div className="mt-6 pt-4 border-t border-border">
+                                <span className="text-sm font-medium text-emerald-600 block mb-3 uppercase tracking-wider flex items-center gap-2">
+                                    <Ticket className="w-4 h-4" />
+                                    Segunda Chance
+                                    <span className="text-xs text-muted-foreground ml-2 normal-case">
+                                        (Sorteio Extra: {result.ticket.secondChanceDrawDate ? new Date(result.ticket.secondChanceDrawDate).toLocaleDateString() : 'Sábado'})
+                                    </span>
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    {(result.ticket.secondChanceNumber.toString().split('').map((digit: string, idx: number) => (
+                                        <div
+                                            key={`sc-${idx}`}
+                                            className="w-12 h-12 rounded-lg bg-emerald-900 text-white flex items-center justify-center font-bold text-xl shadow-sm border border-emerald-500"
+                                        >
+                                            {digit}
+                                        </div>
+                                    )))}
+                                </div>
+                            </div>
+                        )}
+
                         {result.message && (
                             <div className={`p-4 rounded-lg text-center font-medium ${result.status === 'WON' ? 'bg-emerald-100 text-emerald-800' :
                                 result.status === 'LOST' ? 'bg-red-100 text-red-800' :
