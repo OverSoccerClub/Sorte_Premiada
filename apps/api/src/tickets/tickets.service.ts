@@ -159,7 +159,7 @@ export class TicketsService {
         }
 
         try {
-            const createData = {
+            const createData: any = {
                 userId: data.user.connect.id,
                 gameType: data.gameType,
                 numbers: data.numbers,
