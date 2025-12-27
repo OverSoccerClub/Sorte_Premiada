@@ -81,7 +81,8 @@ export const UpdaterService = {
 
             if (!dir) {
                 // Critical native module failure
-                console.error("FileSystem constants are null", { cache: FileSystem.cacheDirectory, doc: FileSystem.documentDirectory });
+                console.error("FileSystem constants are null. Keys available:", Object.keys(FileSystem));
+                console.error("Values:", { cache: FileSystem.cacheDirectory, doc: FileSystem.documentDirectory });
                 throw new Error(`Erro Crítico: Armazenamento não disponível (FS=Null).`);
             }
 
