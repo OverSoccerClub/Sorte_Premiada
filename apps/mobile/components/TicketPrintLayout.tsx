@@ -191,8 +191,8 @@ export const TicketPrintLayout = ({
                 </View>
 
                 {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
-                {/* QR Code Centered and Large */}
-                <View style={tw`items-center justify-center w-full mt-2`}>
+                {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
+                <View style={[tw`items-center justify-center w-full mt-2`, fixPrinterStretch ? { transform: [{ scaleY: 0.50 }] } : {}]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
                     </View>
