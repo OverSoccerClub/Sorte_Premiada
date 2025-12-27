@@ -35,6 +35,7 @@ export default function Game2x500Screen() {
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
     const [isLoadingSold, setIsLoadingSold] = useState(false);
     const [drawSeries, setDrawSeries] = useState<number | undefined>(undefined);
+    const [isRestrictedMode, setIsRestrictedMode] = useState(false);
 
     // Selection State
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -81,6 +82,9 @@ export default function Game2x500Screen() {
                 if (game) {
                     setGameId(game.id);
                     setGameName(game.name);
+                    if (game.rules?.restrictedMode) {
+                        setIsRestrictedMode(true);
+                    }
                     if (game.price) setGamePrice(Number(game.price));
 
                     // Buscar o sorteio ativo para pegar a série
@@ -227,9 +231,44 @@ export default function Game2x500Screen() {
                 setModalVisible(true);
             }
         } else {
-            if (selectedNumbers.length !== 4) {
-                showAlert("Incompleto", "Selecione 4 milhares ou use a Surpresinha.", "warning");
-                return;
+            // Validation Logic
+            if (isRestrictedMode) {
+                // In restricted mode, we allow 1 (auto-complete) OR 4 (full manual)
+                if (selectedNumbers.length === 1) {
+                    // +3 Auto Logic: Generating 3 random numbers to complete the bet
+                    const available = [];
+                    for (let i = 0; i < 10000; i++) {
+                        if (!soldNumbers.has(i) && !selectedNumbers.includes(i)) {
+                            available.push(i);
+                        }
+                    }
+
+                    if (available.length < 3) {
+                        showAlert("Esgotado", "Não há números suficientes para completar a aposta.", "error");
+                        return;
+                    }
+
+                    const newNumbers = [...selectedNumbers];
+                    // Pick 3 random
+                    for (let k = 0; k < 3; k++) {
+                        const randomIndex = Math.floor(Math.random() * available.length);
+                        const num = available[randomIndex];
+                        newNumbers.push(num);
+                        available.splice(randomIndex, 1); // remove to avoid dupe
+                    }
+
+                    setSelectedNumbers(newNumbers);
+
+                } else if (selectedNumbers.length !== 4) {
+                    showAlert("Incompleto", "No modo restrito, selecione 1 número (para completar) ou 4 números.", "warning");
+                    return;
+                }
+            } else {
+                // Strict mode
+                if (selectedNumbers.length !== 4) {
+                    showAlert("Incompleto", "Selecione 4 milhares ou use a Surpresinha.", "warning");
+                    return;
+                }
             }
             setModalVisible(true);
         }
@@ -641,6 +680,11 @@ export default function Game2x500Screen() {
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
                                         <Text style={tw`text-white font-bold text-xs uppercase`}>Surpresinha</Text>
+                                    </View>
+                                )}
+                                {isRestrictedMode && selectedNumbers.length === 1 && (
+                                    <View style={tw`absolute -top-3 -right-2 bg-blue-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
+                                        <Text style={tw`text-white font-bold text-xs uppercase`}>+3 Auto</Text>
                                     </View>
                                 )}
                             </View>

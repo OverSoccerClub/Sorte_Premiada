@@ -16,7 +16,9 @@ interface TicketPrintLayoutProps {
     vendorName?: string;
     drawDate?: string;
     hash?: string;
+
     series?: number; // New prop
+    fixPrinterStretch?: boolean; // New prop for conditional scaling
 }
 
 // Helper para converter números em texto (simplificado para 0-99 para o layout)
@@ -43,7 +45,8 @@ export const TicketPrintLayout = ({
     vendorName = "Vendedor", // Default
     drawDate,
     hash,
-    series
+    series,
+    fixPrinterStretch = false // Default to false (normal aspect ratio)
 }: TicketPrintLayoutProps) => {
 
     // Ordenar números
@@ -53,7 +56,8 @@ export const TicketPrintLayout = ({
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
         // Adjusted scaleY to 0.85. To make QR square, we need to inverse scale Y for it (~1.18).
         // User reported it's stretched VERTICALLY. So we remove the 1.18 inverse to let it be squashed (0.85) to counteract printer stretch.
-        <View style={[tw`bg-white w-[384px] p-1`, { transform: [{ scaleY: 0.85 }] }]}>
+        // NOW: Only apply this if fixPrinterStretch is true!
+        <View style={[tw`bg-white w-[384px] p-1`, fixPrinterStretch ? { transform: [{ scaleY: 0.85 }] } : {}]}>
             {/* Header - Logo Simulada - CLOVER ICON & WIDER */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
@@ -97,7 +101,11 @@ export const TicketPrintLayout = ({
                                         ))}
                                     </View>
                                 ) : (
-                                    <View style={tw`h-12`} /> // Spacer
+                                    <View style={tw`flex-row justify-center w-full px-4 items-center`}>
+                                        <Text style={[tw`text-4xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>
+                                            AUTO
+                                        </Text>
+                                    </View>
                                 )}
                             </View>
                         );
@@ -183,7 +191,7 @@ export const TicketPrintLayout = ({
 
                 {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
                 {/* ScaleY 0.70 to counteract strong printer stretch */}
-                <View style={[tw`items-center justify-center w-full mt-2`, { transform: [{ scaleY: 0.70 }] }]}>
+                <View style={[tw`items-center justify-center w-full mt-2`, fixPrinterStretch ? { transform: [{ scaleY: 0.70 }] } : {}]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
                     </View>

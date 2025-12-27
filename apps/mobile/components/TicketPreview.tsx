@@ -33,6 +33,7 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                 hash={hash}
                 vendorName={vendorName}
                 series={series}
+                fixPrinterStretch={true} // Apply stretch fix for printing
             />
         );
     }
@@ -41,7 +42,8 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
     return (
         <View style={tw`bg-gray-100 items-center justify-center p-1 rounded-xl`}>
             {/* Wrapper to simulate paper background - Scaled up for better visibility */}
-            <View style={[tw`overflow-hidden bg-white shadow-lg`, { width: 384, transform: [{ scale: 0.85 }], marginVertical: -50 }]}>
+            {/* Removed marginVertical: -50 and adjusted scale to 0.80 for better fit without overlap */}
+            <View style={[tw`overflow-hidden bg-white shadow-lg`, { width: 384, transform: [{ scale: 0.80 }] }]}>
                 <TicketPrintLayout
                     gameName={gameName}
                     numbers={numbers}
@@ -52,6 +54,7 @@ export function TicketPreview({ gameName, numbers, price, date = new Date().toLo
                     hash={hash}
                     vendorName={vendorName}
                     series={series}
+                    fixPrinterStretch={false} // Normal aspect ratio for screen
                 />
             </View>
         </View>

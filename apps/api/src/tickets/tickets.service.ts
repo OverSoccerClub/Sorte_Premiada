@@ -51,7 +51,7 @@ export class TicketsService {
         // Applies primarily to "2x1000" or maybe "JB-MILHAR" if requested. 
         // User request mentions: "usuario escolhe a 1a milhar... o sistema escolhe as outras 3... padrao de sequencia terminologia 578"
 
-        if (rules.restrictedMode && data.numbers && data.numbers.length === 1 && (data.gameType === '2x1000' || data.gameType.includes('MILHAR'))) {
+        if (rules.restrictedMode && data.numbers && data.numbers.length === 1 && (data.gameType === '2x1000' || data.gameType === '2x500' || data.gameType.includes('MILHAR'))) {
             const firstNum = data.numbers[0];
             const suffix = firstNum % 1000; // Get last 3 digits (000-999)
 
