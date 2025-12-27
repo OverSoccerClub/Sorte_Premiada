@@ -178,4 +178,53 @@ export class DrawsService {
     async remove(id: string) {
         return this.prisma.draw.delete({ where: { id } });
     }
+    async getDrawDetails(id: string) {
+        const draw = await this.prisma.draw.findUnique({
+            where: { id },
+            include: { game: true }
+        });
+
+        if (!draw) return null;
+
+        // Find tickets for this draw
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                gameId: draw.gameId,
+                drawDate: draw.drawDate
+            },
+            include: {
+                user: {
+                    include: {
+                        area: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // Calculate stats
+        const totalSales = tickets.reduce((sum, t) => sum + Number(t.amount), 0);
+        const totalPrizes = tickets.filter(t => t.status === 'WON').reduce((sum, t) => {
+            // Assuming prize calculation logic is elsewhere or we should strictly look at paid prizes?
+            // Since we don't store prize amount on ticket yet (only status), we might need to estimate or 
+            // if 'amount' is the bet amount.
+            // Wait, standard lottery: Prize is defined by Game Rules * Bet Amount or Fixed per winner?
+            // The current system seems to lack "Prize Amount" field on Ticket model (it has 'amount' which is bet cost).
+            // Let's check schema again. Ticket has 'amount' (Decimal). No 'prizeAmount'.
+            // However, the User Request says "qual valor do premio". 
+            // For now, let's just return the tickets list and the frontend can infer or we just explicitly return empty prize if not stored.
+            // actually, let's just list the tickets.
+            return sum;
+        }, 0);
+
+        return {
+            draw,
+            tickets,
+            stats: {
+                totalSales,
+                ticketCount: tickets.length,
+                winningCount: tickets.filter(t => t.status === 'WON').length
+            }
+        };
+    }
 }

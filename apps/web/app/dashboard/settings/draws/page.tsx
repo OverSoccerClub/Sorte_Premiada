@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen } from "lucide-react"
+import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen, Eye } from "lucide-react"
 
 export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -21,6 +21,31 @@ export default function DrawsSettingsPage() {
     const [loading, setLoading] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [selectedDraw, setSelectedDraw] = useState<any | null>(null)
+
+    // Details Modal State
+    const [detailModalOpen, setDetailModalOpen] = useState(false)
+    const [drawDetails, setDrawDetails] = useState<any>(null)
+
+    const handleOpenDetails = async (drawId: string) => {
+        setDetailModalOpen(true)
+        setDrawDetails(null)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/draws/${drawId}/details`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setDrawDetails(data)
+            } else {
+                toast.error("Erro ao carregar detalhes")
+                setDetailModalOpen(false)
+            }
+        } catch (error) {
+            toast.error("Erro de conexão")
+            setDetailModalOpen(false)
+        }
+    }
 
     // Form State
     const [drawDate, setDrawDate] = useState("")
@@ -241,6 +266,9 @@ export default function DrawsSettingsPage() {
                                                 }
                                             </TableCell>
                                             <TableCell className="text-right flex justify-end gap-2">
+                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => handleOpenDetails(draw.id)} title="Ver Detalhes">
+                                                    <Eye className="w-4 h-4" />
+                                                </Button>
                                                 <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => handleOpenModal(draw)}>
                                                     <SquarePen className="w-4 h-4" />
                                                 </Button>
@@ -288,6 +316,107 @@ export default function DrawsSettingsPage() {
                             Salvar Sorteio
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Detalhes do Sorteio</DialogTitle>
+                        <CardDescription>
+                            {drawDetails?.draw?.game?.name} - {drawDetails?.draw?.series ? `#${drawDetails.draw.series}` : ''} - {drawDetails?.draw?.drawDate && new Date(drawDetails.draw.drawDate).toLocaleString('pt-BR')}
+                        </CardDescription>
+                    </DialogHeader>
+
+                    {drawDetails && (
+                        <div className="space-y-6">
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <Card className="bg-emerald-500/10 border-emerald-500/20">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm font-medium text-emerald-600">Total Arrecadado</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(drawDetails.stats.totalSales)}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">{drawDetails.stats.ticketCount} apostas</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="bg-yellow-500/10 border-yellow-500/20">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm font-medium text-yellow-600">Bilhetes Premiados</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {drawDetails.stats.winningCount}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">Vencedores</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="bg-slate-500/10 border-slate-500/20">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm font-medium text-slate-600">Números Sorteados</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-lg font-mono font-bold tracking-widest">
+                                            {drawDetails.draw.numbers && drawDetails.draw.numbers.length > 0 ? (drawDetails.draw.numbers as number[]).join(' - ') : 'Não realizado'}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Tickets List */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3">Bilhetes Participantes</h3>
+                                <div className="border rounded-md">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Bilhete / Hash</TableHead>
+                                                <TableHead>Cambista / Área</TableHead>
+                                                <TableHead>Números</TableHead>
+                                                <TableHead>Valor</TableHead>
+                                                <TableHead>Status</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {drawDetails.tickets.map((t: any) => (
+                                                <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : ''}>
+                                                    <TableCell className="font-mono text-xs">
+                                                        <div className="font-bold">{t.id.slice(0, 8)}...</div>
+                                                        <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="font-medium text-sm">{t.user?.name || t.user?.username}</div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {t.user?.area?.name ? `${t.user.area.city}/${t.user.area.state}` : 'Sem Área'}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="font-mono text-xs max-w-[150px] break-words">
+                                                        {t.numbers.join(', ')}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={t.status === 'WON' ? 'default' : t.status === 'PENDING' ? 'outline' : 'secondary'} className={t.status === 'WON' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}>
+                                                            {t.status === 'WON' ? 'PREMIADO' : t.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                            {drawDetails.tickets.length === 0 && (
+                                                <TableRow>
+                                                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">Nenhum bilhete encontrado para este sorteio.</TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

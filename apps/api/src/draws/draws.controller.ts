@@ -31,6 +31,13 @@ export class DrawsController {
         return this.drawsService.findOne(id);
     }
 
+    @Get(':id/details')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    getDetails(@Param('id') id: string) {
+        return this.drawsService.getDrawDetails(id);
+    }
+
     @Patch(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
