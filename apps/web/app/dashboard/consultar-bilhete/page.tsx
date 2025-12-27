@@ -140,7 +140,7 @@ export default function ConsultarBilhetePage() {
                                 <span className="text-muted-foreground block mb-1">Data do Sorteio</span>
                                 <span className="font-medium">
                                     {result.ticket.drawDate
-                                        ? format(new Date(result.ticket.drawDate), "dd/MM/yyyy HH:mm")
+                                        ? format(new Date(result.ticket.drawDate), "dd/MM/yyyy 'às' hh:mm:ss a")
                                         : "Não definido"}
                                 </span>
                             </div>
@@ -166,9 +166,9 @@ export default function ConsultarBilhetePage() {
                                 {(result.ticket.numbers || []).sort((a: number, b: number) => a - b).map((num: number, idx: number) => (
                                     <div
                                         key={idx}
-                                        className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold shadow-sm"
+                                        className="h-10 px-3 rounded-md bg-slate-900 text-white flex items-center justify-center font-bold shadow-sm font-mono text-base"
                                     >
-                                        {num.toString().padStart(2, '0')}
+                                        {num.toString().padStart(4, '0')}
                                     </div>
                                 ))}
                             </div>
