@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Search, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle } from "lucide-react"
+import { Loader2, Calendar, Search, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, ArrowUpDown } from "lucide-react"
 
 export default function TwoXOneThousandReportPage() {
     const [tickets, setTickets] = useState<any[]>([])
@@ -20,6 +20,12 @@ export default function TwoXOneThousandReportPage() {
     const [cambistas, setCambistas] = useState<any[]>([])
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
     const [totals, setTotals] = useState({ count: 0, amount: 0 })
+
+    // Sort configuration state
+    const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({
+        key: 'createdAt',
+        direction: 'desc'
+    })
 
     useEffect(() => {
         const init = async () => {
@@ -72,9 +78,6 @@ export default function TwoXOneThousandReportPage() {
                     data = data.filter((t: any) => t.userId === selectedCambista)
                 }
 
-                // Sort by createdAt descending (newest first)
-                data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
                 setTickets(data)
 
                 const totalAmount = data.reduce((acc: number, t: any) => acc + Number(t.amount), 0)
@@ -94,6 +97,37 @@ export default function TwoXOneThousandReportPage() {
         if (!gameId) return
         fetchTickets()
     }, [gameId, startDate, endDate, selectedCambista])
+
+    const handleSort = (key: string) => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+        }))
+    }
+
+    const sortedTickets = useMemo(() => {
+        const sorted = [...tickets]
+        sorted.sort((a, b) => {
+            let aValue = a[sortConfig.key]
+            let bValue = b[sortConfig.key]
+
+            if (sortConfig.key === 'user') {
+                aValue = a.user?.name || a.user?.username || ''
+                bValue = b.user?.name || b.user?.username || ''
+            } else if (sortConfig.key === 'amount') {
+                aValue = Number(a.amount)
+                bValue = Number(b.amount)
+            } else if (sortConfig.key === 'createdAt') {
+                aValue = new Date(a.createdAt).getTime()
+                bValue = new Date(b.createdAt).getTime()
+            }
+
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+            return 0
+        })
+        return sorted
+    }, [tickets, sortConfig])
 
     return (
         <div className="space-y-6">
@@ -194,10 +228,11 @@ export default function TwoXOneThousandReportPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>
+                                    <TableHead className="cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('createdAt')}>
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-4 h-4" />
                                             Data/Hora
+                                            <ArrowUpDown className="w-3 h-3 ml-1 opacity-50" />
                                         </div>
                                     </TableHead>
                                     <TableHead>
@@ -212,10 +247,11 @@ export default function TwoXOneThousandReportPage() {
                                             Extração
                                         </div>
                                     </TableHead>
-                                    <TableHead>
+                                    <TableHead className="cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('user')}>
                                         <div className="flex items-center gap-2">
                                             <User className="w-4 h-4" />
                                             Cambista
+                                            <ArrowUpDown className="w-3 h-3 ml-1 opacity-50" />
                                         </div>
                                     </TableHead>
                                     <TableHead>
@@ -224,10 +260,11 @@ export default function TwoXOneThousandReportPage() {
                                             Números
                                         </div>
                                     </TableHead>
-                                    <TableHead className="text-right">
+                                    <TableHead className="text-right cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('amount')}>
                                         <div className="flex items-center justify-end gap-2">
                                             <Banknote className="w-4 h-4" />
                                             Valor
+                                            <ArrowUpDown className="w-3 h-3 ml-1 opacity-50" />
                                         </div>
                                     </TableHead>
                                     <TableHead>
@@ -245,14 +282,14 @@ export default function TwoXOneThousandReportPage() {
                                             <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                         </TableCell>
                                     </TableRow>
-                                ) : tickets.length === 0 ? (
+                                ) : sortedTickets.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                                             Nenhuma venda encontrada para este período.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    tickets.map((ticket) => (
+                                    sortedTickets.map((ticket) => (
                                         <TableRow key={ticket.id}>
                                             <TableCell>
                                                 <div className="flex items-center gap-2 text-muted-foreground">
