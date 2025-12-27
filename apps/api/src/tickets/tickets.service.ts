@@ -234,42 +234,39 @@ export class TicketsService {
             ? game.extractionTimes
             : ['12:00', '19:00']; // default fallback
 
-        // Helper to parse time string "HH:MM"
-        const parseTime = (timeStr: string, baseDate: Date) => {
+        // Helper to create a UTC date corresponding to Brazil Time (UTC-3)
+        // input: timeStr "HH:MM", baseDate (Date object representing the day in Brazil)
+        const createBrazilDrawDate = (timeStr: string, baseBrazilDate: Date) => {
             const [hours, minutes] = timeStr.split(':').map(Number);
-            const date = new Date(baseDate);
-            date.setHours(hours, minutes, 0, 0);
-            return date;
+            // We construct the UTC date by adding 3 hours to the Brazil local time
+            // Example: 08:15 Brazil = 11:15 UTC
+            // getUTCFullYear/Month/Date on baseBrazilDate gives us the YMD of Brazil
+            return new Date(Date.UTC(
+                baseBrazilDate.getUTCFullYear(),
+                baseBrazilDate.getUTCMonth(),
+                baseBrazilDate.getUTCDate(),
+                hours + 3, // Add 3 hours to get UTC
+                minutes,
+                0,
+                0
+            ));
         };
 
-        const now = new Date();
+        const now = new Date(); // Current system time (UTC)
         const CUTOFF_MINUTES = 10;
 
-        // Sort times to ensure we check in order
+        // Calculate "Now" in Brazil (UTC-3) to identify the current calendar day in Brazil
+        const brazilNow = new Date(now.getTime() - 3 * 3600000);
+
+        // Sort times
         extractionTimes.sort();
 
-        // Check for today's draws
+        // Check for today's draws (relative to Brazil Day)
         for (const timeStr of extractionTimes) {
-            const drawDate = parseTime(timeStr, now);
+            const drawDate = createBrazilDrawDate(timeStr, brazilNow);
 
-            // Calculate cutoff time: Draw Time - 10 minutes
-            // Example: Draw is 08:00. Cutoff is 07:50.
-            // If now is 07:50:59, it is <= 07:50:00? No.
-            // Requirement: "ate as 07:50hs da manha concorrem... as 8hs"
-            // So if now is 07:50:59, it works? User said "apartir das 07:51hs todos passarão a concorrer para o sorteio das 11hs"
-            // So strictly: NOW < 07:51:00.
-            // 07:50:59 < 07:51:00 => True (Concorrem as 8hs)
-            // 07:51:00 < 07:51:00 => False (Concorrem as 11hs)
-
-            // DrawDate (08:00) - 10 minutes = 07:50.
-            // We need the cutoff to be exactly at the minute start of the "next interval".
-            // Actually, simply: Limit Time = DrawDate - 9 minutes (07:51)
-            // Wait, logic: "ate as 07:50" means 07:50:59 is OK.
-            // So Ticket Time <= 07:50:59.
-            // Which is Ticket Time < 07:51:00.
-            // 08:00 minus 9 minutes = 07:51.
-            // So if Now < 07:51:00, use 08:00.
-
+            // Cutoff logic: Draw Time - 9 minutes (effectively)
+            // Using strict timestamps for comparison
             const cutoffDate = new Date(drawDate.getTime() - (CUTOFF_MINUTES - 1) * 60000);
 
             if (now < cutoffDate) {
@@ -277,10 +274,11 @@ export class TicketsService {
             }
         }
 
-        // If no slot found today, return first slot of tomorrow
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return parseTime(extractionTimes[0], tomorrow);
+        // If no slot found today, return first slot of tomorrow (Brazil Day + 1)
+        const tomorrowBrazil = new Date(brazilNow);
+        tomorrowBrazil.setUTCDate(tomorrowBrazil.getUTCDate() + 1);
+
+        return createBrazilDrawDate(extractionTimes[0], tomorrowBrazil);
     }
 
     private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date) {
