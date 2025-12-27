@@ -1,4 +1,3 @@
-```typescript
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@repo/database';
@@ -25,7 +24,7 @@ export class TicketsService {
 
         const gameId = data.game?.connect?.id;
         if (!gameId) {
-             throw new Error("Game ID is required to process rules");
+            throw new Error("Game ID is required to process rules");
         }
 
         // Fetch Game & Rules
@@ -44,47 +43,47 @@ export class TicketsService {
             // 2x500 and 2x1000 use extraction times.
             drawDate = await this.getNextDrawDate(gameId);
         } catch (e) {
-            console.warn(`[TicketsService] Could not calculate next draw date: ${ e } `);
+            console.warn(`[TicketsService] Could not calculate next draw date: ${e} `);
         }
 
         // --- BUSINESS RULE 2: RESTRICTED MODE (Auto-Sequence) ---
         // If enabled, and user sent exactly 1 number (Milhar), fill the rest.
         // Applies primarily to "2x1000" or maybe "JB-MILHAR" if requested. 
         // User request mentions: "usuario escolhe a 1a milhar... o sistema escolhe as outras 3... padrao de sequencia terminologia 578"
-        
+
         if (rules.restrictedMode && data.numbers && data.numbers.length === 1 && (data.gameType === '2x1000' || data.gameType.includes('MILHAR'))) {
-             const firstNum = data.numbers[0];
-             const suffix = firstNum % 1000; // Get last 3 digits (000-999)
-             
-             // Generate 3 other numbers with same suffix from 0000-9999
-             // Logic: Find all matches, remove used, pick 3 random.
-             const possible: number[] = [];
-             for(let i=0; i<=9; i++) {
-                 const candidate = i * 1000 + suffix;
-                 if (candidate !== firstNum) {
-                     possible.push(candidate);
-                 }
-             }
-             
-             // Shuffle and take 3
-             const others = possible.sort(() => 0.5 - Math.random()).slice(0, 3);
-             data.numbers = [firstNum, ...others].sort((a,b) => a-b);
-             
-             console.log(`[TicketsService] restrictedMode applied.Seed: ${ firstNum } -> Result: ${ data.numbers.join(', ') } `);
+            const firstNum = data.numbers[0];
+            const suffix = firstNum % 1000; // Get last 3 digits (000-999)
+
+            // Generate 3 other numbers with same suffix from 0000-9999
+            // Logic: Find all matches, remove used, pick 3 random.
+            const possible: number[] = [];
+            for (let i = 0; i <= 9; i++) {
+                const candidate = i * 1000 + suffix;
+                if (candidate !== firstNum) {
+                    possible.push(candidate);
+                }
+            }
+
+            // Shuffle and take 3
+            const others = possible.sort(() => 0.5 - Math.random()).slice(0, 3);
+            data.numbers = [firstNum, ...others].sort((a, b) => a - b);
+
+            console.log(`[TicketsService] restrictedMode applied.Seed: ${firstNum} -> Result: ${data.numbers.join(', ')} `);
         }
 
         // --- BUSINESS RULE 1: GLOBAL UNIQUENESS ---
         // If enabled, NO one else can have bought these numbers for this draw.
         // This is stricter than `validateNumbersAvailability` which usually checks availability for specific Raffle games.
         // This applies generally if checks are enabled.
-        
+
         if (rules.globalCheck && drawDate && data.numbers && data.numbers.length > 0) {
             // Check if ANY of these numbers are already sold for this Game/Draw
             const soldSet = await this.getSoldNumbers(gameId, drawDate);
             const conflicts = data.numbers.filter((n: number) => soldSet.has(n));
-            
+
             if (conflicts.length > 0) {
-                 throw new BadRequestException(`Números indisponíveis(Bloqueio Global): ${ conflicts.join(', ') } `);
+                throw new BadRequestException(`Números indisponíveis(Bloqueio Global): ${conflicts.join(', ')} `);
             }
         }
 
@@ -92,7 +91,7 @@ export class TicketsService {
 
         // 2x1000 Special Logic
         if (data.gameType === '2x1000') {
-             // Enforce 4 numbers per ticket
+            // Enforce 4 numbers per ticket
             const NUMBERS_PER_TICKET = 4;
             const isAutoPick = !data.numbers || data.numbers.length === 0;
 
@@ -102,12 +101,12 @@ export class TicketsService {
                 data.numbers = await this.generateRandomAvailableNumbers(gameId, NUMBERS_PER_TICKET, drawDate!);
             } else {
                 if (data.numbers.length !== NUMBERS_PER_TICKET) {
-                    throw new Error(`Ticket must have exactly ${ NUMBERS_PER_TICKET } thousands.`);
+                    throw new Error(`Ticket must have exactly ${NUMBERS_PER_TICKET} thousands.`);
                 }
                 // If globalCheck was NOT enabled, 2x1000 inherently checks availability anyway.
                 // But avoiding double checking if we just did it above.
                 if (!rules.globalCheck) {
-                     await this.validateNumbersAvailability(gameId, data.numbers, drawDate!);
+                    await this.validateNumbersAvailability(gameId, data.numbers, drawDate!);
                 }
             }
         }
@@ -124,26 +123,26 @@ export class TicketsService {
             switch (modality) {
                 case 'GRUPO': // 1-25
                     numbers.forEach(n => {
-                        if (n < 1 || n > 25) throw new BadRequestException(`Grupo inválido: ${ n }. Deve ser entre 1 e 25.`);
+                        if (n < 1 || n > 25) throw new BadRequestException(`Grupo inválido: ${n}. Deve ser entre 1 e 25.`);
                     });
                     break;
                 case 'DEZENA': // 00-99
                     numbers.forEach(n => {
-                        if (n < 0 || n > 99) throw new BadRequestException(`Dezena inválida: ${ n }. Deve ser entre 00 e 99.`);
+                        if (n < 0 || n > 99) throw new BadRequestException(`Dezena inválida: ${n}. Deve ser entre 00 e 99.`);
                     });
                     break;
                 case 'CENTENA': // 000-999
                     numbers.forEach(n => {
-                        if (n < 0 || n > 999) throw new BadRequestException(`Centena inválida: ${ n }. Deve ser entre 000 e 999.`);
+                        if (n < 0 || n > 999) throw new BadRequestException(`Centena inválida: ${n}. Deve ser entre 000 e 999.`);
                     });
                     break;
                 case 'MILHAR': // 0000-9999
                     numbers.forEach(n => {
-                        if (n < 0 || n > 9999) throw new BadRequestException(`Milhar inválida: ${ n }. Deve ser entre 0000 e 9999.`);
+                        if (n < 0 || n > 9999) throw new BadRequestException(`Milhar inválida: ${n}. Deve ser entre 0000 e 9999.`);
                     });
                     break;
                 default:
-                    throw new BadRequestException(`Modalidade inválida: ${ modality } `);
+                    throw new BadRequestException(`Modalidade inválida: ${modality} `);
             }
         }
         // Fallback validation for other games (existing logic)
@@ -153,10 +152,10 @@ export class TicketsService {
 
         // FIX: Ensure drawDate is calculated for ALL game types if not already set
         if (!drawDate) {
-             // Redundant with top calc, but safe
-             try {
+            // Redundant with top calc, but safe
+            try {
                 drawDate = await this.getNextDrawDate(gameId);
-             } catch {}
+            } catch { }
         }
 
         try {
@@ -166,7 +165,7 @@ export class TicketsService {
                 numbers: data.numbers,
                 amount: data.amount,
                 status: data.status || 'PENDING',
-                drawDate: drawDate, 
+                drawDate: drawDate,
                 hash: this.generateTicketCode(8),
                 gameId: gameId,
             };
@@ -260,7 +259,7 @@ export class TicketsService {
         const soldNumbers = await this.getSoldNumbers(gameId, drawDate);
         const alreadySold = numbers.filter(n => soldNumbers.has(n));
         if (alreadySold.length > 0) {
-            throw new Error(`Numbers already sold for draw ${ drawDate.toLocaleString() }: ${ alreadySold.join(', ') } `);
+            throw new Error(`Numbers already sold for draw ${drawDate.toLocaleString()}: ${alreadySold.join(', ')} `);
         }
     }
 
@@ -275,7 +274,7 @@ export class TicketsService {
         }
 
         if (available.length < quantity) {
-            throw new Error(`Not enough available numbers.Only ${ available.length } left.`);
+            throw new Error(`Not enough available numbers.Only ${available.length} left.`);
         }
 
         const selected: number[] = [];
@@ -411,7 +410,7 @@ export class TicketsService {
         if (!isPastDraw) {
             return {
                 status: 'PENDING',
-                message: `Sorteio agendado para ${ drawDate.toLocaleString() } `,
+                message: `Sorteio agendado para ${drawDate.toLocaleString()} `,
                 ticket
             };
         }
