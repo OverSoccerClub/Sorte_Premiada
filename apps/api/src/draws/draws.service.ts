@@ -187,10 +187,21 @@ export class DrawsService {
         if (!draw) return null;
 
         // Find tickets for this draw
+        // Calculate timezone offsets to handle legacy data mismatch
+        // Bug: Some tickets might have been saved as UTC-3 (server time) while Draw is UTC (or vice versa), resulting in exactly 3h difference.
+        const exactDate = draw.drawDate;
+        const minus3h = new Date(exactDate.getTime() - 3 * 60 * 60 * 1000);
+        const plus3h = new Date(exactDate.getTime() + 3 * 60 * 60 * 1000);
+
+        // Find tickets for this draw with tolerance for timezone bug
         const tickets = await this.prisma.ticket.findMany({
             where: {
                 gameId: draw.gameId,
-                drawDate: draw.drawDate
+                OR: [
+                    { drawDate: exactDate },
+                    { drawDate: minus3h },
+                    { drawDate: plus3h }
+                ]
             },
             include: {
                 user: {
