@@ -72,6 +72,9 @@ export default function TwoXOneThousandReportPage() {
                     data = data.filter((t: any) => t.userId === selectedCambista)
                 }
 
+                // Sort by createdAt descending (newest first)
+                data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
                 setTickets(data)
 
                 const totalAmount = data.reduce((acc: number, t: any) => acc + Number(t.amount), 0)
@@ -191,13 +194,48 @@ export default function TwoXOneThousandReportPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Hora</TableHead>
-                                    <TableHead>Código</TableHead>
-                                    <TableHead>Extração</TableHead>
-                                    <TableHead>Cambista</TableHead>
-                                    <TableHead>Números</TableHead>
-                                    <TableHead className="text-right">Valor</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="w-4 h-4" />
+                                            Data/Hora
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <Hash className="w-4 h-4" />
+                                            Código
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4" />
+                                            Extração
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <User className="w-4 h-4" />
+                                            Cambista
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <Ticket className="w-4 h-4" />
+                                            Números
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <Banknote className="w-4 h-4" />
+                                            Valor
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle className="w-4 h-4" />
+                                            Status
+                                        </div>
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -219,7 +257,12 @@ export default function TwoXOneThousandReportPage() {
                                             <TableCell>
                                                 <div className="flex items-center gap-2 text-muted-foreground">
                                                     <Clock className="w-4 h-4" />
-                                                    {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                    {new Date(ticket.createdAt).toLocaleString('pt-BR', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
                                                 </div>
                                             </TableCell>
                                             <TableCell>
