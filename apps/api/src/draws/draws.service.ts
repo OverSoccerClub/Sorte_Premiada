@@ -97,57 +97,48 @@ export class DrawsService {
         });
     }
 
-    // Helper to process results
     private async processDrawResults(tx: Prisma.TransactionClient, draw: any) {
         if (!draw.numbers || draw.numbers.length === 0) return;
 
         // Find all PENDING tickets for this game and draw date
+        // Also include already processed ones if we are re-processing via Update? 
+        // Ideally yes, but for now let's focus on PENDING to avoid re-crediting or confusing states.
+        // However, if we edited the draw, we might need to re-evaluate EVERYONE?
+        // Risky. Let's stick to PENDING for first pass or if explicitly requested.
+        // But if I put wrong numbers and fix them, I want to fix the tickets. 
+        // Let's allow checking non-cancelled tickets.
         const tickets = await tx.ticket.findMany({
             where: {
                 gameId: draw.gameId,
                 drawDate: draw.drawDate,
-                status: 'PENDING'
+                status: { not: 'CANCELLED' }
             }
         });
 
         const drawNumbers = new Set(draw.numbers as number[]);
-        const drawNumbersArray = (draw.numbers as number[]).sort((a, b) => a - b).join(',');
 
         let wonCount = 0;
-        let expiredCount = 0;
+        let lostCount = 0;
 
         for (const ticket of tickets) {
             const ticketNumbers = (ticket.numbers as number[]);
 
-            // Check matching logic.
-            // Assuming "Match All" for now as generic rule, or specific game rules?
-            // User did not specify game rules, just "se nao for premiado... expirado".
-            // Implementation: Exact Match of the set.
-            // Note: 2x500/Raffle usually is exact ticket match.
-            // Game 'JB' might be different, but tickets Service logic implies 'JB' validation was separate.
-            // Standard generic logic: Exact Match.
+            // "Match Any" Logic
+            const hasMatch = ticketNumbers.some(n => drawNumbers.has(n));
+            const newStatus = hasMatch ? 'WON' : 'LOST';
 
-            const ticketNumbersArray = ticketNumbers.sort((a, b) => a - b).join(',');
-            const isWinner = ticketNumbersArray === drawNumbersArray;
-
-            // TODO: If we need partial matches (Quina, Quadra), we need Game Rules.
-            // Assuming Exact Match for "Sorteio" as implies Raffle/Lottery Ticket unique ID or sequence.
-
-            if (isWinner) {
+            // Only update if status changed to avoid redundant DB writes
+            if (ticket.status !== newStatus) {
                 await tx.ticket.update({
                     where: { id: ticket.id },
-                    data: { status: 'WON' }
+                    data: { status: newStatus }
                 });
-                wonCount++;
-            } else {
-                await tx.ticket.update({
-                    where: { id: ticket.id },
-                    data: { status: 'EXPIRED' }
-                });
-                expiredCount++;
+
+                if (newStatus === 'WON') wonCount++;
+                else lostCount++;
             }
         }
-        console.log(`[ProcessResults] Draw ${draw.id}: ${wonCount} Won, ${expiredCount} Expired.`);
+        console.log(`[ProcessResults] Draw ${draw.id} Re-calculed: ${wonCount} Won, ${lostCount} Lost.`);
     }
 
     async findAll() {
@@ -169,10 +160,21 @@ export class DrawsService {
     }
 
     async update(id: string, data: Prisma.DrawUpdateInput) {
-        return this.prisma.draw.update({
+        const updatedDraw = await this.prisma.draw.update({
             where: { id },
             data,
         });
+
+        // Trigger result processing if numbers are present
+        if (updatedDraw.numbers && (updatedDraw.numbers as number[]).length > 0) {
+            // We need a transaction client if we want to follow the pattern, 
+            // but since we are not in a transaction here, we pass the main prisma service.
+            // processDrawResults expects Prisma.TransactionClient, which PrismaService satisfies compatible interface wise usually 
+            // but strict typing might complain. Let's cast or adjust.
+            await this.processDrawResults(this.prisma, updatedDraw);
+        }
+
+        return updatedDraw;
     }
 
     async remove(id: string) {

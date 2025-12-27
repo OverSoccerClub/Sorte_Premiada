@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen, Eye } from "lucide-react"
+import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -25,10 +25,12 @@ export default function DrawsSettingsPage() {
     // Details Modal State
     const [detailModalOpen, setDetailModalOpen] = useState(false)
     const [drawDetails, setDrawDetails] = useState<any>(null)
+    const [currentPage, setCurrentPage] = useState(1)
 
     const handleOpenDetails = async (drawId: string) => {
         setDetailModalOpen(true)
         setDrawDetails(null)
+        setCurrentPage(1)
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/draws/${drawId}/details`, {
@@ -381,36 +383,75 @@ export default function DrawsSettingsPage() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {drawDetails.tickets.map((t: any) => (
-                                                <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : ''}>
-                                                    <TableCell className="font-mono text-xs">
-                                                        <div className="font-bold">{t.id.slice(0, 8)}...</div>
-                                                        <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="font-medium text-sm">{t.user?.name || t.user?.username}</div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {t.user?.area?.name ? `${t.user.area.city}/${t.user.area.state}` : 'Sem Área'}
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="font-mono text-xs max-w-[150px] break-words">
-                                                        {t.numbers.join(', ')}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={t.status === 'WON' ? 'default' : t.status === 'PENDING' ? 'outline' : 'secondary'} className={t.status === 'WON' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}>
-                                                            {t.status === 'WON' ? 'PREMIADO' : t.status}
-                                                        </Badge>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                            {drawDetails.tickets.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">Nenhum bilhete encontrado para este sorteio.</TableCell>
-                                                </TableRow>
-                                            )}
+                                            {(() => {
+                                                const ITEMS_PER_PAGE = 5;
+                                                const totalPages = Math.ceil(drawDetails.tickets.length / ITEMS_PER_PAGE);
+                                                const paginatedTickets = drawDetails.tickets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+                                                return (
+                                                    <>
+                                                        {paginatedTickets.map((t: any) => (
+                                                            <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : ''}>
+                                                                <TableCell className="font-mono text-xs">
+                                                                    <div className="font-bold">{t.id.slice(0, 8)}...</div>
+                                                                    <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <div className="font-medium text-sm">{t.user?.name || t.user?.username}</div>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        {t.user?.area?.name ? `${t.user.area.city}/${t.user.area.state}` : 'Sem Área'}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="font-mono text-xs max-w-[150px] break-words">
+                                                                    {t.numbers.join(', ')}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Badge variant={t.status === 'WON' ? 'default' : t.status === 'PENDING' ? 'outline' : 'secondary'} className={t.status === 'WON' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}>
+                                                                        {t.status === 'WON' ? 'PREMIADO' : t.status}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                        {drawDetails.tickets.length === 0 && (
+                                                            <TableRow>
+                                                                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">Nenhum bilhete encontrado para este sorteio.</TableCell>
+                                                            </TableRow>
+                                                        )}
+
+                                                        {/* Pagination Controls */}
+                                                        {drawDetails.tickets.length > ITEMS_PER_PAGE && (
+                                                            <TableRow>
+                                                                <TableCell colSpan={5} className="p-2">
+                                                                    <div className="flex items-center justify-between w-full">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                                            disabled={currentPage === 1}
+                                                                        >
+                                                                            <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
+                                                                        </Button>
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            Página {currentPage} de {totalPages}
+                                                                        </span>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                                                            disabled={currentPage === totalPages}
+                                                                        >
+                                                                            Próximo <ChevronRight className="w-4 h-4 ml-1" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )}
+                                                    </>
+                                                )
+                                            })()}
                                         </TableBody>
                                     </Table>
                                 </div>
