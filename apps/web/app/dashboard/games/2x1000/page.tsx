@@ -192,6 +192,8 @@ export default function TwoXOneThousandReportPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Hora</TableHead>
+                                    <TableHead>Código</TableHead>
+                                    <TableHead>Extração</TableHead>
                                     <TableHead>Cambista</TableHead>
                                     <TableHead>Números</TableHead>
                                     <TableHead className="text-right">Valor</TableHead>
@@ -201,13 +203,13 @@ export default function TwoXOneThousandReportPage() {
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">
+                                        <TableCell colSpan={7} className="h-24 text-center">
                                             <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                         </TableCell>
                                     </TableRow>
                                 ) : tickets.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                                             Nenhuma venda encontrada para este período.
                                         </TableCell>
                                     </TableRow>
@@ -218,6 +220,17 @@ export default function TwoXOneThousandReportPage() {
                                                 <div className="flex items-center gap-2 text-muted-foreground">
                                                     <Clock className="w-4 h-4" />
                                                     {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="font-mono text-sm font-medium">{ticket.hash || ticket.id.slice(0, 8)}</span>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                                                    {ticket.drawDate ?
+                                                        `${new Date(ticket.drawDate).toLocaleDateString('pt-BR')} ${new Date(ticket.drawDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+                                                        : '-'}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-medium">
