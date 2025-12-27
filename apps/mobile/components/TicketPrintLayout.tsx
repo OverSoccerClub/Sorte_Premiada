@@ -56,7 +56,8 @@ export const TicketPrintLayout = ({
     return (
         // Adjusted scaleY to 0.85 to help legibility but prevent too much stretch
         // ... (existing) 
-        <View style={[tw`bg-white w-[384px] p-1`, fixPrinterStretch ? { transform: [{ scaleY: 0.85 }] } : {}]}>
+        // Removed global scaling as it blurs text
+        <View style={tw`bg-white w-[384px] p-1`}>
             {/* Header ... */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
@@ -192,7 +193,7 @@ export const TicketPrintLayout = ({
 
                 {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
                 {/* QR Code Centered and Large - AGGRESSIVE SQUASH to fix vertical stretch */}
-                <View style={[tw`items-center justify-center w-full mt-2`, fixPrinterStretch ? { transform: [{ scaleY: 0.50 }] } : {}]}>
+                <View style={[tw`items-center justify-center w-full mt-2`, fixPrinterStretch ? { transform: [{ scaleY: 0.45 }] } : {}]} collapsable={false}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
                     </View>
