@@ -107,6 +107,23 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
     return (
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
+                {/* 2. Hidden Capture Area (Moved outside ScrollView) */}
+                <View style={{ position: 'absolute', top: 0, opacity: 0, zIndex: -10, left: -600, width: 384, height: 1 }}>
+                    <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
+                        <TicketPrintLayout
+                            gameName={ticketData.gameName}
+                            numbers={ticketData.numbers}
+                            price={ticketData.price}
+                            date={ticketData.date}
+                            ticketId={ticketData.id}
+                            hash={ticketData.hash}
+                            drawDate={ticketData.drawDate}
+                            vendorName={user?.name || user?.username || "Vendedor"}
+                            fixPrinterStretch={true}
+                        />
+                    </ViewShot>
+                </View>
+
                 {/* Header & Content */}
                 <ScrollView
                     style={tw`w-full flex-1 mb-4`}
@@ -135,21 +152,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     {/* Move ViewShot to absolute top-level of modal to avoid ScrollView layout issues?
                         Actually, keep it here but with height 0 and strictly hidden.
                     */}
-                    <View style={{ position: 'absolute', top: 0, opacity: 0, zIndex: -10, left: -600, width: 384, height: 1 }}>
-                        <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
-                            <TicketPrintLayout
-                                gameName={ticketData.gameName}
-                                numbers={ticketData.numbers}
-                                price={ticketData.price}
-                                date={ticketData.date}
-                                ticketId={ticketData.id}
-                                hash={ticketData.hash}
-                                drawDate={ticketData.drawDate}
-                                vendorName={user?.name || user?.username || "Vendedor"}
-                                fixPrinterStretch={true}
-                            />
-                        </ViewShot>
-                    </View>
+
                 </ScrollView>
 
                 {/* Actions - FIXED FOOTER */}
