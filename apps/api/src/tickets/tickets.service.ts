@@ -126,7 +126,7 @@ export class TicketsService {
                 amount: data.amount,
                 status: data.status || 'PENDING',
                 drawDate: drawDate, // Save the scheduled draw date
-                hash: Math.floor(100000000000 + Math.random() * 900000000000).toString(), // Generate 12-digit unique hash
+                hash: this.generateTicketCode(8), // Generate 8-char alphanumeric unqiue code
                 // gameId is optional now
                 ...(data.game?.connect?.id ? { gameId: data.game.connect.id } : {}),
             };
@@ -143,6 +143,18 @@ export class TicketsService {
             }
             throw error;
         }
+    }
+
+    private generateTicketCode(length: number = 8): string {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        const bytes = new Uint8Array(length);
+        // Basic random fallback if crypto not available (Node usually has global crypto or require)
+        // Since we are in NestJS/Node:
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
     }
 
     private async getNextDrawDate(gameId: string): Promise<Date> {
