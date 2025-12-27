@@ -146,6 +146,7 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                                 hash={ticketData.hash}
                                 drawDate={ticketData.drawDate}
                                 vendorName={user?.name || user?.username || "Vendedor"}
+                                fixPrinterStretch={true}
                             />
                         </ViewShot>
                     </View>
