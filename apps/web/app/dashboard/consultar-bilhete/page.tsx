@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
@@ -158,7 +158,7 @@ export default function ConsultarBilhetePage() {
                             </div>
                         </div>
 
-                        <Separator />
+                        <div className="h-[1px] bg-border my-6" />
 
                         <div>
                             <span className="text-sm font-medium text-muted-foreground block mb-3 uppercase tracking-wider">Números Apostados</span>
@@ -176,8 +176,8 @@ export default function ConsultarBilhetePage() {
 
                         {result.message && (
                             <div className={`p-4 rounded-lg text-center font-medium ${result.status === 'WON' ? 'bg-emerald-100 text-emerald-800' :
-                                    result.status === 'LOST' ? 'bg-red-100 text-red-800' :
-                                        'bg-blue-50 text-blue-800'
+                                result.status === 'LOST' ? 'bg-red-100 text-red-800' :
+                                    'bg-blue-50 text-blue-800'
                                 }`}>
                                 {result.message}
                             </div>

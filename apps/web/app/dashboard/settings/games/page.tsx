@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -9,123 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-// ... (imports)
 import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield } from "lucide-react"
-
-// ... inside component
-
-// Rules Editing State
-const [rulesModalOpen, setRulesModalOpen] = useState(false)
-const [rulesValues, setRulesValues] = useState({ globalCheck: false, restrictedMode: false })
-
-// ...
-
-// Rules Functions
-const openRulesModal = (game: any) => {
-    setSelectedGame(game)
-    const currentRules = game.rules || {}
-    setRulesValues({
-        globalCheck: !!currentRules.globalCheck,
-        restrictedMode: !!currentRules.restrictedMode
-    })
-    setRulesModalOpen(true)
-}
-
-const saveRules = async () => {
-    if (!selectedGame) return
-    setSaving(true)
-    try {
-        const token = localStorage.getItem("token")
-
-        // Merge existing rules
-        const updatedRules = {
-            ...(selectedGame.rules || {}),
-            globalCheck: rulesValues.globalCheck,
-            restrictedMode: rulesValues.restrictedMode
-        }
-
-        const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ rules: updatedRules })
-        })
-
-        if (res.ok) {
-            toast.success("Regras atualizadas com sucesso")
-            fetchGames()
-            setRulesModalOpen(false)
-        } else {
-            toast.error("Erro ao salvar regras")
-        }
-    } catch (e) {
-        toast.error("Erro ao salvar")
-    } finally {
-        setSaving(false)
-    }
-}
-
-    // ... inside Table actions
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                            onClick={() => openRulesModal(game)}
-                                                            title="Regras de Negócio"
-                                                        >
-                                                            <Shield className="h-4 w-4" />
-                                                        </Button>
-
-    // ... inside return (add new Dialog)
-            <Dialog open={rulesModalOpen} onOpenChange={setRulesModalOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Regras de Negócio - {selectedGame?.name}</DialogTitle>
-                        <CardDescription>Configure as restrições e regras automáticas deste jogo.</CardDescription>
-                    </DialogHeader>
-                    <div className="space-y-6 py-4">
-                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
-                            <div className="space-y-0.5">
-                                <Label className="text-base font-semibold">Bloqueio Global</Label>
-                                <p className="text-sm text-muted-foreground">
-                                     impede que o mesmo número seja vendido mais de uma vez para o mesmo sorteio, por qualquer cambista.
-                                </p>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={rulesValues.globalCheck}
-                                onChange={(e) => setRulesValues({ ...rulesValues, globalCheck: e.target.checked })}
-                                className="h-6 w-6 accent-emerald-600"
-                            />
-                        </div>
-                        
-                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
-                            <div className="space-y-0.5">
-                                <Label className="text-base font-semibold">Modo Restrito (Auto-Preenchimento)</Label>
-                                <p className="text-sm text-muted-foreground">
-                                    Se o apostador escolher apenas 1 milhar, o sistema irá gerar automaticamente as outras 3 milhares com a mesma terminação (centena).
-                                </p>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={rulesValues.restrictedMode}
-                                onChange={(e) => setRulesValues({ ...rulesValues, restrictedMode: e.target.checked })}
-                                className="h-6 w-6 accent-emerald-600"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setRulesModalOpen(false)}>Cancelar</Button>
-                        <Button onClick={saveRules} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
-                            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                            Salvar Regras
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 
@@ -142,6 +25,14 @@ export default function GameSettingsPage() {
     const [extractionTimes, setExtractionTimes] = useState<{ time: string, series: number }[]>([])
     const [newTime, setNewTime] = useState("")
     const [newSeries, setNewSeries] = useState("")
+
+    // Rules Editing State
+    const [rulesModalOpen, setRulesModalOpen] = useState(false)
+    const [rulesValues, setRulesValues] = useState({ globalCheck: false, restrictedMode: false })
+
+    // Prize Editing State
+    const [prizesModalOpen, setPrizesModalOpen] = useState(false)
+    const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
 
     useEffect(() => {
         fetchGames()
@@ -206,8 +97,6 @@ export default function GameSettingsPage() {
     const openScheduleModal = (game: any) => {
         setSelectedGame(game)
 
-        // Map existing string times to objects with series
-        // If extractionSeries exists (from backend include), use it to populate series
         const existingSeriesMap = new Map()
         if (game.extractionSeries) {
             game.extractionSeries.forEach((s: any) => existingSeriesMap.set(s.time, s.lastSeries))
@@ -228,7 +117,6 @@ export default function GameSettingsPage() {
             toast.warning("Horário já existe")
             return
         }
-        // Simple validation or sorting could go here
         const sorted = [...extractionTimes, { time: newTime, series: Number(newSeries) || 0 }].sort((a, b) => a.time.localeCompare(b.time))
         setExtractionTimes(sorted)
         setNewTime("")
@@ -252,7 +140,6 @@ export default function GameSettingsPage() {
         try {
             const token = localStorage.getItem("token")
 
-            // Send both the string array (extractionTimes) and the series detail (extractionSeries)
             const payload = {
                 extractionTimes: extractionTimes.map(t => t.time),
                 extractionSeries: extractionTimes.map(t => ({
@@ -262,7 +149,7 @@ export default function GameSettingsPage() {
             }
 
             const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
-                method: 'POST', // Using POST/PATCH typically updates
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -285,10 +172,6 @@ export default function GameSettingsPage() {
     }
 
 
-    // Prize Editing State
-    const [prizesModalOpen, setPrizesModalOpen] = useState(false)
-    const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
-
     // Prize Functions
     const openPrizesModal = (game: any) => {
         setSelectedGame(game)
@@ -307,7 +190,6 @@ export default function GameSettingsPage() {
         try {
             const token = localStorage.getItem("token")
 
-            // Merge existing rules with new prizes
             const updatedRules = {
                 ...(selectedGame.rules || {}),
                 prizes: {
@@ -332,6 +214,52 @@ export default function GameSettingsPage() {
                 setPrizesModalOpen(false)
             } else {
                 toast.error("Erro ao salvar premiação")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    // Rules Functions
+    const openRulesModal = (game: any) => {
+        setSelectedGame(game)
+        const currentRules = game.rules || {}
+        setRulesValues({
+            globalCheck: !!currentRules.globalCheck,
+            restrictedMode: !!currentRules.restrictedMode
+        })
+        setRulesModalOpen(true)
+    }
+
+    const saveRules = async () => {
+        if (!selectedGame) return
+        setSaving(true)
+        try {
+            const token = localStorage.getItem("token")
+
+            const updatedRules = {
+                ...(selectedGame.rules || {}),
+                globalCheck: rulesValues.globalCheck,
+                restrictedMode: rulesValues.restrictedMode
+            }
+
+            const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ rules: updatedRules })
+            })
+
+            if (res.ok) {
+                toast.success("Regras atualizadas com sucesso")
+                fetchGames()
+                setRulesModalOpen(false)
+            } else {
+                toast.error("Erro ao salvar regras")
             }
         } catch (e) {
             toast.error("Erro ao salvar")
@@ -431,6 +359,15 @@ export default function GameSettingsPage() {
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                            onClick={() => openRulesModal(game)}
+                                                            title="Regras de Negócio"
+                                                        >
+                                                            <Shield className="h-4 w-4" />
+                                                        </Button>
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
@@ -592,6 +529,53 @@ export default function GameSettingsPage() {
                         <Button onClick={savePrizes} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
                             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                             Salvar Prêmios
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={rulesModalOpen} onOpenChange={setRulesModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Regras de Negócio - {selectedGame?.name}</DialogTitle>
+                        <CardDescription>Configure as restrições e regras automáticas deste jogo.</CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
+                            <div className="space-y-0.5">
+                                <Label className="text-base font-semibold">Bloqueio Global</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    impede que o mesmo número seja vendido mais de uma vez para o mesmo sorteio, por qualquer cambista.
+                                </p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={rulesValues.globalCheck}
+                                onChange={(e) => setRulesValues({ ...rulesValues, globalCheck: e.target.checked })}
+                                className="h-6 w-6 accent-emerald-600"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
+                            <div className="space-y-0.5">
+                                <Label className="text-base font-semibold">Modo Restrito (Auto-Preenchimento)</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    Se o apostador escolher apenas 1 milhar, o sistema irá gerar automaticamente as outras 3 milhares com a mesma terminação (centena).
+                                </p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={rulesValues.restrictedMode}
+                                onChange={(e) => setRulesValues({ ...rulesValues, restrictedMode: e.target.checked })}
+                                className="h-6 w-6 accent-emerald-600"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setRulesModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={saveRules} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
+                            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar Regras
                         </Button>
                     </DialogFooter>
                 </DialogContent>
