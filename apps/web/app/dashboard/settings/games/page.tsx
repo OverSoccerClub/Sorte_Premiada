@@ -440,7 +440,7 @@ export default function GameSettingsPage() {
                             </Button>
                         </div>
 
-                        <div className="border rounded-md p-2 min-h-[100px] bg-slate-50 dark:bg-slate-900/50">
+                        <div className="border border-border rounded-md p-2 min-h-[100px] bg-muted/20">
                             {extractionTimes.length === 0 ? (
                                 <div className="text-center text-muted-foreground text-sm py-8">
                                     Nenhum horário adicionado.
@@ -453,22 +453,22 @@ export default function GameSettingsPage() {
                                         <span></span>
                                     </div>
                                     {extractionTimes.map((item) => (
-                                        <div key={item.time} className="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded border shadow-sm text-sm">
-                                            <div className="flex-1 font-mono font-bold text-base text-slate-700 dark:text-slate-100 flex items-center gap-2">
+                                        <div key={item.time} className="flex items-center gap-2 bg-muted/40 border border-border p-2 rounded shadow-sm text-sm">
+                                            <div className="flex-1 font-mono font-bold text-base text-foreground flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 {item.time}
                                             </div>
                                             <div className="w-[80px]">
                                                 <Input
                                                     type="number"
-                                                    className="h-8 text-right font-mono"
+                                                    className="h-8 text-right font-mono bg-background border-input"
                                                     value={item.series}
                                                     onChange={(e) => updateSeries(item.time, e.target.value)}
                                                     placeholder="0"
                                                 />
                                             </div>
                                             <Button
-                                                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-red-500/10 hover:text-red-500 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-muted-foreground"
                                                 onClick={() => removeTime(item.time)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
