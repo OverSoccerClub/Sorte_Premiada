@@ -178,7 +178,7 @@ export class TicketsService {
         const now = new Date();
         const CUTOFF_MINUTES = 10;
 
-        // Sort times just in case
+        // Sort times to ensure we check in order
         extractionTimes.sort();
 
         // Check for today's draws
@@ -186,7 +186,24 @@ export class TicketsService {
             const drawDate = parseTime(timeStr, now);
 
             // Calculate cutoff time: Draw Time - 10 minutes
-            const cutoffDate = new Date(drawDate.getTime() - CUTOFF_MINUTES * 60000);
+            // Example: Draw is 08:00. Cutoff is 07:50.
+            // If now is 07:50:59, it is <= 07:50:00? No.
+            // Requirement: "ate as 07:50hs da manha concorrem... as 8hs"
+            // So if now is 07:50:59, it works? User said "apartir das 07:51hs todos passarão a concorrer para o sorteio das 11hs"
+            // So strictly: NOW < 07:51:00.
+            // 07:50:59 < 07:51:00 => True (Concorrem as 8hs)
+            // 07:51:00 < 07:51:00 => False (Concorrem as 11hs)
+
+            // DrawDate (08:00) - 10 minutes = 07:50.
+            // We need the cutoff to be exactly at the minute start of the "next interval".
+            // Actually, simply: Limit Time = DrawDate - 9 minutes (07:51)
+            // Wait, logic: "ate as 07:50" means 07:50:59 is OK.
+            // So Ticket Time <= 07:50:59.
+            // Which is Ticket Time < 07:51:00.
+            // 08:00 minus 9 minutes = 07:51.
+            // So if Now < 07:51:00, use 08:00.
+
+            const cutoffDate = new Date(drawDate.getTime() - (CUTOFF_MINUTES - 1) * 60000);
 
             if (now < cutoffDate) {
                 return drawDate;

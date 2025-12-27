@@ -170,7 +170,12 @@ export default function ValidateTicketScreen() {
                                     color={result.error ? "red" : "#10b981"}
                                 />
                                 <Text style={tw`text-2xl font-bold mt-2 text-center`}>
-                                    {result.error ? "Erro" : result.status === 'WON' ? "Premiado!" : "Resultado"}
+                                    {result.error ? "Erro" :
+                                        result.status === 'WON' ? "Bilhete Premiado!" :
+                                            result.status === 'EXPIRED' ? "Bilhete Expirado" :
+                                                result.status === 'LOST' ? "Não Premiado" :
+                                                    result.status === 'PENDING' ? "Aguardando Sorteio" :
+                                                        "Resultado"}
                                 </Text>
                                 <Text style={tw`text-lg text-gray-600 mt-2 text-center`}>
                                     {result.message}

@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
@@ -33,6 +33,7 @@ const sidebarGroups = [
         title: "Operacional",
         items: [
             { icon: Ticket, label: "Jogos / Vendas", href: "/dashboard/games" },
+            { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
             { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
         ]
     },

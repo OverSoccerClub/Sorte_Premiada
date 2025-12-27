@@ -72,16 +72,82 @@ export class DrawsService {
                     data: { lastSeries: { increment: 1 } }
                 });
 
-                return tx.draw.create({
+                const createdDraw = await tx.draw.create({
                     data: {
                         ...data,
                         series: updatedSeries.lastSeries
                     }
                 });
+
+                // IMPORTANT: We cannot await this INSIDE the transaction if it modifies rows that might be locked or if we want it to run after commit.
+                // But generally safe if it updates Tickets. 
+                // However, Prisma doesn't support "after commit" hooks easily inside $transaction callback unless we manually handle it.
+                // Let's return the draw and process results OUTSIDE the transaction or just await it here if performance allows.
+                // Updating tickets is related data, safe to do inside transaction to ensure consistency? 
+                // If the draw fails, tickets shouldn't be updated.
+                // YES, inside transaction is better for consistency.
+                await this.processDrawResults(tx, createdDraw);
+
+                return createdDraw;
             }
 
-            return tx.draw.create({ data });
+            const createdDraw = await tx.draw.create({ data });
+            await this.processDrawResults(tx, createdDraw);
+            return createdDraw;
         });
+    }
+
+    // Helper to process results
+    private async processDrawResults(tx: Prisma.TransactionClient, draw: any) {
+        if (!draw.numbers || draw.numbers.length === 0) return;
+
+        // Find all PENDING tickets for this game and draw date
+        const tickets = await tx.ticket.findMany({
+            where: {
+                gameId: draw.gameId,
+                drawDate: draw.drawDate,
+                status: 'PENDING'
+            }
+        });
+
+        const drawNumbers = new Set(draw.numbers as number[]);
+        const drawNumbersArray = (draw.numbers as number[]).sort((a, b) => a - b).join(',');
+
+        let wonCount = 0;
+        let expiredCount = 0;
+
+        for (const ticket of tickets) {
+            const ticketNumbers = (ticket.numbers as number[]);
+
+            // Check matching logic.
+            // Assuming "Match All" for now as generic rule, or specific game rules?
+            // User did not specify game rules, just "se nao for premiado... expirado".
+            // Implementation: Exact Match of the set.
+            // Note: 2x500/Raffle usually is exact ticket match.
+            // Game 'JB' might be different, but tickets Service logic implies 'JB' validation was separate.
+            // Standard generic logic: Exact Match.
+
+            const ticketNumbersArray = ticketNumbers.sort((a, b) => a - b).join(',');
+            const isWinner = ticketNumbersArray === drawNumbersArray;
+
+            // TODO: If we need partial matches (Quina, Quadra), we need Game Rules.
+            // Assuming Exact Match for "Sorteio" as implies Raffle/Lottery Ticket unique ID or sequence.
+
+            if (isWinner) {
+                await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: { status: 'WON' }
+                });
+                wonCount++;
+            } else {
+                await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: { status: 'EXPIRED' }
+                });
+                expiredCount++;
+            }
+        }
+        console.log(`[ProcessResults] Draw ${draw.id}: ${wonCount} Won, ${expiredCount} Expired.`);
     }
 
     async findAll() {

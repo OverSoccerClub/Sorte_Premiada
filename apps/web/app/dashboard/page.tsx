@@ -117,6 +117,15 @@ export default function DashboardPage() {
             bg: "bg-emerald-500/10"
         },
         {
+            title: "Prêmios Pagos",
+            value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics?.monthlyPayout || 0),
+            icon: Trophy,
+            description: "Total pago em prêmios",
+            trend: "up",
+            color: "text-red-400",
+            bg: "bg-red-500/10"
+        },
+        {
             title: "Lucro Líquido",
             value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.profitMetrics?.netProfit || 0),
             icon: Wallet,
@@ -124,15 +133,6 @@ export default function DashboardPage() {
             trend: "up",
             color: "text-blue-400",
             bg: "bg-blue-500/10"
-        },
-        {
-            title: "Cambistas Online",
-            value: stats.activeCambistas,
-            icon: Activity,
-            description: "Ativos nos últimos 30min",
-            trend: "up",
-            color: "text-orange-400",
-            bg: "bg-orange-500/10"
         },
         {
             title: "Ticket Médio",
@@ -268,7 +268,16 @@ export default function DashboardPage() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
-                                        data={stats.statusBreakdown || []}
+                                        data={stats.statusBreakdown.map(item => ({
+                                            ...item,
+                                            status: {
+                                                'PENDING': 'Aguardando',
+                                                'WON': 'Premiado',
+                                                'LOST': 'Não Premiado',
+                                                'CANCELLED': 'Cancelado',
+                                                'EXPIRED': 'Expirado'
+                                            }[item.status] || item.status
+                                        })) || []}
                                         cx="50%"
                                         cy="50%"
                                         innerRadius={60}
@@ -291,7 +300,15 @@ export default function DashboardPage() {
                             {(stats.statusBreakdown || []).slice(0, 4).map((item) => (
                                 <div key={item.status} className="flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: STATUS_COLORS[item.status as keyof typeof STATUS_COLORS] }} />
-                                    <span className="text-xs text-muted-foreground font-medium uppercase">{item.status}: {item.count}</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase">
+                                        {{
+                                            'PENDING': 'Aguardando',
+                                            'WON': 'Premiado',
+                                            'LOST': 'Não Premiado',
+                                            'CANCELLED': 'Cancelado',
+                                            'EXPIRED': 'Expirado'
+                                        }[item.status] || item.status}: {item.count}
+                                    </span>
                                 </div>
                             ))}
                         </div>

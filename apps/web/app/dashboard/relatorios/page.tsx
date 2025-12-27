@@ -407,15 +407,23 @@ export default function RelatoriosPage() {
                                                             {ticket.numbers.join(', ')}
                                                         </TableCell>
                                                         <TableCell>
-                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                                                            ${ticket.status === 'WON' ? 'bg-green-100 text-green-800' :
-                                                                    ticket.status === 'LOST' ? 'bg-red-100 text-red-800' :
-                                                                        ticket.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-500' :
-                                                                            'bg-muted text-muted-foreground'}`}>
-                                                                {ticket.status === 'PENDING' ? 'Pendente' :
-                                                                    ticket.status === 'WON' ? 'Premiado' :
-                                                                        ticket.status === 'LOST' ? 'Perdeu' : ticket.status}
-                                                            </span>
+                                                            <Badge
+                                                                className={`
+                                                        ${ticket.status === 'WON' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}
+                                                        ${ticket.status === 'LOST' ? 'bg-red-500 hover:bg-red-600' : ''}
+                                                        ${ticket.status === 'PENDING' ? 'bg-amber-500 hover:bg-amber-600' : ''}
+                                                        ${ticket.status === 'CANCELLED' ? 'bg-slate-500 hover:bg-slate-600' : ''}
+                                                        ${ticket.status === 'EXPIRED' ? 'bg-slate-700 hover:bg-slate-800' : ''}
+                                                    `}
+                                                            >
+                                                                {{
+                                                                    'PENDING': 'Aguardando',
+                                                                    'WON': 'Premiado',
+                                                                    'LOST': 'Não Premiado',
+                                                                    'CANCELLED': 'Cancelado',
+                                                                    'EXPIRED': 'Expirado'
+                                                                }[ticket.status] || ticket.status}
+                                                            </Badge>
                                                         </TableCell>
                                                         <TableCell className="text-right font-medium text-emerald-600">
                                                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}

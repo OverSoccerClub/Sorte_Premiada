@@ -107,11 +107,13 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
     return (
         <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
+                {/* Header & Content */}
                 <ScrollView
-                    style={tw`w-full max-h-[90%]`}
-                    contentContainerStyle={tw`pb-8`}
+                    style={tw`w-full flex-1 mb-4`}
+                    contentContainerStyle={tw`pb-4`}
+                    showsVerticalScrollIndicator={false}
                 >
-                    <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>
+                    <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>
                         {isReprint ? "Reimprimir / Compartilhar" : "Aposta Confirmada!"}
                     </Text>
 
@@ -130,7 +132,10 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                     </View>
 
                     {/* 2. Hidden Capture Area (Distorted for Print) */}
-                    <View style={{ position: 'absolute', opacity: 0, zIndex: -10, left: -1000 }}>
+                    {/* Move ViewShot to absolute top-level of modal to avoid ScrollView layout issues?
+                        Actually, keep it here but with height 0 and strictly hidden.
+                    */}
+                    <View style={{ position: 'absolute', top: 0, opacity: 0, zIndex: -10, left: -600, width: 384, height: 1 }}>
                         <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
                             <TicketPrintLayout
                                 gameName={ticketData.gameName}
@@ -144,58 +149,57 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                             />
                         </ViewShot>
                     </View>
+                </ScrollView>
 
-                    {/* Actions - SIMPLIFIED LAYOUT */}
-                    <View style={tw`w-full gap-3`}>
-                        {/* Print & Share Row */}
-                        <View style={tw`flex-row gap-3 w-full`}>
-                            {/* Force Render Print Button */}
-                            <TouchableOpacity
-                                style={tw`flex-1 bg-emerald-600 p-4 rounded-xl flex-row justify-center items-center shadow-lg border border-emerald-500`}
-                                onPress={handlePrintPayload}
-                                disabled={isPrinting || isSharing}
-                            >
-                                {isPrinting ? (
-                                    <ActivityIndicator color="white" size="small" />
-                                ) : (
-                                    <>
-                                        <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
-                                        <Text style={tw`text-white font-bold text-base uppercase`}>
-                                            IMPRIMIR
-                                        </Text>
-                                    </>
-                                )}
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={tw`flex-1 bg-green-600 p-4 rounded-xl flex-row justify-center items-center shadow-lg border border-green-500`}
-                                onPress={handleShare}
-                                disabled={isSharing || isPrinting}
-                            >
-                                {isSharing ? (
-                                    <ActivityIndicator color="white" size="small" />
-                                ) : (
-                                    <>
-                                        <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
-                                        <Text style={tw`text-white font-bold text-base uppercase`}>Zap</Text>
-                                    </>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Close Button */}
+                {/* Actions - FIXED FOOTER */}
+                <View style={tw`w-full gap-3 pt-2 bg-transparent`}>
+                    {/* Print & Share Row */}
+                    <View style={tw`flex-row gap-3 w-full`}>
                         <TouchableOpacity
-                            style={tw`w-full bg-gray-800 p-4 rounded-xl flex-row justify-center items-center border border-gray-700`}
-                            onPress={onClose}
+                            style={tw`flex-1 bg-emerald-600 p-4 rounded-xl flex-row justify-center items-center shadow-lg border border-emerald-500`}
+                            onPress={handlePrintPayload}
+                            disabled={isPrinting || isSharing}
                         >
-                            <Text style={tw`text-gray-300 font-bold text-base`}>
-                                {isReprint ? "Fechar" : "Novo Jogo"}
-                            </Text>
+                            {isPrinting ? (
+                                <ActivityIndicator color="white" size="small" />
+                            ) : (
+                                <>
+                                    <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
+                                    <Text style={tw`text-white font-bold text-base uppercase`}>
+                                        IMPRIMIR
+                                    </Text>
+                                </>
+                            )}
                         </TouchableOpacity>
 
-                        <Text style={tw`text-gray-600 text-xs text-center mt-2`}>vFix-Layout-v2</Text>
+                        <TouchableOpacity
+                            style={tw`flex-1 bg-green-600 p-4 rounded-xl flex-row justify-center items-center shadow-lg border border-green-500`}
+                            onPress={handleShare}
+                            disabled={isSharing || isPrinting}
+                        >
+                            {isSharing ? (
+                                <ActivityIndicator color="white" size="small" />
+                            ) : (
+                                <>
+                                    <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
+                                    <Text style={tw`text-white font-bold text-base uppercase`}>Zap</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
                     </View>
-                </ScrollView>
+
+                    {/* Close Button */}
+                    <TouchableOpacity
+                        style={tw`w-full bg-gray-800 p-4 rounded-xl flex-row justify-center items-center border border-gray-700`}
+                        onPress={onClose}
+                    >
+                        <Text style={tw`text-gray-300 font-bold text-base`}>
+                            {isReprint ? "Fechar" : "Novo Jogo"}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <Text style={tw`text-gray-600 text-xs text-center mt-1`}>vFix-Layout-v3</Text>
+                </View>
             </View>
         </Modal>
     );
