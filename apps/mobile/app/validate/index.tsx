@@ -89,7 +89,7 @@ export default function ValidateTicketScreen() {
                 onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                 barcodeScannerSettings={{
                     barcodeTypes: [
-                        "qr", "pdf417", "ean13", "code128", "code39", "interleaved2of5", "itf14", "codabar", "upc_a", "upc_e", "aztec", "datamatrix", "code93"
+                        "qr", "code128"
                     ],
                 }}
             >
