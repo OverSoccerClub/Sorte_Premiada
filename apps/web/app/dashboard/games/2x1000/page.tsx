@@ -241,7 +241,7 @@ export default function TwoXOneThousandReportPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2 lowercase font-mono text-xs">
-                                                    <Hash className="w-3.5 h-3.5 text-slate-400" />
+                                                    <Ticket className="w-3.5 h-3.5 text-slate-400" />
                                                     {ticket.numbers.map((n: string) => n.toString().padStart(4, '0')).join(', ')}
                                                 </div>
                                             </TableCell>
