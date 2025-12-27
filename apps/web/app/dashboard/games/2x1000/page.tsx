@@ -119,6 +119,28 @@ export default function TwoXOneThousandReportPage() {
         }))
     }
 
+    const getExtractionInfo = (dateString: string) => {
+        if (!dateString) return { label: '-', time: '-' }
+
+        const date = new Date(dateString)
+        const hour = date.getHours()
+        const minutes = date.getMinutes()
+        const timeStr = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+
+        // Determinar a extração baseada no horário aproximado
+        // PTM: ~11h, PT: ~14h, PTV: ~16h, PTN: ~18h, COR: ~21h
+        let label = 'Extração'
+
+        if (hour >= 10 && hour < 13) label = '1ª Extração (PTM)'
+        else if (hour >= 13 && hour < 15) label = '2ª Extração (PT)'
+        else if (hour >= 15 && hour < 17) label = '3ª Extração (PTV)'
+        else if (hour >= 17 && hour < 20) label = '4ª Extração (PTN)'
+        else if (hour >= 20 && hour < 23) label = '5ª Extração (COR)'
+        else label = `Extração ${timeStr}`
+
+        return { label, time: timeStr, fullDate: date.toLocaleDateString('pt-BR') }
+    }
+
     const sortedTickets = useMemo(() => {
         const sorted = [...tickets]
         sorted.sort((a, b) => {
@@ -275,7 +297,7 @@ export default function TwoXOneThousandReportPage() {
                                 <TableHead className="w-[150px]">
                                     <div className="flex items-center gap-2">
                                         <Hash className="w-4 h-4" />
-                                        <span>Código</span>
+                                        <span>Bilhete</span>
                                     </div>
                                 </TableHead>
                                 <TableHead>
@@ -329,79 +351,89 @@ export default function TwoXOneThousandReportPage() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                sortedTickets.map((ticket, index) => (
-                                    <TableRow
-                                        key={ticket.id}
-                                        className={`transition-colors hover:bg-muted/30 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/10'}`}
-                                    >
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-foreground text-sm">
-                                                    {new Date(ticket.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" />
-                                                    {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-mono text-xs font-medium bg-muted px-2 py-1 rounded border border-border">
-                                                {ticket.hash || ticket.id.slice(0, 8)}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                {ticket.drawDate ? (
-                                                    <span className="flex items-center gap-1">
-                                                        <Calendar className="w-3.5 h-3.5" />
-                                                        {new Date(ticket.drawDate).toLocaleDateString('pt-BR')}
+                                sortedTickets.map((ticket, index) => {
+                                    const extraction = getExtractionInfo(ticket.drawDate)
+                                    return (
+                                        <TableRow
+                                            key={ticket.id}
+                                            className={`transition-colors hover:bg-muted/30 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/10'}`}
+                                        >
+                                            <TableCell>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-foreground text-sm">
+                                                        {new Date(ticket.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
                                                     </span>
-                                                ) : '-'}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                                    <User className="w-3 h-3 text-emerald-500" />
+                                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                        <Clock className="w-3 h-3" />
+                                                        {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
                                                 </div>
-                                                <span className="font-medium text-sm text-foreground">
-                                                    {ticket.user?.name || ticket.user?.username || '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="font-mono text-xs font-medium bg-muted px-2 py-1 rounded border border-border">
+                                                    {ticket.hash || ticket.id.slice(0, 8)}
                                                 </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {ticket.numbers.map((n: string, i: number) => (
-                                                    <span
-                                                        key={i}
-                                                        className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-secondary text-secondary-foreground border border-border/50"
-                                                    >
-                                                        {n.toString().padStart(4, '0')}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-medium text-foreground">
+                                                        {extraction.label}
                                                     </span>
-                                                ))}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <span className="font-bold text-emerald-500">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${ticket.status === 'WON'
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar className="w-3 h-3" />
+                                                            {extraction.fullDate}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="w-3 h-3" />
+                                                            {extraction.time}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                                        <User className="w-3 h-3 text-emerald-500" />
+                                                    </div>
+                                                    <span className="font-medium text-sm text-foreground">
+                                                        {ticket.user?.name || ticket.user?.username || '-'}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {ticket.numbers.map((n: string, i: number) => (
+                                                        <span
+                                                            key={i}
+                                                            className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-secondary text-secondary-foreground border border-border/50"
+                                                        >
+                                                            {n.toString().padStart(4, '0')}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <span className="font-bold text-emerald-500">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${ticket.status === 'WON'
                                                     ? 'bg-green-500/10 text-green-500 border-green-500/20'
                                                     : ticket.status === 'PENDING'
                                                         ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
                                                         : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
-                                                }`}>
-                                                {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
-                                                    ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
-                                                        <AlertCircle className="w-3 h-3" />}
-                                                {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
-                                            </span>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                                                    }`}>
+                                                    {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
+                                                        ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
+                                                            <AlertCircle className="w-3 h-3" />}
+                                                    {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
                             )}
                         </TableBody>
                     </Table>
@@ -410,3 +442,4 @@ export default function TwoXOneThousandReportPage() {
         </div>
     )
 }
+

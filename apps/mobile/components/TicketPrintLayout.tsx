@@ -183,7 +183,7 @@ export const TicketPrintLayout = ({
                         <Barcode
                             value={ticketId || '000000000000'}
                             width={370}
-                            height={90}
+                            height={fixPrinterStretch ? 45 : 90}
                         />
                         <Text style={tw`font-bold text-[9px] text-black tracking-[4px] mt-1`}>
                             {ticketId}
@@ -192,9 +192,28 @@ export const TicketPrintLayout = ({
                 </View>
 
                 {/* QR Code Centered and Large */}
-                <View style={[tw`items-center justify-center w-full mt-2`]} collapsable={false}>
+                {/* 
+                    NOTE: The printer stretches content vertically by approx 2x.
+                    We apply scaleY: 0.5 to counteract this.
+                    Since transform doesn't affect layout, we must use negative margins to remove the whitespace.
+                    150px * 0.5 = 75px visual height. Gap is (150-75)/2 = 37.5px on each side.
+                 */}
+                <View
+                    style={[
+                        tw`items-center justify-center w-full mt-2`,
+                        fixPrinterStretch && {
+                            transform: [{ scaleY: 0.5 }],
+                            marginTop: -35,
+                            marginBottom: -35
+                        }
+                    ]}
+                    collapsable={false}
+                >
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
-                        <QRCode value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`} size={150} />
+                        <QRCode
+                            value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`}
+                            size={150}
+                        />
                     </View>
                 </View>
             </View>
