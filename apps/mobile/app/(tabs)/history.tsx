@@ -1,20 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator, ScrollView, Platform } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
-
-const { height } = Dimensions.get("window");
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-
-import { TicketPreview } from "../../components/TicketPreview";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
 import { TicketsService, Ticket } from "../../services/tickets.service";
 import { GAME_FILTERS } from "../../constants/Games";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ScreenLayout } from "../../components/ScreenLayout";
 
 const STATUS_FILTERS = [
     { id: 'ALL', label: 'Todos' },
@@ -28,7 +25,6 @@ export default function HistoryScreen() {
     const router = useRouter();
     const { token } = useAuth();
     const insets = useSafeAreaInsets();
-    // 70 (base tab height) + insets.bottom (safe area) + 50 (extra spacing)
     const BOTTOM_PADDING = 70 + insets.bottom + 50;
 
     const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -179,7 +175,7 @@ export default function HistoryScreen() {
                     <Text style={tw`text-emerald-500 font-bold text-lg`}>R$ {Number(item.amount).toFixed(2).replace('.', ',')}</Text>
                 </View>
                 <TouchableOpacity
-                    style={tw`bg-gray-800 p-2 rounded-lg border border-gray-700 flex-row items-center`}
+                    style={tw`bg-gray-800 p-2 rounded-lg border border-gray-700 flex-row items-center active:bg-gray-700`}
                     onPress={() => handleOpenReprint(item)}
                 >
                     <Ionicons name="print-outline" size={20} color="#94a3b8" style={tw`mr-1`} />
@@ -190,10 +186,10 @@ export default function HistoryScreen() {
     );
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
+        <ScreenLayout>
             {/* Header */}
-            <View style={tw`p-6 border-b border-gray-800 bg-surface flex-row items-center`}>
-                <TouchableOpacity onPress={() => router.push("/(tabs)")} style={tw`mr-4 p-2 bg-gray-800 rounded-full border border-gray-700`}>
+            <View style={tw`w-full p-6 border-b border-gray-800 bg-surface flex-row items-center shadow-md`}>
+                <TouchableOpacity onPress={() => router.back()} style={tw`mr-4 p-2 bg-gray-800 rounded-full border border-gray-700`}>
                     <Ionicons name="arrow-back" size={24} color="#94a3b8" />
                 </TouchableOpacity>
                 <View>
@@ -202,8 +198,8 @@ export default function HistoryScreen() {
                 </View>
             </View>
 
-            {/* Filters */}
-            <View style={tw`bg-surface border-b border-gray-800`}>
+            {/* Filters Container - Full Width */}
+            <View style={tw`w-full bg-surface border-b border-gray-800`}>
                 {/* Date Filter Row */}
                 <View style={tw`px-4 pt-4 pb-2 flex-row gap-2`}>
                     <TouchableOpacity
@@ -235,52 +231,43 @@ export default function HistoryScreen() {
                     )}
                 </View>
 
-                {showStartPicker && (
-                    <DateTimePicker
-                        value={startDate || new Date()}
-                        mode="date"
-                        display="default"
-                        onChange={onStartDateChange}
-                        maximumDate={new Date()}
-                    />
-                )}
-                {showEndPicker && (
-                    <DateTimePicker
-                        value={endDate || new Date()}
-                        mode="date"
-                        display="default"
-                        onChange={onEndDateChange}
-                        maximumDate={new Date()}
-                        minimumDate={startDate}
-                    />
-                )}
+                {/* Status Filters */}
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={STATUS_FILTERS}
+                    contentContainerStyle={tw`p-4 pr-0 gap-2`}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            onPress={() => setStatusFilter(item.id)}
+                            style={tw`px-4 py-2 rounded-full border ${statusFilter === item.id ? 'bg-primary border-primary' : 'bg-gray-800 border-gray-700'}`}
+                        >
+                            <Text style={tw`font-bold text-xs ${statusFilter === item.id ? 'text-white' : 'text-gray-400'}`}>
+                                {item.label}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                />
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`p-4 pr-0 gap-2`}>
-                    {STATUS_FILTERS.map((filter) => (
+                {/* Game Filters */}
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={GAME_FILTERS}
+                    contentContainerStyle={tw`px-4 pb-4 gap-2`}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
                         <TouchableOpacity
-                            key={filter.id}
-                            onPress={() => setStatusFilter(filter.id)}
-                            style={tw`px-4 py-2 rounded-full border ${statusFilter === filter.id ? 'bg-primary border-primary' : 'bg-gray-800 border-gray-700'}`}
+                            onPress={() => setGameFilter(item.id)}
+                            style={tw`px-4 py-2 rounded-full border ${gameFilter === item.id ? 'bg-gray-700 border-gray-600' : 'bg-transparent border-gray-800'}`}
                         >
-                            <Text style={tw`font-bold text-xs ${statusFilter === filter.id ? 'text-white' : 'text-gray-400'}`}>
-                                {filter.label}
+                            <Text style={tw`font-bold text-xs ${gameFilter === item.id ? 'text-white' : 'text-gray-500'}`}>
+                                {item.label}
                             </Text>
                         </TouchableOpacity>
-                    ))}
-                </ScrollView>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`px-4 pb-4 gap-2`}>
-                    {GAME_FILTERS.map((filter) => (
-                        <TouchableOpacity
-                            key={filter.id}
-                            onPress={() => setGameFilter(filter.id)}
-                            style={tw`px-4 py-2 rounded-full border ${gameFilter === filter.id ? 'bg-gray-700 border-gray-600' : 'bg-transparent border-gray-800'}`}
-                        >
-                            <Text style={tw`font-bold text-xs ${gameFilter === filter.id ? 'text-white' : 'text-gray-500'}`}>
-                                {filter.label}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+                    )}
+                />
             </View>
 
             {/* List */}
@@ -288,14 +275,15 @@ export default function HistoryScreen() {
                 data={tickets}
                 renderItem={renderTicket}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ alignItems: 'center', paddingVertical: 16, paddingBottom: BOTTOM_PADDING }}
+                contentContainerStyle={{ alignItems: 'center', paddingVertical: 16, paddingBottom: BOTTOM_PADDING, width: '100%' }}
+                style={{ width: '100%' }}
                 overScrollMode="never"
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#50C878" />
                 }
                 ListEmptyComponent={
                     !isLoading ? (
-                        <View style={tw`items-center justify-center py-20`}>
+                        <View style={tw`items-center justify-center py-20 w-full`}>
                             <MaterialCommunityIcons name="ticket-outline" size={64} color="#334155" />
                             <Text style={tw`text-gray-500 mt-4 font-bold`}>Nenhuma aposta encontrada</Text>
                             <Text style={tw`text-gray-600 text-xs mt-2 text-center max-w-[200px]`}>
@@ -306,14 +294,29 @@ export default function HistoryScreen() {
                 }
             />
 
-
-            {isLoading && !refreshing && (
-                <View style={tw`absolute inset-0 justify-center items-center bg-black/50`}>
-                    <ActivityIndicator size="large" color="#50C878" />
-                </View>
+            {/* Hidden DateTimePickers */}
+            {showStartPicker && (
+                <DateTimePicker
+                    value={startDate || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={onStartDateChange}
+                    maximumDate={new Date()}
+                />
+            )}
+            {showEndPicker && (
+                <DateTimePicker
+                    value={endDate || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={onEndDateChange}
+                    maximumDate={new Date()}
+                    minimumDate={startDate}
+                />
             )}
 
-            {/* Reprint / Share Modal */}
+
+            {/* Modals */}
             <ReceiptModal
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
@@ -335,7 +338,7 @@ export default function HistoryScreen() {
                         new Date(selectedTicket.createdAt),
                         selectedTicket.amount,
                         selectedTicket.gameType,
-                        'BLE', // Default to BLE for history reprint
+                        'BLE',
                         imageUri
                     );
                     if (success) {
@@ -353,6 +356,6 @@ export default function HistoryScreen() {
                 type={alertConfig.type}
                 onClose={hideAlert}
             />
-        </SafeAreaView>
+        </ScreenLayout>
     );
 }

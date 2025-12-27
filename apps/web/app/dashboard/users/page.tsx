@@ -357,25 +357,29 @@ export default function UsersPage() {
                 </Dialog>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <CardTitle>Usuários do Sistema</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="w-5 h-5 text-emerald-500" />
+                                Usuários do Sistema
+                            </CardTitle>
                             <CardDescription>Lista de administradores e gestores do sistema.</CardDescription>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="relative w-64">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <div className="relative w-full sm:w-64">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Buscar usuário..." className="pl-9 bg-muted/50 border-border" />
+                                <Input placeholder="Buscar usuário..." className="pl-9 bg-background border-border h-9" />
                             </div>
-                            <Button variant="outline" size="icon">
-                                <Filter className="h-4 w-4 text-slate-500" />
+                            <Button variant="outline" size="sm" className="h-9">
+                                <Filter className="h-4 w-4 text-muted-foreground mr-2" />
+                                Filtros
                             </Button>
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -383,7 +387,7 @@ export default function UsersPage() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="hover:bg-muted/50">
+                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead className="w-[300px]">Nome</TableHead>
                                     <TableHead>Nível de Acesso</TableHead>
                                     <TableHead>Status</TableHead>
@@ -391,81 +395,89 @@ export default function UsersPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {users.map((user) => {
-                                    const isManuallyBlocked = user.isActive === false;
+                                {users.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                            Nenhum usuário encontrado.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    users.map((user) => {
+                                        const isManuallyBlocked = user.isActive === false;
 
-                                    return (
-                                        <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
-                                                        {user.username.substring(0, 2)}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                            <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
-                                                            {user.name || user.username}
+                                        return (
+                                            <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
+                                                            {user.username.substring(0, 2)}
                                                         </div>
-                                                        <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                            <Mail className="w-3 h-3" />
-                                                            {user.email || "Sem email"}
+                                                        <div>
+                                                            <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                                <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
+                                                                {user.name || user.username}
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                                <Mail className="w-3 h-3" />
+                                                                {user.email || "Sem email"}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
-                                                    <Shield className="w-3.5 h-3.5" />
-                                                    {user.role}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                {isManuallyBlocked ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
-                                                        <Ban className="w-3.5 h-3.5" />
-                                                        Bloqueado
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
+                                                        <Shield className="w-3.5 h-3.5" />
+                                                        {user.role}
                                                     </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                                        Ativo
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
-                                                        onClick={() => handleToggleBlock(user)}
-                                                        title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
-                                                    >
-                                                        {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                        onClick={() => handleOpenDialog(user)}
-                                                        title="Editar"
-                                                    >
-                                                        <SquarePen className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                        onClick={() => handleDelete(user.id)}
-                                                        title="Excluir"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {isManuallyBlocked ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
+                                                            <Ban className="w-3.5 h-3.5" />
+                                                            Bloqueado
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                            <CheckCircle2 className="w-3.5 h-3.5" />
+                                                            Ativo
+                                                        </span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                            onClick={() => handleToggleBlock(user)}
+                                                            title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
+                                                        >
+                                                            {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                            onClick={() => handleOpenDialog(user)}
+                                                            title="Editar"
+                                                        >
+                                                            <SquarePen className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => handleDelete(user.id)}
+                                                            title="Excluir"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
                             </TableBody>
                         </Table>
                     )}

@@ -187,13 +187,13 @@ export default function CashConferencePage() {
             </div>
 
             <Card className="border-border shadow-sm bg-card">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <CardTitle className="text-base flex items-center gap-2">
                         <Filter className="w-5 h-5 text-emerald-500" />
                         Filtros da Conferência
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <div className="space-y-2">
                             <Label>Selecione o Cambista</Label>
@@ -238,7 +238,7 @@ export default function CashConferencePage() {
             </Card>
 
             {!summary && !loading && (
-                <Alert className="bg-muted border-border">
+                <Alert className="bg-muted/30 border-border">
                     <AlertCircle className="h-4 w-4 text-muted-foreground" />
                     <AlertTitle className="text-foreground">Nenhum dado exibido</AlertTitle>
                     <AlertDescription>
@@ -260,7 +260,7 @@ export default function CashConferencePage() {
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center no-print">
+                    <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4 no-print">
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status do Caixa:</span>
                             {summary.status === 'OPEN' && (
@@ -282,11 +282,11 @@ export default function CashConferencePage() {
                                 </span>
                             )}
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full md:w-auto">
                             <Button
                                 onClick={handlePrint}
                                 variant="outline"
-                                className="bg-white hover:bg-zinc-100 text-zinc-900 border-zinc-200 shadow-sm"
+                                className="bg-background hover:bg-muted text-foreground border-border shadow-sm flex-1 md:flex-none"
                             >
                                 <Printer className="mr-2 h-4 w-4" />
                                 Imprimir
@@ -295,7 +295,7 @@ export default function CashConferencePage() {
                             {(summary.status === 'OPEN' || summary.status === 'PENDING') && (
                                 <Button
                                     onClick={handleCloseCashier}
-                                    className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20"
+                                    className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20 flex-1 md:flex-none"
                                 >
                                     <CheckCircle className="mr-2 h-4 w-4" />
                                     {summary.status === 'PENDING' ? 'Conferir e Liberar Caixa' : 'Fechar Caixa e Liberar'}
@@ -348,44 +348,46 @@ export default function CashConferencePage() {
                     </div>
 
                     <Card className="border-border shadow-sm bg-card overflow-hidden">
-                        <CardHeader className="bg-muted/50 border-b border-border flex flex-row items-center justify-between">
+                        <CardHeader className="bg-muted/30 border-b border-border flex flex-row items-center justify-between">
                             <div>
-                                <CardTitle className="text-base text-foreground">Extrato Detalhado</CardTitle>
+                                <CardTitle className="text-base text-foreground flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-emerald-500" />
+                                    Extrato Detalhado
+                                </CardTitle>
                                 <CardDescription>Todas as movimentações do dia {format(new Date(summary.date), "dd/MM/yyyy")}</CardDescription>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button variant="ghost" size="sm" className="hidden md:flex">
                                 <Download className="w-4 h-4 mr-2" />
-                                <span className="sr-only">Exportar</span>
                                 Exportar
                             </Button>
                         </CardHeader>
                         <CardContent className="p-0">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-muted/30">
-                                        <TableHead className="w-[140px]">Horário</TableHead>
+                                    <TableRow className="bg-muted/20 hover:bg-muted/30 border-b border-border/60">
+                                        <TableHead className="w-[140px] pl-6">Horário</TableHead>
                                         <TableHead>Descrição</TableHead>
-                                        <TableHead className="w-[120px]">Tipo</TableHead>
-                                        <TableHead className="text-right w-[140px]">Valor</TableHead>
+                                        <TableHead className="w-[140px]">Tipo</TableHead>
+                                        <TableHead className="text-right w-[160px] pr-6">Valor</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {summary.transactions.map((t) => (
-                                        <TableRow key={t.id} className="hover:bg-muted/50">
-                                            <TableCell className="font-mono text-muted-foreground">
+                                        <TableRow key={t.id} className="hover:bg-muted/50 transition-colors">
+                                            <TableCell className="font-mono text-muted-foreground pl-6">
                                                 {format(new Date(t.createdAt), "HH:mm:ss")}
                                             </TableCell>
                                             <TableCell className="font-medium text-foreground">
                                                 {t.description}
                                             </TableCell>
                                             <TableCell>
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                                                    ${t.type === 'CREDIT' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border
+                                                    ${t.type === 'CREDIT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
                                                     {t.type === 'CREDIT' ? 'Entrada' : 'Saída'}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className={`text-right font-bold ${t.type === 'CREDIT' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                {t.type === 'DEBIT' ? '-' : '+'}{formatCurrency(t.amount)}
+                                            <TableCell className={`text-right font-bold pr-6 ${t.type === 'CREDIT' ? 'text-emerald-600' : 'text-red-500'}`}>
+                                                {t.type === 'DEBIT' ? '- ' : '+ '}{formatCurrency(t.amount)}
                                             </TableCell>
                                         </TableRow>
                                     ))}

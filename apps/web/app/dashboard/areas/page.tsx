@@ -253,20 +253,23 @@ export default function AreasPage() {
                 </Dialog>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <CardTitle>Praças Cadastradas</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <MapPin className="w-5 h-5 text-emerald-500" />
+                                Praças Cadastradas
+                            </CardTitle>
                             <CardDescription>Gerencie as cidades e áreas onde seus cambistas atuam.</CardDescription>
                         </div>
-                        <div className="relative w-64">
+                        <div className="relative w-full sm:w-64">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Buscar praça..." className="pl-9 bg-muted/50 border-border" />
+                            <Input placeholder="Buscar praça..." className="pl-9 bg-background border-border h-9" />
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -274,7 +277,7 @@ export default function AreasPage() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="hover:bg-muted/50">
+                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead>Localização</TableHead>
                                     <TableHead>Área</TableHead>
                                     <TableHead>Cambistas</TableHead>

@@ -7,7 +7,7 @@ import { AppConfig } from "../../AppConfig"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet, SquarePen } from "lucide-react"
+import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet, SquarePen, Mail } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -189,7 +189,7 @@ export default function CobradoresPage() {
                     </h2>
                     <p className="text-muted-foreground mt-1 ml-14">Cadastre e gerencie os responsáveis pelas sangrias.</p>
                 </div>
-                <Button onClick={() => { resetForm(); setIsDialogOpen(true) }}>
+                <Button onClick={() => { resetForm(); setIsDialogOpen(true) }} className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20">
                     <Plus className="mr-2 h-4 w-4" /> Novo Cobrador
                 </Button>
             </div>
@@ -234,36 +234,40 @@ export default function CobradoresPage() {
 
                         <div className="flex justify-end gap-2">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-                            <Button type="submit">Salvar</Button>
+                            <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white">Salvar</Button>
                         </div>
                     </form>
                 </DialogContent>
             </Dialog>
 
             {/* Search and Filter Card */}
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <CardTitle>Equipe de Cobrança</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="w-5 h-5 text-emerald-500" />
+                                Equipe de Cobrança
+                            </CardTitle>
                             <CardDescription>Lista de todos os cobradores cadastrados no sistema.</CardDescription>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="relative w-64">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <div className="relative w-full sm:w-64">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Buscar cobrador..."
-                                    className="pl-9 bg-muted/50 border-border"
+                                    className="pl-9 bg-background border-border h-9"
                                 // Add search logic if needed, or keep visual for now
                                 />
                             </div>
-                            <Button variant="outline" size="icon">
-                                <Filter className="h-4 w-4 text-slate-500" />
+                            <Button variant="outline" size="sm" className="h-9">
+                                <Filter className="h-4 w-4 text-slate-500 mr-2" />
+                                Filtros
                             </Button>
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -271,7 +275,7 @@ export default function CobradoresPage() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="hover:bg-muted/50">
+                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead className="w-[300px]">Nome</TableHead>
                                     <TableHead>Matrícula (Usuário)</TableHead>
                                     <TableHead>PIN de Segurança</TableHead>
@@ -280,82 +284,81 @@ export default function CobradoresPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {cobradores.map((user) => (
-                                    <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
-                                        <TableCell className="font-medium">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-2 ring-emerald-500/20">
-                                                    {user.username.substring(0, 2)}
-                                                </div>
-                                                <div>
-                                                    <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                        <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                                        {user.name || user.username}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                        <Search className="w-3 h-3" /> {/* Using Search as generic ID icon or similar, actually let's use Mail if email */}
-                                                        {user.email ? (
-                                                            <>
-                                                                {/* Assuming Search was imported, do we have Mail? need to check imports */}
-                                                                <span className="flex items-center gap-1"><span className="w-3 h-3 inline-block" />{user.email}</span>
-                                                            </>
-                                                        ) : "Sem email"}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary" className="font-mono bg-muted text-muted-foreground hover:bg-muted flex w-fit items-center gap-1.5">
-                                                <Wallet className="w-3 h-3 text-emerald-500" />
-                                                {user.username}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            {user.securityPin ? (
-                                                <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md border border-emerald-100">
-                                                    <Lock className="h-3 w-3" />
-                                                    <span className="text-xs font-medium">Definido</span>
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-2 text-red-600 bg-red-50 w-fit px-2 py-1 rounded-md border border-red-100">
-                                                    <Lock className="h-3 w-3" />
-                                                    <span className="text-xs font-medium">Pendente</span>
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                Ativo
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                    onClick={() => handleEdit(user)}
-                                                >
-                                                    <SquarePen className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    data-slot="button"
-                                                    className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-md gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    onClick={() => handleDelete(user.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {cobradores.length === 0 && !loading && (
+                                {cobradores.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                             Nenhum cobrador cadastrado.
                                         </TableCell>
                                     </TableRow>
+                                ) : (
+                                    cobradores.map((user) => (
+                                        <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
+                                            <TableCell className="font-medium">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-2 ring-emerald-500/20">
+                                                        {user.username.substring(0, 2)}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                            <Users className="w-3.5 h-3.5 text-emerald-500" />
+                                                            {user.name || user.username}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                            <Mail className="w-3 h-3" />
+                                                            {user.email ? (
+                                                                <span className="flex items-center gap-1">{user.email}</span>
+                                                            ) : "Sem email"}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="secondary" className="font-mono bg-muted text-muted-foreground hover:bg-muted flex w-fit items-center gap-1.5">
+                                                    <Wallet className="w-3 h-3 text-emerald-500" />
+                                                    {user.username}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {user.securityPin ? (
+                                                    <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md border border-emerald-100">
+                                                        <Lock className="h-3 w-3" />
+                                                        <span className="text-xs font-medium">Definido</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-red-600 bg-red-50 w-fit px-2 py-1 rounded-md border border-red-100">
+                                                        <Lock className="h-3 w-3" />
+                                                        <span className="text-xs font-medium">Pendente</span>
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                    Ativo
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                        onClick={() => handleEdit(user)}
+                                                    >
+                                                        <SquarePen className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        onClick={() => handleDelete(user.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
                                 )}
                             </TableBody>
                         </Table>

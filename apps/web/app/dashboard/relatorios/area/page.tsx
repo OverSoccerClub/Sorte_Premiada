@@ -1,7 +1,6 @@
 "use client"
 
 import { API_URL } from "@/lib/api"
-
 import { useEffect, useState } from "react"
 import { useAlert } from "@/context/alert-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, MapPin, Search, ChevronDown, ChevronRight, BarChart, Users, DollarSign } from "lucide-react"
+import { Loader2, MapPin, Search, ChevronDown, ChevronRight, BarChart, Users, DollarSign, Filter, Calendar } from "lucide-react"
 
 interface CambistaStats {
     id: string
@@ -84,43 +83,6 @@ export default function AreaReportPage() {
                 </div>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Search className="w-5 h-5 text-emerald-500" />
-                        Filtros
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div className="space-y-2">
-                            <Label>Data Inicial</Label>
-                            <Input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Data Final</Label>
-                            <Input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                            />
-                        </div>
-                        <Button
-                            onClick={fetchReport}
-                            disabled={loading}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-900/10"
-                        >
-                            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
-                            Filtrar Resultados
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-emerald-500 text-white border-none shadow-lg shadow-emerald-500/20">
                     <CardContent className="pt-6">
@@ -134,7 +96,7 @@ export default function AreaReportPage() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-card border-border">
+                <Card className="bg-card border-border shadow-sm">
                     <CardContent className="pt-6">
                         <div className="text-muted-foreground text-sm font-medium mb-1">Praças Ativas</div>
                         <div className="text-3xl font-bold text-foreground">{areas.length}</div>
@@ -144,7 +106,7 @@ export default function AreaReportPage() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-card border-border">
+                <Card className="bg-card border-border shadow-sm">
                     <CardContent className="pt-6">
                         <div className="text-muted-foreground text-sm font-medium mb-1">Melhor Desempenho</div>
                         <div className="text-xl font-bold text-foreground truncate">
@@ -158,15 +120,53 @@ export default function AreaReportPage() {
                 </Card>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader>
-                    <CardTitle>Detalhamento por Praça</CardTitle>
-                    <CardDescription>Clique na seta para ver os cambistas de cada área.</CardDescription>
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Filter className="w-5 h-5 text-emerald-500" />
+                                Detalhamento por Praça
+                            </CardTitle>
+                            <CardDescription>Expanda para ver os cambistas de cada área.</CardDescription>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[150px] bg-background border-border h-9"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                </div>
+                                <span className="text-muted-foreground">-</span>
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[150px] bg-background border-border h-9"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <Button
+                                onClick={fetchReport}
+                                disabled={loading}
+                                size="sm"
+                                className="h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                                {loading ? "..." : "Filtrar"}
+                            </Button>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="hover:bg-muted/50 bg-muted/30">
+                            <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
                                 <TableHead className="w-[50px]"></TableHead>
                                 <TableHead>Praça (Área)</TableHead>
                                 <TableHead>Cidade/UF</TableHead>
@@ -190,7 +190,7 @@ export default function AreaReportPage() {
                                             className="hover:bg-muted/50 transition-colors cursor-pointer border-b border-border/50"
                                             onClick={() => toggleExpand(area.areaId)}
                                         >
-                                            <TableCell>
+                                            <TableCell className="pl-4">
                                                 {expandedAreaId === area.areaId ? (
                                                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                                 ) : (
@@ -204,22 +204,22 @@ export default function AreaReportPage() {
                                                 {area.city} - {area.state}
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                                                    <Users className="w-3 h-3 mr-1" />
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border">
+                                                    <Users className="w-3 h-3 mr-1 text-muted-foreground" />
                                                     {area.cambistasCount}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-center text-muted-foreground">
                                                 {area.ticketsCount}
                                             </TableCell>
-                                            <TableCell className="text-right font-bold text-emerald-500">
+                                            <TableCell className="text-right font-bold text-emerald-500 pr-6">
                                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(area.totalSales)}
                                             </TableCell>
                                         </TableRow>
                                         {expandedAreaId === area.areaId && (
-                                            <TableRow className="bg-muted/20 hover:bg-muted/20">
+                                            <TableRow className="bg-muted/10 hover:bg-muted/10">
                                                 <TableCell colSpan={6} className="p-0">
-                                                    <div className="p-4 border-l-2 border-emerald-500 ml-4 my-2 bg-card rounded-r-lg shadow-inner">
+                                                    <div className="p-4 border-l-2 border-emerald-500 ml-6 my-2 bg-card rounded-r-lg shadow-sm mr-4">
                                                         <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                                                             <Users className="w-4 h-4" />
                                                             Desempenho dos Cambistas - {area.areaName}
@@ -227,21 +227,21 @@ export default function AreaReportPage() {
                                                         <Table>
                                                             <TableHeader>
                                                                 <TableRow className="border-b border-border/50 hover:bg-transparent">
-                                                                    <TableHead className="h-8 text-xs font-semibold">Cambista</TableHead>
+                                                                    <TableHead className="h-8 text-xs font-semibold pl-4">Cambista</TableHead>
                                                                     <TableHead className="h-8 text-xs font-semibold text-center">Qtd. Apostas</TableHead>
-                                                                    <TableHead className="h-8 text-xs font-semibold text-right">Faturamento</TableHead>
+                                                                    <TableHead className="h-8 text-xs font-semibold text-right pr-4">Faturamento</TableHead>
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
                                                                 {area.cambistas.map((cambista) => (
                                                                     <TableRow key={cambista.id} className="border-0 hover:bg-transparent">
-                                                                        <TableCell className="py-2 text-sm text-foreground font-medium">
+                                                                        <TableCell className="py-2 text-sm text-foreground font-medium pl-4">
                                                                             {cambista.name}
                                                                         </TableCell>
                                                                         <TableCell className="py-2 text-sm text-center text-muted-foreground">
                                                                             {cambista.tickets}
                                                                         </TableCell>
-                                                                        <TableCell className="py-2 text-sm text-right text-emerald-600 font-semibold">
+                                                                        <TableCell className="py-2 text-sm text-right text-emerald-600 font-semibold pr-4">
                                                                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cambista.sales)}
                                                                         </TableCell>
                                                                     </TableRow>

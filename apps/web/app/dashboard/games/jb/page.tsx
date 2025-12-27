@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -9,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Search, Filter, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, Tag } from "lucide-react"
+import { Loader2, Calendar, Search, Filter, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, Tag, LayoutDashboard } from "lucide-react"
 
 export default function JogoDoBichoReportPage() {
     const [tickets, setTickets] = useState<any[]>([])
@@ -64,12 +63,6 @@ export default function JogoDoBichoReportPage() {
 
             let url = `${API_URL}/tickets?gameId=${gameId}&startDate=${start.toISOString()}&endDate=${end.toISOString()}`
 
-            // Note: API `findAll` doesn't support filtering by userId for ADMIN directly via query param unless we add it. 
-            // `findAll` currently uses `req.user.userId` if NOT admin. If Admin, it returns all.
-            // Client-side filtering for Cambista is acceptable for now if dataset isn't huge, 
-            // OR I should have added `userId` filter to `TicketsController.findAll` for Admin.
-            // Let's filter client-side for "Sales Report" MVP.
-
             const res = await fetch(url, {
                 headers: { Authorization: `Bearer ${token}` }
             })
@@ -116,7 +109,7 @@ export default function JogoDoBichoReportPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-1">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Vendido</CardTitle>
                         <Ticket className="h-4 w-4 text-emerald-500" />
@@ -127,7 +120,7 @@ export default function JogoDoBichoReportPage() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-1">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Bilhetes</CardTitle>
                         <Ticket className="h-4 w-4 text-muted-foreground" />
@@ -138,141 +131,135 @@ export default function JogoDoBichoReportPage() {
                 </Card>
             </div>
 
-            <Card>
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-medium">Filtros</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <label className="text-sm font-medium mb-1 block">Data Inicial</label>
-                            <div className="relative">
-                                <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    type="date"
-                                    className="pl-9"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                />
-                            </div>
+            <Card className="overflow-hidden border-border shadow-sm">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                        <div>
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <LayoutDashboard className="w-5 h-5 text-emerald-500" />
+                                Vendas do Período
+                            </CardTitle>
+                            <CardDescription>Detalhamento de bilhetes vendidos.</CardDescription>
                         </div>
-                        <div className="flex-1">
-                            <label className="text-sm font-medium mb-1 block">Data Final</label>
-                            <div className="relative">
-                                <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    type="date"
-                                    className="pl-9"
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex-1">
-                            <label className="text-sm font-medium mb-1 block">Cambista</label>
-                            <Select value={selectedCambista} onValueChange={setSelectedCambista}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Todos" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos</SelectItem>
-                                    {cambistas.map(c => (
-                                        <SelectItem key={c.id} value={c.id}>{c.name || c.username}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex items-end">
-                            <Button onClick={fetchTickets} disabled={loading}>
-                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                                <span className="ml-2">Atualizar</span>
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Detalhamento de Vendas</CardTitle>
-                    <CardDescription>Lista de bilhetes vendidos com os filtros aplicados.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Hora</TableHead>
-                                    <TableHead>Cambista</TableHead>
-                                    <TableHead>Modalidade</TableHead>
-                                    <TableHead>Números</TableHead>
-                                    <TableHead className="text-right">Valor</TableHead>
-                                    <TableHead>Status</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="h-24 text-center">
-                                            <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
-                                        </TableCell>
-                                    </TableRow>
-                                ) : tickets.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                                            Nenhuma venda encontrada para este período.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    tickets.map((ticket) => (
-                                        <TableRow key={ticket.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2 text-muted-foreground">
-                                                    <Clock className="w-4 h-4" />
-                                                    {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <User className="w-4 h-4 text-emerald-500" />
-                                                    {ticket.user?.name || ticket.user?.username || '-'}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
-                                                    <Tag className="w-3 h-3" />
-                                                    {ticket.gameType.replace('JB-', '')}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2 lowercase font-mono text-xs">
-                                                    <Ticket className="w-3.5 h-3.5 text-slate-400" />
-                                                    {ticket.numbers.join(', ')}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right font-bold text-emerald-600">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Banknote className="w-3.5 h-3.5 opacity-50" />
-                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                    ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                                                        'bg-gray-50 text-gray-600 ring-gray-500/10'
-                                                    }`}>
-                                                    {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
-                                                        ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
-                                                            <AlertCircle className="w-3 h-3" />}
-                                                    {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
-                                                </span>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[150px] bg-background border-border"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                </div>
+                                <span className="text-muted-foreground hidden sm:inline">-</span>
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[150px] bg-background border-border"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Select value={selectedCambista} onValueChange={setSelectedCambista}>
+                                    <SelectTrigger className="w-[180px] bg-background border-border">
+                                        <User className="w-4 h-4 mr-2 text-muted-foreground" />
+                                        <SelectValue placeholder="Todos" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Todos os Cambistas</SelectItem>
+                                        {cambistas.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name || c.username}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Button onClick={fetchTickets} disabled={loading} size="icon" variant="outline" className="shrink-0">
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
+                                <TableHead>Hora</TableHead>
+                                <TableHead>Cambista</TableHead>
+                                <TableHead>Modalidade</TableHead>
+                                <TableHead>Números</TableHead>
+                                <TableHead className="text-right">Valor</TableHead>
+                                <TableHead>Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="h-24 text-center">
+                                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
+                                    </TableCell>
+                                </TableRow>
+                            ) : tickets.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                        Nenhuma venda encontrada para este período.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                tickets.map((ticket) => (
+                                    <TableRow key={ticket.id} className="hover:bg-muted/50 transition-colors">
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Clock className="w-4 h-4" />
+                                                {new Date(ticket.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <div className="flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                {ticket.user?.name || ticket.user?.username || '-'}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground border border-border">
+                                                <Tag className="w-3 h-3" />
+                                                {ticket.gameType.replace('JB-', '')}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 lowercase font-mono text-xs">
+                                                <Ticket className="w-3.5 h-3.5 text-slate-400" />
+                                                {ticket.numbers.join(', ')}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right font-bold text-emerald-600">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Banknote className="w-3.5 h-3.5 opacity-50" />
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticket.amount))}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.status === 'WON' ? 'bg-green-50 text-green-700 ring-green-600/20' :
+                                                ticket.status === 'PENDING' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
+                                                    'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                                }`}>
+                                                {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
+                                                    ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
+                                                        <AlertCircle className="w-3 h-3" />}
+                                                {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </div>

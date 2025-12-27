@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../lib/tailwind";
 import { useAuth } from "../context/AuthContext";
-import { StatusBar } from "expo-status-bar";
 import { CustomAlert, AlertType } from "../components/CustomAlert";
 import { VersionFooter } from "../components/VersionFooter";
+import { ScreenLayout } from "../components/ScreenLayout";
+import { ScreenHeader } from "../components/ScreenHeader";
+import { FormField } from "../components/FormField";
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -18,8 +20,6 @@ export default function ProfileScreen() {
     const [email, setEmail] = useState(user?.email || "");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     // Alert State
@@ -85,123 +85,107 @@ export default function ProfileScreen() {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
-            <StatusBar style="light" />
+        <ScreenLayout scrollable contentContainerStyle={{ paddingBottom: BOTTOM_PADDING }}>
+            <ScreenHeader title="Meu Perfil" />
 
-            {/* Header */}
-            <View style={tw`p-4 border-b border-gray-800 flex-row items-center bg-surface`}>
-                <TouchableOpacity onPress={() => router.back()} style={tw`p-2 bg-gray-800 rounded-full`}>
-                    <Ionicons name="arrow-back" size={24} color="#94a3b8" />
-                </TouchableOpacity>
-                <Text style={tw`text-xl font-bold ml-4 text-white`}>Meu Perfil</Text>
-            </View>
-
-            <ScrollView
-                style={tw`flex-1`}
-                overScrollMode="never"
-                contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingVertical: 24, paddingBottom: BOTTOM_PADDING }}
-            >
-                <View style={tw`w-[90%] max-w-[400px]`}>
-                    <View style={tw`items-center mb-8`}>
-                        <View style={tw`w-24 h-24 bg-surface rounded-full justify-center items-center mb-4 border-2 border-primary shadow-lg shadow-primary/30`}>
-                            <Text style={tw`text-4xl font-bold text-primary`}>
-                                {user?.username?.charAt(0).toUpperCase() || "U"}
-                            </Text>
-                        </View>
-                        <Text style={tw`text-2xl font-bold text-white`}>{user?.username}</Text>
-                        <Text style={tw`text-gray-400 uppercase tracking-widest text-xs mt-1`}>Cambista</Text>
+            <View style={tw`w-full px-6 py-8`}>
+                {/* Profile Avatar & Info */}
+                <View style={tw`items-center mb-8`}>
+                    <View style={tw`w-28 h-28 bg-surface rounded-full justify-center items-center mb-4 border-4 border-surface shadow-2xl shadow-black/50 relative`}>
+                        <View style={tw`absolute inset-0 rounded-full border-2 border-primary/30`} />
+                        <Text style={tw`text-5xl font-bold text-primary`}>
+                            {user?.username?.charAt(0).toUpperCase() || "U"}
+                        </Text>
                     </View>
+                    <Text style={tw`text-2xl font-bold text-white mb-1`}>{user?.username}</Text>
+                    <View style={tw`bg-primary/20 px-3 py-1 rounded-full border border-primary/30`}>
+                        <Text style={tw`text-primary font-bold text-xs uppercase tracking-widest`}>Cambista</Text>
+                    </View>
+                </View>
 
-                    <View style={tw`bg-surface p-6 rounded-3xl shadow-lg border border-gray-800`}>
-                        <Text style={tw`text-lg font-bold text-white mb-6 border-b border-gray-700 pb-2`}>Dados Pessoais</Text>
+                {/* Main Card */}
+                <View style={tw`bg-surface p-6 rounded-3xl shadow-xl border border-gray-800 w-full`}>
 
-                        <Text style={tw`mb-2 text-gray-400 text-xs font-bold uppercase`}>Email</Text>
-                        <TextInput
-                            style={tw`w-full bg-surface border border-gray-700 rounded-xl p-4 mb-6 text-gray-500`}
+                    {/* Section: Personal Data */}
+                    <View style={tw`mb-8`}>
+                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
+                            Dados Pessoais
+                        </Text>
+                        <FormField
+                            label="Email"
                             value={email}
                             editable={false}
                             selectTextOnFocus={false}
+                            style={tw`text-gray-500`}
                         />
+                    </View>
 
-                        <Text style={tw`text-lg font-bold text-white mb-6 mt-2 border-b border-gray-700 pb-2`}>Configurações</Text>
-
+                    {/* Section: Settings */}
+                    <View style={tw`mb-6`}>
+                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
+                            Configurações
+                        </Text>
                         <TouchableOpacity
-                            style={tw`w-full bg-gray-800 p-4 rounded-xl items-center border border-gray-700 mb-6 flex-row justify-between`}
+                            style={tw`w-full bg-background p-4 rounded-xl items-center border border-gray-700 mb-2 flex-row justify-between active:bg-gray-800/50`}
                             onPress={() => router.push("/settings/printer")}
                         >
                             <View style={tw`flex-row items-center`}>
-                                <Ionicons name="print-outline" size={24} color="#94a3b8" style={tw`mr-3`} />
-                                <Text style={tw`text-gray-300 font-bold text-base`}>Configurar Impressora</Text>
+                                <View style={tw`w-10 h-10 rounded-full bg-gray-800 items-center justify-center mr-3 border border-gray-700`}>
+                                    <Ionicons name="print-outline" size={20} color="#94a3b8" />
+                                </View>
+                                <Text style={tw`text-gray-200 font-bold text-base`}>Configurar Impressora</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={24} color="#475569" />
-                        </TouchableOpacity>
-
-                        <Text style={tw`text-lg font-bold text-white mb-6 mt-2 border-b border-gray-700 pb-2`}>Segurança</Text>
-
-                        <Text style={tw`mb-2 text-gray-400 text-xs font-bold uppercase`}>Nova Senha</Text>
-                        <View style={tw`w-full bg-background border border-gray-700 rounded-xl mb-4 flex-row items-center focus:border-primary`}>
-                            <TextInput
-                                style={tw`flex-1 p-4 text-white placeholder-gray-600`}
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!isPasswordVisible}
-                                placeholder="Deixe em branco para manter"
-                                placeholderTextColor="#475569"
-                            />
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                                style={tw`p-4`}
-                            >
-                                <Ionicons
-                                    name={isPasswordVisible ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="#94a3b8"
-                                />
-                            </TouchableOpacity>
-                        </View>
-
-                        <Text style={tw`mb-2 text-gray-400 text-xs font-bold uppercase`}>Confirmar Senha</Text>
-                        <View style={tw`w-full bg-background border border-gray-700 rounded-xl mb-8 flex-row items-center focus:border-primary`}>
-                            <TextInput
-                                style={tw`flex-1 p-4 text-white`}
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                                secureTextEntry={!isConfirmPasswordVisible}
-                                placeholder="Repita a nova senha"
-                                placeholderTextColor="#475569"
-                            />
-                            <TouchableOpacity
-                                onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                                style={tw`p-4`}
-                            >
-                                <Ionicons
-                                    name={isConfirmPasswordVisible ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="#94a3b8"
-                                />
-                            </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity
-                            style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/40 ${isLoading ? "opacity-70" : ""} mb-4`}
-                            onPress={handleSave}
-                            disabled={isLoading}
-                        >
-                            <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>
-                                {isLoading ? "Salvando..." : "Salvar Alterações"}
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={tw`w-full bg-red-500/10 p-4 rounded-xl items-center border border-red-500/50`}
-                            onPress={signOut}
-                        >
-                            <Text style={tw`text-red-500 font-bold text-lg uppercase tracking-wide`}>Sair do App</Text>
+                            <Ionicons name="chevron-forward" size={20} color="#475569" />
                         </TouchableOpacity>
                     </View>
+
+                    {/* Section: Security */}
+                    <View style={tw`mb-8`}>
+                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
+                            Segurança
+                        </Text>
+
+                        <FormField
+                            label="Nova Senha"
+                            value={password}
+                            onChangeText={setPassword}
+                            isPassword
+                            placeholder="Deixe em branco para manter"
+                        />
+
+                        <FormField
+                            label="Confirmar Senha"
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            isPassword
+                            placeholder="Repita a nova senha"
+                        />
+                    </View>
+
+                    {/* Actions */}
+                    <TouchableOpacity
+                        style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/30 ${isLoading ? "opacity-70" : ""} mb-4 border-b-4 border-emerald-600 active:border-b-0 active:mt-1`}
+                        onPress={handleSave}
+                        disabled={isLoading}
+                    >
+                        <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>
+                            {isLoading ? "Salvando..." : "Salvar Alterações"}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={tw`w-full bg-red-500/10 p-4 rounded-xl items-center border border-red-500/30 active:bg-red-500/20`}
+                        onPress={signOut}
+                    >
+                        <Text style={tw`text-red-500 font-bold text-lg uppercase tracking-wide`}>Sair do App</Text>
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
-            <VersionFooter />
+            </View>
+
+            <View style={tw`mt-4 mb-8`}>
+                <VersionFooter />
+            </View>
+
             <CustomAlert
                 visible={alertConfig.visible}
                 title={alertConfig.title}
@@ -209,6 +193,6 @@ export default function ProfileScreen() {
                 type={alertConfig.type}
                 onClose={hideAlert}
             />
-        </SafeAreaView>
+        </ScreenLayout>
     );
 }

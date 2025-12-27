@@ -8,9 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield, Settings2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
 export default function GameSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -270,140 +271,143 @@ export default function GameSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg">
-                        <Ticket className="w-8 h-8 text-emerald-500" />
-                    </div>
-                    Configuração de Jogos
-                </h2>
-                <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda, horários e premiações.</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Ticket className="w-8 h-8 text-emerald-500" />
+                        </div>
+                        Configuração de Jogos
+                    </h2>
+                    <p className="text-muted-foreground mt-1 ml-14">Defina o valor de venda, horários e premiações.</p>
+                </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Jogos Disponíveis</CardTitle>
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                        <Settings2 className="w-5 h-5 text-emerald-500" />
+                        Jogos Disponíveis
+                    </CardTitle>
                     <CardDescription>Gerencie os preços e horários de sorteio.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
+                                <TableHead className="pl-6">Nome do Jogo</TableHead>
+                                <TableHead>Preço Atual</TableHead>
+                                <TableHead>Extrações Diárias</TableHead>
+                                <TableHead className="w-[180px] text-right pr-6">Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
                                 <TableRow>
-                                    <TableHead>Nome do Jogo</TableHead>
-                                    <TableHead>Preço Atual</TableHead>
-                                    <TableHead>Extrações Diárias</TableHead>
-                                    <TableHead className="w-[180px] text-right">Ações</TableHead>
+                                    <TableCell colSpan={4} className="h-24 text-center">
+                                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center">
-                                            <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
+                            ) : games.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                        Nenhum jogo encontrado.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                games.map((game) => (
+                                    <TableRow key={game.id} className="hover:bg-muted/50 transition-colors">
+                                        <TableCell className="font-medium pl-6">
+                                            <div className="flex items-center gap-2">
+                                                <Ticket className="w-4 h-4 text-emerald-500" />
+                                                {game.name}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {editingId === game.id ? (
+                                                <Input
+                                                    type="number"
+                                                    value={editPrice}
+                                                    onChange={(e) => setEditPrice(e.target.value)}
+                                                    className="w-32 h-8"
+                                                    step="0.01"
+                                                />
+                                            ) : (
+                                                <span className="font-bold text-emerald-600 flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded w-fit border border-emerald-100">
+                                                    <span className="text-xs text-muted-foreground">R$</span>
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(game.price || 0))}
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-wrap gap-1">
+                                                {game.extractionTimes && game.extractionTimes.length > 0 ? (
+                                                    game.extractionTimes.map((time: string) => (
+                                                        <Badge key={time} variant="secondary" className="text-xs border-border bg-background">
+                                                            {time}
+                                                        </Badge>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-muted-foreground text-xs italic">Nenhum horário definido</span>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right pr-6">
+                                            {editingId === game.id ? (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button size="sm" onClick={() => savePrice(game.id)} disabled={saving} className="h-8 w-8 p-0 bg-emerald-600 hover:bg-emerald-700">
+                                                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                                    </Button>
+                                                    <Button size="sm" variant="ghost" onClick={cancelEditing} disabled={saving} className="h-8 w-8 p-0">
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                                                        onClick={() => openRulesModal(game)}
+                                                        title="Regras de Negócio"
+                                                    >
+                                                        <Shield className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200"
+                                                        onClick={() => openPrizesModal(game)}
+                                                        title="Configurar Prêmios"
+                                                    >
+                                                        <DollarSign className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 text-muted-foreground hover:text-emerald-600 hover:bg-muted"
+                                                        onClick={() => openScheduleModal(game)}
+                                                        title="Gerenciar Horários"
+                                                    >
+                                                        <Clock className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                                                        onClick={() => startEditing(game)}
+                                                        title="Editar Preço"
+                                                    >
+                                                        <SquarePen className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </TableCell>
                                     </TableRow>
-                                ) : games.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                            Nenhum jogo encontrado.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    games.map((game) => (
-                                        <TableRow key={game.id}>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <Ticket className="w-4 h-4 text-emerald-500" />
-                                                    {game.name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {editingId === game.id ? (
-                                                    <Input
-                                                        type="number"
-                                                        value={editPrice}
-                                                        onChange={(e) => setEditPrice(e.target.value)}
-                                                        className="w-32"
-                                                        step="0.01"
-                                                    />
-                                                ) : (
-                                                    <span className="font-bold text-emerald-600 flex items-center gap-1">
-                                                        <span className="text-xs text-muted-foreground">R$</span>
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(game.price || 0))}
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {game.extractionTimes && game.extractionTimes.length > 0 ? (
-                                                        game.extractionTimes.map((time: string) => (
-                                                            <Badge key={time} variant="secondary" className="text-xs">
-                                                                {time}
-                                                            </Badge>
-                                                        ))
-                                                    ) : (
-                                                        <span className="text-muted-foreground text-xs italic">Nenhum horário definido</span>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {editingId === game.id ? (
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button size="sm" onClick={() => savePrice(game.id)} disabled={saving}>
-                                                            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                                                        </Button>
-                                                        <Button size="sm" variant="ghost" onClick={cancelEditing} disabled={saving}>
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                            onClick={() => openRulesModal(game)}
-                                                            title="Regras de Negócio"
-                                                        >
-                                                            <Shield className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                                            onClick={() => openPrizesModal(game)}
-                                                            title="Configurar Prêmios"
-                                                        >
-                                                            <DollarSign className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-muted-foreground hover:text-emerald-600"
-                                                            onClick={() => openScheduleModal(game)}
-                                                            title="Gerenciar Horários"
-                                                        >
-                                                            <Clock className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                            onClick={() => startEditing(game)}
-                                                            title="Editar Preço"
-                                                        >
-                                                            <SquarePen className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
 
@@ -440,7 +444,7 @@ export default function GameSettingsPage() {
                             </Button>
                         </div>
 
-                        <div className="border border-border rounded-md p-2 min-h-[100px] bg-muted/20">
+                        <div className="border border-border rounded-md p-2 min-h-[100px] bg-muted/20 max-h-[300px] overflow-y-auto">
                             {extractionTimes.length === 0 ? (
                                 <div className="text-center text-muted-foreground text-sm py-8">
                                     Nenhum horário adicionado.
@@ -498,30 +502,42 @@ export default function GameSettingsPage() {
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label>Prêmio Milhar (Acerto de 4 dígitos)</Label>
-                            <Input
-                                type="number"
-                                value={prizeValues.milhar}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, milhar: e.target.value })}
-                                placeholder="Ex: 10000"
-                            />
+                            <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                <Input
+                                    type="number"
+                                    className="pl-9"
+                                    value={prizeValues.milhar}
+                                    onChange={(e) => setPrizeValues({ ...prizeValues, milhar: e.target.value })}
+                                    placeholder="Ex: 10000"
+                                />
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Prêmio Centena (Acerto de 3 dígitos)</Label>
-                            <Input
-                                type="number"
-                                value={prizeValues.centena}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, centena: e.target.value })}
-                                placeholder="Ex: 100"
-                            />
+                            <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                <Input
+                                    type="number"
+                                    className="pl-9"
+                                    value={prizeValues.centena}
+                                    onChange={(e) => setPrizeValues({ ...prizeValues, centena: e.target.value })}
+                                    placeholder="Ex: 100"
+                                />
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Prêmio Dezena (Acerto de 2 dígitos)</Label>
-                            <Input
-                                type="number"
-                                value={prizeValues.dezena}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, dezena: e.target.value })}
-                                placeholder="Ex: 10"
-                            />
+                            <div className="relative">
+                                <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                <Input
+                                    type="number"
+                                    className="pl-9"
+                                    value={prizeValues.dezena}
+                                    onChange={(e) => setPrizeValues({ ...prizeValues, dezena: e.target.value })}
+                                    placeholder="Ex: 10"
+                                />
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
@@ -540,34 +556,32 @@ export default function GameSettingsPage() {
                         <DialogTitle>Regras de Negócio - {selectedGame?.name}</DialogTitle>
                         <CardDescription>Configure as restrições e regras automáticas deste jogo.</CardDescription>
                     </DialogHeader>
-                    <div className="space-y-6 py-4">
-                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
+                    <div className="space-y-4 py-4">
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
                             <div className="space-y-0.5">
                                 <Label className="text-base font-semibold">Bloqueio Global</Label>
-                                <p className="text-sm text-muted-foreground">
-                                    impede que o mesmo número seja vendido mais de uma vez para o mesmo sorteio, por qualquer cambista.
+                                <p className="text-sm text-muted-foreground max-w-[300px]">
+                                    Impede que o mesmo número seja vendido mais de uma vez para o mesmo sorteio, por qualquer cambista.
                                 </p>
                             </div>
-                            <input
-                                type="checkbox"
+                            <Switch
                                 checked={rulesValues.globalCheck}
-                                onChange={(e) => setRulesValues({ ...rulesValues, globalCheck: e.target.checked })}
-                                className="h-6 w-6 accent-emerald-600"
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, globalCheck: checked })}
+                                className="data-[state=checked]:bg-emerald-600"
                             />
                         </div>
 
-                        <div className="flex items-center justify-between space-x-2 border p-4 rounded-lg">
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
                             <div className="space-y-0.5">
-                                <Label className="text-base font-semibold">Modo Restrito (Auto-Preenchimento)</Label>
-                                <p className="text-sm text-muted-foreground">
-                                    Se o apostador escolher apenas 1 milhar, o sistema irá gerar automaticamente as outras 3 milhares com a mesma terminação (centena).
+                                <Label className="text-base font-semibold">Modo Restrito</Label>
+                                <p className="text-sm text-muted-foreground max-w-[300px]">
+                                    Gera automaticamente as outras 3 milhares relacionadas ao escolher apenas 1 milhar.
                                 </p>
                             </div>
-                            <input
-                                type="checkbox"
+                            <Switch
                                 checked={rulesValues.restrictedMode}
-                                onChange={(e) => setRulesValues({ ...rulesValues, restrictedMode: e.target.checked })}
-                                className="h-6 w-6 accent-emerald-600"
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
+                                className="data-[state=checked]:bg-emerald-600"
                             />
                         </div>
                     </div>

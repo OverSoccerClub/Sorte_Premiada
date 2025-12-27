@@ -439,34 +439,38 @@ export default function CambistasPage() {
                 </Dialog>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <CardTitle>Equipe de Vendas</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="w-5 h-5 text-emerald-500" />
+                                Equipe de Vendas
+                            </CardTitle>
                             <CardDescription>Lista de todos os cambistas cadastrados no sistema.</CardDescription>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setAudioEnabled(!audioEnabled)}
-                                className={audioEnabled ? "bg-amber-50 text-amber-600 border-amber-200" : ""}
+                                className={`h-9 ${audioEnabled ? "bg-amber-50 text-amber-600 border-amber-200" : ""}`}
                             >
                                 {audioEnabled ? <Bell className="h-4 w-4 mr-2" /> : <BellOff className="h-4 w-4 mr-2" />}
                                 Alerta Sonoro
                             </Button>
-                            <div className="relative w-64">
+                            <div className="relative w-full sm:w-64">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Buscar cambista..." className="pl-9 bg-muted/50 border-border" />
+                                <Input placeholder="Buscar cambista..." className="pl-9 bg-background border-border h-9" />
                             </div>
-                            <Button variant="outline" size="icon">
-                                <Filter className="h-4 w-4 text-slate-500" />
+                            <Button variant="outline" size="sm" className="h-9">
+                                <Filter className="h-4 w-4 text-slate-500 mr-2" />
+                                Filtros
                             </Button>
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -474,7 +478,7 @@ export default function CambistasPage() {
                     ) : (
                         <Table>
                             <TableHeader>
-                                <TableRow className="hover:bg-muted/50">
+                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead className="w-[300px]">Nome</TableHead>
                                     <TableHead>Praça</TableHead>
                                     <TableHead>Status</TableHead>

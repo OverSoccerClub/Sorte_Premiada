@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -12,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Settings as SettingsIcon, Plus, Calendar, Trophy, Trash2, Clock, Hash, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight } from "lucide-react"
+import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag } from "lucide-react"
 
 export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
@@ -162,74 +161,85 @@ export default function DrawsSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg">
-                        <Calendar className="w-8 h-8 text-emerald-500" />
-                    </div>
-                    Gestão de Sorteios
-                </h2>
-                <p className="text-muted-foreground mt-1 ml-14">Agende e gerencie os resultados dos sorteios.</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Calendar className="w-8 h-8 text-emerald-500" />
+                        </div>
+                        Gestão de Sorteios
+                    </h2>
+                    <p className="text-muted-foreground mt-1 ml-14">Agende e gerencie os resultados dos sorteios.</p>
+                </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Filtrar por Jogo</CardTitle>
-                    <CardDescription>Selecione um jogo para ver seus sorteios.</CardDescription>
+            <Card className="border-border shadow-sm bg-card">
+                <CardHeader className="flex items-center justify-between py-4">
+                    <div className="flex items-center gap-2">
+                        <Filter className="w-5 h-5 text-emerald-500" />
+                        <CardTitle className="text-base">Filtrar por Jogo</CardTitle>
+                    </div>
                 </CardHeader>
-                <CardContent className="flex items-center gap-4">
-                    <Select value={selectedGameId} onValueChange={setSelectedGameId}>
-                        <SelectTrigger className="w-[300px]">
-                            <SelectValue placeholder="Selecione um jogo..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                <CardContent>
+                    <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+                        <div className="w-full sm:w-[300px] space-y-1.5">
+                            <Select value={selectedGameId} onValueChange={setSelectedGameId}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione um jogo..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    {selectedGameId && (
-                        <Button onClick={() => handleOpenModal(null)}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Novo Sorteio
-                        </Button>
-                    )}
+                        {selectedGameId && (
+                            <Button onClick={() => handleOpenModal(null)} className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700">
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Sorteio
+                            </Button>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
 
             {selectedGameId && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Sorteios Agendados / Realizados</CardTitle>
+                <Card className="border-border shadow-sm bg-card overflow-hidden">
+                    <CardHeader className="bg-muted/30 border-b border-border">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-emerald-500" />
+                            Sorteios Agendados / Realizados
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-0">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Série</TableHead>
+                                <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
+                                    <TableHead className="pl-6">Série</TableHead>
                                     <TableHead>Data / Hora</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Números Sorteados</TableHead>
-                                    <TableHead className="text-right">Ações</TableHead>
+                                    <TableHead className="text-right pr-6">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center">
+                                        <TableCell colSpan={5} className="h-24 text-center">
                                             <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                         </TableCell>
                                     </TableRow>
                                 ) : (draws || []).length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                             Nenhum sorteio encontrado.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     (draws || []).map(draw => (
-                                        <TableRow key={draw.id}>
-                                            <TableCell>
-                                                <Badge variant="outline" className="font-mono bg-slate-50">
+                                        <TableRow key={draw.id} className="hover:bg-muted/50 transition-colors">
+                                            <TableCell className="pl-6">
+                                                <Badge variant="outline" className="font-mono bg-background">
                                                     #{draw.series?.toString().padStart(4, '0') || '---'}
                                                 </Badge>
                                             </TableCell>
@@ -241,16 +251,16 @@ export default function DrawsSettingsPage() {
                                             </TableCell>
                                             <TableCell>
                                                 {new Date(draw.drawDate) > new Date() ?
-                                                    <span className="flex items-center gap-1 text-yellow-700 bg-yellow-100 px-2 py-1 rounded text-xs font-bold w-fit border border-yellow-200">
+                                                    <span className="inline-flex items-center gap-1.5 text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-yellow-200">
                                                         <Clock className="w-3 h-3" />
                                                         Agendado
                                                     </span> :
                                                     draw.numbers && draw.numbers.length > 0 ?
-                                                        <span className="flex items-center gap-1 text-green-700 bg-green-100 px-2 py-1 rounded text-xs font-bold w-fit border border-green-200">
+                                                        <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-emerald-200">
                                                             <CheckCircle className="w-3 h-3" />
                                                             Realizado
                                                         </span> :
-                                                        <span className="flex items-center gap-1 text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs font-bold w-fit border border-gray-200">
+                                                        <span className="inline-flex items-center gap-1.5 text-gray-600 bg-gray-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-gray-200">
                                                             <AlertCircle className="w-3 h-3" />
                                                             Pendente
                                                         </span>
@@ -259,22 +269,22 @@ export default function DrawsSettingsPage() {
                                             <TableCell>
                                                 {draw.numbers && draw.numbers.length > 0 ?
                                                     <div className="flex items-center gap-2">
-                                                        <div className="p-1 bg-yellow-100 rounded text-yellow-600">
+                                                        <div className="p-1 bg-yellow-100 rounded text-yellow-600 border border-yellow-200">
                                                             <Trophy className="w-3 h-3" />
                                                         </div>
-                                                        <span className="font-mono text-sm tracking-widest">{draw.numbers.join(' - ')}</span>
+                                                        <span className="font-mono text-sm tracking-widest font-bold">{draw.numbers.join(' - ')}</span>
                                                     </div> :
                                                     <span className="text-muted-foreground italic text-xs pl-2">-</span>
                                                 }
                                             </TableCell>
-                                            <TableCell className="text-right flex justify-end gap-2">
-                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => handleOpenDetails(draw.id)} title="Ver Detalhes">
+                                            <TableCell className="text-right flex justify-end gap-2 pr-6">
+                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200" onClick={() => handleOpenDetails(draw.id)} title="Ver Detalhes">
                                                     <Eye className="w-4 h-4" />
                                                 </Button>
-                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => handleOpenModal(draw)}>
+                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200" onClick={() => handleOpenModal(draw)}>
                                                     <SquarePen className="w-4 h-4" />
                                                 </Button>
-                                                <Button size="sm" variant="destructive" onClick={() => handleDelete(draw.id)}>
+                                                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleDelete(draw.id)}>
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </TableCell>
@@ -294,15 +304,15 @@ export default function DrawsSettingsPage() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <label>Data</label>
+                            <label className="text-sm font-medium">Data</label>
                             <Input type="date" value={drawDate} onChange={e => setDrawDate(e.target.value)} />
                         </div>
                         <div className="grid gap-2">
-                            <label>Hora</label>
+                            <label className="text-sm font-medium">Hora</label>
                             <Input type="time" value={drawTime} onChange={e => setDrawTime(e.target.value)} />
                         </div>
                         <div className="grid gap-2">
-                            <label>Números Sorteados (separar por vírgula)</label>
+                            <label className="text-sm font-medium">Números Sorteados (separar por vírgula)</label>
                             <Input
                                 placeholder="Ex: 5, 10, 15 ou Deixe em branco se for agendamento"
                                 value={winningNumbers}
@@ -313,7 +323,7 @@ export default function DrawsSettingsPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
-                        <Button onClick={handleSave} disabled={saving}>
+                        <Button onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
                             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trophy className="h-4 w-4 mr-2" />}
                             Salvar Sorteio
                         </Button>
@@ -334,34 +344,43 @@ export default function DrawsSettingsPage() {
                         <div className="space-y-6">
                             {/* Stats Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <Card className="bg-emerald-500/10 border-emerald-500/20">
+                                <Card className="bg-emerald-500/10 border-emerald-500/20 shadow-sm border">
                                     <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm font-medium text-emerald-600">Total Arrecadado</CardTitle>
+                                        <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-2">
+                                            <Tag className="w-4 h-4" />
+                                            Total Arrecadado
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">
+                                        <div className="text-2xl font-bold text-foreground">
                                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(drawDetails.stats.totalSales)}
                                         </div>
                                         <p className="text-xs text-muted-foreground">{drawDetails.stats.ticketCount} apostas</p>
                                     </CardContent>
                                 </Card>
-                                <Card className="bg-yellow-500/10 border-yellow-500/20">
+                                <Card className="bg-yellow-500/10 border-yellow-500/20 shadow-sm border">
                                     <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm font-medium text-yellow-600">Bilhetes Premiados</CardTitle>
+                                        <CardTitle className="text-sm font-medium text-yellow-600 flex items-center gap-2">
+                                            <Trophy className="w-4 h-4" />
+                                            Bilhetes Premiados
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">
+                                        <div className="text-2xl font-bold text-foreground">
                                             {drawDetails.stats.winningCount}
                                         </div>
                                         <p className="text-xs text-muted-foreground">Vencedores</p>
                                     </CardContent>
                                 </Card>
-                                <Card className="bg-slate-500/10 border-slate-500/20">
+                                <Card className="bg-slate-500/10 border-slate-500/20 shadow-sm border">
                                     <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm font-medium text-slate-600">Números Sorteados</CardTitle>
+                                        <CardTitle className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                            <CheckCircle className="w-4 h-4" />
+                                            Números Sorteados
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-lg font-mono font-bold tracking-widest">
+                                        <div className="text-lg font-mono font-bold tracking-widest text-foreground">
                                             {drawDetails.draw.numbers && drawDetails.draw.numbers.length > 0 ? (drawDetails.draw.numbers as number[]).join(' - ') : 'Não realizado'}
                                         </div>
                                     </CardContent>
@@ -370,12 +389,15 @@ export default function DrawsSettingsPage() {
 
                             {/* Tickets List */}
                             <div>
-                                <h3 className="text-lg font-semibold mb-3">Bilhetes Participantes</h3>
-                                <div className="border rounded-md">
+                                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                    <Ticket className="w-5 h-5 text-emerald-500" />
+                                    Bilhetes Participantes
+                                </h3>
+                                <div className="border rounded-md overflow-hidden">
                                     <Table>
                                         <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Bilhete / Hash</TableHead>
+                                            <TableRow className="bg-muted/30">
+                                                <TableHead className="pl-4">Bilhete / Hash</TableHead>
                                                 <TableHead>Cambista / Área</TableHead>
                                                 <TableHead>Números</TableHead>
                                                 <TableHead>Valor</TableHead>
@@ -391,8 +413,8 @@ export default function DrawsSettingsPage() {
                                                 return (
                                                     <>
                                                         {paginatedTickets.map((t: any) => (
-                                                            <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : ''}>
-                                                                <TableCell className="font-mono text-xs">
+                                                            <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'hover:bg-muted/50'}>
+                                                                <TableCell className="font-mono text-xs pl-4">
                                                                     <div className="font-bold">{t.id.slice(0, 8)}...</div>
                                                                     <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
                                                                 </TableCell>
@@ -424,7 +446,7 @@ export default function DrawsSettingsPage() {
                                                         {/* Pagination Controls */}
                                                         {drawDetails.tickets.length > ITEMS_PER_PAGE && (
                                                             <TableRow>
-                                                                <TableCell colSpan={5} className="p-2">
+                                                                <TableCell colSpan={5} className="p-2 border-t bg-muted/20">
                                                                     <div className="flex items-center justify-between w-full">
                                                                         <Button
                                                                             variant="ghost"

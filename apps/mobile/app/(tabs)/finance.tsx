@@ -1,34 +1,33 @@
 import { useState, useCallback, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions, Share, Alert, Modal, TextInput } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions, Modal, TextInput } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
 
-
 const { height } = Dimensions.get("window");
 import { usePrinter } from "../../context/PrinterContext";
 import { FinanceService, FinanceSummary } from "../../services/finance.service";
-import { printDailyReport, formatDailyReport } from "../../services/printing.service";
+import { printDailyReport } from "../../services/printing.service";
 import { CustomAlert } from "../../components/CustomAlert";
 import { ReportPreview } from "../../components/ReportPreview";
-import { SangriaModal } from "../../components/SangriaModal"; // Added import
+import { SangriaModal } from "../../components/SangriaModal";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
+import { ScreenLayout } from "../../components/ScreenLayout";
 
 export default function FinanceScreen() {
     const router = useRouter();
     const { token } = useAuth();
     const { printerType } = usePrinter();
     const insets = useSafeAreaInsets();
-    // 70 (base tab height) + insets.bottom (safe area) + 50 (extra spacing)
     const BOTTOM_PADDING = 70 + insets.bottom + 50;
 
     const [summary, setSummary] = useState<FinanceSummary | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [sangriaModalVisible, setSangriaModalVisible] = useState(false); // Added state
+    const [sangriaModalVisible, setSangriaModalVisible] = useState(false);
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -126,7 +125,6 @@ export default function FinanceScreen() {
 
     const handleShareReport = async () => {
         try {
-            // Need to wait a bit for render if just opened, but usually it's open already
             if (viewShotRef.current && (viewShotRef.current as any).capture) {
                 const uri = await (viewShotRef.current as any).capture();
                 if (await Sharing.isAvailableAsync()) {
@@ -166,7 +164,6 @@ export default function FinanceScreen() {
     };
 
     const handleOpenPreview = () => {
-        // Shows the report preview (Pre-Close)
         setReportModalVisible(true);
     };
 
@@ -182,20 +179,15 @@ export default function FinanceScreen() {
     };
 
     const performCloseDay = async () => {
-        setAlertConfig(prev => ({ ...prev, visible: false })); // Close confirmation
+        setAlertConfig(prev => ({ ...prev, visible: false }));
         if (!summary) return;
         setIsLoading(true);
 
-        // 1. Close in Backend
         const result = await FinanceService.closeDay(token!);
         setIsLoading(false);
 
         if (result) {
-            // Refresh Data to show closed state
             loadData();
-            // We can keep the modal open or close it. 
-            // Maybe show a success inside the modal or just refresh.
-            // Let's Refresh and show updated state.
             showAlert("Sucesso", "Caixa encerrado com sucesso!", "success");
         } else {
             showAlert("Erro", "Falha ao fechar caixa.", "error");
@@ -208,19 +200,18 @@ export default function FinanceScreen() {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
+        <ScreenLayout>
             {/* Header */}
-            <View style={tw`p-6 border-b border-gray-800 bg-surface flex-row items-center`}>
+            <View style={tw`w-full p-6 border-b border-gray-800 bg-surface flex-row items-center shadow-md`}>
                 <TouchableOpacity onPress={() => router.push("/(tabs)")} style={tw`mr-4 p-2 bg-gray-800 rounded-full border border-gray-700`}>
                     <Ionicons name="arrow-back" size={24} color="#94a3b8" />
                 </TouchableOpacity>
-                <View>
+                <View style={tw`flex-1`}>
                     <TouchableOpacity onLongPress={async () => {
                         const info = await FinanceService.getDebugInfo(token!);
                         if (info) {
-                            Alert.alert("Debug Info", JSON.stringify(info, null, 2));
-                        } else {
-                            Alert.alert("Debug", "Falha ao obter info.");
+                            // Using native alert for debug
+                            alert(JSON.stringify(info, null, 2));
                         }
                     }}>
                         <Text style={tw`text-2xl font-bold text-white`}>Financeiro</Text>
@@ -230,16 +221,17 @@ export default function FinanceScreen() {
             </View>
 
             <ScrollView
+                style={tw`w-full`}
                 overScrollMode="never"
                 contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingVertical: 16, paddingBottom: BOTTOM_PADDING }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#50C878" />}
             >
                 <View style={tw`w-[90%] max-w-[400px]`}>
                     {/* Sales Limit Progress */}
-                    <View style={tw`bg-surface p-4 rounded-xl border border-gray-800 mb-6`}>
+                    <View style={tw`bg-surface p-4 rounded-xl border border-gray-800 mb-6 shadow-sm`}>
                         <View style={tw`flex-row justify-between mb-2`}>
-                            <Text style={tw`text-gray-400 text-xs uppercase`}>Limite de Vendas Diário</Text>
-                            <Text style={tw`text-gray-400 text-xs`}>
+                            <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Limite de Vendas Diário</Text>
+                            <Text style={tw`text-gray-400 text-xs font-mono`}>
                                 {Math.min(((summary?.totalSales || 0) / (summary?.salesLimit || 1000)) * 100, 100).toFixed(1)}%
                             </Text>
                         </View>
@@ -256,7 +248,7 @@ export default function FinanceScreen() {
                         </View>
                         <View style={tw`flex-row justify-between`}>
                             <Text style={tw`text-white font-bold`}>{formatCurrency(summary?.totalSales || 0)}</Text>
-                            <Text style={tw`text-gray-400`}>de {formatCurrency(summary?.salesLimit || 1000)}</Text>
+                            <Text style={tw`text-gray-400 text-xs mt-1`}>de {formatCurrency(summary?.salesLimit || 1000)}</Text>
                         </View>
                     </View>
 
@@ -264,28 +256,28 @@ export default function FinanceScreen() {
                     <View style={tw`flex-row flex-wrap justify-between gap-y-3 mb-6`}>
                         <TouchableOpacity
                             onPress={handleOpenDetails}
-                            style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}
+                            style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800 active:bg-gray-800`}
                         >
-                            <Text style={tw`text-gray-400 text-xs uppercase`}>Vendas do Dia</Text>
+                            <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Vendas do Dia</Text>
                             <Text style={tw`text-emerald-500 text-xl font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.totalSales) : "..."}
                             </Text>
-                            <Text style={tw`text-emerald-500/50 text-[10px] mt-1`}>Toque para detalhar</Text>
+                            <Text style={tw`text-emerald-500/50 text-[10px] mt-1 font-bold`}>VER DETALHES</Text>
                         </TouchableOpacity>
                         <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}>
-                            <Text style={tw`text-gray-400 text-xs uppercase`}>Saldo Final</Text>
+                            <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Saldo Final</Text>
                             <Text style={tw`text-white text-xl font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.finalBalance) : "..."}
                             </Text>
                         </View>
                         <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}>
-                            <Text style={tw`text-gray-400 text-xs uppercase`}>Créditos</Text>
+                            <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Créditos</Text>
                             <Text style={tw`text-blue-400 text-lg font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.totalCredits) : "..."}
                             </Text>
                         </View>
                         <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}>
-                            <Text style={tw`text-gray-400 text-xs uppercase`}>Débitos</Text>
+                            <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Débitos</Text>
                             <Text style={tw`text-red-400 text-lg font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.totalDebits) : "..."}
                             </Text>
@@ -298,7 +290,7 @@ export default function FinanceScreen() {
                             <TouchableOpacity
                                 onPress={() => handleOpenModal('CREDIT')}
                                 disabled={summary?.isClosed}
-                                style={tw`flex-1 bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                                style={tw`flex-1 bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''} active:bg-blue-500/20`}
                             >
                                 <Ionicons name="add-circle" size={20} color="#60a5fa" style={tw`mr-2`} />
                                 <Text style={tw`text-blue-400 font-bold`}>Crédito</Text>
@@ -306,7 +298,7 @@ export default function FinanceScreen() {
                             <TouchableOpacity
                                 onPress={() => handleOpenModal('DEBIT')}
                                 disabled={summary?.isClosed}
-                                style={tw`flex-1 bg-red-500/10 border border-red-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                                style={tw`flex-1 bg-red-500/10 border border-red-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''} active:bg-red-500/20`}
                             >
                                 <Ionicons name="remove-circle" size={20} color="#f87171" style={tw`mr-2`} />
                                 <Text style={tw`text-red-400 font-bold`}>Débito</Text>
@@ -316,7 +308,7 @@ export default function FinanceScreen() {
                         <TouchableOpacity
                             onPress={() => setSangriaModalVisible(true)}
                             disabled={summary?.isClosed}
-                            style={tw`w-full bg-indigo-500/10 border border-indigo-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                            style={tw`w-full bg-indigo-500/10 border border-indigo-500/30 p-3 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''} active:bg-indigo-500/20`}
                         >
                             <Ionicons name="cash-outline" size={20} color="#818cf8" style={tw`mr-2`} />
                             <Text style={tw`text-indigo-400 font-bold uppercase`}>Sangria / Recolhimento</Text>
@@ -334,10 +326,10 @@ export default function FinanceScreen() {
                     )}
 
                     {/* Transitions List */}
-                    <Text style={tw`text-white font-bold text-lg mb-3`}>Movimentações</Text>
+                    <Text style={tw`text-white font-bold text-lg mb-3 pl-1 border-l-4 border-primary ml-1`}>Movimentações</Text>
                     {summary?.transactions && summary.transactions.length > 0 ? (
                         summary.transactions.map((t) => (
-                            <View key={t.id} style={tw`bg-surface p-3 rounded-xl border border-gray-800 mb-2 flex-row justify-between items-center`}>
+                            <View key={t.id} style={tw`bg-surface p-4 rounded-xl border border-gray-800 mb-2 flex-row justify-between items-center shadow-sm`}>
                                 <View>
                                     <Text style={tw`text-white font-bold`}>{t.description}</Text>
                                     <Text style={tw`text-gray-500 text-xs`}>{new Date(t.createdAt).toLocaleTimeString()}</Text>
@@ -348,16 +340,18 @@ export default function FinanceScreen() {
                             </View>
                         ))
                     ) : (
-                        <Text style={tw`text-gray-500 text-center py-4`}>Nenhuma movimentação hoje.</Text>
+                        <View style={tw`p-8 items-center justify-center border border-dashed border-gray-800 rounded-xl`}>
+                            <Text style={tw`text-gray-500 text-center`}>Nenhuma movimentação hoje.</Text>
+                        </View>
                     )}
 
                     <TouchableOpacity
-                        onPress={handleOpenPreview} // Changed from handleCloseDay
+                        onPress={handleOpenPreview}
                         disabled={summary?.isClosed}
-                        style={tw`mt-8 bg-emerald-600 p-4 rounded-xl items-center flex-row justify-center ${summary?.isClosed ? 'opacity-50' : ''}`}
+                        style={tw`mt-8 bg-emerald-600 p-4 rounded-xl items-center flex-row justify-center shadow-lg shadow-emerald-600/20 ${summary?.isClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
                     >
                         <Ionicons name="receipt" size={24} color="white" style={tw`mr-2`} />
-                        <Text style={tw`text-white font-bold text-lg`}>{summary?.isClosed ? "Caixa Fechado" : "Conferir Fechamento"}</Text>
+                        <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>{summary?.isClosed ? "Caixa Fechado" : "Conferir Fechamento"}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -370,28 +364,28 @@ export default function FinanceScreen() {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={tw`flex-1 justify-end bg-black/50`}>
-                    <View style={tw`bg-surface rounded-t-3xl p-6 border-t border-gray-800`}>
+                    <View style={tw`bg-surface rounded-t-3xl p-6 border-t border-gray-800 pb-10`}>
                         <View style={tw`flex-row justify-between items-center mb-6`}>
                             <Text style={tw`text-xl font-bold text-white`}>
                                 {transactionType === 'CREDIT' ? 'Adicionar Crédito' : 'Adicionar Débito'}
                             </Text>
-                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                            <TouchableOpacity onPress={() => setModalVisible(false)} style={tw`p-2 bg-gray-800 rounded-full`}>
                                 <Ionicons name="close" size={24} color="#94a3b8" />
                             </TouchableOpacity>
                         </View>
 
-                        <Text style={tw`text-gray-400 mb-2`}>Descrição</Text>
+                        <Text style={tw`text-gray-400 mb-2 font-bold uppercase text-xs`}>Descrição</Text>
                         <TextInput
-                            style={tw`bg-background text-white p-4 rounded-xl border border-gray-700 mb-4`}
+                            style={tw`bg-background text-white p-4 rounded-xl border border-gray-700 mb-4 focus:border-primary text-base`}
                             placeholder="Ex: Pagamento, Troco..."
                             placeholderTextColor="#64748b"
                             value={description}
                             onChangeText={setDescription}
                         />
 
-                        <Text style={tw`text-gray-400 mb-2`}>Valor (R$)</Text>
+                        <Text style={tw`text-gray-400 mb-2 font-bold uppercase text-xs`}>Valor (R$)</Text>
                         <TextInput
-                            style={tw`bg-background text-white p-4 rounded-xl border border-gray-700 mb-6`}
+                            style={tw`bg-background text-white p-4 rounded-xl border border-gray-700 mb-6 focus:border-primary text-lg font-bold`}
                             placeholder="0,00"
                             placeholderTextColor="#64748b"
                             keyboardType="numeric"
@@ -402,15 +396,14 @@ export default function FinanceScreen() {
                         <TouchableOpacity
                             onPress={handleSubmitTransaction}
                             disabled={isSubmitting}
-                            style={tw`bg-emerald-600 p-4 rounded-xl items-center`}
+                            style={tw`bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/40`}
                         >
                             {isSubmitting ? (
                                 <ActivityIndicator color="white" />
                             ) : (
-                                <Text style={tw`text-white font-bold text-lg`}>Salvar</Text>
+                                <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Salvar</Text>
                             )}
                         </TouchableOpacity>
-                        <View style={tw`h-8`} />
                     </View>
                 </View>
             </Modal>
@@ -426,7 +419,7 @@ export default function FinanceScreen() {
                     <View style={tw`bg-surface rounded-t-3xl p-6 border-t border-gray-800 h-[80%]`}>
                         <View style={tw`flex-row justify-between items-center mb-6`}>
                             <Text style={tw`text-xl font-bold text-white`}>Detalhamento de Vendas</Text>
-                            <TouchableOpacity onPress={() => setDetailsModalVisible(false)}>
+                            <TouchableOpacity onPress={() => setDetailsModalVisible(false)} style={tw`p-2 bg-gray-800 rounded-full`}>
                                 <Ionicons name="close" size={24} color="#94a3b8" />
                             </TouchableOpacity>
                         </View>
@@ -464,7 +457,6 @@ export default function FinanceScreen() {
             >
                 <View style={tw`flex-1 justify-center items-center bg-black/80`}>
                     <View style={tw`w-full h-full bg-transparent justify-center my-4 px-1`}>
-                        {/* Close Button Row */}
                         <View style={tw`flex-row justify-end mb-2 mr-2`}>
                             <TouchableOpacity onPress={() => setReportModalVisible(false)} style={tw`bg-gray-800 rounded-full p-2 border border-gray-600`}>
                                 <Ionicons name="close" size={24} color="#FFF" />
@@ -480,7 +472,7 @@ export default function FinanceScreen() {
                                 <ViewShot
                                     ref={viewShotRef}
                                     options={{ format: "jpg", quality: 0.9 }}
-                                    style={{ backgroundColor: '#ffffff' }} // Force white background
+                                    style={{ backgroundColor: '#ffffff' }}
                                 >
                                     <ReportPreview
                                         data={summary}
@@ -490,7 +482,6 @@ export default function FinanceScreen() {
                                 </ViewShot>
                             )}
 
-                            {/* Action Buttons Container */}
                             <View style={tw`w-full mt-6 gap-3`}>
                                 <View style={tw`flex-row gap-3`}>
                                     <TouchableOpacity
@@ -510,11 +501,10 @@ export default function FinanceScreen() {
                                     </TouchableOpacity>
                                 </View>
 
-                                {/* Final Close Button inside Preview */}
                                 {!summary?.isClosed && (
                                     <TouchableOpacity
                                         onPress={handleConfirmClose}
-                                        style={tw`bg-red-600 p-4 rounded-xl items-center flex-row justify-center`}
+                                        style={tw`bg-red-600 p-4 rounded-xl items-center flex-row justify-center shadow-lg shadow-red-600/30`}
                                     >
                                         <Ionicons name="lock-closed" size={20} color="white" style={tw`mr-2`} />
                                         <Text style={tw`text-white font-bold uppercase`}>Encerrar Dia (Definitivo)</Text>
@@ -526,16 +516,12 @@ export default function FinanceScreen() {
                 </View>
             </Modal>
 
-            {/* ... Custom Alert ... */}
-
             <SangriaModal
                 visible={sangriaModalVisible}
                 onClose={() => setSangriaModalVisible(false)}
                 onSuccess={() => {
-                    setSangriaModalVisible(false); // Close Sangria Modal
-                    loadData(); // Refresh data
-                    // Alert is already shown inside SangriaModal for success, but maybe refresh summary is enough?
-                    // Actually SangriaModal shows success.
+                    setSangriaModalVisible(false);
+                    loadData();
                 }}
             />
 
@@ -548,6 +534,6 @@ export default function FinanceScreen() {
                 onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
                 onConfirm={alertConfig.onConfirm}
             />
-        </SafeAreaView>
+        </ScreenLayout>
     );
 }

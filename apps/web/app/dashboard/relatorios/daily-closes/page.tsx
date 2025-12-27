@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Download, CalendarCheck, Search, Filter, Eye, ArrowUpCircle, ArrowDownCircle, CheckCircle2, Clock, AlertTriangle, Printer } from "lucide-react"
+import { Download, CalendarCheck, Search, Filter, Eye, ArrowUpCircle, ArrowDownCircle, CheckCircle2, Clock, AlertTriangle, Printer, Calendar } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -124,28 +124,43 @@ export default function DailyClosesPage() {
                 </div>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-emerald-500" />
-                        Filtros de Pesquisa
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                        <div className="space-y-2">
-                            <Label>Início</Label>
-                            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b border-border no-print">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <CardTitle className="text-base uppercase tracking-wider font-bold flex items-center gap-2">
+                                <Filter className="w-4 h-4 text-emerald-500" />
+                                Histórico de Fechamentos
+                            </CardTitle>
+                            <CardDescription>Filtre e visualize os fechamentos de caixa.</CardDescription>
                         </div>
-                        <div className="space-y-2">
-                            <Label>Fim</Label>
-                            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Cambista</Label>
+
+                        <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[140px] bg-background border-border h-9"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                </div>
+                                <span className="text-muted-foreground">-</span>
+                                <div className="relative">
+                                    <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        type="date"
+                                        className="pl-9 w-[140px] bg-background border-border h-9"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
                             <Select value={selectedCambista} onValueChange={setSelectedCambista}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Todos" />
+                                <SelectTrigger className="w-[180px] h-9 bg-background border-border">
+                                    <SelectValue placeholder="Todos Cambistas" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos Cambistas</SelectItem>
@@ -154,37 +169,31 @@ export default function DailyClosesPage() {
                                     ))}
                                 </SelectContent>
                             </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Situação</Label>
+
                             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Todas" />
+                                <SelectTrigger className="w-[140px] h-9 bg-background border-border">
+                                    <SelectValue placeholder="Todas Situações" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Todas Situações</SelectItem>
+                                    <SelectItem value="all">Todas</SelectItem>
                                     <SelectItem value="PENDING">Pendente</SelectItem>
                                     <SelectItem value="VERIFIED">Conferido</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-                        <Button onClick={fetchCloses} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700">
-                            {loading ? "Buscando..." : "Filtrar"}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
 
-            <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20 no-print">
-                    <CardTitle className="text-base uppercase tracking-wider font-bold">Histórico de Fechamentos</CardTitle>
-                    <Button onClick={handlePrint} variant="outline" size="sm" className="gap-2 bg-white">
-                        <Printer className="w-4 h-4" /> Imprimir Lista
-                    </Button>
+                            <Button onClick={fetchCloses} disabled={loading} size="sm" className="h-9 bg-emerald-600 hover:bg-emerald-700">
+                                {loading ? "..." : "Filtrar"}
+                            </Button>
+
+                            <Button onClick={handlePrint} variant="outline" size="sm" className="h-9 gap-2 bg-background border-border">
+                                <Printer className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
                 </CardHeader>
 
                 {/* Print Header */}
-                <div className="hidden print:block mb-6 border-b pb-4">
+                <div className="hidden print:block p-6 mb-4 border-b">
                     <h1 className="text-2xl font-bold">Relatório de Fechamentos Diários</h1>
                     <p className="text-sm">Período: {format(new Date(startDate), "dd/MM/yyyy")} até {format(new Date(endDate), "dd/MM/yyyy")}</p>
                     {selectedCambista !== "all" && <p className="text-sm">Cambista: {cambistas.find(c => c.id === selectedCambista)?.name}</p>}
@@ -193,15 +202,15 @@ export default function DailyClosesPage() {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-muted/30">
-                                <TableHead>Data</TableHead>
+                            <TableRow className="bg-muted/20 hover:bg-muted/30 border-b border-border/60">
+                                <TableHead className="pl-4">Data</TableHead>
                                 <TableHead>Cambista</TableHead>
                                 <TableHead className="text-right">Vendas</TableHead>
                                 <TableHead className="text-right">Entradas</TableHead>
                                 <TableHead className="text-right">Saídas</TableHead>
                                 <TableHead className="text-right">Saldo Final</TableHead>
                                 <TableHead className="text-center">Situação</TableHead>
-                                <TableHead className="text-right">Ações</TableHead>
+                                <TableHead className="text-right pr-4">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -213,8 +222,8 @@ export default function DailyClosesPage() {
                                 </TableRow>
                             )}
                             {closes.map((c) => (
-                                <TableRow key={c.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">
+                                <TableRow key={c.id} className="hover:bg-muted/50 transition-colors">
+                                    <TableCell className="font-medium pl-4">
                                         {format(new Date(c.date || c.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                                     </TableCell>
                                     <TableCell>{c.closedByUser?.name || c.closedByUser?.username || "-"}</TableCell>
@@ -235,15 +244,15 @@ export default function DailyClosesPage() {
                                             </span>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right pr-4">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-8 w-8 p-0"
+                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full"
                                             title="Ver Detalhes"
                                             onClick={() => fetchDetail(c)}
                                         >
-                                            <Eye className="h-4 w-4 text-emerald-600" />
+                                            <Eye className="h-4 w-4" />
                                         </Button>
                                     </TableCell>
                                 </TableRow>

@@ -1,34 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Platform, Alert, PermissionsAndroid } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { usePrinter } from "../../context/PrinterContext";
-import { BLEPrinter } from "react-native-thermal-receipt-printer-image-qr";
-import { CustomAlert, AlertType } from "../../components/CustomAlert"; // Added Import
-
-interface BluetoothDevice {
-    name: string;
-    macAddress: string;
-}
+import { CustomAlert, AlertType } from "../../components/CustomAlert";
+import { ScreenLayout } from "../../components/ScreenLayout";
+import { ScreenHeader } from "../../components/ScreenHeader";
 
 export default function PrinterSettingsScreen() {
     const router = useRouter();
     const {
         printerType,
         setPrinterType,
-        printers,           // Fixed
-        scanPrinters,       // Fixed
-        connectPrinter,     // Fixed
-        disconnectPrinter,  // Fixed
-        connectedPrinter,   // Fixed (was connectedDevice)
+        printers,
+        scanPrinters,
+        connectPrinter,
+        disconnectPrinter,
+        connectedPrinter,
         isScanning,
-        isPosDevice         // Added
     } = usePrinter();
-
-    // const [devices, setDevices] = useState<BluetoothDevice[]>([]); // Removed local state, use context
-    // const [scanLoading, setScanLoading] = useState(false); // Use isScanning from context
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -58,57 +49,6 @@ export default function PrinterSettingsScreen() {
         }
     }, [printerType]);
 
-    const requestPermissions = async () => {
-        if (Platform.OS === 'android') {
-            try {
-                const granted = await PermissionsAndroid.requestMultiple([
-                    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-                    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                ]);
-
-                return (
-                    granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED &&
-                    granted['android.permission.BLUETOOTH_CONNECT'] === PermissionsAndroid.RESULTS.GRANTED
-                );
-            } catch (err) {
-                console.warn(err);
-                return false;
-            }
-        }
-        return true;
-    };
-
-    // This function is no longer needed as scanPrinters from context handles the scanning logic.
-    // const scanDevices = async () => {
-    //     setScanLoading(true);
-    //     try {
-    //         const hasPerms = await requestPermissions();
-    //         if (!hasPerms) {
-    //             showAlert("Permissão Negada", "O app precisa de permissão Bluetooth para encontrar impressoras.", "error"); // CustomAlert
-    //             setScanLoading(false);
-    //             return;
-    //         }
-
-    //         // Mock scan or library scan
-    //         BLEPrinter.init();
-    //         BLEPrinter.getDeviceList()
-    //             .then((results: BluetoothDevice[]) => {
-    //                 setDevices(results);
-    //             })
-    //             .catch((e: any) => {
-    //                 console.warn("Scan Error", e);
-    //                 showAlert("Erro", "Falha ao buscar dispositivos Bluetooth.", "error"); // CustomAlert
-    //             })
-    //             .finally(() => setScanLoading(false));
-
-    //     } catch (e) {
-    //         console.error(e);
-    //         showAlert("Erro", "Erro ao iniciar busca.", "error"); // CustomAlert
-    //         setScanLoading(false);
-    //     }
-    // };
-
     const handleConnect = async (printer: any) => {
         try {
             await connectPrinter(printer);
@@ -127,36 +67,30 @@ export default function PrinterSettingsScreen() {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
-            {/* Header */}
-            <View style={tw`p-6 border-b border-gray-800 flex-row items-center bg-surface`}>
-                <TouchableOpacity onPress={() => router.back()} style={tw`mr-4 p-2 bg-gray-800 rounded-full border border-gray-700`}>
-                    <Ionicons name="arrow-back" size={24} color="#94a3b8" />
-                </TouchableOpacity>
-                <Text style={tw`text-2xl font-bold text-white`}>Configurar Impressora</Text>
-            </View>
+        <ScreenLayout>
+            <ScreenHeader title="Configurar Impressora" />
 
-            <View style={tw`p-6 flex-1`}>
+            <View style={tw`w-full max-w-[500px] p-6 flex-1`}>
                 {/* Type Selection */}
                 <Text style={tw`text-gray-400 font-bold mb-4 uppercase text-xs tracking-wider`}>Tipo de Impressão</Text>
 
                 <View style={tw`flex-row gap-4 mb-8`}>
                     <TouchableOpacity
                         onPress={() => togglePrinterType('BLE')}
-                        style={tw`flex-1 p-4 rounded-xl border ${printerType === 'BLE' ? 'bg-primary border-primary' : 'bg-surface border-gray-700'}`}
+                        style={tw`flex-1 p-4 rounded-xl border ${printerType === 'BLE' ? 'bg-primary border-primary' : 'bg-surface border-gray-700'} items-center`}
                     >
-                        <Ionicons name="bluetooth" size={24} color={printerType === 'BLE' ? 'white' : '#94a3b8'} style={tw`mb-2`} />
-                        <Text style={tw`font-bold ${printerType === 'BLE' ? 'text-white' : 'text-gray-400'}`}>Bluetooth (Térmica)</Text>
-                        <Text style={tw`text-[10px] mt-1 ${printerType === 'BLE' ? 'text-white/80' : 'text-gray-600'}`}>Impressoras portáteis 58mm</Text>
+                        <Ionicons name="bluetooth" size={32} color={printerType === 'BLE' ? 'white' : '#94a3b8'} style={tw`mb-2`} />
+                        <Text style={tw`font-bold ${printerType === 'BLE' ? 'text-white' : 'text-gray-400'}`}>Bluetooth</Text>
+                        <Text style={tw`text-[10px] mt-1 text-center ${printerType === 'BLE' ? 'text-white/80' : 'text-gray-600'}`}>Impressoras 58mm</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => togglePrinterType('NATIVE')}
-                        style={tw`flex-1 p-4 rounded-xl border ${printerType === 'NATIVE' ? 'bg-primary border-primary' : 'bg-surface border-gray-700'}`}
+                        style={tw`flex-1 p-4 rounded-xl border ${printerType === 'NATIVE' ? 'bg-primary border-primary' : 'bg-surface border-gray-700'} items-center`}
                     >
-                        <Ionicons name="print" size={24} color={printerType === 'NATIVE' ? 'white' : '#94a3b8'} style={tw`mb-2`} />
-                        <Text style={tw`font-bold ${printerType === 'NATIVE' ? 'text-white' : 'text-gray-400'}`}>Nativa (Sistema)</Text>
-                        <Text style={tw`text-[10px] mt-1 ${printerType === 'NATIVE' ? 'text-white/80' : 'text-gray-600'}`}>USB / WiFi / PDF</Text>
+                        <Ionicons name="print" size={32} color={printerType === 'NATIVE' ? 'white' : '#94a3b8'} style={tw`mb-2`} />
+                        <Text style={tw`font-bold ${printerType === 'NATIVE' ? 'text-white' : 'text-gray-400'}`}>Nativa</Text>
+                        <Text style={tw`text-[10px] mt-1 text-center ${printerType === 'NATIVE' ? 'text-white/80' : 'text-gray-600'}`}>USB / WiFi / PDF</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -165,19 +99,21 @@ export default function PrinterSettingsScreen() {
                     <>
                         <View style={tw`flex-row justify-between items-center mb-4`}>
                             <Text style={tw`text-gray-400 font-bold uppercase text-xs tracking-wider`}>Dispositivos Encontrados</Text>
-                            <TouchableOpacity onPress={handleRefresh} disabled={isScanning}>
+                            <TouchableOpacity onPress={handleRefresh} disabled={isScanning} style={tw`bg-gray-800 p-2 rounded-full border border-gray-700`}>
                                 {isScanning ? <ActivityIndicator size="small" color="#10b981" /> : <Ionicons name="refresh" size={20} color="#10b981" />}
                             </TouchableOpacity>
                         </View>
 
                         <View style={tw`bg-surface rounded-xl border border-gray-700 overflow-hidden flex-1`}>
                             <FlatList
-                                data={printers} // Use context printers
+                                data={printers}
                                 keyExtractor={(item) => item.inner_mac_address}
+                                contentContainerStyle={tw`pb-4`}
                                 ListEmptyComponent={
                                     <View style={tw`p-8 items-center`}>
                                         <Ionicons name="bluetooth" size={40} color="#334155" style={tw`mb-4`} />
-                                        <Text style={tw`text-gray-500 text-center`}>Nenhuma impressora encontrada.{'\n'}Toque em atualizar.</Text>
+                                        <Text style={tw`text-gray-500 text-center font-bold`}>Nenhuma impressora encontrada</Text>
+                                        <Text style={tw`text-gray-600 text-xs mt-2 text-center`}>Toque em atualizar para buscar.</Text>
                                     </View>
                                 }
                                 renderItem={({ item }) => (
@@ -190,7 +126,7 @@ export default function PrinterSettingsScreen() {
                                             <Text style={tw`text-gray-500 text-xs`}>{item.inner_mac_address}</Text>
                                         </View>
                                         {connectedPrinter?.inner_mac_address === item.inner_mac_address && (
-                                            <View style={tw`bg-emerald-500/20 px-2 py-1 rounded`}>
+                                            <View style={tw`bg-emerald-500/20 px-2 py-1 rounded border border-emerald-500/30`}>
                                                 <Text style={tw`text-emerald-500 text-xs font-bold`}>Conectado</Text>
                                             </View>
                                         )}
@@ -199,8 +135,8 @@ export default function PrinterSettingsScreen() {
                             />
                         </View>
 
-                        <Text style={tw`text-gray-500 text-xs mt-4 text-center leading-5 mb-4`}>
-                            Certifique-se de que a impressora está ligada ou pareada nas configurações do Android caso não apareça na lista.
+                        <Text style={tw`text-gray-500 text-xs mt-4 text-center leading-5 mb-4 px-4`}>
+                            Certifique-se de que a impressora está ligada e pareada nas configurações do Android.
                         </Text>
                     </>
                 )}
@@ -212,6 +148,6 @@ export default function PrinterSettingsScreen() {
                 type={alertConfig.type}
                 onClose={hideAlert}
             />
-        </SafeAreaView>
+        </ScreenLayout>
     );
 }

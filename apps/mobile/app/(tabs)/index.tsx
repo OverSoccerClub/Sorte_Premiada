@@ -1,14 +1,13 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Dimensions } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
-import { StatusBar } from "expo-status-bar";
-
 import { useState, useCallback } from "react";
 import { FinanceService } from "../../services/finance.service";
 import { CustomAlert } from "../../components/CustomAlert";
+import { ScreenLayout } from "../../components/ScreenLayout";
 
 const { height } = Dimensions.get("window");
 
@@ -21,7 +20,6 @@ export default function Dashboard() {
     const router = useRouter();
     const { user, token } = useAuth();
     const [isDayClosed, setIsDayClosed] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -83,11 +81,10 @@ export default function Dashboard() {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
-            <StatusBar style="light" />
+        <ScreenLayout scrollable contentContainerStyle={{ paddingBottom: BOTTOM_PADDING }}>
 
             {/* Header com Perfil */}
-            <View style={tw`p-4 bg-surface border-b border-gray-800 flex-row justify-between items-center`}>
+            <View style={tw`w-full p-4 bg-surface border-b border-gray-800 flex-row justify-between items-center shadow-md`}>
                 <View>
                     <Text style={tw`text-2xl font-bold text-white mb-1`}>Olá, <Text style={tw`text-primary`}>{user?.name || user?.username || "Cambista"}</Text></Text>
                     <View style={tw`flex-row items-center`}>
@@ -96,7 +93,7 @@ export default function Dashboard() {
                     </View>
                 </View>
                 <TouchableOpacity
-                    style={tw`bg-gray-800 p-3 rounded-full border border-gray-700`}
+                    style={tw`bg-gray-800 p-3 rounded-full border border-gray-700 active:bg-gray-700`}
                     onPress={() => router.push("/profile")}
                 >
                     <Ionicons name="person" size={24} color="#94a3b8" />
@@ -104,7 +101,7 @@ export default function Dashboard() {
             </View>
 
             {isDayClosed && (
-                <View style={tw`mx-6 mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center`}>
+                <View style={tw`w-[90%] mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center`}>
                     <Ionicons name="lock-closed" size={24} color="#f97316" style={tw`mr-3`} />
                     <View style={tw`flex-1`}>
                         <Text style={tw`text-orange-500 font-bold`}>Caixa Fechado</Text>
@@ -113,35 +110,30 @@ export default function Dashboard() {
                 </View>
             )}
 
-            <View style={tw`px-4 pt-4 pb-2`}>
+            <View style={tw`w-full px-6 pt-6 pb-2`}>
                 <Text style={tw`text-lg font-bold text-white uppercase tracking-wider`}>Jogos Disponíveis</Text>
             </View>
 
-            <ScrollView
-                style={tw`flex-1`}
-                overScrollMode="never"
-                contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingVertical: 16, paddingBottom: BOTTOM_PADDING }}
-            >
-                <View style={tw`w-[90%] max-w-[400px] flex-row flex-wrap justify-between`}>
-                    {games.map((game) => (
-                        <TouchableOpacity
-                            key={game.id}
-                            style={tw`w-[48%] bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${game.borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''}`}
-                            onPress={() => handleGamePress(game.id, game.name)}
-                            activeOpacity={0.8}
-                        >
-                            <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 rotate-3`}>
-                                <Ionicons name={game.icon as any} size={32} color="white" />
-                            </View>
-                            <Text style={tw`font-bold text-lg text-white`}>{game.name}</Text>
-                        </TouchableOpacity>
-                    ))}
+            <View style={tw`w-[90%] flex-row flex-wrap justify-between mt-2`}>
+                {games.map((game) => (
+                    <TouchableOpacity
+                        key={game.id}
+                        style={tw`w-[48%] bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${game.borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
+                        onPress={() => handleGamePress(game.id, game.name)}
+                        activeOpacity={0.8}
+                    >
+                        <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 rotate-3`}>
+                            <Ionicons name={game.icon as any} size={32} color="white" />
+                        </View>
+                        <Text style={tw`font-bold text-lg text-white`}>{game.name}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
-                </View>
-
-                {/* Botão de Validação */}
+            {/* Botão de Validação */}
+            <View style={tw`w-[90%] mt-2`}>
                 <TouchableOpacity
-                    style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3`}
+                    style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3 active:bg-slate-700`}
                     onPress={() => router.push("/validate")}
                     activeOpacity={0.8}
                 >
@@ -153,11 +145,7 @@ export default function Dashboard() {
                         <Text style={tw`text-xs text-gray-400`}>Use a câmera para validar premiações</Text>
                     </View>
                 </TouchableOpacity>
-
-
-            </ScrollView>
-
-
+            </View>
 
             <CustomAlert
                 visible={alertConfig.visible}
@@ -168,6 +156,6 @@ export default function Dashboard() {
                 onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
                 onConfirm={alertConfig.onConfirm}
             />
-        </SafeAreaView >
+        </ScreenLayout>
     );
 }

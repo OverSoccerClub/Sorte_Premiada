@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, Linking, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Linking, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import tw from "../lib/tailwind";
-import { useAuth } from "../context/AuthContext";
-import { CustomAlert, AlertType } from "../components/CustomAlert";
-import { AppConfig } from "../constants/AppConfig";
-import { VersionFooter } from "../components/VersionFooter";
+import tw from "../../lib/tailwind";
+import { useAuth } from "../../context/AuthContext";
+import { CustomAlert, AlertType } from "../../components/CustomAlert";
+import { VersionFooter } from "../../components/VersionFooter";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { ScreenLayout } from "../../components/ScreenLayout";
+import { FormField } from "../../components/FormField";
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const router = useRouter();
-
     const { signIn, isLoading } = useAuth();
+    const insets = useSafeAreaInsets();
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -57,12 +57,6 @@ export default function LoginScreen() {
     };
 
     const handleForgotPassword = () => {
-        // MVP: Contact Admin via WhatsApp
-        // TODO: Move phone number to AppConfig if possible, but hardcoding for MVP is fine or use empty if unknown.
-        // Assuming a generic placeholder or asking user to provide one if I knew it.
-        // I will use a generic message without a specific number if I don't have one, or just open WhatsApp.
-        // Better: Alert with "Contact Admin" and button "Open WhatsApp".
-
         setAlertConfig({
             visible: true,
             title: "Recuperar Senha",
@@ -73,12 +67,10 @@ export default function LoginScreen() {
             confirmText: "Contatar Suporte",
             useAppIcon: true,
             onConfirm: () => {
-                // Open WhatsApp with pre-filled message
                 const message = "Olá, estou precisando recuperar minha senha no app Fezinha de Hoje.";
                 const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
 
                 Linking.openURL(url).catch(() => {
-                    // Fallback if WhatsApp is not installed
                     setAlertConfig(prev => ({
                         ...prev,
                         type: 'error',
@@ -93,11 +85,10 @@ export default function LoginScreen() {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1 bg-background`}>
-            <StatusBar style="light" />
+        <ScreenLayout>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={tw`flex-1 justify-center items-center p-4`}
+                style={tw`flex-1 w-full justify-center items-center p-4`}
             >
                 <ScrollView
                     style={{ width: '100%' }}
@@ -106,51 +97,39 @@ export default function LoginScreen() {
                     showsVerticalScrollIndicator={false}
                     overScrollMode="never"
                 >
-                    <View style={tw`w-[90%] max-w-[400px] items-center mb-2`}>
-                        <View style={tw`w-20 h-20 bg-surface rounded-3xl justify-center items-center shadow-lg border border-primary mb-2`}>
-                            <MaterialCommunityIcons name="clover" size={40} color="#50C878" />
+                    <View style={tw`w-full max-w-[400px] items-center mb-8`}>
+                        <View style={tw`w-24 h-24 bg-surface rounded-3xl justify-center items-center shadow-lg border border-primary mb-4`}>
+                            <MaterialCommunityIcons name="clover" size={48} color="#50C878" />
                         </View>
-                        <Text style={tw`text-3xl font-extrabold text-white tracking-tighter`}>
+                        <Text style={tw`text-4xl font-extrabold text-white tracking-tighter`}>
                             Fezinha <Text style={tw`text-primary`}>de Hoje</Text>
                         </Text>
                         <Text style={tw`text-gray-400 text-sm tracking-widest uppercase mt-1`}>Cambista Edition</Text>
                     </View>
 
-                    <View style={tw`w-[90%] max-w-[400px] bg-surface p-6 rounded-3xl shadow-2xl border border-gray-800`}>
-                        <Text style={tw`text-gray-400 mb-2 font-bold text-xs uppercase tracking-wider`}>Usuário</Text>
-                        <TextInput
-                            style={tw`w-full h-14 bg-background border border-gray-700 rounded-xl px-4 text-white focus:border-primary mb-4`}
+                    <View style={tw`w-full max-w-[400px] bg-surface p-8 rounded-3xl shadow-2xl border border-gray-800`}>
+                        <FormField
+                            label="Usuário"
                             value={username}
                             onChangeText={setUsername}
                             autoCapitalize="none"
                             placeholder="Digite seu usuário"
-                            placeholderTextColor="#475569"
+                            containerStyle={tw`mb-6`}
+                            style={tw`h-14`}
                         />
 
-                        <Text style={tw`text-gray-400 mb-2 font-bold text-xs uppercase tracking-wider`}>Senha</Text>
-                        <View style={tw`w-full h-14 bg-background border border-gray-700 rounded-xl mb-6 flex-row items-center focus:border-primary overflow-hidden`}>
-                            <TextInput
-                                style={tw`flex-1 h-full px-4 text-white`}
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!isPasswordVisible}
-                                placeholder="Digite sua senha"
-                                placeholderTextColor="#475569"
-                            />
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                                style={tw`h-full justify-center px-4 bg-gray-900/50`}
-                            >
-                                <Ionicons
-                                    name={isPasswordVisible ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="#94a3b8"
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        <FormField
+                            label="Senha"
+                            value={password}
+                            onChangeText={setPassword}
+                            isPassword
+                            placeholder="Digite sua senha"
+                            containerStyle={tw`mb-8`}
+                            style={tw`h-14`}
+                        />
 
                         <TouchableOpacity
-                            style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/50 active:opacity-90`}
+                            style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/50 active:scale-95 transition-transform`}
                             onPress={handleLogin}
                             disabled={isLoading}
                         >
@@ -160,18 +139,20 @@ export default function LoginScreen() {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            style={tw`mt-4`}
+                            style={tw`mt-6 items-center`}
                             onPress={handleForgotPassword}
                         >
-                            <Text style={tw`text-gray-500 text-sm font-semibold underline`}>
+                            <Text style={tw`text-gray-500 text-sm font-semibold hover:text-primary`}>
                                 Esqueceu a senha?
                             </Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-
             </KeyboardAvoidingView>
-            <VersionFooter />
+
+            <View style={tw`pb-4`}>
+                <VersionFooter />
+            </View>
 
             <CustomAlert
                 visible={alertConfig.visible}
@@ -185,6 +166,6 @@ export default function LoginScreen() {
                 cancelText={alertConfig.cancelText}
                 useAppIcon={alertConfig.useAppIcon}
             />
-        </SafeAreaView>
+        </ScreenLayout>
     );
 }
