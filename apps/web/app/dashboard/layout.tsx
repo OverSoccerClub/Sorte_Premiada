@@ -15,6 +15,16 @@ const sidebarGroups = [
         ]
     },
     {
+        title: "Cadastros",
+        items: [
+            { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
+            { icon: Wallet, label: "Cobradores", href: "/dashboard/cobradores" },
+            { icon: User, label: "Usuários (Admin)", href: "/dashboard/users" },
+            { icon: Smartphone, label: "Dispositivos POS", href: "/dashboard/pos" },
+            { icon: MapPin, label: "Praças", href: "/dashboard/areas" },
+        ]
+    },
+    {
         title: "Vendas & Operação",
         items: [
             { icon: Ticket, label: "Jogos / Vendas", href: "/dashboard/games" },
@@ -36,16 +46,6 @@ const sidebarGroups = [
             { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
             { icon: TrendingUp, label: "Inteligência (BI)", href: "/dashboard/analytics" },
             { icon: Wallet, label: "Prestação de Contas", href: "/dashboard/prestacao-contas" }, // Assuming path based on task
-        ]
-    },
-    {
-        title: "Cadastros",
-        items: [
-            { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
-            { icon: Wallet, label: "Cobradores", href: "/dashboard/cobradores" },
-            { icon: User, label: "Usuários (Admin)", href: "/dashboard/users" },
-            { icon: Smartphone, label: "Dispositivos POS", href: "/dashboard/pos" },
-            { icon: MapPin, label: "Praças", href: "/dashboard/areas" },
         ]
     },
     {

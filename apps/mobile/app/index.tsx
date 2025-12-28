@@ -97,25 +97,25 @@ export default function LoginScreen() {
                     showsVerticalScrollIndicator={false}
                     overScrollMode="never"
                 >
-                    <View style={tw`w-full max-w-[400px] items-center mb-8`}>
-                        <View style={tw`w-24 h-24 bg-surface rounded-3xl justify-center items-center shadow-lg border border-primary mb-4`}>
-                            <MaterialCommunityIcons name="clover" size={48} color="#50C878" />
+                    <View style={tw`w-full max-w-[400px] items-center mb-6`}>
+                        <View style={tw`w-20 h-20 bg-surface rounded-2xl justify-center items-center shadow-lg border border-primary mb-3`}>
+                            <MaterialCommunityIcons name="clover" size={40} color="#50C878" />
                         </View>
-                        <Text style={tw`text-4xl font-extrabold text-white tracking-tighter`}>
+                        <Text style={tw`text-3xl font-extrabold text-white tracking-tighter`}>
                             Fezinha <Text style={tw`text-primary`}>de Hoje</Text>
                         </Text>
-                        <Text style={tw`text-gray-400 text-sm tracking-widest uppercase mt-1`}>Cambista Edition</Text>
+                        <Text style={tw`text-gray-400 text-xs tracking-widest uppercase mt-1`}>Cambista Edition</Text>
                     </View>
 
-                    <View style={tw`w-full max-w-[400px] bg-surface p-8 rounded-3xl shadow-2xl border border-gray-800`}>
+                    <View style={tw`w-full max-w-[360px] bg-surface p-6 rounded-2xl shadow-2xl border border-gray-800`}>
                         <FormField
                             label="Usuário"
                             value={username}
                             onChangeText={setUsername}
                             autoCapitalize="none"
                             placeholder="Digite seu usuário"
-                            containerStyle={tw`mb-6`}
-                            style={tw`h-14`}
+                            containerStyle={tw`mb-4`}
+                            style={tw`h-12 text-sm`}
                         />
 
                         <FormField
@@ -124,25 +124,25 @@ export default function LoginScreen() {
                             onChangeText={setPassword}
                             isPassword
                             placeholder="Digite sua senha"
-                            containerStyle={tw`mb-8`}
-                            style={tw`h-14`}
+                            containerStyle={tw`mb-6`}
+                            style={tw`h-12 text-sm`}
                         />
 
                         <TouchableOpacity
-                            style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/50 active:scale-95 transition-transform`}
+                            style={tw`w-full bg-primary p-3 rounded-xl items-center shadow-lg shadow-primary/50 active:scale-95 transition-transform`}
                             onPress={handleLogin}
                             disabled={isLoading}
                         >
-                            <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>
+                            <Text style={tw`text-white font-bold text-base uppercase tracking-wide`}>
                                 {isLoading ? "Entrando..." : "Acessar Sistema"}
                             </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            style={tw`mt-6 items-center`}
+                            style={tw`mt-4 items-center`}
                             onPress={handleForgotPassword}
                         >
-                            <Text style={tw`text-gray-500 text-sm font-semibold hover:text-primary`}>
+                            <Text style={tw`text-gray-500 text-xs font-semibold hover:text-primary`}>
                                 Esqueceu a senha?
                             </Text>
                         </TouchableOpacity>
