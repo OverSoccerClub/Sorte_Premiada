@@ -35,14 +35,9 @@ export function useTicketPrint() {
                 : data.price;
 
             const success = await printTicket(
-                data.numbers,
-                data.hash || data.ticketId,
-                new Date(), // Current date/time for the print job
-                cleanAmount,
-                data.gameName,
+                data,
                 printerType,
-                uri,
-                data.possiblePrize
+                uri
             );
 
             return success;

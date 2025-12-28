@@ -377,7 +377,14 @@ export default function HistoryScreen() {
                     secondChanceNumber: selectedTicket.secondChanceNumber,
                     secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? new Date(selectedTicket.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                     secondChanceLabel: "SEGUNDA CHANCE",
-                    status: selectedTicket.status
+                    status: selectedTicket.status,
+                    vendorName: selectedTicket.user?.name || selectedTicket.user?.username,
+                    terminalId: selectedTicket.terminalId,
+                    prizes: selectedTicket.game?.prizeMilhar || selectedTicket.game?.prizeCentena || selectedTicket.game?.prizeDezena ? {
+                        milhar: selectedTicket.game.prizeMilhar ? `R$ ${Number(selectedTicket.game.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                        centena: selectedTicket.game.prizeCentena ? `R$ ${Number(selectedTicket.game.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                        dezena: selectedTicket.game.prizeDezena ? `R$ ${Number(selectedTicket.game.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                    } : undefined
                 } as TicketData) : null}
             />
 

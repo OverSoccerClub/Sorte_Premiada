@@ -232,7 +232,8 @@ export default function MegaSenaScreen() {
                 series: ticketData.series,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
-                secondChanceLabel: "SEGUNDA CHANCE"
+                secondChanceLabel: "SEGUNDA CHANCE",
+                status: ticketData.status
             };
 
             setLastTicket(fullTicket);

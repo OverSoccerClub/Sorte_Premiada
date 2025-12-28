@@ -15,35 +15,31 @@ const formatDate = (date: Date) => {
   return date.toLocaleString('pt-BR');
 };
 
+import { TicketData } from '../components/ticket/TicketContent';
+
 export const printTicket = async (
-  numbers: number[],
-  ticketId: string,
-  date: Date,
-  amount: string | number,
-  gameType: string,
+  data: TicketData,
   printerType: PrinterType = 'BLE',
-  imageUri?: string,
-  possiblePrize?: string
+  imageUri?: string
 ) => {
+  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes } = data;
   try {
-    console.log(`Printing ticket: ${ticketId}, Game: ${gameType}, Type: ${printerType}, Image: ${!!imageUri}`);
+    console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
     // If Image URI is provided and Type is BLE, try printing image first
+    // Note: Image capture already includes the watermarks if present on screen
     if (printerType === 'BLE' && imageUri) {
       try {
         let base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
 
-        // Clean up base64 if it has prefix (FileSystem usually returns raw, but just in safe)
         if (base64.startsWith('data:image')) {
           base64 = base64.split(',')[1];
         }
 
         console.log(`Printing Image Base64: Length=${base64.length}`);
 
-        // Some printers need a few line feeds before/after
         await BLEPrinter.printText("\n");
 
-        // Try standard width 384 (58mm) and center alignment
         try {
           await BLEPrinter.printImageBase64(base64, { imageWidth: 384, paddingX: 0 });
         } catch (innerErr) {
@@ -59,15 +55,15 @@ export const printTicket = async (
       }
     }
 
-    const dateStr = formatDate(date);
-    const amountStr = formatCurrency(amount);
+    const dateStr = date;
+    const amountStr = price;
 
     // Determine padding based on game type
     let padLength = 2;
-    if (gameType.includes("2x1000") || gameType.includes("MILHAR")) padLength = 4;
-    else if (gameType.includes("CENTENA")) padLength = 3;
+    if (gameName.includes("2x1000") || gameName.includes("MILHAR")) padLength = 4;
+    else if (gameName.includes("CENTENA")) padLength = 3;
 
-    // Format numbers like 08 13 16 ... (No brackets, as per image)
+    // Format numbers
     const numbersStr = numbers
       .sort((a, b) => a - b)
       .map(n => n.toString().padStart(padLength, '0'))
@@ -85,7 +81,7 @@ export const printTicket = async (
         <html>
           <head>
             <style>
-              body { font-family: monospace; font-size: 12px; margin: 0; padding: 0; text-align: center; width: 58mm; }
+              body { font-family: monospace; font-size: 12px; margin: 0; padding: 0; text-align: center; width: 58mm; position: relative; }
               h1 { font-size: 16px; margin: 5px 0; }
               .dashed { border-top: 1px dashed black; margin: 10px 0; }
               .bold { font-weight: bold; }
@@ -93,14 +89,29 @@ export const printTicket = async (
               .left { text-align: left; }
               .flex { display: flex; justify-content: space-between; }
               .footer { font-size: 10px; margin-top: 10px; }
+              .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 40px;
+                color: rgba(255, 0, 0, 0.2);
+                font-weight: bold;
+                border: 4px solid rgba(255, 0, 0, 0.2);
+                padding: 10px;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 1000;
+              }
             </style>
           </head>
           <body>
+            ${status === 'CANCELLED' ? '<div class="watermark">CANCELADO</div>' : ''}
             <h1>Fezinha de Hoje</h1>
             <div>COMPROVANTE DE APOSTA</div>
             <div class="dashed"></div>
             
-            <div class="bold big">${gameType.toUpperCase()}</div>
+            <div class="bold big">${gameName.toUpperCase()}</div>
             <div>${dateStr}</div>
             
             <div class="dashed"></div>
@@ -111,7 +122,13 @@ export const printTicket = async (
             
             <div class="dashed"></div>
             
-            ${possiblePrize ? `
+            ${prizes ? `
+            <div class="bold">PREMIAÇÃO</div>
+            <div class="left">MILHAR: ${prizes.milhar || 'R$ 0,00'}</div>
+            <div class="left">CENTENA: ${prizes.centena || 'R$ 0,00'}</div>
+            <div class="left">DEZENA: ${prizes.dezena || 'R$ 0,00'}</div>
+            <div class="dashed"></div>
+            ` : possiblePrize ? `
             <div class="bold">PRÊMIO MÁXIMO</div>
             <div class="bold big">${possiblePrize}</div>
             <div class="dashed"></div>
@@ -125,7 +142,6 @@ export const printTicket = async (
             <div class="dashed"></div>
             
             <div class="footer">
-              <div>Barcode Placeholder</div>
               <div>ID: ${ticketId}</div>
               <br/>
               <div>Este bilhete não possui valor fiscal.</div>
@@ -139,8 +155,7 @@ export const printTicket = async (
       return true;
     }
 
-    // BLE Printing Logic (Text Fallback or standard)
-    console.log("Available BLEPrinter methods:", Object.keys(BLEPrinter));
+    // BLE Printing Logic
     let receipt = "";
 
     // ESC/POS Commands
@@ -159,7 +174,6 @@ export const printTicket = async (
     const FONT_B = ESC + "!" + "\x01";
     const FONT_A = ESC + "!" + "\x00";
 
-    // Helper to pad text left/right (Assuming 32 chars specific for 58mm printer)
     const MAX_CHARS = 32;
     const padPair = (left: string, right: string) => {
       let space = MAX_CHARS - left.length - right.length;
@@ -167,76 +181,55 @@ export const printTicket = async (
       return left + " ".repeat(space) + right;
     };
 
-    // Build Receipt
     receipt += INITIALIZE;
-    receipt += CENTER;
 
-    // Header
+    // CANCELADO Watermark (Text style)
+    if (status === 'CANCELLED') {
+      receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "\n*** CANCELADO ***\n" + BOLD_OFF + NORMAL + "\n";
+    }
+
+    receipt += CENTER;
     receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "Fezinha de Hoje" + BOLD_OFF + NORMAL + "\n";
     receipt += CENTER + "COMPROVANTE DE APOSTA\n";
+    receipt += "- - - - - - - - - - - - - - - -\n\n";
 
-    // Separator
-    receipt += "- - - - - - - - - - - - - - - -\n\n"; // Dashed line
-
-    // Game Info
-    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + gameType.toUpperCase() + BOLD_OFF + NORMAL + "\n";
+    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + gameName.toUpperCase() + BOLD_OFF + NORMAL + "\n";
     receipt += dateStr + "\n\n";
 
-    // Numbers (Two Columns, Centered)
     const sortedNumbers = numbers.sort((a, b) => a - b);
     const formattedNumbers = sortedNumbers.map(n => n.toString().padStart(padLength, '0'));
 
-    // Chunk into pairs
     for (let i = 0; i < formattedNumbers.length; i += 2) {
       const left = formattedNumbers[i];
       const right = formattedNumbers[i + 1];
-
-      let line = "";
-      if (right) {
-        // Two numbers:   XX      XX
-        line = `${left}      ${right}`;
-      } else {
-        // Single number:      XX
-        line = `${left}`;
-      }
-
+      let line = right ? `${left}      ${right}` : `${left}`;
       receipt += DOUBLE_HEIGHT + BOLD_ON + line + BOLD_OFF + NORMAL + "\n";
     }
     receipt += "\n";
 
-    // Possible Prize
-    if (possiblePrize) {
+    if (prizes) {
+      receipt += "- - - - - - - - - - - - - - - -\n";
+      receipt += BOLD_ON + "PREMIACAO" + BOLD_OFF + "\n";
+      receipt += padPair("MILHAR:", prizes.milhar || "R$ 0,00") + "\n";
+      receipt += padPair("CENTENA:", prizes.centena || "R$ 0,00") + "\n";
+      receipt += padPair("DEZENA:", prizes.dezena || "R$ 0,00") + "\n";
+    } else if (possiblePrize) {
       receipt += "- - - - - - - - - - - - - - - -\n";
       receipt += BOLD_ON + "PREMIO MAXIMO" + BOLD_OFF + "\n";
       receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + possiblePrize + BOLD_OFF + NORMAL + "\n";
     }
 
-    // Price
     receipt += "- - - - - - - - - - - - - - - -\n";
-    receipt += LEFT;
-    receipt += BOLD_ON + padPair("TOTAL A PAGAR", amountStr) + BOLD_OFF + "\n";
+    receipt += LEFT + BOLD_ON + padPair("TOTAL A PAGAR", amountStr) + BOLD_OFF + "\n";
 
-    // Footer Details (Small Font)
-    receipt += CENTER; // Center align footer
-
-    // Barcode Simulation (Visual stripes)
-    receipt += "\n";
+    receipt += CENTER + "\n";
     receipt += "|| ||| || |||| ||| || ||||| ||||\n";
-    receipt += FONT_B;
-    receipt += `ID: ${ticketId}\n`;
-    receipt += "\nEste bilhete não possui valor fiscal.\n";
-    receipt += "Boa Sorte!\n";
-    receipt += FONT_A;
-    receipt += "\n\n\n"; // Feed lines
+    receipt += FONT_B + `ID: ${ticketId}\n`;
+    receipt += "\nEste bilhete não possui valor fiscal.\nBoa Sorte!\n" + FONT_A + "\n\n\n";
 
-    // Use printBill if available, otherwise printText
-    if (BLEPrinter.printBill) {
-      await BLEPrinter.printBill(receipt);
-    } else if (BLEPrinter.printText) {
-      await BLEPrinter.printText(receipt);
-    } else {
-      throw new Error("No text printing method found");
-    }
+    if (BLEPrinter.printBill) await BLEPrinter.printBill(receipt);
+    else if (BLEPrinter.printText) await BLEPrinter.printText(receipt);
+    else throw new Error("No text printing method found");
 
     return true;
   } catch (error) {

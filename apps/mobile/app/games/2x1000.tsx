@@ -36,6 +36,11 @@ export default function Game2x1000Screen() {
     const [isLoadingSold, setIsLoadingSold] = useState(false);
     const [drawSeries, setDrawSeries] = useState<number | undefined>(undefined);
     const [isRestrictedMode, setIsRestrictedMode] = useState(false);
+    const [gamePrizes, setGamePrizes] = useState<{
+        milhar?: string;
+        centena?: string;
+        dezena?: string;
+    } | null>(null);
 
     // Selection State
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -87,6 +92,16 @@ export default function Game2x1000Screen() {
                         setIsRestrictedMode(true);
                     }
                     if (game.price) setGamePrice(Number(game.price));
+
+                    // Store Prizes
+                    if (game.prizeMilhar || game.prizeCentena || game.prizeDezena) {
+                        const fmt = (val: any) => val ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val)) : undefined;
+                        setGamePrizes({
+                            milhar: fmt(game.prizeMilhar),
+                            centena: fmt(game.prizeCentena),
+                            dezena: fmt(game.prizeDezena)
+                        });
+                    }
 
                     // Buscar o sorteio ativo para pegar a série
                     const drawsRes = await fetch(`${API_URL}/draws?gameId=${game.id}`, {
@@ -361,6 +376,8 @@ export default function Game2x1000Screen() {
                 terminalId: Device.deviceName || Device.modelName || "Terminal",
                 vendorName: user?.name || user?.username || "Vendedor",
                 possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,
+                prizes: gamePrizes || undefined,
+                status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                 secondChanceLabel: "SEGUNDA CHANCE"
@@ -637,12 +654,13 @@ export default function Game2x1000Screen() {
                             <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl items-center`}>
                                 <TicketDisplay
                                     data={{
-                                        gameName: "2x1000",
+                                        gameName: gameName,
                                         numbers: selectedNumbers,
                                         price: "R$ 10,00",
                                         series: drawSeries?.toString(),
                                         date: new Date().toLocaleString('pt-BR'),
-                                        ticketId: "PREVIEW"
+                                        ticketId: "PREVIEW",
+                                        prizes: gamePrizes || undefined
                                     }}
                                     mode="preview"
                                 />

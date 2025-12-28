@@ -214,13 +214,16 @@ export default function JogoDoBichoScreen() {
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
+                possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,
+                status: ticketData.status,
+                secondChanceNumber: ticketData.secondChanceNumber,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
                 prizes: gameConfig ? {
-                    milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toFixed(2).replace('.', ',')}` : undefined,
-                    centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toFixed(2).replace('.', ',')}` : undefined,
-                    dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toFixed(2).replace('.', ',')}` : undefined,
-                } : undefined
+                    milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                    centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                    dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                } : undefined,
             };
             setLastTicket(ticketObj);
 
@@ -385,7 +388,12 @@ export default function JogoDoBichoScreen() {
                                 numbers: selectedNumbers,
                                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                 date: new Date().toLocaleString('pt-BR'),
-                                ticketId: "PREVIEW"
+                                ticketId: "PREVIEW",
+                                prizes: gameConfig ? {
+                                    milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                                    centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                                    dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                                } : undefined
                             }}
                             mode="preview"
                         />

@@ -149,9 +149,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : (
-                <Text style={tw`text-center font-black text-[11px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
-                    MILHAR: R$ 1.000,00 • CENTENA: R$ 100,00 • DEZENA: R$ 10,00
-                </Text>
+                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2`} />
             )}
 
             {/* Second Chance */}
