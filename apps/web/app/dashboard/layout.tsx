@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 {/* Scrollable Navigation */}
-                <nav className="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-6">
+                <nav className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-6">
                     {sidebarGroups.map((group) => (
                         <div key={group.title}>
                             {group.title !== "Principal" && !isCollapsed && (
