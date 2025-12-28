@@ -163,14 +163,22 @@ export default function MegaSenaScreen() {
                 });
                 if (res.ok) {
                     const games = await res.json();
-                    const game = games.find((g: any) => g.name === "Mega Sena");
+                    // More robust find: case insensitive and handles variations
+                    const game = games.find((g: any) =>
+                        g.name.toLowerCase().includes("mega") &&
+                        g.name.toLowerCase().includes("sena")
+                    );
+
                     if (game) {
                         setGamePrice(Number(game.price));
                         setGameId(game.id);
+                    } else {
+                        showAlert("Jogo Indisponível", "Configuração da Mega Sena não encontrada.", "error");
                     }
                 }
             } catch (error) {
                 console.error("Failed to fetch game price", error);
+                showAlert("Erro de Conexão", "Não foi possível carregar as informações do jogo.", "error");
             }
         };
         fetchGameDetails();
@@ -179,6 +187,11 @@ export default function MegaSenaScreen() {
     // ... (rest of code)
 
     const handlePrint = async () => {
+        if (!gameId) {
+            showAlert("Erro", "O jogo não está configurado corretamente. Tente reiniciar o app.", "error");
+            return;
+        }
+
         setModalVisible(false);
         show("Processando Aposta...");
 
@@ -245,7 +258,7 @@ export default function MegaSenaScreen() {
             hide();
             console.error(error);
             setTimeout(() => {
-                showAlert("Erro", "Não foi possível salvar a aposta. Tente novamente.", "error");
+                showAlert("Erro", "Não foi possível salvar a aposta. Verifique sua conexão.", "error");
             }, 300);
         }
     };

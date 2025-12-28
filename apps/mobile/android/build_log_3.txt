@@ -562,14 +562,12 @@ Proceeding without mode-specific .env
 > Task :react-native-ping:generateReleaseBuildConfig
 > Task :react-native-async-storage_async-storage:bundleLibCompileToJarRelease
 
-> Task :expo-modules-core:compileReleaseKotlin
-e: This version (1.5.15) of the Compose Compiler requires Kotlin version 1.9.25 but you appear to be using Kotlin version 1.9.24 which is not known to be compatible.  Please consult the Compose-Kotlin compatibility map located at https://developer.android.com/jetpack/androidx/releases/compose-kotlin to choose a compatible version pair (or `suppressKotlinVersionCompatibilityCheck` but don't say I didn't warn you!).
-
-> Task :expo-modules-core:compileReleaseKotlin FAILED
-
 > Task :react-native-community_datetimepicker:compileReleaseJavaWithJavac
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
+
+> Task :expo-modules-core:compileReleaseKotlin FAILED
+e: This version (1.5.15) of the Compose Compiler requires Kotlin version 1.9.25 but you appear to be using Kotlin version 1.9.24 which is not known to be compatible.  Please consult the Compose-Kotlin compatibility map located at https://developer.android.com/jetpack/androidx/releases/compose-kotlin to choose a compatible version pair (or `suppressKotlinVersionCompatibilityCheck` but don't say I didn't warn you!).
 
 FAILURE: Build failed with an exception.
 
@@ -773,5 +771,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 42s
+BUILD FAILED in 41s
 427 actionable tasks: 35 executed, 392 up-to-date

@@ -242,7 +242,9 @@ export class TicketsService {
             };
 
             // Second Chance ...
-            if (game.secondChanceEnabled && game.secondChanceRangeStart && game.secondChanceRangeEnd) {
+            if (game.secondChanceEnabled &&
+                game.secondChanceRangeStart !== null && game.secondChanceRangeStart !== undefined &&
+                game.secondChanceRangeEnd !== null && game.secondChanceRangeEnd !== undefined) {
                 try {
                     const scDrawDate = this.getNextSecondChanceDate(
                         game.secondChanceWeekday ?? 6,
@@ -403,7 +405,13 @@ export class TicketsService {
 
     private async getSoldNumbers(gameId: string, drawDate: Date): Promise<Set<number>> {
         const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}`;
-        const cached = await this.redis.get(cacheKey);
+        let cached: string | null = null;
+
+        try {
+            cached = await this.redis.get(cacheKey);
+        } catch (error) {
+            console.warn(`[TicketsService] Redis get failed for ${cacheKey}. Falling back to DB.`, error);
+        }
 
         if (cached) {
             return new Set(JSON.parse(cached));
@@ -426,7 +434,11 @@ export class TicketsService {
         });
 
         // Cache for 60 seconds (short-lived but effective for bursts)
-        await this.redis.set(cacheKey, JSON.stringify(soldArr), 60);
+        try {
+            await this.redis.set(cacheKey, JSON.stringify(soldArr), 60);
+        } catch (error) {
+            console.warn(`[TicketsService] Redis set failed for ${cacheKey}`, error);
+        }
 
         return new Set(soldArr);
     }

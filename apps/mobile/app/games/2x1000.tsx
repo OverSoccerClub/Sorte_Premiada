@@ -308,7 +308,7 @@ export default function Game2x1000Screen() {
             const payload = {
                 gameType: "2x1000",
                 numbers: selectedNumbers, // Always use selected numbers (explicit)
-                amount: 10.00,
+                amount: gamePrice,
                 game: { connect: { id: gameId } } // Backend expects gameId logic? No, check my backend fix.
                 // Wait, I fixed backend to use `gameId` directly in Prisma.
                 // Payload sent to Controller -> Service. 

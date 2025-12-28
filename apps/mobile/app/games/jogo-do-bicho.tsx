@@ -174,7 +174,10 @@ export default function JogoDoBichoScreen() {
     };
 
     const handlePrint = async () => {
-        if (!gameId) return;
+        if (!gameId) {
+            showAlert("Erro", "Jogo não configurado. Reinicie o aplicativo.", "error");
+            return;
+        }
         setModalVisible(false);
         show("Salvando Aposta...");
 
