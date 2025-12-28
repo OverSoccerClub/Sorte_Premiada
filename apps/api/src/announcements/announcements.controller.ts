@@ -23,7 +23,7 @@ export class AnnouncementsController {
 
     @Get('active')
     findAllActive(@Request() req: any) {
-        return this.announcementsService.findAllActive(req.user?.id);
+        return this.announcementsService.findAllActive(req.user?.userId);
     }
 
     @Get(':id')
