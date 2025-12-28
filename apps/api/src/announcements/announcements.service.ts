@@ -9,48 +9,54 @@ export class AnnouncementsService {
         private notificationsService: NotificationsService
     ) { }
 
-    async create(data: any) {
+    async create(data: { title: string; content: string; type: string; expiresAt?: Date; targetUserId?: string; sendPush?: boolean }) {
         const announcement = await this.prisma.announcement.create({
-            data,
+            data: {
+                title: data.title,
+                content: data.content,
+                type: data.type,
+                expiresAt: data.expiresAt,
+                targetUserId: data.targetUserId,
+            },
         });
 
-        // Send Push Notification
-        try {
-            let tokens: string[] = [];
+        // Send Push Notification if enabled
+        if (data.sendPush !== false) {
+            try {
+                let tokens: string[] = [];
 
-            if (data.targetUserId) {
-                // Targeted Announcement
-                const user = await this.prisma.user.findUnique({
-                    where: { id: data.targetUserId },
-                    select: { pushToken: true }
-                });
-                if (user?.pushToken) {
-                    tokens.push(user.pushToken);
+                if (data.targetUserId) {
+                    // Targeted Announcement
+                    const user = await this.prisma.user.findUnique({
+                        where: { id: data.targetUserId },
+                        select: { pushToken: true }
+                    });
+                    if (user?.pushToken) {
+                        tokens.push(user.pushToken);
+                    }
+                } else {
+                    // Global Announcement
+                    const users = await this.prisma.user.findMany({
+                        where: {
+                            isActive: true,
+                            pushToken: { not: null }
+                        },
+                        select: { pushToken: true }
+                    });
+                    tokens = users.map(u => u.pushToken).filter(t => t !== null) as string[];
                 }
-            } else {
-                // Global Announcement - Send to all active users with push token
-                // Optionally filter by role if needed (e.g., only CAMBISTAS), but mostly Global means everyone.
-                const users = await this.prisma.user.findMany({
-                    where: {
-                        isActive: true,
-                        pushToken: { not: null }
-                    },
-                    select: { pushToken: true }
-                });
-                tokens = users.map(u => u.pushToken).filter(t => t !== null) as string[];
-            }
 
-            if (tokens.length > 0) {
-                await this.notificationsService.sendPushNotification(
-                    tokens,
-                    data.title,
-                    data.content,
-                    { announcementId: announcement.id, type: 'ANNOUNCEMENT' }
-                );
+                if (tokens.length > 0) {
+                    await this.notificationsService.sendPushNotification(
+                        tokens,
+                        data.title,
+                        data.content,
+                        { announcementId: announcement.id, type: 'ANNOUNCEMENT' }
+                    );
+                }
+            } catch (error) {
+                console.error('Failed to send announcement push notification', error);
             }
-        } catch (error) {
-            console.error('Failed to send announcement push notification', error);
-            // Don't fail the request if notification fails
         }
 
         return announcement;

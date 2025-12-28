@@ -75,7 +75,7 @@ async function registerForPushNotificationsAsync() {
             console.log("Push Token:", token);
         } catch (e: any) {
             console.error("Erro ao pegar token Expo:", e);
-            alert(`Erro Push: ${e.message}`);
+            // Falha silenciosa pois Firebase pode não estar configurado
         }
     } else {
         console.log('Precisa usar um dispositivo físico para Notificações Push');

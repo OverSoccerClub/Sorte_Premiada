@@ -25,6 +25,7 @@ const formSchema = z.object({
     expiresAt: z.string().optional().nullable(),
     targetType: z.string().default("GLOBAL"), // GLOBAL or USER
     targetUserId: z.string().optional().nullable(),
+    sendPush: z.boolean().default(false),
 })
 
 export default function AnnouncementsPage() {
@@ -45,6 +46,7 @@ export default function AnnouncementsPage() {
             expiresAt: "",
             targetType: "GLOBAL",
             targetUserId: "",
+            sendPush: false,
         },
     })
 
@@ -112,6 +114,7 @@ export default function AnnouncementsPage() {
                 expiresAt: "",
                 targetType: "GLOBAL",
                 targetUserId: "",
+                sendPush: false,
             })
         }
         setIsDialogOpen(true)
@@ -406,6 +409,35 @@ export default function AnnouncementsPage() {
                                                     className={field.value ? "bg-emerald-500 hover:bg-emerald-600" : ""}
                                                 >
                                                     {field.value ? "Ativo" : "Inativo"}
+                                                </Button>
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="sendPush"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-muted/20">
+                                            <div className="space-y-0.5">
+                                                <FormLabel>Enviar Notificação Push</FormLabel>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Se ativado, envia um alerta para o celular.
+                                                    <span className="block text-amber-500 font-medium mt-1">
+                                                        *Requer configuração Firebase (Google)
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <FormControl>
+                                                <Button
+                                                    type="button"
+                                                    variant={field.value ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => field.onChange(!field.value)}
+                                                    className={field.value ? "bg-blue-600 hover:bg-blue-700" : ""}
+                                                >
+                                                    {field.value ? "Sim" : "Não"}
                                                 </Button>
                                             </FormControl>
                                         </FormItem>
