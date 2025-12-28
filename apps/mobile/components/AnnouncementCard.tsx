@@ -45,7 +45,7 @@ export function AnnouncementCard({ announcement, onClose }: AnnouncementCardProp
     const styles = getTypeStyles(announcement.type);
 
     return (
-        <View style={tw`w-[90%] mt-4 p-4 rounded-2xl border ${styles.bg} ${styles.border}`}>
+        <View style={tw`w-[90%] mt-4 p-4 rounded-2xl border ${styles.bg} ${styles.border} self-center`}>
             <View style={tw`flex-row justify-between items-start mb-2`}>
                 <View style={tw`flex-row items-center flex-1 pr-4`}>
                     <Ionicons name={styles.icon as any} size={20} color={styles.text === 'text-red-500' ? '#ef4444' : styles.text === 'text-amber-500' ? '#f59e0b' : styles.text === 'text-emerald-500' ? '#10b981' : '#3b82f6'} style={tw`mr-2`} />

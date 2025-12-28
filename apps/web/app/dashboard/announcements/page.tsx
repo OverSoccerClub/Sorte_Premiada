@@ -70,6 +70,7 @@ export default function AnnouncementsPage() {
     }
 
     const fetchUsers = async () => {
+        console.log("Fetching users for announcements...");
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/users?role=CAMBISTA`, {

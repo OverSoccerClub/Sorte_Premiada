@@ -102,9 +102,6 @@ Clean expo-modules-core-arm64-v8a
 Clean expo-modules-core-x86
 Clean expo-modules-core-x86_64
 
-> Transform io.nlopez.smartlocation-3.3.3-jetified.aar (project :expo-location$io.nlopez.smartlocation-jetified-aar) with DexingNoClasspathTransform
-ERROR: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex: D8: java.nio.file.NoSuchFileException: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex
-
 > Task :expo-modules-core:clean
 > Task :expo-notifications:clean
 > Task :expo-print:clean
@@ -157,9 +154,9 @@ Clean rnscreens-x86_64
 > Task :expo-clipboard:preReleaseBuild UP-TO-DATE
 > Task :expo:writeReleaseAarMetadata
 > Task :expo-asset:writeReleaseAarMetadata
-> Task :expo-clipboard:writeReleaseAarMetadata
-> Task :expo-application:writeReleaseAarMetadata
 > Task :expo-camera:writeReleaseAarMetadata
+> Task :expo-application:writeReleaseAarMetadata
+> Task :expo-clipboard:writeReleaseAarMetadata
 
 > Task :expo-constants:createExpoConfig
 The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set.
@@ -201,11 +198,11 @@ Proceeding without mode-specific .env
 > Task :expo-modules-core:preReleaseBuild UP-TO-DATE
 > Task :expo-manifests:writeReleaseAarMetadata
 > Task :expo-notifications:preBuild UP-TO-DATE
-> Task :expo-modules-core:writeReleaseAarMetadata
 > Task :expo-notifications:preReleaseBuild UP-TO-DATE
+> Task :expo-modules-core:writeReleaseAarMetadata
 > Task :expo-print:preBuild UP-TO-DATE
-> Task :expo-notifications:writeReleaseAarMetadata
 > Task :expo-print:preReleaseBuild UP-TO-DATE
+> Task :expo-notifications:writeReleaseAarMetadata
 > Task :expo-sharing:preBuild UP-TO-DATE
 > Task :expo-sharing:preReleaseBuild UP-TO-DATE
 > Task :expo-print:writeReleaseAarMetadata
@@ -219,8 +216,8 @@ Proceeding without mode-specific .env
 > Task :expo-updates:preReleaseBuild UP-TO-DATE
 > Task :expo-system-ui:writeReleaseAarMetadata
 > Task :expo-updates-interface:preBuild UP-TO-DATE
-> Task :expo-updates:writeReleaseAarMetadata
 > Task :expo-updates-interface:preReleaseBuild UP-TO-DATE
+> Task :expo-updates:writeReleaseAarMetadata
 > Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
 > Task :react-native-async-storage_async-storage:preReleaseBuild UP-TO-DATE
 > Task :expo-updates-interface:writeReleaseAarMetadata
@@ -250,8 +247,8 @@ Proceeding without mode-specific .env
 > Task :react-native-thermal-receipt-printer-image-qr:preReleaseBuild UP-TO-DATE
 > Task :react-native-svg:writeReleaseAarMetadata
 > Task :react-native-view-shot:preBuild UP-TO-DATE
-> Task :react-native-thermal-receipt-printer-image-qr:writeReleaseAarMetadata
 > Task :react-native-view-shot:preReleaseBuild UP-TO-DATE
+> Task :react-native-thermal-receipt-printer-image-qr:writeReleaseAarMetadata
 > Task :react-native-worklets:assertMinimalReactNativeVersionTask SKIPPED
 > Task :react-native-view-shot:writeReleaseAarMetadata
 > Task :react-native-worklets:prepareWorkletsHeadersForPrefabs
@@ -262,7 +259,7 @@ Proceeding without mode-specific .env
 > Task :app:createBundleReleaseJsAndAssets
 Starting Metro Bundler
 warning: Bundler cache is empty, rebuilding (this may take a minute)
-Android Bundled 28864ms index.js (1858 modules)
+Android Bundled 25810ms index.js (1858 modules)
 Writing bundle output to: android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle
 Writing sourcemap output to: android\app\build\intermediates\sourcemaps\react\release\index.android.bundle.packager.map
 Copying 77 asset files
@@ -526,18 +523,18 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-application:extractDeepLinksRelease
 > Task :expo-asset:extractDeepLinksRelease
 > Task :expo-camera:extractDeepLinksRelease
-> Task :app:parseReleaseLocalResources
 > Task :expo-clipboard:extractDeepLinksRelease
 > Task :expo-constants:extractDeepLinksRelease
-> Task :expo-camera:processReleaseManifest
-> Task :expo-application:processReleaseManifest
-> Task :expo-asset:processReleaseManifest
-> Task :expo:processReleaseManifest
-> Task :expo-clipboard:processReleaseManifest
+> Task :app:parseReleaseLocalResources
 > Task :expo-device:extractDeepLinksRelease
 > Task :expo-constants:processReleaseManifest
-> Task :expo-eas-client:extractDeepLinksRelease
+> Task :expo-clipboard:processReleaseManifest
+> Task :expo-application:processReleaseManifest
+> Task :expo:processReleaseManifest
+> Task :expo-asset:processReleaseManifest
+> Task :expo-camera:processReleaseManifest
 > Task :expo-device:processReleaseManifest
+> Task :expo-eas-client:extractDeepLinksRelease
 > Task :expo-file-system:extractDeepLinksRelease
 > Task :expo-eas-client:processReleaseManifest
 > Task :expo-font:extractDeepLinksRelease
@@ -546,8 +543,8 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 C:\Projetos\App\MegaSena\node_modules\expo-file-system\android\src\main\AndroidManifest.xml:6:9-8:20 Warning:
 	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:6 to replace other declarations but no other declaration present
 
-> Task :expo-intent-launcher:extractDeepLinksRelease
 > Task :expo-font:processReleaseManifest
+> Task :expo-intent-launcher:extractDeepLinksRelease
 > Task :expo-json-utils:extractDeepLinksRelease
 > Task :expo-intent-launcher:processReleaseManifest
 > Task :expo-keep-awake:extractDeepLinksRelease
@@ -558,14 +555,14 @@ C:\Projetos\App\MegaSena\node_modules\expo-file-system\android\src\main\AndroidM
 > Task :expo-linking:processReleaseManifest
 > Task :expo-manifests:extractDeepLinksRelease
 > Task :expo-location:processReleaseManifest
-> Task :expo-modules-core:extractDeepLinksRelease
 > Task :expo-manifests:processReleaseManifest
+> Task :expo-modules-core:extractDeepLinksRelease
+> Task :expo-notifications:extractDeepLinksRelease
 
 > Task :expo-modules-core:processReleaseManifest
 C:\Projetos\App\MegaSena\node_modules\expo-modules-core\android\src\main\AndroidManifest.xml:8:9-11:45 Warning:
 	meta-data#com.facebook.soloader.enabled@android:value was tagged at AndroidManifest.xml:8 to replace other declarations but no other declaration present
 
-> Task :expo-notifications:extractDeepLinksRelease
 > Task :expo-print:extractDeepLinksRelease
 > Task :expo-notifications:processReleaseManifest
 > Task :expo-sharing:extractDeepLinksRelease
@@ -647,26 +644,26 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-asset:compileReleaseLibraryResources
 > Task :expo-asset:parseReleaseLocalResources
 > Task :expo-camera:compileReleaseLibraryResources
-> Task :expo-application:generateReleaseRFile
-> Task :expo:generateReleaseRFile
-> Task :expo-asset:generateReleaseRFile
 > Task :app:processReleaseManifestForPackage
 > Task :expo-camera:parseReleaseLocalResources
+> Task :expo-asset:generateReleaseRFile
 > Task :expo-clipboard:compileReleaseLibraryResources
+> Task :expo:generateReleaseRFile
+> Task :expo-application:generateReleaseRFile
 > Task :expo-camera:generateReleaseRFile
 > Task :expo-clipboard:parseReleaseLocalResources
 > Task :expo-constants:compileReleaseLibraryResources
-> Task :expo-clipboard:generateReleaseRFile
 > Task :expo-constants:parseReleaseLocalResources
+> Task :expo-clipboard:generateReleaseRFile
 > Task :expo-device:compileReleaseLibraryResources
-> Task :expo-constants:generateReleaseRFile
 > Task :expo-device:parseReleaseLocalResources
+> Task :expo-constants:generateReleaseRFile
 > Task :expo-eas-client:compileReleaseLibraryResources
 > Task :expo-device:generateReleaseRFile
 > Task :expo-eas-client:parseReleaseLocalResources
 > Task :expo-file-system:compileReleaseLibraryResources
-> Task :expo-eas-client:generateReleaseRFile
 > Task :expo-file-system:parseReleaseLocalResources
+> Task :expo-eas-client:generateReleaseRFile
 > Task :expo-font:compileReleaseLibraryResources
 > Task :expo-file-system:generateReleaseRFile
 > Task :expo-font:parseReleaseLocalResources
@@ -674,8 +671,8 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-font:generateReleaseRFile
 > Task :expo-intent-launcher:parseReleaseLocalResources
 > Task :expo-json-utils:compileReleaseLibraryResources
-> Task :expo-intent-launcher:generateReleaseRFile
 > Task :expo-json-utils:parseReleaseLocalResources
+> Task :expo-intent-launcher:generateReleaseRFile
 > Task :expo-keep-awake:compileReleaseLibraryResources
 > Task :expo-json-utils:generateReleaseRFile
 > Task :expo-keep-awake:parseReleaseLocalResources
@@ -683,10 +680,10 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-keep-awake:generateReleaseRFile
 > Task :expo-linking:parseReleaseLocalResources
 > Task :expo-location:compileReleaseLibraryResources
-> Task :expo-linking:generateReleaseRFile
 > Task :expo-location:parseReleaseLocalResources
-> Task :expo-manifests:compileReleaseLibraryResources
+> Task :expo-linking:generateReleaseRFile
 > Task :expo-location:generateReleaseRFile
+> Task :expo-manifests:compileReleaseLibraryResources
 > Task :expo-manifests:parseReleaseLocalResources
 > Task :expo-modules-core:compileReleaseLibraryResources
 > Task :expo-manifests:generateReleaseRFile
@@ -695,9 +692,9 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-modules-core:generateReleaseRFile
 > Task :expo-notifications:parseReleaseLocalResources
 > Task :expo-print:compileReleaseLibraryResources
-> Task :expo-notifications:generateReleaseRFile
 > Task :expo-print:parseReleaseLocalResources
 > Task :expo-sharing:compileReleaseLibraryResources
+> Task :expo-notifications:generateReleaseRFile
 > Task :expo-print:generateReleaseRFile
 > Task :expo-sharing:parseReleaseLocalResources
 > Task :expo-structured-headers:compileReleaseLibraryResources
@@ -713,8 +710,8 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-updates:generateReleaseRFile
 > Task :expo-updates-interface:parseReleaseLocalResources
 > Task :react-native-async-storage_async-storage:compileReleaseLibraryResources
-> Task :expo-updates-interface:generateReleaseRFile
 > Task :react-native-async-storage_async-storage:parseReleaseLocalResources
+> Task :expo-updates-interface:generateReleaseRFile
 > Task :react-native-community_datetimepicker:compileReleaseLibraryResources
 > Task :react-native-async-storage_async-storage:generateReleaseRFile
 > Task :react-native-community_datetimepicker:parseReleaseLocalResources
@@ -728,24 +725,24 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :react-native-reanimated:generateReleaseRFile
 > Task :react-native-safe-area-context:parseReleaseLocalResources
 > Task :react-native-safe-area-context:generateReleaseRFile
-> Task :react-native-screens:compileReleaseLibraryResources
 > Task :react-native-screens:parseReleaseLocalResources
 > Task :react-native-svg:compileReleaseLibraryResources
-> Task :react-native-screens:generateReleaseRFile
+> Task :react-native-screens:compileReleaseLibraryResources
 > Task :react-native-svg:parseReleaseLocalResources
+> Task :react-native-screens:generateReleaseRFile
 > Task :react-native-thermal-receipt-printer-image-qr:compileReleaseLibraryResources
 > Task :react-native-svg:generateReleaseRFile
 > Task :react-native-thermal-receipt-printer-image-qr:parseReleaseLocalResources
 > Task :react-native-view-shot:compileReleaseLibraryResources
-> Task :react-native-view-shot:parseReleaseLocalResources
 > Task :react-native-thermal-receipt-printer-image-qr:generateReleaseRFile
-> Task :react-native-view-shot:generateReleaseRFile
+> Task :react-native-view-shot:parseReleaseLocalResources
 > Task :react-native-worklets:compileReleaseLibraryResources
-> Task :react-native-worklets:parseReleaseLocalResources
 > Task :expo:checkKotlinGradlePluginConfigurationErrors
-> Task :react-native-worklets:generateReleaseRFile
+> Task :react-native-view-shot:generateReleaseRFile
+> Task :react-native-worklets:parseReleaseLocalResources
 > Task :expo:generateReleaseBuildConfig
 > Task :expo-application:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-worklets:generateReleaseRFile
 > Task :expo-application:generateReleaseBuildConfig
 > Task :expo-modules-core:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-modules-core:generateReleaseBuildConfig
@@ -754,8 +751,8 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-modules-core:javaPreCompileRelease
 > Task :expo-application:javaPreCompileRelease
 > Task :expo-asset:generateReleaseBuildConfig
-> Task :expo-asset:javaPreCompileRelease
 > Task :expo-camera:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-asset:javaPreCompileRelease
 > Task :expo-camera:generateReleaseBuildConfig
 > Task :expo-clipboard:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-camera:javaPreCompileRelease
@@ -775,14 +772,14 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-font:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-file-system:javaPreCompileRelease
 > Task :expo-font:generateReleaseBuildConfig
-> Task :expo-font:javaPreCompileRelease
 > Task :expo-intent-launcher:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-font:javaPreCompileRelease
 > Task :expo-intent-launcher:generateReleaseBuildConfig
-> Task :expo-intent-launcher:javaPreCompileRelease
 > Task :expo-json-utils:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-intent-launcher:javaPreCompileRelease
 > Task :expo-json-utils:generateReleaseBuildConfig
-> Task :expo-json-utils:javaPreCompileRelease
 > Task :expo-keep-awake:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-json-utils:javaPreCompileRelease
 > Task :expo-keep-awake:generateReleaseBuildConfig
 > Task :expo-linking:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-keep-awake:javaPreCompileRelease
@@ -793,8 +790,8 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-manifests:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-location:javaPreCompileRelease
 > Task :expo-manifests:generateReleaseBuildConfig
-> Task :expo-notifications:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-manifests:javaPreCompileRelease
+> Task :expo-notifications:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-notifications:generateReleaseBuildConfig
 > Task :expo-print:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-notifications:javaPreCompileRelease
@@ -802,8 +799,8 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :expo-sharing:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-print:javaPreCompileRelease
 > Task :expo-sharing:generateReleaseBuildConfig
-> Task :expo-sharing:javaPreCompileRelease
 > Task :expo-structured-headers:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-sharing:javaPreCompileRelease
 > Task :expo-structured-headers:generateReleaseBuildConfig
 > Task :expo-system-ui:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-structured-headers:javaPreCompileRelease
@@ -819,6 +816,7 @@ C:\Projetos\App\MegaSena\apps\mobile\android\app\src\main\AndroidManifest.xml Wa
 > Task :react-native-async-storage_async-storage:javaPreCompileRelease
 > Task :react-native-community_datetimepicker:generateReleaseBuildConfig
 > Task :expo-updates:javaPreCompileRelease
+> Task :app:processReleaseResources
 
 > Task :react-native-async-storage_async-storage:compileReleaseJavaWithJavac
 Note: Some input files use or override a deprecated API.
@@ -829,14 +827,13 @@ Note: Recompile with -Xlint:unchecked for details.
 > Task :react-native-community_datetimepicker:javaPreCompileRelease
 > Task :react-native-ping:generateReleaseBuildConfig
 > Task :react-native-async-storage_async-storage:bundleLibCompileToJarRelease
-> Task :app:processReleaseResources
 
 > Task :react-native-community_datetimepicker:compileReleaseJavaWithJavac
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 
-> Task :react-native-community_datetimepicker:bundleLibCompileToJarRelease
 > Task :react-native-ping:javaPreCompileRelease
+> Task :react-native-community_datetimepicker:bundleLibCompileToJarRelease
 > Task :react-native-reanimated:generateReleaseBuildConfig
 
 > Task :react-native-ping:compileReleaseJavaWithJavac
@@ -845,8 +842,8 @@ Note: Recompile with -Xlint:deprecation for details.
 
 > Task :react-native-reanimated:packageNdkLibs NO-SOURCE
 > Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors
-> Task :react-native-ping:bundleLibCompileToJarRelease
 > Task :react-native-reanimated:javaPreCompileRelease
+> Task :react-native-ping:bundleLibCompileToJarRelease
 > Task :react-native-safe-area-context:generateReleaseBuildConfig
 
 > Task :react-native-reanimated:compileReleaseJavaWithJavac
@@ -863,15 +860,12 @@ Note: Recompile with -Xlint:unchecked for details.
 > Task :react-native-svg:generateReleaseBuildConfig
 > Task :react-native-svg:javaPreCompileRelease
 > Task :react-native-thermal-receipt-printer-image-qr:generateReleaseBuildConfig
+> Task :expo-modules-core:compileReleaseKotlin
 
 > Task :react-native-svg:compileReleaseJavaWithJavac
 C:\Projetos\App\MegaSena\node_modules\react-native-svg\android\src\main\java\com\horcrux\svg\RenderableViewManager.java:388: warning: [removal] processTransform(ReadableArray,double[]) in TransformHelper has been deprecated and marked for removal
     TransformHelper.processTransform(transforms, sTransformDecompositionArray);
                    ^
-
-> Task :expo-modules-core:compileReleaseKotlin
-
-> Task :react-native-svg:compileReleaseJavaWithJavac
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
@@ -953,61 +947,78 @@ Note: Recompile with -Xlint:unchecked for details.
 > Task :expo-updates-interface:prepareLintJarForPublish
 > Task :expo-updates:prepareLintJarForPublish
 > Task :expo:prepareLintJarForPublish
+> Task :react-native-safe-area-context:compileReleaseKotlin
 > Task :react-native-async-storage_async-storage:processReleaseJavaRes NO-SOURCE
 > Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarRelease
 > Task :react-native-async-storage_async-storage:extractProguardFiles
 > Task :react-native-async-storage_async-storage:createFullJarRelease
+> Task :react-native-screens:compileReleaseKotlin
 > Task :react-native-async-storage_async-storage:generateReleaseLintModel
 > Task :react-native-async-storage_async-storage:prepareLintJarForPublish
 > Task :react-native-community_datetimepicker:processReleaseJavaRes NO-SOURCE
-> Task :react-native-community_datetimepicker:extractProguardFiles
 > Task :react-native-community_datetimepicker:bundleLibRuntimeToJarRelease
-> Task :react-native-community_datetimepicker:generateReleaseLintModel
+
+> Task :react-native-safe-area-context:compileReleaseKotlin
+w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:27:11 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
+w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:33:27 'getter for hasConstants: Boolean' is deprecated. This property is unused and it's planning to be removed in a future version of
+        React Native. Please refrain from using it.
+w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'getter for uiImplementation: UIImplementation!' is deprecated. Deprecated in Java
+
+> Task :react-native-community_datetimepicker:extractProguardFiles
 > Task :react-native-community_datetimepicker:createFullJarRelease
+> Task :react-native-community_datetimepicker:generateReleaseLintModel
 > Task :react-native-community_datetimepicker:prepareLintJarForPublish
 > Task :react-native-ping:processReleaseJavaRes NO-SOURCE
 > Task :react-native-ping:bundleLibRuntimeToJarRelease
 > Task :react-native-ping:extractProguardFiles
+
+> Task :react-native-safe-area-context:compileReleaseJavaWithJavac
+Note: C:\Projetos\App\MegaSena\node_modules\react-native-safe-area-context\android\src\paper\java\com\th3rdwave\safeareacontext\NativeSafeAreaContextSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
 > Task :react-native-ping:createFullJarRelease
-> Task :react-native-safe-area-context:compileReleaseKotlin
+> Task :react-native-safe-area-context:bundleLibCompileToJarRelease
 > Task :react-native-ping:generateReleaseLintModel
 > Task :react-native-ping:prepareLintJarForPublish
-> Task :react-native-screens:compileReleaseKotlin
 > Task :react-native-reanimated:processReleaseJavaRes NO-SOURCE
 > Task :react-native-reanimated:extractProguardFiles
 > Task :react-native-reanimated:bundleLibRuntimeToJarRelease
 > Task :react-native-reanimated:generateReleaseLintModel
 > Task :react-native-reanimated:createFullJarRelease
 > Task :react-native-reanimated:prepareLintJarForPublish
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarRelease
+> Task :react-native-safe-area-context:processReleaseJavaRes
+> Task :react-native-safe-area-context:createFullJarRelease
 > Task :react-native-safe-area-context:extractProguardFiles
+> Task :react-native-safe-area-context:generateReleaseLintModel
 > Task :react-native-safe-area-context:prepareLintJarForPublish
 > Task :react-native-screens:extractProguardFiles
 > Task :react-native-screens:prepareLintJarForPublish
 > Task :react-native-svg:processReleaseJavaRes NO-SOURCE
 > Task :react-native-svg:extractProguardFiles
-> Task :react-native-svg:bundleLibRuntimeToJarRelease
 > Task :react-native-svg:generateReleaseLintModel
-> Task :react-native-svg:createFullJarRelease
 > Task :react-native-svg:prepareLintJarForPublish
-> Task :react-native-thermal-receipt-printer-image-qr:processReleaseJavaRes NO-SOURCE
 > Task :react-native-thermal-receipt-printer-image-qr:bundleLibRuntimeToJarRelease
-> Task :react-native-thermal-receipt-printer-image-qr:extractProguardFiles
+> Task :react-native-thermal-receipt-printer-image-qr:processReleaseJavaRes NO-SOURCE
 > Task :react-native-thermal-receipt-printer-image-qr:createFullJarRelease
+> Task :react-native-thermal-receipt-printer-image-qr:extractProguardFiles
 > Task :react-native-thermal-receipt-printer-image-qr:generateReleaseLintModel
 > Task :react-native-thermal-receipt-printer-image-qr:prepareLintJarForPublish
 > Task :react-native-view-shot:processReleaseJavaRes NO-SOURCE
-> Task :react-native-view-shot:extractProguardFiles
 > Task :react-native-view-shot:bundleLibRuntimeToJarRelease
-> Task :react-native-view-shot:generateReleaseLintModel
+> Task :react-native-view-shot:extractProguardFiles
 > Task :react-native-view-shot:createFullJarRelease
+> Task :react-native-view-shot:generateReleaseLintModel
 > Task :react-native-view-shot:prepareLintJarForPublish
 > Task :react-native-worklets:processReleaseJavaRes NO-SOURCE
-> Task :react-native-worklets:extractProguardFiles
 > Task :react-native-worklets:bundleLibRuntimeToJarRelease
-> Task :react-native-worklets:generateReleaseLintModel
+> Task :react-native-worklets:extractProguardFiles
 > Task :react-native-worklets:createFullJarRelease
+> Task :react-native-worklets:generateReleaseLintModel
 > Task :react-native-worklets:prepareLintJarForPublish
+> Task :react-native-svg:bundleLibRuntimeToJarRelease
 > Task :expo:mergeReleaseJniLibFolders
+> Task :react-native-svg:createFullJarRelease
 > Task :expo:mergeReleaseNativeLibs NO-SOURCE
 > Task :expo:stripReleaseDebugSymbols NO-SOURCE
 > Task :expo:extractDeepLinksForAarRelease
@@ -1022,39 +1033,14 @@ Note: Recompile with -Xlint:unchecked for details.
 > Task :react-native-safe-area-context:stripReleaseDebugSymbols NO-SOURCE
 > Task :react-native-safe-area-context:copyReleaseJniLibsProjectAndLocalJars
 > Task :react-native-safe-area-context:extractDeepLinksForAarRelease
+> Task :react-native-safe-area-context:extractReleaseAnnotations
+> Task :react-native-safe-area-context:mergeReleaseGeneratedProguardFiles
+> Task :react-native-safe-area-context:mergeReleaseConsumerProguardFiles
 > Task :react-native-safe-area-context:mergeReleaseShaders
 > Task :react-native-safe-area-context:compileReleaseShaders NO-SOURCE
 > Task :react-native-safe-area-context:generateReleaseAssets UP-TO-DATE
 > Task :react-native-safe-area-context:packageReleaseAssets
 > Task :react-native-safe-area-context:prepareReleaseArtProfile
-> Task :react-native-screens:configureCMakeRelWithDebInfo[arm64-v8a]
-
-> Task :react-native-safe-area-context:compileReleaseKotlin
-w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:27:11 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
-w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:33:27 'getter for hasConstants: Boolean' is deprecated. This property is unused and it's planning to be removed in a future version of
-        React Native. Please refrain from using it.
-w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'getter for uiImplementation: UIImplementation!' is deprecated. Deprecated in Java
-
-> Task :react-native-screens:buildCMakeRelWithDebInfo[arm64-v8a]
-
-> Task :react-native-safe-area-context:compileReleaseJavaWithJavac
-Note: C:\Projetos\App\MegaSena\node_modules\react-native-safe-area-context\android\src\paper\java\com\th3rdwave\safeareacontext\NativeSafeAreaContextSpec.java uses or overrides a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-
-> Task :react-native-safe-area-context:bundleLibCompileToJarRelease
-> Task :react-native-safe-area-context:bundleLibRuntimeToJarRelease
-> Task :react-native-safe-area-context:processReleaseJavaRes
-> Task :react-native-safe-area-context:createFullJarRelease
-> Task :react-native-safe-area-context:generateReleaseLintModel
-> Task :react-native-safe-area-context:extractReleaseAnnotations
-> Task :react-native-safe-area-context:mergeReleaseGeneratedProguardFiles
-> Task :react-native-safe-area-context:mergeReleaseConsumerProguardFiles
-> Task :react-native-screens:configureCMakeRelWithDebInfo[armeabi-v7a]
-> Task :react-native-safe-area-context:mergeReleaseJavaResource
-> Task :react-native-screens:buildCMakeRelWithDebInfo[armeabi-v7a]
-> Task :react-native-safe-area-context:syncReleaseLibJars
-> Task :react-native-safe-area-context:bundleReleaseLocalLintAar
-> Task :react-native-screens:configureCMakeRelWithDebInfo[x86]
 
 > Task :react-native-screens:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt:19:53 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
@@ -1118,131 +1104,67 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-screens/android/sr
 w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:12:13 Parameter 'view' is never used
 w: file:///C:/Projetos/App/MegaSena/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:15:33 Parameter 'tag' is never used
 
-> Task :react-native-screens:buildCMakeRelWithDebInfo[x86]
+> Task :react-native-safe-area-context:mergeReleaseJavaResource
+> Task :react-native-screens:configureCMakeRelWithDebInfo[arm64-v8a]
 
 > Task :react-native-screens:compileReleaseJavaWithJavac
 Note: C:\Projetos\App\MegaSena\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\NativeScreensModuleSpec.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 
-> Task :react-native-screens:bundleLibCompileToJarRelease
 > Task :react-native-screens:processReleaseJavaRes
 > Task :react-native-screens:bundleLibRuntimeToJarRelease
+> Task :react-native-screens:bundleLibCompileToJarRelease
 > Task :react-native-screens:generateReleaseLintModel
 > Task :react-native-screens:createFullJarRelease
+> Task :react-native-safe-area-context:syncReleaseLibJars
+> Task :react-native-safe-area-context:bundleReleaseLocalLintAar
+> Task :react-native-screens:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-screens:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-screens:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-screens:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-screens:buildCMakeRelWithDebInfo[x86]
 > Task :react-native-screens:configureCMakeRelWithDebInfo[x86_64]
 > Task :react-native-screens:buildCMakeRelWithDebInfo[x86_64]
-> Task :react-native-screens:mergeReleaseJniLibFolders
-> Task :react-native-screens:extractDeepLinksForAarRelease
-> Task :react-native-screens:mergeReleaseNativeLibs
-> Task :react-native-screens:extractReleaseAnnotations
-> Task :react-native-screens:mergeReleaseGeneratedProguardFiles
-> Task :react-native-screens:mergeReleaseConsumerProguardFiles
-> Task :react-native-screens:mergeReleaseShaders
-> Task :react-native-screens:compileReleaseShaders NO-SOURCE
-> Task :react-native-screens:generateReleaseAssets UP-TO-DATE
-> Task :react-native-screens:packageReleaseAssets
-> Task :react-native-screens:prepareReleaseArtProfile
-> Task :react-native-screens:mergeReleaseJavaResource
-> Task :react-native-async-storage_async-storage:mergeReleaseJniLibFolders
-> Task :react-native-screens:syncReleaseLibJars
-> Task :react-native-async-storage_async-storage:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-async-storage_async-storage:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-async-storage_async-storage:extractDeepLinksForAarRelease
-> Task :react-native-async-storage_async-storage:extractReleaseAnnotations
-> Task :react-native-async-storage_async-storage:mergeReleaseGeneratedProguardFiles
-> Task :react-native-async-storage_async-storage:mergeReleaseConsumerProguardFiles
-> Task :react-native-async-storage_async-storage:mergeReleaseShaders
-> Task :react-native-async-storage_async-storage:compileReleaseShaders NO-SOURCE
-> Task :react-native-async-storage_async-storage:generateReleaseAssets UP-TO-DATE
-> Task :react-native-async-storage_async-storage:packageReleaseAssets
-> Task :react-native-async-storage_async-storage:prepareReleaseArtProfile
-> Task :react-native-community_datetimepicker:mergeReleaseJniLibFolders
-> Task :react-native-async-storage_async-storage:mergeReleaseJavaResource
-> Task :react-native-community_datetimepicker:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-screens:stripReleaseDebugSymbols
-> Task :react-native-async-storage_async-storage:syncReleaseLibJars
-> Task :react-native-async-storage_async-storage:bundleReleaseLocalLintAar
-> Task :react-native-screens:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-community_datetimepicker:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-screens:bundleReleaseLocalLintAar
-> Task :react-native-community_datetimepicker:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-community_datetimepicker:extractDeepLinksForAarRelease
-> Task :react-native-community_datetimepicker:extractReleaseAnnotations
-> Task :react-native-community_datetimepicker:mergeReleaseGeneratedProguardFiles
-> Task :react-native-community_datetimepicker:mergeReleaseConsumerProguardFiles
-> Task :react-native-community_datetimepicker:mergeReleaseShaders
-> Task :react-native-community_datetimepicker:compileReleaseShaders NO-SOURCE
-> Task :react-native-community_datetimepicker:generateReleaseAssets UP-TO-DATE
-> Task :react-native-community_datetimepicker:packageReleaseAssets
-> Task :react-native-community_datetimepicker:prepareReleaseArtProfile
-> Task :react-native-community_datetimepicker:mergeReleaseJavaResource
-> Task :react-native-ping:mergeReleaseJniLibFolders
-> Task :react-native-community_datetimepicker:syncReleaseLibJars
-> Task :react-native-community_datetimepicker:bundleReleaseLocalLintAar
-> Task :react-native-ping:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-ping:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-ping:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-ping:extractDeepLinksForAarRelease
-> Task :react-native-ping:extractReleaseAnnotations
-> Task :react-native-ping:mergeReleaseGeneratedProguardFiles
-> Task :react-native-ping:mergeReleaseConsumerProguardFiles
-> Task :react-native-ping:mergeReleaseShaders
-> Task :react-native-ping:compileReleaseShaders NO-SOURCE
-> Task :react-native-ping:generateReleaseAssets UP-TO-DATE
-> Task :react-native-ping:packageReleaseAssets
-> Task :react-native-ping:prepareReleaseArtProfile
-> Task :react-native-ping:mergeReleaseJavaResource
-> Task :react-native-reanimated:configureCMakeRelWithDebInfo[arm64-v8a]
-> Task :react-native-ping:syncReleaseLibJars
-> Task :react-native-ping:bundleReleaseLocalLintAar
-> Task :react-native-reanimated:buildCMakeRelWithDebInfo[arm64-v8a]
 > Task :expo-modules-core:compileReleaseJavaWithJavac
 > Task :expo-modules-core:processReleaseJavaRes
 > Task :expo-modules-core:bundleLibRuntimeToJarRelease
 > Task :expo-modules-core:bundleLibCompileToJarRelease
 > Task :expo-modules-core:generateReleaseLintModel
 > Task :expo-asset:compileReleaseKotlin
-> Task :expo-constants:compileReleaseKotlin
-> Task :expo-asset:compileReleaseJavaWithJavac
-> Task :expo-asset:bundleLibCompileToJarRelease
-> Task :expo-constants:compileReleaseJavaWithJavac
-> Task :expo-constants:bundleLibCompileToJarRelease
 > Task :expo-application:compileReleaseKotlin
-> Task :expo-eas-client:compileReleaseKotlin
-> Task :expo-application:compileReleaseJavaWithJavac
-> Task :expo-application:bundleLibCompileToJarRelease
-> Task :expo-eas-client:compileReleaseJavaWithJavac
-> Task :expo-eas-client:bundleLibCompileToJarRelease
-> Task :expo-json-utils:compileReleaseKotlin
-> Task :expo-font:compileReleaseKotlin
-> Task :expo-json-utils:compileReleaseJavaWithJavac
-> Task :expo-font:compileReleaseJavaWithJavac
-> Task :expo-json-utils:bundleLibCompileToJarRelease
-> Task :expo-font:bundleLibCompileToJarRelease
+> Task :expo-asset:compileReleaseJavaWithJavac
 > Task :expo-device:compileReleaseKotlin
-
-> Task :expo-camera:compileReleaseKotlin
-w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt:605:73 'getter for defaultDisplay: Display!' is deprecated. Deprecated in Java
-w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/ResolveTakenPicture.kt:146:32 Type mismatch: inferred type is String? but String was expected
-w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/utils/ExifTags.kt:71:32 'TAG_ISO_SPEED_RATINGS: String' is deprecated. Deprecated in Java
-
-> Task :expo-linking:compileReleaseKotlin
-> Task :expo-intent-launcher:compileReleaseKotlin
-> Task :expo-device:compileReleaseJavaWithJavac
-> Task :expo-keep-awake:compileReleaseKotlin
-> Task :expo-camera:compileReleaseJavaWithJavac
-> Task :expo-device:bundleLibCompileToJarRelease
-> Task :expo-camera:bundleLibCompileToJarRelease
+> Task :expo-application:compileReleaseJavaWithJavac
+> Task :expo-constants:compileReleaseKotlin
+> Task :expo-asset:bundleLibCompileToJarRelease
+> Task :expo-application:bundleLibCompileToJarRelease
+> Task :expo-eas-client:compileReleaseKotlin
+> Task :expo-constants:compileReleaseJavaWithJavac
 > Task :expo-clipboard:compileReleaseKotlin
-> Task :expo-intent-launcher:compileReleaseJavaWithJavac
+> Task :expo-constants:bundleLibCompileToJarRelease
 > Task :expo-clipboard:compileReleaseJavaWithJavac
 > Task :expo-clipboard:bundleLibCompileToJarRelease
+> Task :expo-device:compileReleaseJavaWithJavac
+> Task :expo-device:bundleLibCompileToJarRelease
+> Task :expo-eas-client:compileReleaseJavaWithJavac
+> Task :expo-eas-client:bundleLibCompileToJarRelease
+> Task :expo-camera:compileReleaseKotlin
+> Task :expo-json-utils:compileReleaseKotlin
+> Task :expo-intent-launcher:compileReleaseKotlin
+> Task :expo-font:compileReleaseKotlin
+> Task :expo-json-utils:compileReleaseJavaWithJavac
+> Task :expo-keep-awake:compileReleaseKotlin
+> Task :expo-linking:compileReleaseKotlin
+> Task :expo-font:compileReleaseJavaWithJavac
+> Task :expo-font:bundleLibCompileToJarRelease
+> Task :expo-intent-launcher:compileReleaseJavaWithJavac
 > Task :expo-intent-launcher:bundleLibCompileToJarRelease
+> Task :expo-json-utils:bundleLibCompileToJarRelease
 > Task :expo-keep-awake:compileReleaseJavaWithJavac
 > Task :expo-keep-awake:bundleLibCompileToJarRelease
 > Task :expo-linking:compileReleaseJavaWithJavac
 > Task :expo-linking:bundleLibCompileToJarRelease
+> Task :expo-structured-headers:compileReleaseKotlin NO-SOURCE
 
 > Task :expo-manifests:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/EmbeddedManifest.kt:19:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
@@ -1250,26 +1172,13 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-manifests/android/src/main
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/ExpoUpdatesManifest.kt:16:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-manifests/android/src/main/java/expo/modules/manifests/core/Manifest.kt:15:12 'getRawJson(): JSONObject' is deprecated. Prefer to use specific field getters
 
-> Task :expo-structured-headers:compileReleaseKotlin NO-SOURCE
-> Task :expo-manifests:compileReleaseJavaWithJavac
-> Task :expo-manifests:bundleLibCompileToJarRelease
-
-> Task :expo-print:compileReleaseKotlin
-w: file:///C:/Projetos/App/MegaSena/node_modules/expo-print/android/src/main/java/expo/modules/print/PrintPDFRenderTask.kt:82:18 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+> Task :expo-camera:compileReleaseKotlin
+w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt:605:73 'getter for defaultDisplay: Display!' is deprecated. Deprecated in Java
+w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/ResolveTakenPicture.kt:146:32 Type mismatch: inferred type is String? but String was expected
+w: file:///C:/Projetos/App/MegaSena/node_modules/expo-camera/android/src/main/java/expo/modules/camera/utils/ExifTags.kt:71:32 'TAG_ISO_SPEED_RATINGS: String' is deprecated. Deprecated in Java
 
 > Task :expo-sharing:compileReleaseKotlin
 > Task :expo-structured-headers:compileReleaseJavaWithJavac
-> Task :expo-print:compileReleaseJavaWithJavac
-> Task :expo-print:bundleLibCompileToJarRelease
-> Task :expo-sharing:compileReleaseJavaWithJavac
-> Task :expo-sharing:bundleLibCompileToJarRelease
-> Task :expo-structured-headers:bundleLibCompileToJarRelease
-> Task :expo-file-system:compileReleaseKotlin
-> Task :expo-updates-interface:compileReleaseKotlin
-> Task :expo-file-system:compileReleaseJavaWithJavac
-> Task :expo-file-system:bundleLibCompileToJarRelease
-> Task :expo-updates-interface:compileReleaseJavaWithJavac
-> Task :expo-updates-interface:bundleLibCompileToJarRelease
 
 > Task :expo-location:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/java/expo/modules/location/LocationModule.kt:664:63 'getFromLocationName(String, Int): (Mutable)List<Address!>?' is deprecated. Deprecated in Java
@@ -1279,28 +1188,47 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/java/expo/modules/location/records/LocationResults.kt:133:7 Unchecked cast: {BaseBundle & Parcelable & kotlin.Cloneable} to BundleType
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/java/expo/modules/location/services/LocationTaskService.kt:50:5 'stopForeground(Boolean): Unit' is deprecated. Deprecated in Java
 
-> Task :expo-system-ui:compileReleaseKotlin
+> Task :expo-file-system:compileReleaseKotlin
+
+> Task :expo-print:compileReleaseKotlin
+w: file:///C:/Projetos/App/MegaSena/node_modules/expo-print/android/src/main/java/expo/modules/print/PrintPDFRenderTask.kt:82:18 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
+
+> Task :expo-camera:compileReleaseJavaWithJavac
+> Task :expo-camera:bundleLibCompileToJarRelease
+> Task :expo-file-system:compileReleaseJavaWithJavac
+> Task :expo-file-system:bundleLibCompileToJarRelease
 > Task :expo-location:compileReleaseJavaWithJavac
 > Task :expo-location:bundleLibCompileToJarRelease
-> Task :expo-system-ui:compileReleaseJavaWithJavac
-> Task :expo-system-ui:bundleLibCompileToJarRelease
+> Task :expo-manifests:compileReleaseJavaWithJavac
+> Task :expo-manifests:bundleLibCompileToJarRelease
+> Task :expo-print:compileReleaseJavaWithJavac
+> Task :expo-print:bundleLibCompileToJarRelease
+> Task :expo-sharing:compileReleaseJavaWithJavac
+> Task :expo-sharing:bundleLibCompileToJarRelease
+> Task :expo-structured-headers:bundleLibCompileToJarRelease
 > Task :expo-application:bundleLibRuntimeToJarRelease
 > Task :expo-application:processReleaseJavaRes
 > Task :expo-application:createFullJarRelease
+> Task :expo-updates-interface:compileReleaseKotlin
 > Task :expo-modules-core:createFullJarRelease
+> Task :expo-updates-interface:compileReleaseJavaWithJavac
+> Task :expo-updates-interface:bundleLibCompileToJarRelease
+> Task :expo-system-ui:compileReleaseKotlin
 > Task :expo-application:generateReleaseLintModel
+> Task :expo-system-ui:compileReleaseJavaWithJavac
+> Task :expo-system-ui:bundleLibCompileToJarRelease
 > Task :expo-asset:bundleLibRuntimeToJarRelease
 > Task :expo-asset:processReleaseJavaRes
 > Task :expo-asset:createFullJarRelease
 > Task :expo-asset:generateReleaseLintModel
-> Task :expo-camera:bundleLibRuntimeToJarRelease
 > Task :expo-camera:processReleaseJavaRes
-> Task :expo-camera:createFullJarRelease
+> Task :expo-camera:bundleLibRuntimeToJarRelease
 > Task :expo-camera:generateReleaseLintModel
-> Task :expo-clipboard:bundleLibRuntimeToJarRelease
+> Task :expo-camera:createFullJarRelease
 > Task :expo-clipboard:processReleaseJavaRes
-> Task :expo-clipboard:createFullJarRelease
+> Task :expo-clipboard:bundleLibRuntimeToJarRelease
 > Task :expo-clipboard:generateReleaseLintModel
+> Task :expo-clipboard:createFullJarRelease
 > Task :expo-constants:bundleLibRuntimeToJarRelease
 > Task :expo-constants:processReleaseJavaRes
 > Task :expo-constants:createFullJarRelease
@@ -1332,6 +1260,7 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/
 > Task :expo-keep-awake:bundleLibRuntimeToJarRelease
 > Task :expo-keep-awake:processReleaseJavaRes
 > Task :expo-keep-awake:createFullJarRelease
+> Task :expo-notifications:compileReleaseKotlin
 > Task :expo-keep-awake:generateReleaseLintModel
 > Task :expo-linking:bundleLibRuntimeToJarRelease
 > Task :expo-linking:processReleaseJavaRes
@@ -1353,10 +1282,10 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/
 > Task :expo-sharing:processReleaseJavaRes
 > Task :expo-sharing:createFullJarRelease
 > Task :expo-sharing:generateReleaseLintModel
-> Task :expo-structured-headers:processReleaseJavaRes NO-SOURCE
 > Task :expo-structured-headers:bundleLibRuntimeToJarRelease
-> Task :expo-structured-headers:generateReleaseLintModel
+> Task :expo-structured-headers:processReleaseJavaRes NO-SOURCE
 > Task :expo-structured-headers:createFullJarRelease
+> Task :expo-structured-headers:generateReleaseLintModel
 > Task :expo-system-ui:bundleLibRuntimeToJarRelease
 > Task :expo-system-ui:processReleaseJavaRes
 > Task :expo-system-ui:createFullJarRelease
@@ -1365,8 +1294,11 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-location/android/src/main/
 > Task :expo-updates-interface:processReleaseJavaRes
 > Task :expo-updates-interface:createFullJarRelease
 > Task :expo-updates-interface:generateReleaseLintModel
-> Task :expo-updates:kspReleaseKotlin
-> Task :react-native-reanimated:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-screens:mergeReleaseJniLibFolders
+> Task :react-native-screens:extractDeepLinksForAarRelease
+> Task :react-native-screens:mergeReleaseNativeLibs
+> Task :react-native-screens:extractReleaseAnnotations
+
 > Task :expo-notifications:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/Utils.kt:41:21 'get(String!): Any?' is deprecated. Deprecated in Java
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/notifications/categories/ExpoNotificationCategoriesModule.kt:69:40 'getParcelableArrayList(String?): ArrayList<T!>?' is deprecated. Deprecated in Java
@@ -1403,8 +1335,82 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-notifications/android/src/
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:207:41 'get(String!): Any?' is deprecated. Deprecated in Java
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-notifications/android/src/main/java/expo/modules/notifications/service/delegates/ExpoPresentationDelegate.kt:210:124 'get(String!): Any?' is deprecated. Deprecated in Java
 
+> Task :react-native-screens:mergeReleaseGeneratedProguardFiles
+> Task :react-native-screens:mergeReleaseConsumerProguardFiles
+> Task :react-native-screens:mergeReleaseShaders
+> Task :react-native-screens:compileReleaseShaders NO-SOURCE
+> Task :react-native-screens:generateReleaseAssets UP-TO-DATE
+> Task :react-native-screens:packageReleaseAssets
+> Task :react-native-screens:prepareReleaseArtProfile
+> Task :react-native-screens:mergeReleaseJavaResource
+> Task :react-native-screens:stripReleaseDebugSymbols
+
+> Task :expo-notifications:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: C:\Projetos\App\MegaSena\node_modules\expo-notifications\android\src\main\java\expo\modules\notifications\notifications\model\NotificationCategory.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :expo-notifications:bundleLibCompileToJarRelease
+> Task :expo-notifications:bundleLibRuntimeToJarRelease
+> Task :expo-notifications:processReleaseJavaRes
+> Task :expo-notifications:createFullJarRelease
+> Task :expo-notifications:generateReleaseLintModel
+> Task :react-native-screens:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-screens:syncReleaseLibJars
+> Task :expo-updates:kspReleaseKotlin
+> Task :react-native-screens:bundleReleaseLocalLintAar
+> Task :react-native-async-storage_async-storage:mergeReleaseJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-async-storage_async-storage:extractDeepLinksForAarRelease
+> Task :react-native-async-storage_async-storage:extractReleaseAnnotations
+> Task :react-native-async-storage_async-storage:mergeReleaseGeneratedProguardFiles
+> Task :react-native-async-storage_async-storage:mergeReleaseConsumerProguardFiles
+> Task :react-native-async-storage_async-storage:mergeReleaseShaders
+> Task :react-native-async-storage_async-storage:compileReleaseShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateReleaseAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageReleaseAssets
+> Task :react-native-async-storage_async-storage:prepareReleaseArtProfile
+> Task :react-native-async-storage_async-storage:mergeReleaseJavaResource
+> Task :react-native-community_datetimepicker:mergeReleaseJniLibFolders
+> Task :react-native-async-storage_async-storage:syncReleaseLibJars
+> Task :react-native-async-storage_async-storage:bundleReleaseLocalLintAar
+> Task :react-native-community_datetimepicker:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-community_datetimepicker:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-community_datetimepicker:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-community_datetimepicker:extractDeepLinksForAarRelease
+> Task :react-native-community_datetimepicker:extractReleaseAnnotations
+> Task :react-native-community_datetimepicker:mergeReleaseGeneratedProguardFiles
+> Task :react-native-community_datetimepicker:mergeReleaseConsumerProguardFiles
+> Task :react-native-community_datetimepicker:mergeReleaseShaders
+> Task :react-native-community_datetimepicker:compileReleaseShaders NO-SOURCE
+> Task :react-native-community_datetimepicker:generateReleaseAssets UP-TO-DATE
+> Task :react-native-community_datetimepicker:packageReleaseAssets
+> Task :react-native-community_datetimepicker:prepareReleaseArtProfile
+> Task :react-native-community_datetimepicker:mergeReleaseJavaResource
+> Task :react-native-ping:mergeReleaseJniLibFolders
+> Task :react-native-community_datetimepicker:syncReleaseLibJars
+> Task :react-native-community_datetimepicker:bundleReleaseLocalLintAar
+> Task :react-native-ping:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-ping:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-ping:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-ping:extractDeepLinksForAarRelease
+> Task :react-native-ping:extractReleaseAnnotations
+> Task :react-native-ping:mergeReleaseGeneratedProguardFiles
+> Task :react-native-ping:mergeReleaseConsumerProguardFiles
+> Task :react-native-ping:mergeReleaseShaders
+> Task :react-native-ping:compileReleaseShaders NO-SOURCE
+> Task :react-native-ping:generateReleaseAssets UP-TO-DATE
+> Task :react-native-ping:packageReleaseAssets
+> Task :react-native-ping:prepareReleaseArtProfile
+> Task :react-native-ping:mergeReleaseJavaResource
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-ping:syncReleaseLibJars
+> Task :react-native-ping:bundleReleaseLocalLintAar
 > Task :expo-updates:compileReleaseKotlin
-> Task :react-native-reanimated:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[arm64-v8a]
 
 > Task :expo-updates:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-updates/android/src/main/java/expo/modules/updates/DisabledUpdatesController.kt:66:20 This class shouldn't be used in Kotlin. Use kotlin.Any instead.
@@ -1465,33 +1471,23 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo-updates/android/src/main/j
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/StartupProcedure.kt:199:34 'getCurrentState(): UpdatesStateValue' is deprecated. Avoid needing to access current state to know how to transition to next state
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo-updates/android/src/main/java/expo/modules/updates/procedures/StateMachineSerialExecutorQueue.kt:43:35 'getCurrentState(): UpdatesStateValue' is deprecated. Avoid needing to access current state to know how to transition to next state
 
-> Task :expo-notifications:compileReleaseJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-Note: C:\Projetos\App\MegaSena\node_modules\expo-notifications\android\src\main\java\expo\modules\notifications\notifications\model\NotificationCategory.java uses unchecked or unsafe operations.
-Note: Recompile with -Xlint:unchecked for details.
-
-> Task :expo-notifications:bundleLibCompileToJarRelease
 > Task :expo-updates:compileReleaseJavaWithJavac
-> Task :expo-notifications:processReleaseJavaRes
 > Task :expo-updates:bundleLibCompileToJarRelease
-> Task :expo-notifications:bundleLibRuntimeToJarRelease
-> Task :expo-notifications:createFullJarRelease
-> Task :expo-notifications:generateReleaseLintModel
-> Task :expo-updates:bundleLibRuntimeToJarRelease
 > Task :expo-updates:processReleaseJavaRes
+> Task :expo-updates:bundleLibRuntimeToJarRelease
 > Task :expo-updates:createFullJarRelease
 > Task :expo-updates:generateReleaseLintModel
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[armeabi-v7a]
 
 > Task :expo:compileReleaseKotlin
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo/android/src/main/java/expo/modules/ReactActivityDelegateWrapper.kt:163:34 'constructor ReactDelegate(Activity!, ReactNativeHost!, String?, Bundle?)' is deprecated. Deprecated in Java
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt:40:16 This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details
 w: file:///C:/Projetos/App/MegaSena/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt:42:11 'deallocate(): Unit' is deprecated. Use sharedObjectDidRelease() instead.
 
-> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[armeabi-v7a]
 > Task :expo:compileReleaseJavaWithJavac
-> Task :expo:bundleLibRuntimeToJarRelease
 > Task :expo:bundleLibCompileToJarRelease
+> Task :expo:bundleLibRuntimeToJarRelease
 > Task :expo:processReleaseJavaRes
 > Task :expo:createFullJarRelease
 > Task :expo:generateReleaseLintModel
@@ -1500,15 +1496,17 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo/android/src/main/java/expo
 > Task :expo:mergeReleaseConsumerProguardFiles
 > Task :expo:mergeReleaseJavaResource
 > Task :app:compileReleaseKotlin
-> Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86]
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
 > Task :app:compileReleaseJavaWithJavac
 > Task :app:generateReleaseLintVitalReportModel
 > Task :expo:syncReleaseLibJars
 > Task :expo:bundleReleaseLocalLintAar
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86]
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86_64]
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86_64]
 > Task :react-native-reanimated:mergeReleaseJniLibFolders
 > Task :react-native-reanimated:extractDeepLinksForAarRelease
+> Task :react-native-reanimated:mergeReleaseNativeLibs
 > Task :react-native-reanimated:extractReleaseAnnotations
 > Task :react-native-reanimated:mergeReleaseGeneratedProguardFiles
 > Task :react-native-reanimated:mergeReleaseConsumerProguardFiles
@@ -1516,654 +1514,20 @@ w: file:///C:/Projetos/App/MegaSena/node_modules/expo/android/src/main/java/expo
 > Task :react-native-reanimated:compileReleaseShaders NO-SOURCE
 > Task :react-native-reanimated:generateReleaseAssets UP-TO-DATE
 > Task :react-native-reanimated:packageReleaseAssets
-> Task :react-native-reanimated:mergeReleaseNativeLibs
+> Task :react-native-reanimated:stripReleaseDebugSymbols
 > Task :react-native-reanimated:externalNativeBuildRelease
+> Task :react-native-reanimated:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
 > Task :react-native-reanimated:generateJsonModelRelease
 > Task :react-native-reanimated:prefabReleaseConfigurePackage
-> Task :react-native-reanimated:stripReleaseDebugSymbols
-> Task :react-native-reanimated:prefabReleasePackage
-> Task :react-native-reanimated:prepareReleaseArtProfile
-> Task :react-native-reanimated:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-reanimated:mergeReleaseJavaResource
-> Task :react-native-svg:mergeReleaseJniLibFolders
-> Task :react-native-reanimated:syncReleaseLibJars
-> Task :react-native-reanimated:bundleReleaseLocalLintAar
-> Task :react-native-svg:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-svg:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-svg:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-svg:extractDeepLinksForAarRelease
-> Task :react-native-svg:extractReleaseAnnotations
-> Task :react-native-svg:mergeReleaseGeneratedProguardFiles
-> Task :react-native-svg:mergeReleaseConsumerProguardFiles
-> Task :react-native-svg:mergeReleaseShaders
-> Task :react-native-svg:compileReleaseShaders NO-SOURCE
-> Task :react-native-svg:generateReleaseAssets UP-TO-DATE
-> Task :react-native-svg:packageReleaseAssets
-> Task :react-native-svg:prepareReleaseArtProfile
-> Task :react-native-svg:mergeReleaseJavaResource
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseJniLibFolders
-> Task :react-native-svg:syncReleaseLibJars
-> Task :react-native-svg:bundleReleaseLocalLintAar
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-thermal-receipt-printer-image-qr:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-thermal-receipt-printer-image-qr:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-thermal-receipt-printer-image-qr:extractDeepLinksForAarRelease
-> Task :react-native-thermal-receipt-printer-image-qr:extractReleaseAnnotations
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseGeneratedProguardFiles
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseConsumerProguardFiles
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseShaders
-> Task :react-native-thermal-receipt-printer-image-qr:compileReleaseShaders NO-SOURCE
-> Task :react-native-thermal-receipt-printer-image-qr:generateReleaseAssets UP-TO-DATE
-> Task :react-native-thermal-receipt-printer-image-qr:packageReleaseAssets
-> Task :react-native-thermal-receipt-printer-image-qr:prepareReleaseArtProfile
-> Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseJavaResource
-> Task :react-native-view-shot:mergeReleaseJniLibFolders
-> Task :react-native-thermal-receipt-printer-image-qr:syncReleaseLibJars
-> Task :react-native-thermal-receipt-printer-image-qr:bundleReleaseLocalLintAar
-> Task :react-native-view-shot:mergeReleaseNativeLibs NO-SOURCE
-> Task :react-native-view-shot:stripReleaseDebugSymbols NO-SOURCE
-> Task :react-native-view-shot:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-view-shot:extractDeepLinksForAarRelease
-> Task :react-native-view-shot:mergeReleaseGeneratedProguardFiles
-> Task :react-native-view-shot:mergeReleaseConsumerProguardFiles
-> Task :react-native-view-shot:mergeReleaseShaders
-> Task :react-native-view-shot:compileReleaseShaders NO-SOURCE
-> Task :react-native-view-shot:generateReleaseAssets UP-TO-DATE
-> Task :react-native-view-shot:packageReleaseAssets
-> Task :react-native-view-shot:prepareReleaseArtProfile
-> Task :react-native-view-shot:mergeReleaseJavaResource
-
-> Task :react-native-worklets:configureCMakeRelWithDebInfo[arm64-v8a]
-C/C++: CMake Warning:
-C/C++:   Manually-specified variables were not used by the project:
-C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
-
-> Task :react-native-view-shot:extractReleaseAnnotations
-Warning: fr.greweb.reactnativeviewshot.ViewShot.Formats: The typedef annotation should have @Retention(RetentionPolicy.SOURCE)
-Warning: fr.greweb.reactnativeviewshot.ViewShot.Results: The typedef annotation should have @Retention(RetentionPolicy.SOURCE)
-
-> Task :react-native-worklets:buildCMakeRelWithDebInfo[arm64-v8a][worklets]
-> Task :react-native-view-shot:syncReleaseLibJars
-> Task :react-native-view-shot:bundleReleaseLocalLintAar
-
-> Task :react-native-worklets:configureCMakeRelWithDebInfo[armeabi-v7a]
-C/C++: CMake Warning:
-C/C++:   Manually-specified variables were not used by the project:
-C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
-
-> Task :react-native-worklets:buildCMakeRelWithDebInfo[armeabi-v7a][worklets]
-
-> Task :react-native-worklets:configureCMakeRelWithDebInfo[x86]
-C/C++: CMake Warning:
-C/C++:   Manually-specified variables were not used by the project:
-C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
-
-> Task :react-native-worklets:buildCMakeRelWithDebInfo[x86][worklets]
-
-> Task :react-native-worklets:configureCMakeRelWithDebInfo[x86_64]
-C/C++: CMake Warning:
-C/C++:   Manually-specified variables were not used by the project:
-C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
-
-> Task :react-native-worklets:buildCMakeRelWithDebInfo[x86_64][worklets]
-> Task :react-native-worklets:mergeReleaseJniLibFolders
-> Task :react-native-worklets:extractDeepLinksForAarRelease
-> Task :react-native-worklets:extractReleaseAnnotations
-> Task :react-native-worklets:mergeReleaseGeneratedProguardFiles
-> Task :react-native-worklets:mergeReleaseConsumerProguardFiles
-> Task :react-native-worklets:mergeReleaseNativeLibs
-> Task :react-native-worklets:mergeReleaseShaders
-> Task :react-native-worklets:compileReleaseShaders NO-SOURCE
-> Task :react-native-worklets:generateReleaseAssets UP-TO-DATE
-> Task :react-native-worklets:packageReleaseAssets
-> Task :react-native-worklets:stripReleaseDebugSymbols
-> Task :react-native-worklets:externalNativeBuildRelease
-> Task :react-native-worklets:generateJsonModelRelease
-> Task :react-native-worklets:prefabReleaseConfigurePackage
-> Task :react-native-worklets:copyReleaseJniLibsProjectAndLocalJars
-> Task :react-native-worklets:prefabReleasePackage
-> Task :react-native-worklets:prepareReleaseArtProfile
-> Task :react-native-worklets:mergeReleaseJavaResource
-> Task :expo-application:mergeReleaseJniLibFolders
-> Task :react-native-worklets:syncReleaseLibJars
-> Task :react-native-worklets:bundleReleaseLocalLintAar
-> Task :expo-application:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-application:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-application:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-application:extractDeepLinksForAarRelease
-> Task :expo-application:extractReleaseAnnotations
-> Task :expo-application:mergeReleaseGeneratedProguardFiles
-> Task :expo-application:mergeReleaseConsumerProguardFiles
-> Task :expo-application:mergeReleaseShaders
-> Task :expo-application:compileReleaseShaders NO-SOURCE
-> Task :expo-application:generateReleaseAssets UP-TO-DATE
-> Task :expo-application:packageReleaseAssets
-> Task :expo-application:prepareReleaseArtProfile
-> Task :expo-application:mergeReleaseJavaResource
-> Task :expo-asset:mergeReleaseJniLibFolders
-> Task :expo-application:syncReleaseLibJars
-> Task :expo-application:bundleReleaseLocalLintAar
-> Task :expo-asset:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-asset:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-asset:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-asset:extractDeepLinksForAarRelease
-> Task :expo-asset:extractReleaseAnnotations
-> Task :expo-asset:mergeReleaseGeneratedProguardFiles
-> Task :expo-asset:mergeReleaseConsumerProguardFiles
-> Task :expo-asset:mergeReleaseShaders
-> Task :expo-asset:compileReleaseShaders NO-SOURCE
-> Task :expo-asset:generateReleaseAssets UP-TO-DATE
-> Task :expo-asset:packageReleaseAssets
-> Task :expo-asset:prepareReleaseArtProfile
-> Task :expo-asset:mergeReleaseJavaResource
-> Task :expo-camera:mergeReleaseJniLibFolders
-> Task :expo-asset:syncReleaseLibJars
-> Task :expo-asset:bundleReleaseLocalLintAar
-> Task :expo-camera:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-camera:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-camera:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-camera:extractDeepLinksForAarRelease
-> Task :expo-camera:extractReleaseAnnotations
-> Task :expo-camera:mergeReleaseGeneratedProguardFiles
-> Task :expo-camera:mergeReleaseConsumerProguardFiles
-> Task :expo-camera:mergeReleaseShaders
-> Task :expo-camera:compileReleaseShaders NO-SOURCE
-> Task :expo-camera:generateReleaseAssets UP-TO-DATE
-> Task :expo-camera:packageReleaseAssets
-> Task :expo-camera:prepareReleaseArtProfile
-> Task :expo-camera:mergeReleaseJavaResource
-> Task :expo-clipboard:mergeReleaseJniLibFolders
-> Task :expo-camera:syncReleaseLibJars
-> Task :expo-camera:bundleReleaseLocalLintAar
-> Task :expo-clipboard:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-clipboard:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-clipboard:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-clipboard:extractDeepLinksForAarRelease
-> Task :expo-clipboard:extractReleaseAnnotations
-> Task :expo-clipboard:mergeReleaseGeneratedProguardFiles
-> Task :expo-clipboard:mergeReleaseConsumerProguardFiles
-> Task :expo-clipboard:mergeReleaseShaders
-> Task :expo-clipboard:compileReleaseShaders NO-SOURCE
-> Task :expo-clipboard:generateReleaseAssets UP-TO-DATE
-> Task :expo-clipboard:packageReleaseAssets
-> Task :expo-clipboard:prepareReleaseArtProfile
-> Task :expo-clipboard:mergeReleaseJavaResource
-> Task :expo-constants:mergeReleaseJniLibFolders
-> Task :expo-clipboard:syncReleaseLibJars
-> Task :expo-clipboard:bundleReleaseLocalLintAar
-> Task :expo-constants:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-constants:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-constants:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-constants:extractDeepLinksForAarRelease
-> Task :expo-constants:extractReleaseAnnotations
-> Task :expo-constants:mergeReleaseGeneratedProguardFiles
-> Task :expo-constants:mergeReleaseConsumerProguardFiles
-> Task :expo-constants:mergeReleaseShaders
-> Task :expo-constants:compileReleaseShaders NO-SOURCE
-> Task :expo-constants:generateReleaseAssets UP-TO-DATE
-> Task :expo-constants:packageReleaseAssets
-> Task :expo-constants:prepareReleaseArtProfile
-> Task :expo-device:mergeReleaseJniLibFolders
-> Task :expo-constants:mergeReleaseJavaResource
-> Task :expo-device:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-constants:syncReleaseLibJars
-> Task :expo-constants:bundleReleaseLocalLintAar
-> Task :expo-device:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-device:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-device:extractDeepLinksForAarRelease
-> Task :expo-device:extractReleaseAnnotations
-> Task :expo-device:mergeReleaseGeneratedProguardFiles
-> Task :expo-device:mergeReleaseConsumerProguardFiles
-> Task :expo-device:mergeReleaseShaders
-> Task :expo-device:compileReleaseShaders NO-SOURCE
-> Task :expo-device:generateReleaseAssets UP-TO-DATE
-> Task :expo-device:packageReleaseAssets
-> Task :expo-device:prepareReleaseArtProfile
-> Task :expo-device:mergeReleaseJavaResource
-> Task :expo-updates:mergeReleaseJniLibFolders
-> Task :expo-device:syncReleaseLibJars
-> Task :expo-device:bundleReleaseLocalLintAar
-> Task :expo-updates:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-updates:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-updates:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-updates:extractDeepLinksForAarRelease
-> Task :expo-updates:extractReleaseAnnotations
-> Task :expo-updates:mergeReleaseGeneratedProguardFiles
-> Task :expo-updates:mergeReleaseConsumerProguardFiles
-> Task :expo-updates:mergeReleaseShaders
-> Task :expo-updates:compileReleaseShaders NO-SOURCE
-> Task :expo-updates:generateReleaseAssets UP-TO-DATE
-> Task :expo-updates:packageReleaseAssets
-> Task :expo-updates:prepareReleaseArtProfile
-> Task :expo-eas-client:mergeReleaseJniLibFolders
-> Task :expo-eas-client:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-eas-client:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-updates:mergeReleaseJavaResource
-> Task :expo-eas-client:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-updates:syncReleaseLibJars
-> Task :expo-updates:bundleReleaseLocalLintAar
-> Task :expo-eas-client:extractDeepLinksForAarRelease
-> Task :expo-eas-client:extractReleaseAnnotations
-> Task :expo-eas-client:mergeReleaseGeneratedProguardFiles
-> Task :expo-eas-client:mergeReleaseConsumerProguardFiles
-> Task :expo-eas-client:mergeReleaseShaders
-> Task :expo-eas-client:compileReleaseShaders NO-SOURCE
-> Task :expo-eas-client:generateReleaseAssets UP-TO-DATE
-> Task :expo-eas-client:packageReleaseAssets
-> Task :expo-eas-client:prepareReleaseArtProfile
-> Task :expo-eas-client:mergeReleaseJavaResource
-> Task :expo-file-system:mergeReleaseJniLibFolders
-> Task :expo-eas-client:syncReleaseLibJars
-> Task :expo-eas-client:bundleReleaseLocalLintAar
-> Task :expo-file-system:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-file-system:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-file-system:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-file-system:extractDeepLinksForAarRelease
-> Task :expo-file-system:extractReleaseAnnotations
-> Task :expo-file-system:mergeReleaseGeneratedProguardFiles
-> Task :expo-file-system:mergeReleaseConsumerProguardFiles
-> Task :expo-file-system:mergeReleaseShaders
-> Task :expo-file-system:compileReleaseShaders NO-SOURCE
-> Task :expo-file-system:generateReleaseAssets UP-TO-DATE
-> Task :expo-file-system:packageReleaseAssets
-> Task :expo-file-system:prepareReleaseArtProfile
-> Task :expo-file-system:mergeReleaseJavaResource
-> Task :expo-font:mergeReleaseJniLibFolders
-> Task :expo-file-system:syncReleaseLibJars
-> Task :expo-file-system:bundleReleaseLocalLintAar
-> Task :expo-font:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-font:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-font:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-font:extractDeepLinksForAarRelease
-> Task :expo-font:extractReleaseAnnotations
-> Task :expo-font:mergeReleaseGeneratedProguardFiles
-> Task :expo-font:mergeReleaseConsumerProguardFiles
-> Task :expo-font:mergeReleaseShaders
-> Task :expo-font:compileReleaseShaders NO-SOURCE
-> Task :expo-font:generateReleaseAssets UP-TO-DATE
-> Task :expo-font:packageReleaseAssets
-> Task :expo-font:prepareReleaseArtProfile
-> Task :expo-font:mergeReleaseJavaResource
-> Task :expo-intent-launcher:mergeReleaseJniLibFolders
-> Task :expo-font:syncReleaseLibJars
-> Task :expo-font:bundleReleaseLocalLintAar
-> Task :expo-intent-launcher:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-intent-launcher:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-intent-launcher:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-intent-launcher:extractDeepLinksForAarRelease
-> Task :expo-intent-launcher:extractReleaseAnnotations
-> Task :expo-intent-launcher:mergeReleaseGeneratedProguardFiles
-> Task :expo-intent-launcher:mergeReleaseConsumerProguardFiles
-> Task :expo-intent-launcher:mergeReleaseShaders
-> Task :expo-intent-launcher:compileReleaseShaders NO-SOURCE
-> Task :expo-intent-launcher:generateReleaseAssets UP-TO-DATE
-> Task :expo-intent-launcher:packageReleaseAssets
-> Task :expo-intent-launcher:prepareReleaseArtProfile
-> Task :expo-intent-launcher:mergeReleaseJavaResource
-> Task :expo-manifests:mergeReleaseJniLibFolders
-> Task :expo-intent-launcher:syncReleaseLibJars
-> Task :expo-intent-launcher:bundleReleaseLocalLintAar
-> Task :expo-manifests:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-manifests:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-manifests:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-manifests:extractDeepLinksForAarRelease
-> Task :expo-manifests:extractReleaseAnnotations
-> Task :expo-manifests:mergeReleaseGeneratedProguardFiles
-> Task :expo-manifests:mergeReleaseConsumerProguardFiles
-> Task :expo-manifests:mergeReleaseShaders
-> Task :expo-manifests:compileReleaseShaders NO-SOURCE
-> Task :expo-manifests:generateReleaseAssets UP-TO-DATE
-> Task :expo-manifests:packageReleaseAssets
-> Task :expo-manifests:prepareReleaseArtProfile
-> Task :expo-manifests:mergeReleaseJavaResource
-> Task :expo-json-utils:mergeReleaseJniLibFolders
-> Task :expo-manifests:syncReleaseLibJars
-> Task :expo-manifests:bundleReleaseLocalLintAar
-> Task :expo-json-utils:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-json-utils:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-json-utils:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-json-utils:extractDeepLinksForAarRelease
-> Task :expo-json-utils:extractReleaseAnnotations
-> Task :expo-json-utils:mergeReleaseGeneratedProguardFiles
-> Task :expo-json-utils:mergeReleaseConsumerProguardFiles
-> Task :expo-json-utils:mergeReleaseShaders
-> Task :expo-json-utils:compileReleaseShaders NO-SOURCE
-> Task :expo-json-utils:generateReleaseAssets UP-TO-DATE
-> Task :expo-json-utils:packageReleaseAssets
-> Task :expo-json-utils:prepareReleaseArtProfile
-> Task :expo-json-utils:mergeReleaseJavaResource
-> Task :expo-keep-awake:mergeReleaseJniLibFolders
-> Task :expo-json-utils:syncReleaseLibJars
-> Task :expo-json-utils:bundleReleaseLocalLintAar
-> Task :expo-keep-awake:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-keep-awake:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-keep-awake:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-keep-awake:extractDeepLinksForAarRelease
-> Task :expo-keep-awake:extractReleaseAnnotations
-> Task :expo-keep-awake:mergeReleaseGeneratedProguardFiles
-> Task :expo-keep-awake:mergeReleaseConsumerProguardFiles
-> Task :expo-keep-awake:mergeReleaseShaders
-> Task :expo-keep-awake:compileReleaseShaders NO-SOURCE
-> Task :expo-keep-awake:generateReleaseAssets UP-TO-DATE
-> Task :expo-keep-awake:packageReleaseAssets
-> Task :expo-keep-awake:prepareReleaseArtProfile
-> Task :expo-keep-awake:mergeReleaseJavaResource
-> Task :expo-linking:mergeReleaseJniLibFolders
-> Task :expo-keep-awake:syncReleaseLibJars
-> Task :expo-keep-awake:bundleReleaseLocalLintAar
-> Task :expo-linking:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-linking:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-linking:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-linking:extractDeepLinksForAarRelease
-> Task :expo-linking:extractReleaseAnnotations
-> Task :expo-linking:mergeReleaseGeneratedProguardFiles
-> Task :expo-linking:mergeReleaseConsumerProguardFiles
-> Task :expo-linking:mergeReleaseShaders
-> Task :expo-linking:compileReleaseShaders NO-SOURCE
-> Task :expo-linking:generateReleaseAssets UP-TO-DATE
-> Task :expo-linking:packageReleaseAssets
-> Task :expo-linking:prepareReleaseArtProfile
-> Task :expo-linking:mergeReleaseJavaResource
-> Task :expo-location:mergeReleaseJniLibFolders
-> Task :expo-linking:syncReleaseLibJars
-> Task :expo-linking:bundleReleaseLocalLintAar
-> Task :expo-location:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-location:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-location:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-location:extractDeepLinksForAarRelease
-> Task :expo-location:extractReleaseAnnotations
-> Task :expo-location:mergeReleaseGeneratedProguardFiles
-> Task :expo-location:mergeReleaseConsumerProguardFiles
-> Task :expo-location:mergeReleaseShaders
-> Task :expo-location:compileReleaseShaders NO-SOURCE
-> Task :expo-location:generateReleaseAssets UP-TO-DATE
-> Task :expo-location:packageReleaseAssets
-> Task :expo-location:prepareReleaseArtProfile
-> Task :expo-location:mergeReleaseJavaResource
-> Task :expo-notifications:mergeReleaseJniLibFolders
-> Task :expo-location:syncReleaseLibJars
-> Task :expo-location:bundleReleaseLocalLintAar
-> Task :expo-notifications:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-notifications:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-notifications:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-notifications:extractDeepLinksForAarRelease
-> Task :expo-notifications:extractReleaseAnnotations
-> Task :expo-notifications:mergeReleaseGeneratedProguardFiles
-> Task :expo-notifications:mergeReleaseConsumerProguardFiles
-> Task :expo-notifications:mergeReleaseShaders
-> Task :expo-notifications:compileReleaseShaders NO-SOURCE
-> Task :expo-notifications:generateReleaseAssets UP-TO-DATE
-> Task :expo-notifications:packageReleaseAssets
-> Task :expo-notifications:prepareReleaseArtProfile
-> Task :expo-notifications:mergeReleaseJavaResource
-> Task :expo-print:mergeReleaseJniLibFolders
-> Task :expo-notifications:syncReleaseLibJars
-> Task :expo-notifications:bundleReleaseLocalLintAar
-> Task :expo-print:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-print:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-print:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-print:extractDeepLinksForAarRelease
-> Task :expo-print:extractReleaseAnnotations
-> Task :expo-print:mergeReleaseGeneratedProguardFiles
-> Task :expo-print:mergeReleaseConsumerProguardFiles
-> Task :expo-print:mergeReleaseShaders
-> Task :expo-print:compileReleaseShaders NO-SOURCE
-> Task :expo-print:generateReleaseAssets UP-TO-DATE
-> Task :expo-print:packageReleaseAssets
-> Task :expo-print:prepareReleaseArtProfile
-> Task :expo-print:mergeReleaseJavaResource
-> Task :expo-sharing:mergeReleaseJniLibFolders
-> Task :expo-print:syncReleaseLibJars
-> Task :expo-print:bundleReleaseLocalLintAar
-> Task :expo-sharing:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-sharing:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-sharing:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-sharing:extractDeepLinksForAarRelease
-> Task :expo-sharing:extractReleaseAnnotations
-> Task :expo-sharing:mergeReleaseGeneratedProguardFiles
-> Task :expo-sharing:mergeReleaseConsumerProguardFiles
-> Task :expo-sharing:mergeReleaseShaders
-> Task :expo-sharing:compileReleaseShaders NO-SOURCE
-> Task :expo-sharing:generateReleaseAssets UP-TO-DATE
-> Task :expo-sharing:packageReleaseAssets
-> Task :expo-sharing:prepareReleaseArtProfile
-> Task :expo-sharing:mergeReleaseJavaResource
-> Task :expo-structured-headers:mergeReleaseJniLibFolders
-> Task :expo-sharing:syncReleaseLibJars
-> Task :expo-sharing:bundleReleaseLocalLintAar
-> Task :expo-structured-headers:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-structured-headers:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-structured-headers:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-structured-headers:extractDeepLinksForAarRelease
-> Task :expo-structured-headers:extractReleaseAnnotations
-> Task :expo-structured-headers:mergeReleaseGeneratedProguardFiles
-> Task :expo-structured-headers:mergeReleaseConsumerProguardFiles
-> Task :expo-structured-headers:mergeReleaseShaders
-> Task :expo-structured-headers:compileReleaseShaders NO-SOURCE
-> Task :expo-structured-headers:generateReleaseAssets UP-TO-DATE
-> Task :expo-structured-headers:packageReleaseAssets
-> Task :expo-structured-headers:prepareReleaseArtProfile
-> Task :expo-structured-headers:mergeReleaseJavaResource
-> Task :expo-system-ui:mergeReleaseJniLibFolders
-> Task :expo-structured-headers:syncReleaseLibJars
-> Task :expo-structured-headers:bundleReleaseLocalLintAar
-> Task :expo-system-ui:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-system-ui:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-system-ui:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-system-ui:extractDeepLinksForAarRelease
-> Task :expo-system-ui:extractReleaseAnnotations
-> Task :expo-system-ui:mergeReleaseGeneratedProguardFiles
-> Task :expo-system-ui:mergeReleaseConsumerProguardFiles
-> Task :expo-system-ui:mergeReleaseShaders
-> Task :expo-system-ui:compileReleaseShaders NO-SOURCE
-> Task :expo-system-ui:generateReleaseAssets UP-TO-DATE
-> Task :expo-system-ui:packageReleaseAssets
-> Task :expo-system-ui:prepareReleaseArtProfile
-> Task :expo-system-ui:mergeReleaseJavaResource
-> Task :expo-updates-interface:mergeReleaseJniLibFolders
-> Task :expo-system-ui:syncReleaseLibJars
-> Task :expo-system-ui:bundleReleaseLocalLintAar
-> Task :expo-updates-interface:mergeReleaseNativeLibs NO-SOURCE
-> Task :expo-updates-interface:stripReleaseDebugSymbols NO-SOURCE
-> Task :expo-updates-interface:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-updates-interface:extractDeepLinksForAarRelease
-> Task :expo-updates-interface:extractReleaseAnnotations
-> Task :expo-updates-interface:mergeReleaseGeneratedProguardFiles
-> Task :expo-updates-interface:mergeReleaseConsumerProguardFiles
-> Task :expo-updates-interface:mergeReleaseShaders
-> Task :expo-updates-interface:compileReleaseShaders NO-SOURCE
-> Task :expo-updates-interface:generateReleaseAssets UP-TO-DATE
-> Task :expo-updates-interface:packageReleaseAssets
-> Task :expo-updates-interface:prepareReleaseArtProfile
-> Task :expo-updates-interface:mergeReleaseJavaResource
-> Task :expo-modules-core:configureCMakeRelWithDebInfo[arm64-v8a]
-> Task :expo-updates-interface:syncReleaseLibJars
-> Task :expo-updates-interface:bundleReleaseLocalLintAar
-> Task :expo-modules-core:buildCMakeRelWithDebInfo[arm64-v8a]
-> Task :expo-modules-core:configureCMakeRelWithDebInfo[armeabi-v7a]
-> Task :expo-modules-core:buildCMakeRelWithDebInfo[armeabi-v7a]
-> Task :expo-modules-core:configureCMakeRelWithDebInfo[x86]
-> Task :expo-modules-core:buildCMakeRelWithDebInfo[x86]
-> Task :expo-modules-core:configureCMakeRelWithDebInfo[x86_64]
-> Task :expo-modules-core:buildCMakeRelWithDebInfo[x86_64]
-> Task :expo-modules-core:mergeReleaseJniLibFolders
-> Task :expo-modules-core:extractDeepLinksForAarRelease
-> Task :expo-modules-core:extractReleaseAnnotations
-> Task :expo-modules-core:mergeReleaseGeneratedProguardFiles
-> Task :expo-modules-core:mergeReleaseNativeLibs
-> Task :expo-modules-core:mergeReleaseConsumerProguardFiles
-> Task :expo-modules-core:mergeReleaseShaders
-> Task :expo-modules-core:compileReleaseShaders NO-SOURCE
-> Task :expo-modules-core:generateReleaseAssets UP-TO-DATE
-> Task :expo-modules-core:packageReleaseAssets
-> Task :expo-modules-core:prepareReleaseArtProfile
-> Task :expo-modules-core:mergeReleaseJavaResource
-> Task :expo-application:writeReleaseLintModelMetadata
-> Task :expo-modules-core:stripReleaseDebugSymbols
-> Task :expo-modules-core:syncReleaseLibJars
-> Task :expo-asset:writeReleaseLintModelMetadata
-> Task :expo-camera:writeReleaseLintModelMetadata
-> Task :expo-modules-core:copyReleaseJniLibsProjectAndLocalJars
-> Task :expo-clipboard:writeReleaseLintModelMetadata
-> Task :expo-modules-core:bundleReleaseLocalLintAar
-> Task :expo-constants:writeReleaseLintModelMetadata
-> Task :expo-device:writeReleaseLintModelMetadata
-> Task :expo-eas-client:writeReleaseLintModelMetadata
-> Task :expo-file-system:writeReleaseLintModelMetadata
-> Task :expo-font:writeReleaseLintModelMetadata
-> Task :expo-intent-launcher:writeReleaseLintModelMetadata
-> Task :expo-json-utils:writeReleaseLintModelMetadata
-> Task :expo-keep-awake:writeReleaseLintModelMetadata
-> Task :expo-linking:writeReleaseLintModelMetadata
-> Task :expo-location:writeReleaseLintModelMetadata
-> Task :expo-manifests:writeReleaseLintModelMetadata
-> Task :expo-modules-core:writeReleaseLintModelMetadata
-> Task :expo-notifications:writeReleaseLintModelMetadata
-> Task :expo-print:writeReleaseLintModelMetadata
-> Task :expo-sharing:writeReleaseLintModelMetadata
-> Task :expo-structured-headers:writeReleaseLintModelMetadata
-> Task :expo-system-ui:writeReleaseLintModelMetadata
-> Task :expo-updates:writeReleaseLintModelMetadata
-> Task :expo-updates-interface:writeReleaseLintModelMetadata
-> Task :expo:writeReleaseLintModelMetadata
-> Task :react-native-async-storage_async-storage:writeReleaseLintModelMetadata
-> Task :react-native-community_datetimepicker:writeReleaseLintModelMetadata
-> Task :react-native-ping:writeReleaseLintModelMetadata
-> Task :react-native-reanimated:writeReleaseLintModelMetadata
-> Task :react-native-safe-area-context:writeReleaseLintModelMetadata
-> Task :react-native-screens:writeReleaseLintModelMetadata
-> Task :react-native-svg:writeReleaseLintModelMetadata
-> Task :react-native-thermal-receipt-printer-image-qr:writeReleaseLintModelMetadata
-> Task :react-native-view-shot:writeReleaseLintModelMetadata
-> Task :react-native-worklets:writeReleaseLintModelMetadata
-> Task :expo:generateReleaseLintVitalModel
-> Task :expo-application:generateReleaseLintVitalModel
-> Task :expo-asset:generateReleaseLintVitalModel
-> Task :expo-camera:generateReleaseLintVitalModel
-> Task :expo-clipboard:generateReleaseLintVitalModel
-> Task :expo-constants:generateReleaseLintVitalModel
-> Task :expo-device:generateReleaseLintVitalModel
-> Task :expo-eas-client:generateReleaseLintVitalModel
-> Task :expo-file-system:generateReleaseLintVitalModel
-> Task :expo-font:generateReleaseLintVitalModel
-> Task :expo-intent-launcher:generateReleaseLintVitalModel
-> Task :expo-json-utils:generateReleaseLintVitalModel
-> Task :expo-keep-awake:generateReleaseLintVitalModel
-> Task :expo-linking:generateReleaseLintVitalModel
-> Task :expo-location:generateReleaseLintVitalModel
-> Task :expo-manifests:generateReleaseLintVitalModel
-> Task :expo-modules-core:generateReleaseLintVitalModel
-> Task :expo-notifications:generateReleaseLintVitalModel
-> Task :expo-print:generateReleaseLintVitalModel
-> Task :expo-sharing:generateReleaseLintVitalModel
-> Task :expo-structured-headers:generateReleaseLintVitalModel
-> Task :expo-system-ui:generateReleaseLintVitalModel
-> Task :expo-updates:generateReleaseLintVitalModel
-> Task :expo-updates-interface:generateReleaseLintVitalModel
-> Task :react-native-async-storage_async-storage:generateReleaseLintVitalModel
-> Task :react-native-community_datetimepicker:generateReleaseLintVitalModel
-> Task :react-native-ping:generateReleaseLintVitalModel
-> Task :react-native-reanimated:generateReleaseLintVitalModel
-> Task :react-native-safe-area-context:generateReleaseLintVitalModel
-> Task :react-native-screens:generateReleaseLintVitalModel
-> Task :react-native-svg:generateReleaseLintVitalModel
-> Task :react-native-thermal-receipt-printer-image-qr:generateReleaseLintVitalModel
-> Task :react-native-view-shot:generateReleaseLintVitalModel
-> Task :react-native-worklets:generateReleaseLintVitalModel
-> Task :app:mergeReleaseJniLibFolders
-> Task :expo:copyReleaseJniLibsProjectOnly
-> Task :expo-application:copyReleaseJniLibsProjectOnly
-> Task :expo-asset:copyReleaseJniLibsProjectOnly
-> Task :expo-camera:copyReleaseJniLibsProjectOnly
-> Task :expo-clipboard:copyReleaseJniLibsProjectOnly
-> Task :expo-constants:copyReleaseJniLibsProjectOnly
-> Task :expo-device:copyReleaseJniLibsProjectOnly
-> Task :expo-eas-client:copyReleaseJniLibsProjectOnly
-> Task :expo-file-system:copyReleaseJniLibsProjectOnly
-> Task :expo-font:copyReleaseJniLibsProjectOnly
-> Task :expo-intent-launcher:copyReleaseJniLibsProjectOnly
-> Task :expo-json-utils:copyReleaseJniLibsProjectOnly
-> Task :expo-keep-awake:copyReleaseJniLibsProjectOnly
-> Task :expo-linking:copyReleaseJniLibsProjectOnly
-> Task :expo-location:copyReleaseJniLibsProjectOnly
-> Task :expo-manifests:copyReleaseJniLibsProjectOnly
-> Task :expo-notifications:copyReleaseJniLibsProjectOnly
-> Task :expo-print:copyReleaseJniLibsProjectOnly
-> Task :expo-sharing:copyReleaseJniLibsProjectOnly
-> Task :expo-structured-headers:copyReleaseJniLibsProjectOnly
-> Task :expo-system-ui:copyReleaseJniLibsProjectOnly
-> Task :expo-updates:copyReleaseJniLibsProjectOnly
-> Task :expo-updates-interface:copyReleaseJniLibsProjectOnly
-> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectOnly
-> Task :react-native-community_datetimepicker:copyReleaseJniLibsProjectOnly
-> Task :react-native-ping:copyReleaseJniLibsProjectOnly
-> Task :react-native-safe-area-context:copyReleaseJniLibsProjectOnly
-> Task :react-native-svg:copyReleaseJniLibsProjectOnly
-> Task :react-native-thermal-receipt-printer-image-qr:copyReleaseJniLibsProjectOnly
-> Task :react-native-screens:copyReleaseJniLibsProjectOnly
-> Task :react-native-view-shot:copyReleaseJniLibsProjectOnly
-> Task :react-native-worklets:copyReleaseJniLibsProjectOnly
-> Task :react-native-reanimated:copyReleaseJniLibsProjectOnly
-> Task :expo-modules-core:copyReleaseJniLibsProjectOnly
-> Task :react-native-safe-area-context:bundleLibRuntimeToDirRelease
-> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirRelease
-> Task :expo:bundleLibRuntimeToDirRelease
-> Task :react-native-screens:bundleLibRuntimeToDirRelease
-> Task :react-native-ping:bundleLibRuntimeToDirRelease
-> Task :react-native-community_datetimepicker:bundleLibRuntimeToDirRelease
-> Task :react-native-thermal-receipt-printer-image-qr:bundleLibRuntimeToDirRelease
-> Task :react-native-reanimated:bundleLibRuntimeToDirRelease
-> Task :react-native-view-shot:bundleLibRuntimeToDirRelease
-> Task :app:mergeReleaseNativeLibs
-> Task :react-native-svg:bundleLibRuntimeToDirRelease
-> Task :react-native-worklets:bundleLibRuntimeToDirRelease
-> Task :expo-asset:bundleLibRuntimeToDirRelease
-> Task :expo-application:bundleLibRuntimeToDirRelease
-> Task :expo-constants:bundleLibRuntimeToDirRelease
-> Task :expo-device:bundleLibRuntimeToDirRelease
-> Task :expo-clipboard:bundleLibRuntimeToDirRelease
-> Task :expo-eas-client:bundleLibRuntimeToDirRelease
-> Task :app:stripReleaseDebugSymbols
-> Task :expo-camera:bundleLibRuntimeToDirRelease
-> Task :expo-font:bundleLibRuntimeToDirRelease
-> Task :expo-asset:lintVitalAnalyzeRelease
-> Task :expo-updates:bundleLibRuntimeToDirRelease
-> Task :expo-intent-launcher:bundleLibRuntimeToDirRelease
-> Task :expo-file-system:bundleLibRuntimeToDirRelease
-> Task :expo-manifests:bundleLibRuntimeToDirRelease
-> Task :expo-json-utils:bundleLibRuntimeToDirRelease
-> Task :expo-keep-awake:bundleLibRuntimeToDirRelease
-> Task :expo-application:lintVitalAnalyzeRelease
-> Task :app:extractReleaseNativeSymbolTables
-> Task :expo-linking:bundleLibRuntimeToDirRelease
-> Task :expo-location:bundleLibRuntimeToDirRelease
-> Task :app:mergeReleaseNativeDebugMetadata
-> Task :expo:lintVitalAnalyzeRelease
-> Task :expo-print:bundleLibRuntimeToDirRelease
-> Task :expo-notifications:bundleLibRuntimeToDirRelease
-> Task :expo-sharing:bundleLibRuntimeToDirRelease
-> Task :expo-system-ui:bundleLibRuntimeToDirRelease
-> Task :expo-structured-headers:bundleLibRuntimeToDirRelease
-> Task :expo-updates-interface:bundleLibRuntimeToDirRelease
-> Task :app:checkReleaseDuplicateClasses
-> Task :app:dexBuilderRelease
-> Task :app:desugarReleaseFileDependencies
-> Task :app:mergeReleaseStartupProfile
-> Task :app:mergeReleaseGlobalSynthetics FAILED
-> Task :app:mergeReleaseArtProfile
-> Task :expo-modules-core:bundleLibRuntimeToDirRelease
-> Task :expo-clipboard:lintVitalAnalyzeRelease
-> Task :expo-camera:lintVitalAnalyzeRelease
-> Task :app:mergeExtDexRelease
+> Task :react-native-reanimated:prefabReleasePackage FAILED
+w: Detected multiple Kotlin daemon sessions at kotlin\sessions
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:mergeReleaseGlobalSynthetics'.
-> Could not resolve all files for configuration ':app:releaseRuntimeClasspath'.
-   > Failed to transform io.nlopez.smartlocation-3.3.3-jetified.aar (project :expo-location$io.nlopez.smartlocation-jetified-aar) to match attributes {artifactType=android-global-synthetics, dexing-component-attributes=ComponentSpecificParameters(minSdkVersion=24, debuggable=false, enableCoreLibraryDesugaring=false, enableGlobalSynthetics=true, enableApiModeling=true, dependenciesClassesAreInstrumented=false, asmTransformComponent=null, useJacocoTransformInstrumentation=false, enableDesugaring=true, needsClasspath=false, useFullClasspath=false, componentIfUsingFullClasspath=null), org.gradle.usage=java-runtime}.
-      > Execution failed for DexingNoClasspathTransform: C:\Users\natal\.gradle\caches\8.10.2\transforms\0c9b6f452604572ad2bf29500f60fa01\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime.jar.
-         > Error while dexing.
+Execution failed for task ':react-native-reanimated:prefabReleasePackage'.
+> Could not copy file 'C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\prefab-headers\reanimated\reanimated\android\NativeProxy.h' to 'C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\intermediates\prefab_package\release\prefab\modules\reanimated\include\reanimated\android\NativeProxy.h'.
+   > C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\intermediates\prefab_package\release\prefab\modules\reanimated\include\reanimated\android\NativeProxy.h (O sistema não pode encontrar o caminho especificado)
 
 * Try:
 > Run with --info or --debug option to get more log output.
@@ -2171,105 +1535,10 @@ Execution failed for task ':app:mergeReleaseGlobalSynthetics'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:mergeReleaseGlobalSynthetics'.
-	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:38)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
-	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
-	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
-	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
-	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-Caused by: org.gradle.api.internal.artifacts.ivyservice.TypedResolveException: Could not resolve all files for configuration ':app:releaseRuntimeClasspath'.
-	at org.gradle.api.internal.artifacts.ResolveExceptionMapper.mapFailure(ResolveExceptionMapper.java:68)
-	at org.gradle.api.internal.artifacts.ResolveExceptionMapper.mapFailures(ResolveExceptionMapper.java:60)
-	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$DefaultResolutionHost.mapFailure(DefaultConfiguration.java:1984)
-	at org.gradle.api.internal.artifacts.configurations.ResolutionHost.rethrowFailure(ResolutionHost.java:48)
-	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.maybeThrowResolutionFailures(ResolutionBackedFileCollection.java:84)
-	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.visitContents(ResolutionBackedFileCollection.java:74)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection$UnresolvedItemsCollector.visitContents(DefaultConfigurableFileCollection.java:594)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.visitChildren(DefaultConfigurableFileCollection.java:416)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.lambda$calculateFinalizedValue$1(DefaultConfigurableFileCollection.java:391)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection$UnresolvedItemsCollector.visitContents(DefaultConfigurableFileCollection.java:594)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.calculateFinalizedValue(DefaultConfigurableFileCollection.java:391)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.finalizeNow(DefaultConfigurableFileCollection.java:120)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.lambda$visitChildren$2(DefaultConfigurableFileCollection.java:415)
-	at org.gradle.api.internal.provider.ValueState.finalizeOnReadIfNeeded(ValueState.java:139)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.visitChildren(DefaultConfigurableFileCollection.java:415)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:92)
-	at org.gradle.api.internal.file.DefaultFileCollectionFactory$ResolvingFileCollection.visitChildren(DefaultFileCollectionFactory.java:306)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.tasks.PropertyFileCollection.visitChildren(PropertyFileCollection.java:48)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.internal.fingerprint.impl.DefaultFileCollectionSnapshotter.snapshot(DefaultFileCollectionSnapshotter.java:47)
-	at org.gradle.internal.execution.impl.DefaultInputFingerprinter$InputCollectingVisitor.visitInputFileProperty(DefaultInputFingerprinter.java:133)
-	at org.gradle.api.internal.tasks.execution.TaskExecution.visitRegularInputs(TaskExecution.java:324)
-	at org.gradle.internal.execution.impl.DefaultInputFingerprinter.fingerprintInputProperties(DefaultInputFingerprinter.java:63)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionStateWithOutputs(AbstractCaptureStateBeforeExecutionStep.java:109)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.lambda$captureExecutionState$0(AbstractCaptureStateBeforeExecutionStep.java:74)
-	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionState(AbstractCaptureStateBeforeExecutionStep.java:69)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:62)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
-	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
-	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
-	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
-	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
-	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
-	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
-	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
-	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
-	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
-	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
-	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
-	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':react-native-reanimated:prefabReleasePackage'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
@@ -2298,11 +1567,57 @@ Caused by: org.gradle.api.internal.artifacts.ivyservice.TypedResolveException: C
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-Caused by: org.gradle.api.internal.artifacts.transform.TransformException: Failed to transform io.nlopez.smartlocation-3.3.3-jetified.aar (project :expo-location$io.nlopez.smartlocation-jetified-aar) to match attributes {artifactType=android-global-synthetics, dexing-component-attributes=ComponentSpecificParameters(minSdkVersion=24, debuggable=false, enableCoreLibraryDesugaring=false, enableGlobalSynthetics=true, enableApiModeling=true, dependenciesClassesAreInstrumented=false, asmTransformComponent=null, useJacocoTransformInstrumentation=false, enableDesugaring=true, needsClasspath=false, useFullClasspath=false, componentIfUsingFullClasspath=null), org.gradle.usage=java-runtime}.
-	at org.gradle.api.internal.artifacts.transform.TransformedProjectArtifactSet.visit(TransformedProjectArtifactSet.java:87)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ParallelResolveArtifactSet$VisitingSet$StartVisitAction.visitResults(ParallelResolveArtifactSet.java:100)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ParallelResolveArtifactSet$VisitingSet.visit(ParallelResolveArtifactSet.java:69)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver$1.run(ResolvedArtifactSetResolver.java:65)
+Caused by: org.gradle.api.internal.file.AbstractFileTreeElement$CopyFileElementException: Could not copy file 'C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\prefab-headers\reanimated\reanimated\android\NativeProxy.h' to 'C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\intermediates\prefab_package\release\prefab\modules\reanimated\include\reanimated\android\NativeProxy.h'.
+	at org.gradle.api.internal.file.AbstractFileTreeElement.copyTo(AbstractFileTreeElement.java:89)
+	at org.gradle.api.internal.file.copy.DefaultFileCopyDetails.copyTo(DefaultFileCopyDetails.java:137)
+	at org.gradle.api.internal.file.copy.FileCopyAction$FileCopyDetailsInternalAction.processFile(FileCopyAction.java:49)
+	at org.gradle.api.internal.file.copy.SyncCopyActionDecorator.lambda$execute$0(SyncCopyActionDecorator.java:74)
+	at org.gradle.api.internal.file.copy.NormalizingCopyActionDecorator.lambda$execute$0(NormalizingCopyActionDecorator.java:72)
+	at org.gradle.api.internal.file.copy.DuplicateHandlingCopyActionDecorator.lambda$execute$0(DuplicateHandlingCopyActionDecorator.java:71)
+	at org.gradle.api.internal.file.copy.CopyFileVisitorImpl.processFile(CopyFileVisitorImpl.java:68)
+	at org.gradle.api.internal.file.copy.CopyFileVisitorImpl.visitFile(CopyFileVisitorImpl.java:52)
+	at org.gradle.api.internal.file.collections.PathVisitor.visitFile(PathVisitor.java:88)
+	at org.gradle.api.internal.file.collections.PathVisitor.visitFile(PathVisitor.java:38)
+	at org.gradle.api.internal.file.collections.DefaultDirectoryWalker.walkDir(DefaultDirectoryWalker.java:44)
+	at org.gradle.api.internal.file.collections.DirectoryFileTree.walkDir(DirectoryFileTree.java:150)
+	at org.gradle.api.internal.file.collections.DirectoryFileTree.visitFrom(DirectoryFileTree.java:128)
+	at org.gradle.api.internal.file.collections.DirectoryFileTree.visit(DirectoryFileTree.java:114)
+	at org.gradle.api.internal.file.collections.FileTreeAdapter.visit(FileTreeAdapter.java:110)
+	at org.gradle.api.internal.file.CompositeFileTree.visit(CompositeFileTree.java:108)
+	at org.gradle.api.internal.file.copy.CopySpecActionImpl.execute(CopySpecActionImpl.java:43)
+	at org.gradle.api.internal.file.copy.CopySpecActionImpl.execute(CopySpecActionImpl.java:25)
+	at org.gradle.api.internal.file.copy.DefaultCopySpec$DefaultCopySpecResolver.walk(DefaultCopySpec.java:888)
+	at org.gradle.api.internal.file.copy.DefaultCopySpec.walk(DefaultCopySpec.java:595)
+	at org.gradle.api.internal.file.copy.DelegatingCopySpecInternal.walk(DelegatingCopySpecInternal.java:316)
+	at org.gradle.api.internal.file.copy.CopySpecBackedCopyActionProcessingStream.process(CopySpecBackedCopyActionProcessingStream.java:42)
+	at org.gradle.api.internal.file.copy.DuplicateHandlingCopyActionDecorator.lambda$execute$1(DuplicateHandlingCopyActionDecorator.java:51)
+	at org.gradle.api.internal.file.copy.NormalizingCopyActionDecorator.lambda$execute$1(NormalizingCopyActionDecorator.java:64)
+	at org.gradle.api.internal.file.copy.SyncCopyActionDecorator.lambda$execute$1(SyncCopyActionDecorator.java:72)
+	at org.gradle.api.internal.file.copy.FileCopyAction.execute(FileCopyAction.java:38)
+	at org.gradle.api.internal.file.copy.SyncCopyActionDecorator.execute(SyncCopyActionDecorator.java:72)
+	at org.gradle.api.internal.file.copy.NormalizingCopyActionDecorator.execute(NormalizingCopyActionDecorator.java:63)
+	at org.gradle.api.internal.file.copy.DuplicateHandlingCopyActionDecorator.execute(DuplicateHandlingCopyActionDecorator.java:51)
+	at org.gradle.api.internal.file.copy.CopyActionExecuter.execute(CopyActionExecuter.java:48)
+	at org.gradle.api.internal.file.copy.FileCopier.doCopy(FileCopier.java:102)
+	at org.gradle.api.internal.file.copy.FileCopier.sync(FileCopier.java:85)
+	at org.gradle.api.internal.file.DefaultFileOperations.sync(DefaultFileOperations.java:289)
+	at org.gradle.api.internal.file.DefaultFileSystemOperations.sync(DefaultFileSystemOperations.java:59)
+	at com.android.build.gradle.internal.cxx.prefab.PrefabPackageBuilder.installHeaders(PackageBuilder.kt:181)
+	at com.android.build.gradle.internal.cxx.prefab.PrefabPackageBuilder.createModule(PackageBuilder.kt:130)
+	at com.android.build.gradle.internal.cxx.prefab.PrefabPackageBuilder.configurePrefab(PackageBuilder.kt:97)
+	at com.android.build.gradle.internal.cxx.prefab.PackageBuilderKt.buildPrefabPackage(PackageBuilder.kt:69)
+	at com.android.build.gradle.internal.cxx.prefab.PackageBuilderKt.buildPrefabPackage$default(PackageBuilder.kt:60)
+	at com.android.build.gradle.tasks.PrefabPackageTask.doTaskAction(PrefabPackageTask.kt:76)
+	at com.android.build.gradle.internal.tasks.NonIncrementalTask$taskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:67)
+	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
+	at com.android.build.gradle.internal.tasks.NonIncrementalTask.taskAction(NonIncrementalTask.kt:78)
+	at jdk.internal.reflect.GeneratedMethodAccessor638.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
@@ -2310,156 +1625,10 @@ Caused by: org.gradle.api.internal.artifacts.transform.TransformException: Faile
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.visitArtifacts(ResolvedArtifactSetResolver.java:62)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.lambda$visitInUnmanagedWorkerThread$0(ResolvedArtifactSetResolver.java:58)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsUnmanagedWorkerThread(DefaultWorkerLeaseService.java:139)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.visitInUnmanagedWorkerThread(ResolvedArtifactSetResolver.java:58)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.DefaultSelectedArtifactSet.visitArtifacts(DefaultSelectedArtifactSet.java:59)
-	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.SelectedArtifactSet.visitFiles(SelectedArtifactSet.java:34)
-	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.visitContents(ResolutionBackedFileCollection.java:73)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection$UnresolvedItemsCollector.visitContents(DefaultConfigurableFileCollection.java:594)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.visitChildren(DefaultConfigurableFileCollection.java:416)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.lambda$calculateFinalizedValue$1(DefaultConfigurableFileCollection.java:391)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection$UnresolvedItemsCollector.visitContents(DefaultConfigurableFileCollection.java:594)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.calculateFinalizedValue(DefaultConfigurableFileCollection.java:391)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.finalizeNow(DefaultConfigurableFileCollection.java:120)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.lambda$visitChildren$2(DefaultConfigurableFileCollection.java:415)
-	at org.gradle.api.internal.provider.ValueState.finalizeOnReadIfNeeded(ValueState.java:139)
-	at org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection.visitChildren(DefaultConfigurableFileCollection.java:415)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:67)
-	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:92)
-	at org.gradle.api.internal.file.DefaultFileCollectionFactory$ResolvingFileCollection.visitChildren(DefaultFileCollectionFactory.java:306)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.tasks.PropertyFileCollection.visitChildren(PropertyFileCollection.java:48)
-	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:113)
-	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:360)
-	at org.gradle.internal.fingerprint.impl.DefaultFileCollectionSnapshotter.snapshot(DefaultFileCollectionSnapshotter.java:47)
-	at org.gradle.internal.execution.impl.DefaultInputFingerprinter$InputCollectingVisitor.visitInputFileProperty(DefaultInputFingerprinter.java:133)
-	at org.gradle.api.internal.tasks.execution.TaskExecution.visitRegularInputs(TaskExecution.java:324)
-	at org.gradle.internal.execution.impl.DefaultInputFingerprinter.fingerprintInputProperties(DefaultInputFingerprinter.java:63)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionStateWithOutputs(AbstractCaptureStateBeforeExecutionStep.java:109)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.lambda$captureExecutionState$0(AbstractCaptureStateBeforeExecutionStep.java:74)
-	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionState(AbstractCaptureStateBeforeExecutionStep.java:69)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:62)
-	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
-	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
-	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
-	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
-	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
-	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
-	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
-	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
-	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
-	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
-	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
-	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
-	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
-	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
-	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
-	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
-	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
-	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
-	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
-	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
-	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
-	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
-	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
-	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
-	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-Caused by: org.gradle.api.internal.artifacts.transform.TransformException: Execution failed for DexingNoClasspathTransform: C:\Users\natal\.gradle\caches\8.10.2\transforms\0c9b6f452604572ad2bf29500f60fa01\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime.jar.
-	at org.gradle.api.internal.artifacts.transform.DefaultTransformInvocationFactory.lambda$createInvocation$1(DefaultTransformInvocationFactory.java:167)
-	at org.gradle.internal.Try$Failure.mapFailure(Try.java:284)
-	at org.gradle.api.internal.artifacts.transform.DefaultTransformInvocationFactory.lambda$createInvocation$2(DefaultTransformInvocationFactory.java:167)
-	at org.gradle.internal.Deferrable$1.applyAndRequireNonNull(Deferrable.java:63)
-	at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
-	at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.lambda$transform$0(TransformStepNode.java:317)
-	at org.gradle.internal.Try$Success.flatMap(Try.java:170)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.transform(TransformStepNode.java:315)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:379)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:358)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:352)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:332)
-	at org.gradle.internal.model.CalculatedValueContainer$CalculationState.lambda$attachValue$0(CalculatedValueContainer.java:228)
-	at org.gradle.internal.Try.ofFailable(Try.java:50)
-	at org.gradle.internal.model.CalculatedValueContainer$CalculationState.attachValue(CalculatedValueContainer.java:223)
-	at org.gradle.internal.model.CalculatedValueContainer.finalizeIfNotAlready(CalculatedValueContainer.java:194)
-	at org.gradle.internal.model.CalculatedValueContainer.run(CalculatedValueContainer.java:180)
-	at org.gradle.api.internal.artifacts.transform.TransformStepNode.execute(TransformStepNode.java:181)
-	at org.gradle.execution.plan.WorkNodeExecutor.execute(WorkNodeExecutor.java:27)
-	... 10 more
-Caused by: com.android.builder.dexing.DexArchiveBuilderException: Error while dexing.
-	at com.android.builder.dexing.D8DexArchiveBuilder.getExceptionToRethrow(D8DexArchiveBuilder.java:188)
-	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:127)
-	at com.android.build.gradle.internal.dependency.BaseDexingTransform.process(DexingTransform.kt:284)
-	at com.android.build.gradle.internal.dependency.BaseDexingTransform.processNonIncrementally(DexingTransform.kt:230)
-	at com.android.build.gradle.internal.dependency.BaseDexingTransform.transform(DexingTransform.kt:150)
-	at org.gradle.api.internal.artifacts.transform.DefaultTransform.transform(DefaultTransform.java:276)
-	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:147)
-	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:141)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.executeWithinTransformerListener(AbstractTransformExecution.java:141)
-	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.execute(AbstractTransformExecution.java:134)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
 	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
 	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
 	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
@@ -2519,13 +1688,29 @@ Caused by: com.android.builder.dexing.DexArchiveBuilderException: Error while de
 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
-	at org.gradle.internal.execution.workspace.impl.NonLockingMutableWorkspaceProvider.withWorkspace(NonLockingMutableWorkspaceProvider.java:36)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$0(ExecuteWorkBuildOperationFiringStep.java:53)
-	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
@@ -2533,232 +1718,23 @@ Caused by: com.android.builder.dexing.DexArchiveBuilderException: Error while de
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$1(ExecuteWorkBuildOperationFiringStep.java:51)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:51)
-	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.executeInCache(IdentityCacheStep.java:80)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$0(IdentityCacheStep.java:60)
-	at org.gradle.cache.Cache.lambda$get$0(Cache.java:31)
-	at org.gradle.cache.ManualEvictionInMemoryCache.get(ManualEvictionInMemoryCache.java:30)
-	at org.gradle.cache.Cache.get(Cache.java:31)
-	at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$1(IdentityCacheStep.java:58)
-	at org.gradle.internal.Deferrable$3.completeAndGet(Deferrable.java:117)
-	... 33 more
-Caused by: com.android.tools.r8.CompilationFailedException: Compilation failed to complete, origin: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex
-	at Version.fakeStackEntry(Version_8.6.17.java:0)
-	at com.android.tools.r8.T.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:5)
-	at com.android.tools.r8.internal.wo.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:82)
-	at com.android.tools.r8.internal.wo.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:32)
-	at com.android.tools.r8.internal.wo.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:31)
-	at com.android.tools.r8.internal.wo.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-	at com.android.tools.r8.D8.run(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:11)
-	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:125)
-	... 133 more
-Caused by: java.nio.file.NoSuchFileException: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex
-	at org.gradle.internal.classpath.declarations.NioFileInterceptors.intercept_list(NioFileInterceptors.java:274)
-	at com.android.tools.r8.DexIndexedConsumer$DirectoryConsumer.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-	at com.android.tools.r8.DexIndexedConsumer$DirectoryConsumer.accept(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:8)
-	at com.android.tools.r8.dex.k.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:57)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:17)
-	at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
-	at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:74)
-	at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
-	at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:323)
-	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:69)
-	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:36)
-	at com.android.tools.r8.internal.Hi0.submit(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-	at com.android.tools.r8.internal.ti0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:19)
-	at com.android.tools.r8.internal.Mq.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:3)
-	at com.android.tools.r8.internal.Mq.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:10)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:5)
-	at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-	at com.android.tools.r8.dex.k.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:147)
-	at com.android.tools.r8.dex.k.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:272)
-	at com.android.tools.r8.D8.d(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:154)
-	at com.android.tools.r8.D8.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-	at com.android.tools.r8.internal.wo.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:28)
-	... 136 more
-	Suppressed: java.lang.RuntimeException: com.android.tools.r8.internal.g: java.nio.file.NoSuchFileException: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex
-		at com.android.tools.r8.internal.V60.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:29)
-		at com.android.tools.r8.dex.k.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:283)
-		at com.android.tools.r8.D8.d(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:154)
-		at com.android.tools.r8.D8.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-		at com.android.tools.r8.internal.wo.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:28)
-		at com.android.tools.r8.internal.wo.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-		at com.android.tools.r8.D8.run(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:11)
-		at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:125)
-		at com.android.build.gradle.internal.dependency.BaseDexingTransform.process(DexingTransform.kt:284)
-		at com.android.build.gradle.internal.dependency.BaseDexingTransform.processNonIncrementally(DexingTransform.kt:230)
-		at com.android.build.gradle.internal.dependency.BaseDexingTransform.transform(DexingTransform.kt:150)
-		at org.gradle.api.internal.artifacts.transform.DefaultTransform.transform(DefaultTransform.java:276)
-		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:147)
-		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:141)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.executeWithinTransformerListener(AbstractTransformExecution.java:141)
-		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.execute(AbstractTransformExecution.java:134)
-		at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
-		at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
-		at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
-		at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-		at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
-		at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
-		at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
-		at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
-		at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
-		at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
-		at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
-		at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
-		at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
-		at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
-		at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
-		at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
-		at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
-		at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
-		at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
-		at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
-		at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
-		at org.gradle.internal.Either$Right.fold(Either.java:175)
-		at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
-		at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
-		at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
-		at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
-		at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
-		at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
-		at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
-		at java.base/java.util.Optional.orElseGet(Optional.java:364)
-		at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
-		at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
-		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
-		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
-		at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
-		at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
-		at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
-		at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
-		at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
-		at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
-		at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
-		at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
-		at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
-		at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
-		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
-		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
-		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
-		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
-		at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
-		at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
-		at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
-		at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
-		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
-		at org.gradle.internal.execution.workspace.impl.NonLockingMutableWorkspaceProvider.withWorkspace(NonLockingMutableWorkspaceProvider.java:36)
-		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
-		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
-		at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
-		at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
-		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$0(ExecuteWorkBuildOperationFiringStep.java:53)
-		at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-		at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
-		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$1(ExecuteWorkBuildOperationFiringStep.java:51)
-		at java.base/java.util.Optional.map(Optional.java:260)
-		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:51)
-		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
-		at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
-		at org.gradle.internal.execution.steps.IdentityCacheStep.executeInCache(IdentityCacheStep.java:80)
-		at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$0(IdentityCacheStep.java:60)
-		at org.gradle.cache.Cache.lambda$get$0(Cache.java:31)
-		at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1708)
-		at org.gradle.cache.ManualEvictionInMemoryCache.get(ManualEvictionInMemoryCache.java:30)
-		at org.gradle.cache.Cache.get(Cache.java:31)
-		at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$1(IdentityCacheStep.java:58)
-		at org.gradle.internal.Deferrable$3.completeAndGet(Deferrable.java:117)
-		at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
-		at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.lambda$transform$0(TransformStepNode.java:317)
-		at org.gradle.internal.Try$Success.flatMap(Try.java:170)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.transform(TransformStepNode.java:315)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:379)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:358)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:352)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:332)
-		at org.gradle.internal.model.CalculatedValueContainer$CalculationState.lambda$attachValue$0(CalculatedValueContainer.java:228)
-		at org.gradle.internal.Try.ofFailable(Try.java:50)
-		at org.gradle.internal.model.CalculatedValueContainer$CalculationState.attachValue(CalculatedValueContainer.java:223)
-		at org.gradle.internal.model.CalculatedValueContainer.finalizeIfNotAlready(CalculatedValueContainer.java:194)
-		at org.gradle.internal.model.CalculatedValueContainer.run(CalculatedValueContainer.java:180)
-		at org.gradle.api.internal.artifacts.transform.TransformStepNode.execute(TransformStepNode.java:181)
-		at org.gradle.execution.plan.WorkNodeExecutor.execute(WorkNodeExecutor.java:27)
-		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
-		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
-		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
-		at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
-		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
-		at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
-		at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-		at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
-		at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-		at java.base/java.lang.Thread.run(Thread.java:842)
-	Caused by: com.android.tools.r8.internal.g: java.nio.file.NoSuchFileException: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex
-		at com.android.tools.r8.internal.V60.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:21)
-		at com.android.tools.r8.internal.V60.error(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-		at com.android.tools.r8.DexIndexedConsumer$DirectoryConsumer.accept(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:10)
-		at com.android.tools.r8.dex.k.b(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:57)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:17)
-		at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
-		at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:74)
-		at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
-		at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:323)
-		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
-		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:69)
-		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:36)
-		at com.android.tools.r8.internal.Hi0.submit(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-		at com.android.tools.r8.internal.ti0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:19)
-		at com.android.tools.r8.internal.Mq.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:3)
-		at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-		at com.android.tools.r8.internal.Mq.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:2)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:10)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:5)
-		at com.android.tools.r8.internal.Gi0.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:1)
-		at com.android.tools.r8.dex.k.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:147)
-		at com.android.tools.r8.dex.k.a(R8_8.6.17_ad35be29c7108873fdb35df1527459cc24cc04d949c37dc9efbc6304e042931d:272)
-		... 145 more
-	Caused by: [CIRCULAR REFERENCE: java.nio.file.NoSuchFileException: C:\Projetos\App\MegaSena\node_modules\expo-location\android\build\expo-location$io.nlopez.smartlocation-jetified-aar\build\.transforms\64bcffe0361564c4d630671f3cb2566f\transformed\io.nlopez.smartlocation-3.3.3-jetified-runtime\io.nlopez.smartlocation-3.3.3-jetified-runtime_dex]
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: java.io.FileNotFoundException: C:\Projetos\App\MegaSena\node_modules\react-native-reanimated\android\build\intermediates\prefab_package\release\prefab\modules\reanimated\include\reanimated\android\NativeProxy.h (O sistema não pode encontrar o caminho especificado)
+	at org.gradle.api.internal.file.AbstractFileTreeElement.copyFile(AbstractFileTreeElement.java:101)
+	at org.gradle.api.internal.file.AbstractFileTreeElement.copyTo(AbstractFileTreeElement.java:84)
+	... 161 more
 
 
-BUILD FAILED in 14m 17s
-1387 actionable tasks: 1372 executed, 15 up-to-date
+BUILD FAILED in 10m 40s
+883 actionable tasks: 867 executed, 16 up-to-date

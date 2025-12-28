@@ -10,6 +10,8 @@ import { CustomAlert } from "../../components/CustomAlert";
 import { ScreenLayout } from "../../components/ScreenLayout";
 import { AnnouncementService, Announcement } from "../../services/announcements.service";
 import { AnnouncementCard } from "../../components/AnnouncementCard";
+import { usePushNotifications } from "../../hooks/usePushNotifications";
+import { UserService } from "../../services/users.service";
 
 const { height } = Dimensions.get("window");
 
@@ -42,6 +44,9 @@ export default function Dashboard() {
     const insets = useSafeAreaInsets();
     const BOTTOM_PADDING = insets.bottom + 120;
 
+    // Push Notifications
+    const { expoPushToken } = usePushNotifications();
+
     useFocusEffect(
         useCallback(() => {
             if (token) {
@@ -49,6 +54,16 @@ export default function Dashboard() {
                 fetchAnnouncements();
             }
         }, [token])
+    );
+
+    // Update Push Token on Server
+    useFocusEffect(
+        useCallback(() => {
+            if (token && expoPushToken) {
+                console.log("Updating push token on server:", expoPushToken);
+                UserService.updatePushToken(token, expoPushToken);
+            }
+        }, [token, expoPushToken])
     );
 
     const fetchAnnouncements = async () => {
@@ -126,7 +141,7 @@ export default function Dashboard() {
                 ))}
 
             {isDayClosed && (
-                <View style={tw`w-[90%] mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center`}>
+                <View style={tw`w-[90%] mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center self-center`}>
                     <Ionicons name="lock-closed" size={24} color="#f97316" style={tw`mr-3`} />
                     <View style={tw`flex-1`}>
                         <Text style={tw`text-orange-500 font-bold`}>Caixa Fechado</Text>
@@ -139,7 +154,7 @@ export default function Dashboard() {
                 <Text style={tw`text-lg font-bold text-white uppercase tracking-wider`}>Jogos Disponíveis</Text>
             </View>
 
-            <View style={tw`w-[90%] flex-row justify-center gap-4 mt-2`}>
+            <View style={tw`w-[90%] flex-row justify-center gap-4 mt-2 self-center`}>
                 {games.map((game) => (
                     <TouchableOpacity
                         key={game.id}
@@ -156,7 +171,7 @@ export default function Dashboard() {
             </View>
 
             {/* Botão de Validação */}
-            <View style={tw`w-[90%] mt-0`}>
+            <View style={tw`w-[90%] mt-0 self-center`}>
                 <TouchableOpacity
                     style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3 active:bg-slate-700`}
                     onPress={() => router.push("/validate")}
