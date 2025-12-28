@@ -14,6 +14,10 @@ import { DevicesModule } from './devices/devices.module';
 import { DrawsModule } from './draws/draws.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
+import { SecurityModule } from './security/security.module';
+import { AuditModule } from './audit/audit.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -27,14 +31,16 @@ import { NotificationsModule } from './notifications/notifications.module';
     GamesModule,
     TicketsModule,
     ReportsModule,
-    ReportsModule,
     FinanceModule,
     AreasModule,
-    DevicesModule,
     DevicesModule,
     DrawsModule,
     ScheduleModule.forRoot(),
     NotificationsModule,
+    AnnouncementsModule,
+    SecurityModule,
+    AuditModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,10 +10,12 @@ import { useLoading } from "../../context/LoadingContext";
 import { usePrinter } from "../../context/PrinterContext";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { StatusBar } from "expo-status-bar";
-import { TicketPreview } from "../../components/TicketPreview";
-import { AppConfig } from "../../constants/AppConfig";
-import { printTicket } from "../../services/printing.service";
+import { TicketPrintManager } from "../../components/ticket/TicketPrintManager";
+import { TicketDisplay } from "../../components/ticket/TicketDisplay";
+import { useTicketPrint } from "../../hooks/useTicketPrint";
+import { TicketData } from "../../components/ticket/TicketContent";
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { AppConfig } from "../../constants/AppConfig";
 
 
 // Animal Data
@@ -71,7 +73,8 @@ export default function JogoDoBichoScreen() {
 
     // Receipt Modal State
     const [receiptVisible, setReceiptVisible] = useState(false);
-    const [lastTicket, setLastTicket] = useState<any>(null);
+    const [lastTicket, setLastTicket] = useState<TicketData | null>(null);
+    const { print, isPrinting } = useTicketPrint();
 
     // Fetch Game ID on Mount
     useEffect(() => {
@@ -198,11 +201,13 @@ export default function JogoDoBichoScreen() {
 
             const ticketData = await res.json();
 
-            const ticketObj = {
+            hide();
+
+            const ticketObj: TicketData = {
                 gameName: `JB - ${modality}`,
                 numbers: ticketData.numbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                id: ticketData.id,
+                ticketId: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
@@ -210,39 +215,20 @@ export default function JogoDoBichoScreen() {
             setLastTicket(ticketObj);
 
             // 1. Show Standard Loading
-            show("Imprimindo Bilhete...");
+            show("Imprimindo...");
 
             // 2. Wait for Render
             setTimeout(async () => {
                 try {
-                    // 3. Capture Image
-                    let uri = undefined;
-                    try {
-                        if (printViewShotRef.current?.capture) {
-                            uri = await printViewShotRef.current.capture();
-                        }
-                    } catch (capErr) {
-                        console.warn("Capture failed", capErr);
-                    }
-
-                    // 4. Print
-                    await printTicket(
-                        selectedNumbers,
-                        ticketData.hash || ticketData.id,
-                        new Date(),
-                        gamePrice,
-                        `BICHO - ${modality}`,
-                        printerType,
-                        uri
-                    );
+                    await print(ticketObj, printViewShotRef);
                 } catch (err) {
-                    console.error("Print failed", err);
+                    console.error("[JB] Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
                 } finally {
                     hide();
                     setReceiptVisible(true);
                 }
-            }, 1000); // 1s wait
+            }, 800);
 
         } catch (error: any) {
             hide();
@@ -258,26 +244,9 @@ export default function JogoDoBichoScreen() {
 
 
 
-    const handleAutoPrint = async (imageUri?: string) => {
+    const handleAutoPrint = async () => {
         if (!lastTicket) return;
-        show("Imprimindo...");
-        try {
-            const success = await printTicket(
-                lastTicket.numbers,
-                lastTicket.id,
-                new Date(),
-                gamePrice,
-                lastTicket.gameName,
-                printerType,
-                imageUri
-            );
-            if (success) showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
-            else showAlert("Erro", "Falha ao enviar para impressão.", "error");
-        } catch (error) {
-            showAlert("Erro", "Erro ao tentar imprimir.", "error");
-        } finally {
-            hide();
-        }
+        await print(lastTicket, printViewShotRef);
     };
 
     const renderAnimalItem = ({ item }: { item: any }) => {
@@ -311,22 +280,9 @@ export default function JogoDoBichoScreen() {
                 <View style={tw`w-10`} />
             </View>
 
-            {/* Hidden ViewShot for Printing High Quality Ticket */}
-            <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
-                <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
-                    {lastTicket && (
-                        <TicketPreview
-                            gameName={lastTicket.gameName}
-                            numbers={lastTicket.numbers}
-                            price={lastTicket.price}
-                            date={lastTicket.date}
-                            id={lastTicket.id}
-                            hash={lastTicket.hash}
-                            isCapture={true}
-                        />
-                    )}
-                </ViewShot>
-            </View>
+            {/* Hidden Capture Area */}
+            <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+
 
             <View style={tw`flex-1 p-4`}>
                 {/* Modality Tabs */}
@@ -413,13 +369,16 @@ export default function JogoDoBichoScreen() {
                 <View style={tw`flex-1 justify-center items-center bg-black/90 p-4`}>
                     <View style={tw`w-full`}>
                         <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAÇÃO</Text>
-                        <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl p-4`}>
-                            <Text style={tw`text-center text-gray-800 font-bold mb-2`}>{modality}</Text>
-                            <Text style={tw`text-center text-3xl font-black text-emerald-600 tracking-widest mb-4`}>
-                                {selectedNumbers.map(n => n.toString().padStart(modality === 'MILHAR' ? 4 : modality === 'CENTENA' ? 3 : 2, '0')).join(', ')}
-                            </Text>
-                            <Text style={tw`text-center text-gray-500 font-bold`}>Valor: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}</Text>
-                        </View>
+                        <TicketDisplay
+                            data={{
+                                gameName: `JB - ${modality}`,
+                                numbers: selectedNumbers,
+                                price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
+                                date: new Date().toLocaleString('pt-BR'),
+                                ticketId: "PREVIEW"
+                            }}
+                            mode="preview"
+                        />
                         <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
                             <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
                         </TouchableOpacity>

@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
@@ -33,9 +33,13 @@ const sidebarGroups = [
         title: "Operacional",
         items: [
             { icon: ShieldAlert, label: "Gestão de Risco", href: "/dashboard/risk" },
+            { icon: XCircle, label: "Cancelamentos", href: "/dashboard/cancellations" },
             { icon: Ticket, label: "Jogos / Vendas", href: "/dashboard/games" },
             { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
             { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
+            { icon: TrendingUp, label: "Inteligência (BI)", href: "/dashboard/analytics" },
+            { icon: Megaphone, label: "Avisos Globais", href: "/dashboard/announcements" },
+            { icon: ShieldAlert, label: "Security Center", href: "/dashboard/security" },
         ]
     },
     {
@@ -43,6 +47,8 @@ const sidebarGroups = [
         items: [
             { icon: Settings, label: "Jogos / Preços", href: "/dashboard/settings/games" },
             { icon: Calendar, label: "Sorteios", href: "/dashboard/settings/draws" },
+            { icon: History, label: "Logs de Auditoria", href: "/dashboard/audit" },
+            { icon: ShieldCheck, label: "Segurança (MFA)", href: "/dashboard/security-mfa" },
         ]
     },
 ];

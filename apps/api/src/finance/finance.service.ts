@@ -168,8 +168,12 @@ export class FinanceService {
         });
     }
 
-    async closeDay(userId: string) {
+    async closeDay(userId: string, physicalCashReported?: number) {
         const summary = await this.getSummary(userId);
+
+        const variance = physicalCashReported !== undefined
+            ? Number(physicalCashReported) - summary.finalBalance
+            : null;
 
         // Check if already closed today
         const startOfDay = new Date();
@@ -197,6 +201,8 @@ export class FinanceService {
                         finalBalance: summary.finalBalance,
                         netBalance: summary.netBalance,
                         totalCommission: summary.totalCommission,
+                        physicalCashReported: physicalCashReported,
+                        variance: variance,
                         status: 'PENDING',
                         verifiedByUserId: null,
                         verifiedAt: null
@@ -213,6 +219,8 @@ export class FinanceService {
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,
                 finalBalance: summary.finalBalance,
+                physicalCashReported: physicalCashReported,
+                variance: variance,
                 closedByUserId: userId,
                 netBalance: summary.netBalance,
                 totalCommission: summary.totalCommission,
@@ -224,7 +232,7 @@ export class FinanceService {
     }
 
     // Admin: close a day for a specific user and optionally auto-verify
-    async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true) {
+    async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true, physicalCashReported?: number) {
         // Prevent duplicate close for the target user's today
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
@@ -247,12 +255,18 @@ export class FinanceService {
         // Build a summary for the target user
         const summary = await this.getSummary(targetUserId);
 
+        const variance = physicalCashReported !== undefined
+            ? Number(physicalCashReported) - summary.finalBalance
+            : null;
+
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
                 totalSales: summary.totalSales,
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,
                 finalBalance: summary.finalBalance,
+                physicalCashReported: physicalCashReported,
+                variance: variance,
                 closedByUserId: targetUserId,
                 netBalance: summary.netBalance,
                 totalCommission: summary.totalCommission,

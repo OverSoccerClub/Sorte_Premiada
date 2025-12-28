@@ -12,12 +12,12 @@ import { usePrinter } from "../../context/PrinterContext";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { StatusBar } from "expo-status-bar";
 import { VersionFooter } from "../../components/VersionFooter";
-import { TicketPreview } from "../../components/TicketPreview";
-import { TicketPrintLayout } from "../../components/TicketPrintLayout";
-import { AppConfig } from "../../constants/AppConfig";
-import { printTicket } from "../../services/printing.service";
-
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { TicketPrintManager } from "../../components/ticket/TicketPrintManager";
+import { TicketDisplay } from "../../components/ticket/TicketDisplay";
+import { useTicketPrint } from "../../hooks/useTicketPrint";
+import { TicketData } from "../../components/ticket/TicketContent";
+import { AppConfig } from "../../constants/AppConfig";
 
 
 export default function Game2x1000Screen() {
@@ -57,7 +57,8 @@ export default function Game2x1000Screen() {
 
     // Receipt Modal State
     const [receiptVisible, setReceiptVisible] = useState(false);
-    const [lastTicket, setLastTicket] = useState<any>(null);
+    const [lastTicket, setLastTicket] = useState<TicketData | null>(null);
+    const { print, isPrinting } = useTicketPrint();
 
     // Fetch Game ID on Mount
     useEffect(() => {
@@ -344,63 +345,44 @@ export default function Game2x1000Screen() {
             const ticketData = await res.json();
             const finalNumbers = ticketData.numbers || [];
 
-
-
             hide();
-            // Refresh sold numbers for next bet
             fetchSoldNumbers(gameId);
 
-            // Prepare Receipt Data & Auto Print
-            setLastTicket({
+            // Prepare Unified Ticket Data
+            const fullTicket: TicketData = {
                 gameName: "2x1000",
                 numbers: finalNumbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                id: ticketData.id,
+                ticketId: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
-                series: drawSeries,
+                series: drawSeries?.toString(),
+                terminalId: Device.deviceName || Device.modelName || "Terminal",
+                vendorName: user?.name || user?.username || "Vendedor",
                 possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                 secondChanceLabel: "SEGUNDA CHANCE"
-            });
+            };
+
+            setLastTicket(fullTicket);
 
             // 1. Show Standard Loading
-            show("Imprimindo Bilhete...");
+            show("Imprimindo...");
 
-            // 2. Wait for Render (TicketPreview needs to update with lastTicket)
+            // 2. Wait for Render and Print
             setTimeout(async () => {
                 try {
-                    // 3. Capture Image
-                    let uri = undefined;
-                    try {
-                        if (printViewShotRef.current?.capture) {
-                            uri = await printViewShotRef.current.capture();
-                        }
-                    } catch (capErr) {
-                        console.warn("Capture failed", capErr);
-                    }
-
-                    // 4. Print
-                    await printTicket(
-                        finalNumbers,
-                        ticketData.hash || ticketData.id,
-                        new Date(),
-                        gamePrice,
-                        "2x1000",
-                        printerType,
-                        uri, // Pass the image!
-                        ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined
-                    );
+                    await print(fullTicket, printViewShotRef);
                 } catch (err) {
-                    console.error("Print failed", err);
+                    console.error("[2x1000] Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas erro na impressão.", "warning");
                 } finally {
                     hide();
                     setReceiptVisible(true);
                 }
-            }, 1000); // 1s to ensure render
+            }, 800);
 
         } catch (error: any) {
             hide();
@@ -426,23 +408,9 @@ export default function Game2x1000Screen() {
         setCurrentRangeStart(0);
     };
 
-    const handleAutoPrint = async (imageUri?: string) => {
+    const handleAutoPrint = async () => {
         if (!lastTicket) return;
-        const success = await printTicket(
-            lastTicket.numbers,
-            lastTicket.id,
-            new Date(), // Current date for print or parse from lastTicket.date if needed
-            gamePrice,
-            "2x1000",
-            printerType,
-            imageUri,
-            lastTicket.possiblePrize
-        );
-        if (success) {
-            showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
-        } else {
-            showAlert("Erro", "Falha ao enviar para impressão.", "error");
-        }
+        await print(lastTicket, printViewShotRef);
     };
 
     // Grid Render Item (Optimized)
@@ -538,25 +506,9 @@ export default function Game2x1000Screen() {
 
             <View style={tw`flex-1 items-center`}>
 
-                {/* Hidden ViewShot for Printing High Quality Ticket */}
-                <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
-                    <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
-                        {lastTicket && (
-                            <TicketPrintLayout
-                                gameName="2x1000"
-                                numbers={lastTicket.numbers}
-                                price={lastTicket.price}
-                                date={lastTicket.date}
-                                ticketId={lastTicket.id}
-                                drawDate={lastTicket.drawDate}
-                                hash={lastTicket.hash}
-                                vendorName={user?.name || user?.username || "Vendedor"}
-                                terminalId={Device.deviceName || Device.modelName || "Terminal"}
-                                series={lastTicket.series}
-                            />
-                        )}
-                    </ViewShot>
-                </View>
+                {/* Hidden Capture Area */}
+                <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+
 
                 <View style={tw`w-[90%] max-w-[400px] flex-1 p-4`}>
 
@@ -683,11 +635,16 @@ export default function Game2x1000Screen() {
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAÇÃO</Text>
 
                             <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl items-center`}>
-                                <TicketPreview
-                                    gameName="2x1000"
-                                    numbers={selectedNumbers}
-                                    price="R$ 10,00"
-                                    series={drawSeries}
+                                <TicketDisplay
+                                    data={{
+                                        gameName: "2x1000",
+                                        numbers: selectedNumbers,
+                                        price: "R$ 10,00",
+                                        series: drawSeries?.toString(),
+                                        date: new Date().toLocaleString('pt-BR'),
+                                        ticketId: "PREVIEW"
+                                    }}
+                                    mode="preview"
                                 />
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>

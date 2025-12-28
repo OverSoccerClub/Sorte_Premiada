@@ -79,11 +79,15 @@ export const FinanceService = {
         }
     },
 
-    async closeDay(token: string): Promise<any | null> {
+    async closeDay(token: string, physicalCashReported?: number): Promise<any | null> {
         try {
             const res = await fetch(`${AppConfig.api.baseUrl}/finance/close`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ physicalCashReported })
             });
             if (res.ok) return await res.json();
             return null;

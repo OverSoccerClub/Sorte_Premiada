@@ -7,7 +7,16 @@ import { objectsToCsv } from './csv.util';
 export class ReportsService {
     constructor(private prisma: PrismaService) { }
 
-    async getFinanceSummary(userId: string, date: Date) {
+    private async getAreaFilter(requestingUserId?: string) {
+        if (!requestingUserId) return {};
+        const user = await this.prisma.user.findUnique({ where: { id: requestingUserId } });
+        if (user && user.role === 'COBRADOR' && user.areaId) {
+            return { areaId: user.areaId };
+        }
+        return {};
+    }
+
+    async getFinanceSummary(userId: string, date: Date, requestingUserId?: string) {
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
@@ -95,14 +104,21 @@ export class ReportsService {
         };
     }
 
-    async getSalesByCambista() {
+    async getSalesByCambista(requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
+        const where: any = {
+            status: {
+                not: 'CANCELLED'
+            }
+        };
+
+        if (areaFilter.areaId) {
+            where.user = { areaId: areaFilter.areaId };
+        }
+
         const sales = await this.prisma.ticket.groupBy({
             by: ['userId'],
-            where: {
-                status: {
-                    not: 'CANCELLED'
-                }
-            },
+            where,
             _sum: {
                 amount: true,
             },
@@ -142,8 +158,10 @@ export class ReportsService {
         cambistaId?: string,
         gameId?: string,
         page: number = 1,
-        limit: number = 20
+        limit: number = 20,
+        requestingUserId?: string
     ) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = {
             createdAt: {
                 gte: startDate,
@@ -153,6 +171,10 @@ export class ReportsService {
                 not: 'CANCELLED'
             }
         };
+
+        if (areaFilter.areaId) {
+            where.user = { areaId: areaFilter.areaId };
+        }
 
         if (cambistaId && cambistaId !== 'all') {
             where.userId = cambistaId;
@@ -186,7 +208,10 @@ export class ReportsService {
             }),
             // Fetch users in this report to check isActive
             this.prisma.user.findMany({
-                where: cambistaId && cambistaId !== 'all' ? { id: cambistaId } : { role: 'CAMBISTA' },
+                where: {
+                    ...(cambistaId && cambistaId !== 'all' ? { id: cambistaId } : { role: 'CAMBISTA' }),
+                    ...(areaFilter.areaId ? { areaId: areaFilter.areaId } : {})
+                },
                 select: { id: true, name: true, username: true, isActive: true }
             }),
             // Fetch daily closes in this period
@@ -266,7 +291,8 @@ export class ReportsService {
         };
     }
 
-    async getDashboardStats() {
+    async getDashboardStats(requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
         const now = new Date();
         const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
@@ -278,7 +304,10 @@ export class ReportsService {
         const totalSalesAggregate = await this.prisma.ticket.aggregate({
             _sum: { amount: true },
             _count: { id: true },
-            where: { status: { not: 'CANCELLED' } }
+            where: {
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
+            }
         });
 
         // Active Cambistas (Sold a ticket in the last 30 minutes)
@@ -288,7 +317,8 @@ export class ReportsService {
             by: ['userId'],
             where: {
                 createdAt: { gte: thirtyMinsAgo },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             }
         });
 
@@ -310,7 +340,8 @@ export class ReportsService {
                         gte: date,
                         lt: nextDate
                     },
-                    status: { not: 'CANCELLED' }
+                    status: { not: 'CANCELLED' },
+                    ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
                 }
             });
 
@@ -327,7 +358,8 @@ export class ReportsService {
             by: ['status'],
             where: {
                 createdAt: { gte: startOfMonth },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             _count: { id: true }
         });
@@ -342,7 +374,8 @@ export class ReportsService {
             by: ['gameType'],
             where: {
                 createdAt: { gte: startOfMonth },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             _sum: { amount: true }
         });
@@ -356,7 +389,8 @@ export class ReportsService {
         const todaysTickets = await this.prisma.ticket.findMany({
             where: {
                 createdAt: { gte: startOfDay },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             select: { createdAt: true, amount: true }
         });
@@ -378,7 +412,8 @@ export class ReportsService {
         const monthlySalesAgg = await this.prisma.ticket.aggregate({
             where: {
                 createdAt: { gte: startOfMonth },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             _sum: { amount: true }
         });
@@ -386,7 +421,8 @@ export class ReportsService {
         const monthlyDebitsAgg = await this.prisma.transaction.aggregate({
             where: {
                 createdAt: { gte: startOfMonth },
-                type: 'DEBIT'
+                type: 'DEBIT',
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             _sum: { amount: true }
         });
@@ -403,7 +439,8 @@ export class ReportsService {
             by: ['userId'],
             where: {
                 createdAt: { gte: startOfMonth },
-                status: { not: 'CANCELLED' }
+                status: { not: 'CANCELLED' },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             _sum: { amount: true },
             _count: { id: true }
@@ -441,7 +478,8 @@ export class ReportsService {
             orderBy: { createdAt: 'desc' },
             where: {
                 status: { not: 'CANCELLED' },
-                createdAt: { gte: startOfDay }
+                createdAt: { gte: startOfDay },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             include: {
                 user: { select: { id: true, username: true, name: true, email: true } },
@@ -490,7 +528,8 @@ export class ReportsService {
             }
         };
     }
-    async getSalesByArea(startDate: Date, endDate: Date) {
+    async getSalesByArea(startDate: Date, endDate: Date, requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
         // Fetch tickets with user and area relations
         const tickets = await this.prisma.ticket.findMany({
             where: {
@@ -500,7 +539,8 @@ export class ReportsService {
                 },
                 status: {
                     not: 'CANCELLED'
-                }
+                },
+                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
             },
             include: {
                 user: {
@@ -564,7 +604,8 @@ export class ReportsService {
     }
 
     // New report methods
-    async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string) {
+    async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string, requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = {};
         if (startDate || endDate) {
             const start = startDate ? new Date(startDate) : new Date(0);
@@ -577,6 +618,10 @@ export class ReportsService {
         }
         if (userId) where.closedByUserId = userId;
         if (status) where.status = status;
+
+        if (areaFilter.areaId) {
+            where.closedByUser = { areaId: areaFilter.areaId };
+        }
 
         const results = await this.prisma.dailyClose.findMany({
             where,
@@ -608,8 +653,13 @@ export class ReportsService {
         }));
     }
 
-    async getPendingCloses() {
-        return this.prisma.dailyClose.findMany({ where: { status: 'PENDING' }, include: { closedByUser: true }, orderBy: { createdAt: 'desc' } });
+    async getPendingCloses(requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
+        const where: any = { status: 'PENDING' };
+        if (areaFilter.areaId) {
+            where.closedByUser = { areaId: areaFilter.areaId };
+        }
+        return this.prisma.dailyClose.findMany({ where, include: { closedByUser: true }, orderBy: { createdAt: 'desc' } });
     }
 
     async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string) {
@@ -648,8 +698,12 @@ export class ReportsService {
         return this.prisma.ticket.findMany({ where, include: { user: { select: { username: true, name: true } }, game: true }, orderBy: { createdAt: 'desc' } });
     }
 
-    async getTopSellers(limit: number = 10, startDate?: Date, endDate?: Date) {
-        const where: any = { status: { not: 'CANCELLED' } };
+    async getTopSellers(limit: number = 10, startDate?: Date, endDate?: Date, requestingUserId?: string) {
+        const areaFilter = await this.getAreaFilter(requestingUserId);
+        const where: any = {
+            status: { not: 'CANCELLED' },
+            ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
+        };
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
             const lte = endDate ? endDate : new Date();

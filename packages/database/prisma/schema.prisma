@@ -25,6 +25,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tickets      Ticket[]
+  cancelledTickets Ticket[] @relation("TicketCancelledBy") // New relation
   transactions Transaction[]
   transactionsCollected Transaction[] @relation("TransactionCobrador")
   dailyCloses  DailyClose[]
@@ -35,6 +36,13 @@ model User {
   area         Area?    @relation(fields: [areaId], references: [id])
   isActive     Boolean  @default(true) // Controla bloqueio manual do cambista
   commissionRate Decimal? @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
+
+  // Corporate Maturity
+  auditLogs       AuditLog[] @relation("UserAuditLogs")
+  
+  // Hardened Security (MFA)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean @default(false)
 }
 
 model Area {
@@ -43,6 +51,7 @@ model Area {
   city      String
   state     String
   users     User[]
+  configs   AreaConfig[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -61,6 +70,7 @@ model Game {
   // Risk and Financial Config
   prizeMultiplier Decimal @default(1000.0) // Multiplicador de Prêmio (ex: 1000x)
   maxLiability    Decimal @default(5000.0) // Limite máximo de prêmio acumulado por milhar
+  commissionRate  Decimal @default(10.0)   // Comissão padrão do jogo (ex: 10%)
   
   // Configuração Segunda Chance (Sorteio Semanal/Sábado)
   secondChanceEnabled Boolean @default(false)
@@ -69,6 +79,7 @@ model Game {
   secondChanceWeekday    Int?  @default(6) // 0=Dom, 6=Sáb
   secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
   lastSecondChanceSeries Int @default(0)
+  configs   AreaConfig[]
 }
 
 model Draw {
@@ -112,7 +123,33 @@ model Ticket {
   netValue         Decimal @default(0) // Valor líquido (Amount - Commission)
   possiblePrize    Decimal @default(0) // Prêmio estimado se ganhar
   
+  // Cancellation Audit
+  cancellationReason  String?
+  cancelledByUserId   String?
+  cancelledByUser     User?    @relation("TicketCancelledBy", fields: [cancelledByUserId], references: [id])
+  
   createdAt DateTime @default(now())
+  
+  // Anti-Fraud
+  digitalSignature String? @unique
+
+  @@index([drawDate, gameId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation("UserAuditLogs", fields: [userId], references: [id])
+  action      String   // e.g., "UPDATE_GAME", "CREATE_USER"
+  entity      String   // e.g., "Game", "User"
+  entityId    String?
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
 }
 
 enum Role {
@@ -125,6 +162,7 @@ enum TicketStatus {
   PENDING
   PAID
   CANCELLED
+  CANCEL_REQUESTED // New
   WON
   LOST
   EXPIRED
@@ -151,6 +189,11 @@ model DailyClose {
   finalBalance    Decimal
   totalCommission Decimal  @default(0)
   netBalance      Decimal  @default(0)
+  
+  // Audit Fields
+  physicalCashReported Decimal?
+  variance            Decimal?
+  
   closedByUserId  String
   closedByUser    User     @relation(fields: [closedByUserId], references: [id])
   status          DailyCloseStatus @default(PENDING)
@@ -206,4 +249,50 @@ model NotificationLog {
 enum NotificationStatus {
   SENT
   FAILED
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  type      String   @default("INFO") // INFO, WARNING, ALERT, SUCCESS
+  isActive  Boolean  @default(true)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AreaConfig {
+  id              String   @id @default(uuid())
+  areaId          String
+  area            Area     @relation(fields: [areaId], references: [id])
+  gameId          String
+  game            Game     @relation(fields: [gameId], references: [id])
+  
+  // Overrides
+  commissionRate  Decimal?
+  prizeMultiplier Decimal?
+  maxLiability    Decimal?
+  
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([areaId, gameId])
+}
+
+model SecurityLog {
+  id          String   @id @default(uuid())
+  type        String   // "SUSPICIOUS_BET", "LATE_BET", "HACK_ATTEMPT"
+  severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  message     String
+  metadata    Json?    // Store ticketId, userId, etc.
+  areaId      String?
+  userId      String?
+  isResolved  Boolean  @default(false)
+  resolvedBy  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
 }

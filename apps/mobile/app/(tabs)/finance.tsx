@@ -50,6 +50,8 @@ export default function FinanceScreen() {
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [auditModalVisible, setAuditModalVisible] = useState(false);
+    const [reportedCash, setReportedCash] = useState("");
 
     // Details Modal State
     const [detailsModalVisible, setDetailsModalVisible] = useState(false);
@@ -168,25 +170,37 @@ export default function FinanceScreen() {
     };
 
     const handleConfirmClose = () => {
+        setReportedCash(""); // Reset
+        setAuditModalVisible(true);
+    };
+
+    const handleAuditSubmit = () => {
+        if (!reportedCash) {
+            showAlert("Aviso", "Por favor, informe o valor em mãos para conferência.", "warning");
+            return;
+        }
+
+        setAuditModalVisible(false);
         setAlertConfig({
             visible: true,
             title: "ATENÇÃO: ENCERRAR DIA",
-            message: "Você está prestes a bloquear o caixa. \n\n⚠️ Ao confirmar, você NÃO poderá mais vender bilhetes ou lançar movimentações hoje.\n\nCertifique-se de que já conferiu, imprimiu ou enviou o relatório. Após o fechamento, as vendas só serão liberadas quando o supervisor confirmar a conferência.",
+            message: `Você informou ${formatCurrency(reportedCash.replace(',', '.'))} em mãos.\n\nAo confirmar, você NÃO poderá mais vender bilhetes hoje.\n\nConfirmar encerramento definitivo?`,
             type: "warning",
             showCancel: true,
-            onConfirm: performCloseDay
+            onConfirm: () => performCloseDay(parseFloat(reportedCash.replace(',', '.')))
         });
     };
 
-    const performCloseDay = async () => {
+    const performCloseDay = async (cashValue?: number) => {
         setAlertConfig(prev => ({ ...prev, visible: false }));
         if (!summary) return;
         setIsLoading(true);
 
-        const result = await FinanceService.closeDay(token!);
+        const result = await FinanceService.closeDay(token!, cashValue);
         setIsLoading(false);
 
         if (result) {
+            setReportModalVisible(false); // Close preview if open
             loadData();
             showAlert("Sucesso", "Caixa encerrado com sucesso!", "success");
         } else {
@@ -538,6 +552,59 @@ export default function FinanceScreen() {
                     loadData();
                 }}
             />
+
+            {/* Audit Modal (Physical Cash Reporting) */}
+            <Modal
+                transparent={true}
+                visible={auditModalVisible}
+                animationType="fade"
+                onRequestClose={() => setAuditModalVisible(false)}
+            >
+                <View style={tw`flex-1 justify-center items-center bg-black/70 px-6`}>
+                    <View style={tw`w-full bg-surface rounded-3xl p-6 border border-gray-800`}>
+                        <View style={tw`items-center mb-6`}>
+                            <View style={tw`w-16 h-16 bg-emerald-500/10 rounded-full items-center justify-center mb-4`}>
+                                <Ionicons name="calculator" size={32} color="#10b981" />
+                            </View>
+                            <Text style={tw`text-xl font-bold text-white text-center`}>Conferência de Caixa</Text>
+                            <Text style={tw`text-gray-400 text-sm text-center mt-2`}>
+                                Informe o valor total em dinheiro que você possui em mãos agora para finalizar o dia.
+                            </Text>
+                        </View>
+
+                        <View style={tw`mb-6`}>
+                            <Text style={tw`text-gray-500 text-xs font-bold uppercase mb-2 ml-1`}>Valor em Mãos (R$)</Text>
+                            <View style={tw`flex-row items-center bg-background border border-gray-700 rounded-2xl px-4 h-16`}>
+                                <Text style={tw`text-gray-500 text-xl font-bold mr-2`}>R$</Text>
+                                <TextInput
+                                    style={tw`flex-1 text-white text-2xl font-bold`}
+                                    placeholder="0,00"
+                                    placeholderTextColor="#334155"
+                                    keyboardType="numeric"
+                                    autoFocus
+                                    value={reportedCash}
+                                    onChangeText={setReportedCash}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={tw`flex-row gap-3`}>
+                            <TouchableOpacity
+                                onPress={() => setAuditModalVisible(false)}
+                                style={tw`flex-1 bg-gray-800 p-4 rounded-xl items-center border border-gray-700`}
+                            >
+                                <Text style={tw`text-gray-400 font-bold`}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={handleAuditSubmit}
+                                style={tw`flex-2 bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/20`}
+                            >
+                                <Text style={tw`text-white font-bold`}>Continuar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             <CustomAlert
                 visible={alertConfig.visible}

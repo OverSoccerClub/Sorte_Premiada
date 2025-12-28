@@ -55,9 +55,8 @@ export default function ValidateTicketScreen() {
             } else {
                 setResult({ error: true, message: validation.message });
             }
-        } catch (error) {
-            console.error(error);
-            setResult({ error: true, message: error.response?.data?.message || 'Erro ao processar bilhete.' });
+        } catch (error: any) {
+            setResult({ error: true, message: error?.response?.data?.message || 'Erro ao processar bilhete.' });
         } finally {
             setLoading(false);
         }

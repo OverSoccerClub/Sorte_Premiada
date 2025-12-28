@@ -5,11 +5,14 @@ export interface Ticket {
     gameType: string;
     numbers: number[];
     amount: string;
-    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'WON' | 'LOST' | 'EXPIRED';
+    status: 'PENDING' | 'PAID' | 'CANCELLED' | 'WON' | 'LOST' | 'EXPIRED' | 'CANCEL_REQUESTED';
     drawDate?: string;
     hash?: string;
     series?: string; // Added series field
     createdAt: string;
+    possiblePrize?: string;
+    secondChanceNumber?: number;
+    secondChanceDrawDate?: string;
 }
 
 export interface TicketFilters {
@@ -81,6 +84,29 @@ export const TicketsService = {
             return { success: true, data: json };
         } catch (error) {
             console.error("[TicketsService] Validate Error:", error);
+            return { success: false, message: "Erro de conexão" };
+        }
+    },
+
+    requestCancel: async (token: string, ticketId: string, reason: string): Promise<{ success: boolean; message?: string }> => {
+        try {
+            const url = `${AppConfig.api.baseUrl}/tickets/${ticketId}/request-cancel`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ reason })
+            });
+
+            const json = await res.json();
+            if (!res.ok) {
+                return { success: false, message: json.message || "Erro ao solicitar cancelamento" };
+            }
+            return { success: true, message: json.message || "Solicitação enviada com sucesso" };
+        } catch (error) {
+            console.error("[TicketsService] Request Cancel Error:", error);
             return { success: false, message: "Erro de conexão" };
         }
     }

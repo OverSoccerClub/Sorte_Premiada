@@ -3,10 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@repo/database';
 import { toBrazilTime } from '../utils/date.util';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class DrawsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private redis: RedisService
+    ) { }
 
     async create(data: any) {
         return this.prisma.$transaction(async (tx) => {
@@ -248,6 +252,13 @@ export class DrawsService {
      * Essential for the Admin Risk Dashboard.
      */
     async getLiabilityReport(gameId: string, drawDate: string) {
+        const cacheKey = `liability:${gameId}:${drawDate}`;
+        const cached = await this.redis.get(cacheKey);
+
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
         const date = new Date(drawDate);
         const tickets = await this.prisma.ticket.findMany({
             where: {
@@ -260,7 +271,7 @@ export class DrawsService {
         const liabilityMap: Record<string, number> = {};
 
         tickets.forEach(ticket => {
-            ticket.numbers.forEach(num => {
+            (ticket.numbers as number[]).forEach(num => {
                 const numStr = num.toString().padStart(4, '0');
                 liabilityMap[numStr] = (liabilityMap[numStr] || 0) + Number(ticket.possiblePrize || 0);
             });
@@ -270,6 +281,9 @@ export class DrawsService {
         const report = Object.entries(liabilityMap)
             .map(([number, liability]) => ({ number, liability }))
             .sort((a, b) => b.liability - a.liability);
+
+        // Cache for 60 seconds
+        await this.redis.set(cacheKey, JSON.stringify(report), 60);
 
         return report;
     }

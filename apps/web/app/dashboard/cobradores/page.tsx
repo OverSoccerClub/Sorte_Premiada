@@ -34,9 +34,18 @@ interface Cobrador {
     email: string
     role: string
     securityPin?: string
+    areaId?: string
     area?: {
         name: string
+        city: string
     }
+}
+
+interface Area {
+    id: string
+    name: string
+    city: string
+    state: string
 }
 
 export default function CobradoresPage() {
@@ -55,11 +64,28 @@ export default function CobradoresPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [pin, setPin] = useState("")
+    const [areaId, setAreaId] = useState("")
+    const [areas, setAreas] = useState<Area[]>([])
     const [showPin, setShowPin] = useState(false)
 
     useEffect(() => {
         fetchCobradores()
+        fetchAreas()
     }, [token])
+
+    const fetchAreas = async () => {
+        try {
+            const res = await fetch(`${AppConfig.api.baseUrl}/areas`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setAreas(data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     const fetchCobradores = async () => {
         try {
@@ -92,7 +118,8 @@ export default function CobradoresPage() {
             username,
             email: email || undefined,
             role: 'COBRADOR',
-            securityPin: pin
+            securityPin: pin,
+            areaId: areaId || undefined
         }
 
         if (password) payload.password = password
@@ -135,7 +162,9 @@ export default function CobradoresPage() {
         setUsername("")
         setEmail("")
         setPassword("")
+        setPassword("")
         setPin("")
+        setAreaId("")
     }
 
     const handleEdit = (user: Cobrador) => {
@@ -144,8 +173,7 @@ export default function CobradoresPage() {
         setUsername(user.username)
         setEmail(user.email || "")
         setPin(user.securityPin || "") // Requires backend to expose PIN (usually bad practice, but for admin management OK or just overwrite)
-        // If backend doesn't return pin for security, we might leave it blank to indicate "Unchanged". 
-        // For now let's assume admin can overwrite.
+        setAreaId(user.areaId || "")
         setIsDialogOpen(true)
     }
 
@@ -232,6 +260,22 @@ export default function CobradoresPage() {
                         </div>
                         <p className="text-xs text-muted-foreground">O PIN é usado para confirmar sangrias no celular do cambista.</p>
 
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Praça (Área de Atuação)</label>
+                            <select
+                                className="w-full h-10 px-3 py-2 bg-background border border-input rounded-md outline-hidden focus:ring-2 focus:ring-ring"
+                                value={areaId}
+                                onChange={e => setAreaId(e.target.value)}
+                            >
+                                <option value="">Nenhuma praça selecionada</option>
+                                {areas.map(area => (
+                                    <option key={area.id} value={area.id}>
+                                        {area.city} - {area.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                         <div className="flex justify-end gap-2">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                             <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white">Salvar</Button>
@@ -276,7 +320,8 @@ export default function CobradoresPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
-                                    <TableHead className="w-[300px]">Nome</TableHead>
+                                    <TableHead>Nome</TableHead>
+                                    <TableHead>Praça</TableHead>
                                     <TableHead>Matrícula (Usuário)</TableHead>
                                     <TableHead>PIN de Segurança</TableHead>
                                     <TableHead>Status</TableHead>
@@ -311,6 +356,16 @@ export default function CobradoresPage() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {user.area ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-foreground font-medium">{user.area.city}</span>
+                                                        <span className="text-muted-foreground text-xs">({user.area.name})</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-xs italic">Sem praça</span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="secondary" className="font-mono bg-muted text-muted-foreground hover:bg-muted flex w-fit items-center gap-1.5">
@@ -365,6 +420,6 @@ export default function CobradoresPage() {
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </div >
     )
 }

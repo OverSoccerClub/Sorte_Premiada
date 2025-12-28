@@ -11,10 +11,12 @@ import { usePrinter } from "../../context/PrinterContext";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { StatusBar } from "expo-status-bar";
 import { VersionFooter } from "../../components/VersionFooter";
-import { TicketPreview } from "../../components/TicketPreview";
-import { AppConfig } from "../../constants/AppConfig";
-import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
+import { TicketPrintManager } from "../../components/ticket/TicketPrintManager";
+import { TicketDisplay } from "../../components/ticket/TicketDisplay";
+import { useTicketPrint } from "../../hooks/useTicketPrint";
+import { TicketData } from "../../components/ticket/TicketContent";
+import { AppConfig } from "../../constants/AppConfig";
 
 
 // --- Number Ball Component ---
@@ -107,7 +109,8 @@ export default function MegaSenaScreen() {
 
     // Receipt Modal State
     const [receiptVisible, setReceiptVisible] = useState(false);
-    const [lastTicket, setLastTicket] = useState<any>(null);
+    const [lastTicket, setLastTicket] = useState<TicketData | null>(null);
+    const { print, isPrinting } = useTicketPrint();
 
     const numbers = Array.from({ length: 60 }, (_, i) => i + 1);
 
@@ -205,54 +208,38 @@ export default function MegaSenaScreen() {
 
             hide();
 
-            setLastTicket({
+            const fullTicket: TicketData = {
                 gameName: "Mega Sena",
                 numbers: selectedNumbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                id: ticketData.id,
+                ticketId: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
                 series: ticketData.series,
                 secondChanceNumber: ticketData.secondChanceNumber,
-                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined
-            });
+                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                secondChanceLabel: "SEGUNDA CHANCE"
+            };
+
+            setLastTicket(fullTicket);
 
             // 1. Show Standard Loading
-            show("Imprimindo Bilhete...");
+            show("Imprimindo...");
 
-            // 2. Wait for Render
+            // 2. Wait for Render and Print
             setTimeout(async () => {
                 try {
-                    // 3. Capture Image
-                    let uri = undefined;
-                    try {
-                        if (printViewShotRef.current?.capture) {
-                            uri = await printViewShotRef.current.capture();
-                        }
-                    } catch (capErr) {
-                        console.warn("Capture failed", capErr);
-                    }
-
-                    // 4. Print
-                    await printTicket(
-                        selectedNumbers,
-                        ticketData.hash || ticketData.id, // Use Hash for better barcode, fallback to ID
-                        new Date(),
-                        gamePrice,
-                        "Mega Sena",
-                        printerType,
-                        uri
-                    );
+                    await print(fullTicket, printViewShotRef);
                 } catch (err) {
-                    console.error("Print failed", err);
+                    console.error("[MegaSena] Print failed", err);
                     showAlert("Aviso", "Aposta salva, mas houve erro na impressão.", "warning");
                 } finally {
                     hide();
                     setReceiptVisible(true);
                     setSelectedNumbers([]);
                 }
-            }, 1000); // 1s wait
+            }, 800);
 
         } catch (error) {
             hide();
@@ -289,27 +276,9 @@ export default function MegaSenaScreen() {
 
 
 
-    const handleAutoPrint = async (imageUri?: string) => {
+    const handleAutoPrint = async () => {
         if (!lastTicket) return;
-        show("Imprimindo...");
-        try {
-            const success = await printTicket(
-                lastTicket.numbers,
-                lastTicket.id,
-                new Date(),
-                gamePrice,
-                "Mega Sena",
-                printerType,
-                imageUri
-            );
-
-            if (success) showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
-            else showAlert("Erro", "Falha ao enviar para impressão.", "error");
-        } catch (error) {
-            showAlert("Erro", "Erro ao tentar imprimir.", "error");
-        } finally {
-            hide();
-        }
+        await print(lastTicket, printViewShotRef);
     };
 
     return (
@@ -328,26 +297,9 @@ export default function MegaSenaScreen() {
                 <View style={tw`w-10`} />
             </View>
 
-            {/* Hidden ViewShot for Printing High Quality Ticket */}
-            <View style={{ position: 'absolute', top: -2000, left: 0, opacity: 0 }}>
-                <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
-                    {lastTicket && (
-                        <TicketPreview
-                            gameName="Mega Sena"
-                            numbers={lastTicket.numbers}
-                            price={lastTicket.price}
-                            date={lastTicket.date}
-                            id={lastTicket.id}
-                            series={lastTicket.series}
-                            hash={lastTicket.hash}
-                            isCapture={true}
-                            secondChanceNumber={lastTicket.secondChanceNumber}
-                            secondChanceDrawDate={lastTicket.secondChanceDrawDate}
-                            secondChanceLabel="SEGUNDA CHANCE"
-                        />
-                    )}
-                </ViewShot>
-            </View>
+            {/* Hidden Capture Area */}
+            <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+
 
             {/* Grid de Números */}
             <ScrollView
@@ -409,10 +361,15 @@ export default function MegaSenaScreen() {
 
                             <View style={tw`w-full mb-8 shadow-2xl shadow-black items-center`}>
                                 <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9, result: "tmpfile" }} style={{ backgroundColor: 'white' }}>
-                                    <TicketPreview
-                                        gameName="Mega Sena"
-                                        numbers={selectedNumbers}
-                                        price={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}
+                                    <TicketDisplay
+                                        data={{
+                                            gameName: "Mega Sena",
+                                            numbers: selectedNumbers,
+                                            price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
+                                            date: new Date().toLocaleString('pt-BR'),
+                                            ticketId: "PREVIEW"
+                                        }}
+                                        mode="preview"
                                     />
                                 </ViewShot>
                             </View>

@@ -28,10 +28,7 @@ export class UsersController {
         if (updateUserDto.password && typeof updateUserDto.password === 'string') {
             updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
         }
-        // Prevent updating sensitive fields like role or id if necessary, 
-        // but for now we trust the DTO or assume the service handles it. 
-        // Ideally we should have a separate DTO for profile updates.
-        return this.usersService.update(req.user.userId, updateUserDto);
+        return this.usersService.update(req.user.userId, updateUserDto, req.user.userId);
     }
 
     @Post()
@@ -47,8 +44,9 @@ export class UsersController {
 
     @Get()
     @UseGuards(RolesGuard)
-    async findAll(@Query('username') username?: string, @Query('role') role?: string) {
-        const users = await this.usersService.findAll(username, role);
+    @Roles('ADMIN', 'COBRADOR')
+    async findAll(@Request() req: any, @Query('username') username?: string, @Query('role') role?: string) {
+        const users = await this.usersService.findAll(username, role, req.user.userId);
         return users;
     }
 
@@ -62,11 +60,11 @@ export class UsersController {
     @Patch(':id')
     @UseGuards(RolesGuard)
     @Roles('ADMIN')
-    async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+    async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput, @Request() req: any) {
         if (updateUserDto.password && typeof updateUserDto.password === 'string') {
             updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
         }
-        return this.usersService.update(id, updateUserDto);
+        return this.usersService.update(id, updateUserDto, req.user.userId);
     }
 
     @Delete(':id')
@@ -79,12 +77,12 @@ export class UsersController {
     @Patch(':id/limit')
     @UseGuards(RolesGuard)
     @Roles('ADMIN')
-    async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string, accountabilityLimitHours?: number }) {
+    async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string, accountabilityLimitHours?: number }, @Request() req: any) {
         const data: Prisma.UserUpdateInput = {};
         if (body.salesLimit !== undefined) data.salesLimit = body.salesLimit;
         if (body.limitOverrideExpiresAt !== undefined) data.limitOverrideExpiresAt = body.limitOverrideExpiresAt;
         if (body.accountabilityLimitHours !== undefined) data.accountabilityLimitHours = body.accountabilityLimitHours;
 
-        return this.usersService.update(id, data);
+        return this.usersService.update(id, data, req.user.userId);
     }
 }

@@ -97,6 +97,28 @@ export default function DailyClosesPage() {
         }
     }
 
+    const handleVerify = async (id: string, status: 'VERIFIED' | 'REJECTED') => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/finance/close/${id}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            })
+            if (res.ok) {
+                toast.success(status === 'VERIFIED' ? "Caixa conferido e liberado!" : "Fechamento rejeitado.")
+                fetchCloses()
+            } else {
+                toast.error("Erro ao verificar caixa")
+            }
+        } catch (err) {
+            toast.error("Erro de conexão")
+        }
+    }
+
     useEffect(() => {
         fetchCambistas()
         fetchCloses()
@@ -209,6 +231,8 @@ export default function DailyClosesPage() {
                                 <TableHead className="text-right">Entradas</TableHead>
                                 <TableHead className="text-right">Saídas</TableHead>
                                 <TableHead className="text-right">Saldo Final</TableHead>
+                                <TableHead className="text-right">Informado</TableHead>
+                                <TableHead className="text-right">Diferença</TableHead>
                                 <TableHead className="text-center">Situação</TableHead>
                                 <TableHead className="text-right pr-4">Ações</TableHead>
                             </TableRow>
@@ -233,6 +257,12 @@ export default function DailyClosesPage() {
                                     <TableCell className="text-right font-bold text-foreground">
                                         {formatCurrency(c.finalBalance)}
                                     </TableCell>
+                                    <TableCell className="text-right text-muted-foreground">
+                                        {c.physicalCashReported !== null ? formatCurrency(c.physicalCashReported) : "-"}
+                                    </TableCell>
+                                    <TableCell className={`text-right font-bold ${Number(c.variance || 0) < 0 ? 'text-red-500' : Number(c.variance || 0) > 0 ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                                        {c.variance !== null ? (Number(c.variance || 0) > 0 ? "+" : "") + formatCurrency(c.variance) : "-"}
+                                    </TableCell>
                                     <TableCell className="text-center">
                                         {c.status === 'PENDING' ? (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 gap-1 mr-1">
@@ -245,15 +275,28 @@ export default function DailyClosesPage() {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right pr-4">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full"
-                                            title="Ver Detalhes"
-                                            onClick={() => fetchDetail(c)}
-                                        >
-                                            <Eye className="h-4 w-4" />
-                                        </Button>
+                                        <div className="flex justify-end gap-1">
+                                            {c.status === 'PENDING' && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-full"
+                                                    title="Conferir / Liberar"
+                                                    onClick={() => handleVerify(c.id, 'VERIFIED')}
+                                                >
+                                                    <CheckCircle2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full"
+                                                title="Ver Detalhes"
+                                                onClick={() => fetchDetail(c)}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

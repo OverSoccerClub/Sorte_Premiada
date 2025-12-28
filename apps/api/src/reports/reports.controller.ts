@@ -8,17 +8,18 @@ import type { Response } from 'express';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.COBRADOR)
 export class ReportsController {
     constructor(private readonly reportsService: ReportsService) { }
 
     @Get('sales-by-cambista')
-    async getSalesByCambista() {
-        return this.reportsService.getSalesByCambista();
+    async getSalesByCambista(@Request() req: any) {
+        return this.reportsService.getSalesByCambista(req.user.userId);
     }
 
     @Get('sales-by-date')
     async getSalesByDate(
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('cambistaId') cambistaId?: string,
@@ -32,12 +33,14 @@ export class ReportsController {
             cambistaId,
             gameId,
             page ? Number(page) : 1,
-            limit ? Number(limit) : 20
+            limit ? Number(limit) : 20,
+            req.user.userId
         );
     }
 
     @Get('sales-by-area')
     async getSalesByArea(
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
     ) {
@@ -48,44 +51,47 @@ export class ReportsController {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
 
-        return this.reportsService.getSalesByArea(start, end);
+        return this.reportsService.getSalesByArea(start, end, req.user.userId);
     }
     @Get('dashboard')
-    async getDashboardStats() {
-        return this.reportsService.getDashboardStats();
+    async getDashboardStats(@Request() req: any) {
+        return this.reportsService.getDashboardStats(req.user.userId);
     }
 
     @Get('finance-summary')
     async getFinanceSummary(
+        @Request() req: any,
         @Query('cambistaId') cambistaId: string,
         @Query('date') date: string,
     ) {
-        return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date());
+        return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), req.user.userId);
     }
 
     @Get('daily-closes')
     async getDailyCloses(
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('userId') userId: string,
         @Query('status') status: string,
     ) {
-        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status);
+        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status, req.user.userId);
     }
 
     @Get('pending-closes')
-    async getPendingCloses() {
-        return this.reportsService.getPendingCloses();
+    async getPendingCloses(@Request() req: any) {
+        return this.reportsService.getPendingCloses(req.user.userId);
     }
 
     @Get('transactions/export')
     async exportTransactions(
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('userId') userId: string,
         @Res() res: Response,
     ) {
-        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId);
+        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="transactions_${Date.now()}.csv"`);
         res.send(csv);

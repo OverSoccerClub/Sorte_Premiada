@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -38,10 +38,10 @@ export class GamesController {
     @Post(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
-    async update(@Param('id') id: string, @Body() updateGameDto: any) {
+    async update(@Param('id') id: string, @Body() updateGameDto: any, @Request() req: any) {
         try {
             console.log("Updating game", id, updateGameDto);
-            return await this.gamesService.update(id, updateGameDto);
+            return await this.gamesService.update(id, updateGameDto, req.user.userId);
         } catch (e) {
             console.error("Error updating game", e);
             throw e;

@@ -1,14 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@repo/database';
-import { FinanceService } from '../finance/finance.service';
-import { getBrazilTime, dayjs } from '../utils/date.util';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class TicketsService {
     constructor(
         private prisma: PrismaService,
-        private financeService: FinanceService
+        private financeService: FinanceService,
+        private securityService: SecurityService,
+        private redis: RedisService
     ) { }
     // Force rebuild 1
 
@@ -36,12 +34,36 @@ export class TicketsService {
         if (!game) throw new Error("Game not found");
         const rules = (game.rules as any) || {};
 
-        // Fetch User for Commission Rate
+        // Fetch User with Area for Commission Rate
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: { commissionRate: true }
+            select: { commissionRate: true, areaId: true }
         });
-        const commissionRate = user?.commissionRate ? Number(user.commissionRate) : 0;
+
+        // Fetch Area Override
+        const areaConfig = (user?.areaId && gameId) ? await this.prisma.areaConfig.findUnique({
+            where: { areaId_gameId: { areaId: user.areaId, gameId } }
+        }) : null;
+
+        // Priority Logic: Individual > Area > Global
+        const commissionRate = Number(
+            user?.commissionRate ??
+            areaConfig?.commissionRate ??
+            game?.commissionRate ??
+            10
+        );
+
+        const multiplier = Number(
+            areaConfig?.prizeMultiplier ??
+            game?.prizeMultiplier ??
+            1000
+        );
+
+        const maxLiability = Number(
+            areaConfig?.maxLiability ??
+            game?.maxLiability ??
+            5000
+        );
 
         // Calc Financials
         const amount = Number(data.amount || 0);
@@ -51,8 +73,6 @@ export class TicketsService {
         // Prize Calc (Estimated per winning number)
         const numberCount = data.numbers ? data.numbers.length : 1;
         const betPerNumber = numberCount > 0 ? amount / numberCount : 0;
-        const multiplier = game.prizeMultiplier ? Number(game.prizeMultiplier) : 1000;
-        const maxLiability = game.maxLiability ? Number(game.maxLiability) : 5000;
 
         const possiblePrize = betPerNumber * multiplier;
 
@@ -235,9 +255,46 @@ export class TicketsService {
 
             console.log("DEBUG PRISMA DATA (With Financials):", JSON.stringify(createData, null, 2));
 
-            return await this.prisma.ticket.create({
+            // Anti-Fraud: Late Bet Check
+            if (createData.drawDate) {
+                const now = new Date();
+                const lateCheck = await this.securityService.checkLateBet(
+                    createData.hash, // Use the short hash as ref
+                    createData.drawDate,
+                    now
+                );
+
+                if (lateCheck.isSuspicious && lateCheck.severity === 'CRITICAL') {
+                    throw new BadRequestException("Sorteio já iniciado. Aposta não permitida.");
+                }
+            }
+
+            // Anti-Fraud: Digital Signature
+            const ticketId = crypto.randomUUID();
+            createData.id = ticketId;
+            createData.digitalSignature = this.securityService.generateTicketSignature({
+                id: ticketId,
+                numbers: createData.numbers,
+                amount: createData.amount,
+                userId: createData.userId,
+                drawDate: createData.drawDate
+            });
+
+            const ticket = await this.prisma.ticket.create({
                 data: createData
             });
+
+            // Invalidate Redis Caches for this game and draw date
+            try {
+                const cacheKey = `sold_numbers:${ticket.gameId}:${ticket.drawDate?.toISOString()}`;
+                const liabilityKey = `liability:${ticket.gameId}:${ticket.drawDate?.toISOString()}`;
+                await this.redis.del(cacheKey);
+                await this.redis.del(liabilityKey);
+            } catch (e) {
+                console.error("Redis invalidation failed", e);
+            }
+
+            return ticket;
         } catch (error) {
             console.error("Error creating ticket:", error);
             throw error;
@@ -337,22 +394,33 @@ export class TicketsService {
     }
 
     private async getSoldNumbers(gameId: string, drawDate: Date): Promise<Set<number>> {
+        const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}`;
+        const cached = await this.redis.get(cacheKey);
+
+        if (cached) {
+            return new Set(JSON.parse(cached));
+        }
+
         const tickets = await this.prisma.ticket.findMany({
             where: {
                 gameId: gameId,
                 status: { not: 'CANCELLED' },
-                drawDate: drawDate // Scope by specific draw date
+                drawDate: drawDate
             },
             select: { numbers: true }
         });
 
-        const sold = new Set<number>();
+        const soldArr: number[] = [];
         tickets.forEach(t => {
             if (Array.isArray(t.numbers)) {
-                (t.numbers as number[]).forEach(n => sold.add(n));
+                (t.numbers as number[]).forEach(n => soldArr.push(n));
             }
         });
-        return sold;
+
+        // Cache for 60 seconds (short-lived but effective for bursts)
+        await this.redis.set(cacheKey, JSON.stringify(soldArr), 60);
+
+        return new Set(soldArr);
     }
 
     async getAvailability(gameId: string): Promise<number[]> {
@@ -517,6 +585,87 @@ export class TicketsService {
             where: { id: ticketId },
             data: { status: 'PAID' }
         });
+    }
+
+    /**
+     * Request a ticket cancellation.
+     * If within grace period (e.g. 10 mins), auto-cancel.
+     * Otherwise, set status to CANCEL_REQUESTED for admin approval.
+     */
+    async requestCancellation(ticketId: string, userId: string, reason: string) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId }
+        });
+
+        if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
+        if (ticket.userId !== userId) throw new BadRequestException("Você só pode cancelar seus próprios bilhetes.");
+
+        if (ticket.status === 'CANCELLED') return ticket;
+        if (ticket.status === 'WON' || ticket.status === 'PAID') {
+            throw new BadRequestException("Não é possível cancelar um bilhete premiado ou pago.");
+        }
+
+        const now = dayjs();
+        const drawDate = dayjs(ticket.drawDate);
+        if (now.isAfter(drawDate)) {
+            throw new BadRequestException("Não é possível cancelar bilhetes após a realização do sorteio.");
+        }
+
+        const GRACE_PERIOD_MINUTES = 10;
+        const createdAt = dayjs(ticket.createdAt);
+
+        if (now.diff(createdAt, 'minute') <= GRACE_PERIOD_MINUTES) {
+            // Auto-cancel within grace period
+            return this.prisma.ticket.update({
+                where: { id: ticketId },
+                data: {
+                    status: 'CANCELLED',
+                    cancellationReason: reason || "Cancelamento automático (Prazo de tolerância)"
+                }
+            });
+        } else {
+            // Need Admin/Supervisor approval
+            return this.prisma.ticket.update({
+                where: { id: ticketId },
+                data: {
+                    status: 'CANCEL_REQUESTED' as any,
+                    cancellationReason: reason
+                }
+            });
+        }
+    }
+
+    /**
+     * Admin/Supervisor approval of a cancellation.
+     */
+    async approveCancellation(ticketId: string, adminId: string, approved: boolean) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId }
+        });
+
+        if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
+        if (ticket.status !== 'CANCEL_REQUESTED' as any) {
+            throw new BadRequestException("Este bilhete não possui uma solicitação de cancelamento pendente.");
+        }
+
+        if (approved) {
+            return this.prisma.ticket.update({
+                where: { id: ticketId },
+                data: {
+                    status: 'CANCELLED',
+                    cancelledByUserId: adminId
+                }
+            });
+        } else {
+            // Reject: set back to PENDING (or previous state)
+            return this.prisma.ticket.update({
+                where: { id: ticketId },
+                data: {
+                    status: 'PENDING',
+                    cancellationReason: null // Clear reason as it was rejected
+                }
+            });
+        }
     }
 
     private getNextSecondChanceDate(weekday: number, timeStr: string): Date {

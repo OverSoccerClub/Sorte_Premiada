@@ -1,14 +1,12 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User, Prisma } from '@repo/database';
-import { FinanceService } from '../finance/finance.service';
+import { AuditLogService } from '../audit/audit-log.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
         @Inject(forwardRef(() => FinanceService))
-        private financeService: FinanceService
+        private financeService: FinanceService,
+        private auditLog: AuditLogService
     ) { }
 
     async findOne(username: string): Promise<User | null> {
@@ -47,10 +45,20 @@ export class UsersService {
         });
     }
 
-    async findAll(username?: string, role?: string): Promise<any[]> {
+    async findAll(username?: string, role?: string, requestingUserId?: string): Promise<any[]> {
         const where: Prisma.UserWhereInput = {};
         if (username) where.username = username;
         if (role) where.role = role as any;
+
+        if (requestingUserId) {
+            const requester = await this.prisma.user.findUnique({
+                where: { id: requestingUserId }
+            });
+
+            if (requester && requester.role === 'COBRADOR' && requester.areaId) {
+                where.areaId = requester.areaId;
+            }
+        }
 
         let users = await this.prisma.user.findMany({
             where,
@@ -121,15 +129,29 @@ export class UsersService {
         });
     }
 
-    async update(id: string, data: Prisma.UserUpdateInput): Promise<User> {
-        // If manually updating cobrador username/pin, reset expiry?
-        // For now, let's just allow manual update. 
-        // If they update username/pin, we might want to reset expiry to give them full duration.
-        // But simple update is fine.
-        return this.prisma.user.update({
+    async update(id: string, data: Prisma.UserUpdateInput, adminId?: string): Promise<User> {
+        const oldUser = await this.prisma.user.findUnique({ where: { id } });
+
+        const updatedUser = await this.prisma.user.update({
             where: { id },
             data,
         });
+
+        if (adminId) {
+            const { password: pw1, ...oldValue } = oldUser || {};
+            const { password: pw2, ...newValue } = updatedUser;
+
+            await this.auditLog.log({
+                userId: adminId,
+                action: 'UPDATE_USER',
+                entity: 'User',
+                entityId: id,
+                oldValue,
+                newValue
+            });
+        }
+
+        return updatedUser;
     }
 
     async remove(id: string): Promise<User> {

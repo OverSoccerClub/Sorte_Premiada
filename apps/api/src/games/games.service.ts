@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@repo/database';
+import { AuditLogService } from '../audit/audit-log.service';
 
 @Injectable()
 export class GamesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private auditLog: AuditLogService
+    ) { }
 
     async create(data: Prisma.GameCreateInput) {
         return this.prisma.game.create({ data });
@@ -23,7 +24,11 @@ export class GamesService {
         });
     }
 
-    async update(id: string, data: any) {
+    async update(id: string, data: any, adminId?: string) {
+        const oldGame = await this.prisma.game.findUnique({
+            where: { id },
+            include: { extractionSeries: true }
+        });
         // Separe extractionSeries data if present in data
         const { extractionSeries, ...gameData } = data;
 
@@ -56,6 +61,17 @@ export class GamesService {
                     });
                 }
             }
+        }
+
+        if (adminId) {
+            await this.auditLog.log({
+                userId: adminId,
+                action: 'UPDATE_GAME',
+                entity: 'Game',
+                entityId: id,
+                oldValue: oldGame,
+                newValue: updatedGame
+            });
         }
 
         return updatedGame;

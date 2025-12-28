@@ -8,6 +8,8 @@ import { useState, useCallback } from "react";
 import { FinanceService } from "../../services/finance.service";
 import { CustomAlert } from "../../components/CustomAlert";
 import { ScreenLayout } from "../../components/ScreenLayout";
+import { AnnouncementService, Announcement } from "../../services/announcements.service";
+import { AnnouncementCard } from "../../components/AnnouncementCard";
 
 const { height } = Dimensions.get("window");
 
@@ -20,6 +22,8 @@ export default function Dashboard() {
     const router = useRouter();
     const { user, token } = useAuth();
     const [isDayClosed, setIsDayClosed] = useState(false);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+    const [dismissedIds, setDismissedIds] = useState<string[]>([]);
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -42,9 +46,19 @@ export default function Dashboard() {
         useCallback(() => {
             if (token) {
                 checkStatus();
+                fetchAnnouncements();
             }
         }, [token])
     );
+
+    const fetchAnnouncements = async () => {
+        try {
+            const data = await AnnouncementService.getActive(token!);
+            setAnnouncements(data);
+        } catch (error) {
+            console.error("Error fetching announcements", error);
+        }
+    };
 
     const checkStatus = async () => {
         try {
@@ -99,6 +113,17 @@ export default function Dashboard() {
                     <Ionicons name="person" size={24} color="#94a3b8" />
                 </TouchableOpacity>
             </View>
+
+            {/* Avisos Ativos */}
+            {announcements
+                .filter(a => !dismissedIds.includes(a.id))
+                .map(a => (
+                    <AnnouncementCard
+                        key={a.id}
+                        announcement={a}
+                        onClose={(id) => setDismissedIds(prev => [...prev, id])}
+                    />
+                ))}
 
             {isDayClosed && (
                 <View style={tw`w-[90%] mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center`}>
@@ -156,6 +181,6 @@ export default function Dashboard() {
                 onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
                 onConfirm={alertConfig.onConfirm}
             />
-        </ScreenLayout>
+        </ScreenLayout >
     );
 }
