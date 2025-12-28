@@ -12,8 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff, DollarSign, Percent } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff, DollarSign, Percent, Info } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
+import { Switch } from "@/components/ui/switch"
 
 const ACCOUNTABILITY_ALARM_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
 
@@ -26,6 +27,7 @@ const formSchema = z.object({
     salesLimit: z.coerce.number().min(0).optional(),
     commissionRate: z.coerce.number().min(0).max(100).optional(),
     accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
+    canCancelTickets: z.boolean().default(false),
     isActive: z.boolean().default(true),
 })
 
@@ -67,6 +69,7 @@ export default function CambistasPage() {
             salesLimit: 1000,
             commissionRate: 10,
             accountabilityLimitHours: 24,
+            canCancelTickets: false,
             isActive: true,
         },
     })
@@ -124,6 +127,7 @@ export default function CambistasPage() {
                 salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
                 commissionRate: cambista.commissionRate ? Number(cambista.commissionRate) : 10,
                 accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
+                canCancelTickets: cambista.canCancelTickets ?? false,
                 isActive: cambista.isActive ?? true,
             })
         } else {
@@ -137,6 +141,7 @@ export default function CambistasPage() {
                 salesLimit: 1000,
                 commissionRate: 10,
                 accountabilityLimitHours: 24,
+                canCancelTickets: false,
                 isActive: true,
             })
         }
@@ -419,6 +424,26 @@ export default function CambistasPage() {
                                             </FormItem>
                                         )}
                                     />
+                                    <FormField
+                                        control={form.control}
+                                        name="canCancelTickets"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-muted/30">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-foreground">Autorizar Cancelamento</FormLabel>
+                                                    <p className="text-[0.7rem] text-muted-foreground mr-2">
+                                                        Permite ao cambista cancelar bilhetes dentro do prazo de tolerância.
+                                                    </p>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                                 <FormField
                                     control={form.control}
@@ -525,6 +550,11 @@ export default function CambistasPage() {
                                                         <div className="font-semibold text-foreground flex items-center gap-1.5">
                                                             <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
                                                             {cambista.name || cambista.username}
+                                                            {cambista.canCancelTickets && (
+                                                                <div title="Pode cancelar bilhetes" className="p-0.5 bg-red-100 dark:bg-red-900/30 rounded text-red-600 dark:text-red-400">
+                                                                    <Trash2 className="w-3 h-3" />
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground flex items-center gap-1">
                                                             <Mail className="w-3 h-3" />

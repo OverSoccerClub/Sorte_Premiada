@@ -634,17 +634,34 @@ export class TicketsService {
         const GRACE_PERIOD_MINUTES = 10;
         const createdAt = dayjs(ticket.createdAt);
 
-        if (now.diff(createdAt, 'minute') <= GRACE_PERIOD_MINUTES) {
+        // Check if user has permission to auto-cancel
+        const requester = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { canCancelTickets: true, role: true }
+        });
+
+        const hasAutoCancelPermission = requester?.canCancelTickets || requester?.role === 'ADMIN';
+
+        if (hasAutoCancelPermission && now.diff(createdAt, 'minute') <= GRACE_PERIOD_MINUTES) {
             // Auto-cancel within grace period
-            return this.prisma.ticket.update({
+            const updatedTicket = await this.prisma.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'CANCELLED',
-                    cancellationReason: reason || "Cancelamento automático (Prazo de tolerância)"
+                    cancellationReason: reason || "Cancelamento automático (Prazo de tolerância)",
+                    cancelledByUserId: userId
                 }
             });
+
+            // Clear sold numbers cache
+            if (ticket.gameId && ticket.drawDate) {
+                const cacheKey = `sold_numbers:${ticket.gameId}:${dayjs(ticket.drawDate).toISOString()}`;
+                await this.redis.del(cacheKey);
+            }
+
+            return updatedTicket;
         } else {
-            // Need Admin/Supervisor approval
+            // Need Admin/Supervisor approval or user doesn't have auto-cancel permission
             return this.prisma.ticket.update({
                 where: { id: ticketId },
                 data: {
@@ -669,13 +686,21 @@ export class TicketsService {
         }
 
         if (approved) {
-            return this.prisma.ticket.update({
+            const updatedTicket = await this.prisma.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'CANCELLED',
                     cancelledByUserId: adminId
                 }
             });
+
+            // Clear sold numbers cache
+            if (ticket.gameId && ticket.drawDate) {
+                const cacheKey = `sold_numbers:${ticket.gameId}:${dayjs(ticket.drawDate).toISOString()}`;
+                await this.redis.del(cacheKey);
+            }
+
+            return updatedTicket;
         } else {
             // Reject: set back to PENDING (or previous state)
             return this.prisma.ticket.update({

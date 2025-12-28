@@ -25,6 +25,7 @@ export interface TicketData {
         centena?: string;
         dezena?: string;
     };
+    status?: string;
 }
 
 interface TicketContentProps {
@@ -45,6 +46,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
+            {data.status === 'CANCELLED' && (
+                <View
+                    pointerEvents="none"
+                    style={[
+                        tw`absolute items-center justify-center`,
+                        {
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            zIndex: 50,
+                            overflow: 'hidden'
+                        }
+                    ]}
+                >
+                    <Text style={[
+                        tw`text-red-500 font-black opacity-30`,
+                        {
+                            fontSize: 70,
+                            transform: [{ rotate: '-45deg' }],
+                            textAlign: 'center',
+                            borderWidth: 5,
+                            borderColor: 'rgba(239, 68, 68, 0.3)',
+                            padding: 10,
+                            borderRadius: 10,
+                        }
+                    ]}>
+                        CANCELADO
+                    </Text>
+                </View>
+            )}
             {/* Header */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
@@ -57,6 +86,9 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         </View>
                     </View>
                 </View>
+                <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
+                    {data.gameName}
+                </Text>
                 <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
                     SORTEIO {displayTicketId} - {data.drawDate || data.date.split(' ')[0]} - 19H
                 </Text>
@@ -96,25 +128,25 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:
             </Text>
 
-            {data.possiblePrize ? (
-                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2 items-center`}>
-                    <Text style={tw`text-center font-black text-lg text-black uppercase`}>PRÊMIO MÁXIMO</Text>
-                    <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
-                </View>
-            ) : data.prizes ? (
+            {data.prizes ? (
                 <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2`}>
                     <View style={tw`flex-row justify-between mb-1`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>MILHAR:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.milhar}</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.milhar || 'R$ 0,00'}</Text>
                     </View>
                     <View style={tw`flex-row justify-between mb-1`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>CENTENA:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.centena}</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.centena || 'R$ 0,00'}</Text>
                     </View>
                     <View style={tw`flex-row justify-between`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>DEZENA:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.dezena}</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.dezena || 'R$ 0,00'}</Text>
                     </View>
+                </View>
+            ) : data.possiblePrize ? (
+                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2 items-center`}>
+                    <Text style={tw`text-center font-black text-lg text-black uppercase`}>PRÊMIO MÁXIMO</Text>
+                    <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : (
                 <Text style={tw`text-center font-black text-[11px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
@@ -182,7 +214,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
                             value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                            size={100}
+                            size={125}
                         />
                     </View>
                 </View>
