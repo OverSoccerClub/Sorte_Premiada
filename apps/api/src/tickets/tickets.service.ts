@@ -717,26 +717,25 @@ export class TicketsService {
 
     private getNextSecondChanceDate(weekday: number, timeStr: string): Date {
         const [hours, minutes] = timeStr.split(':').map(Number);
-        const now = new Date();
-        const next = new Date();
-        next.setHours(hours, minutes, 0, 0);
+        const nowBrazil = getBrazilTime();
+        let next = nowBrazil.clone().hour(hours).minute(minutes).second(0).millisecond(0);
 
-        const currentDay = now.getDay(); // 0=Sun, 6=Sat
+        const currentDay = nowBrazil.day(); // 0=Sun, 6=Sat
         let daysUntil = (weekday - currentDay + 7) % 7;
 
         // If today is the day
         if (daysUntil === 0) {
-            // If time has passed today, move to next week
-            if (now > next) {
+            // If time has passed today (with 10 min cutoff notion, or just strict time?)
+            // Usually next draw implies if passed, go to next week.
+            // Let's stick to strict time for simple "Next Draw" logic.
+            if (nowBrazil.isAfter(next)) {
                 daysUntil = 7;
             }
         }
 
-        next.setDate(now.getDate() + daysUntil);
-        // Reset time again to ensure correctness after date math
-        next.setHours(hours, minutes, 0, 0);
-
-        return next;
+        next = next.add(daysUntil, 'day');
+        // Return native Date (UTC-converted)
+        return next.toDate();
     }
 
     private async generateUniqueSecondChanceNumber(

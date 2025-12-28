@@ -29,8 +29,8 @@ export class SecondChanceService {
     }
 
     private async processWinners(tx: Prisma.TransactionClient, draw: any) {
-        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
-        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+        const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
+        const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
         // Find tickets for the same game, same range of day, with matching number
         const tickets = await tx.ticket.findMany({
@@ -80,8 +80,8 @@ export class SecondChanceService {
 
         if (!draw) throw new BadRequestException("Sorteio não encontrado");
 
-        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
-        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+        const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
+        const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
         return this.prisma.ticket.findMany({
             where: {
@@ -108,8 +108,8 @@ export class SecondChanceService {
 
         if (!draw) throw new BadRequestException("Sorteio não encontrado");
 
-        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
-        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+        const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
+        const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
         return this.prisma.ticket.findMany({
             where: {
