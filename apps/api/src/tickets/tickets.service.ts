@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@repo/database';
 import { FinanceService } from '../finance/finance.service';
+import { getBrazilTime, dayjs } from '../utils/date.util';
 
 @Injectable()
 export class TicketsService {
@@ -234,51 +235,42 @@ export class TicketsService {
             ? game.extractionTimes
             : ['12:00', '19:00']; // default fallback
 
-        // Helper to create a UTC date corresponding to Brazil Time (UTC-3)
-        // input: timeStr "HH:MM", baseDate (Date object representing the day in Brazil)
-        const createBrazilDrawDate = (timeStr: string, baseBrazilDate: Date) => {
+        // Helper: Create Brazil-based date from "HH:MM", handling day boundaries
+        const createBrazilDrawDate = (timeStr: string, baseBrazilDate: dayjs.Dayjs) => {
             const [hours, minutes] = timeStr.split(':').map(Number);
-            // We construct the UTC date by adding 3 hours to the Brazil local time
-            // Example: 08:15 Brazil = 11:15 UTC
-            // getUTCFullYear/Month/Date on baseBrazilDate gives us the YMD of Brazil
-            return new Date(Date.UTC(
-                baseBrazilDate.getUTCFullYear(),
-                baseBrazilDate.getUTCMonth(),
-                baseBrazilDate.getUTCDate(),
-                hours + 3, // Add 3 hours to get UTC
-                minutes,
-                0,
-                0
-            ));
+            // Set hour/minute on the Brazil-zoned object
+            return baseBrazilDate.hour(hours).minute(minutes).second(0).millisecond(0);
         };
 
-        const now = new Date(); // Current system time (UTC)
+        const nowBrazil = getBrazilTime();
         const CUTOFF_MINUTES = 10;
-
-        // Calculate "Now" in Brazil (UTC-3) to identify the current calendar day in Brazil
-        const brazilNow = new Date(now.getTime() - 3 * 3600000);
 
         // Sort times
         extractionTimes.sort();
 
-        // Check for today's draws (relative to Brazil Day)
+        // Check slots for today (Brazil Time)
         for (const timeStr of extractionTimes) {
-            const drawDate = createBrazilDrawDate(timeStr, brazilNow);
+            const drawDateBrazil = createBrazilDrawDate(timeStr, nowBrazil);
+            const drawDateNative = drawDateBrazil.toDate(); // Get standard JS Date (UTC) for storage/comparison
 
-            // Cutoff logic: Draw Time - 9 minutes (effectively)
-            // Using strict timestamps for comparison
-            const cutoffDate = new Date(drawDate.getTime() - (CUTOFF_MINUTES - 1) * 60000);
+            // Cutoff logic: Draw Time - 10 minutes
+            // If now is 9:55 and Draw is 10:00 -> Diff is 5 mins -> OK
+            // If now is 9:51 and Draw is 10:00 -> Diff is 9 mins -> OK (Wait, cutoff is "closings stops at X mins before")
+            // Convention: "Stop selling 10 mins before". So if now > draw - 10mins, valid = false.
+            // Or: if now < draw - 10mins, return it.
 
-            if (now < cutoffDate) {
-                return drawDate;
+            // Replicating original logic: cutoffDate = draw - 9 mins
+            // if now < cutoffDate -> return draw.
+            const cutoffBrazil = drawDateBrazil.subtract(CUTOFF_MINUTES - 1, 'minute');
+
+            if (nowBrazil.isBefore(cutoffBrazil)) {
+                return drawDateNative;
             }
         }
 
-        // If no slot found today, return first slot of tomorrow (Brazil Day + 1)
-        const tomorrowBrazil = new Date(brazilNow);
-        tomorrowBrazil.setUTCDate(tomorrowBrazil.getUTCDate() + 1);
-
-        return createBrazilDrawDate(extractionTimes[0], tomorrowBrazil);
+        // If no slot found today, return first slot of tomorrow
+        const tomorrowBrazil = nowBrazil.add(1, 'day');
+        return createBrazilDrawDate(extractionTimes[0], tomorrowBrazil).toDate();
     }
 
     private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date) {
