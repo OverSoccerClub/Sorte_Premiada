@@ -58,24 +58,21 @@ export function VersionFooter() {
                                 const percent = Math.round(progress * 100);
                                 setAlertConfig(prev => ({
                                     ...prev,
-                                    title: "Baixando...", // Keep title consistent
+                                    title: "Baixando...",
                                     message: `Baixando atualização... ${percent}%`,
                                     type: "info",
                                     showCancel: false,
                                     useAppIcon: true
                                 }));
                             });
-                            // If download finishes and intent is launched, we can close the alert or leave it
-                            // Usually intent takes over. Let's close it after a brief success msg.
+
                             setAlertConfig({
                                 visible: true,
-                                title: "Instalando",
-                                message: "O instalador do Android será aberto. Siga as instruções.",
+                                title: "Instalação",
+                                message: "O instalador será aberto agora. Siga as instruções na tela.",
                                 type: "success",
-                                showCancel: false,
                                 confirmText: "OK",
-                                onConfirm: hideAlert,
-                                useAppIcon: true
+                                onConfirm: hideAlert
                             });
                         } catch (err: any) {
                             setAlertConfig({

@@ -63,11 +63,37 @@ function AppInit() {
                         showCancel: !updateInfo.force,
                         confirmText: "ATUALIZAR",
                         useAppIcon: true,
-                        onConfirm: () => {
-                            UpdaterService.downloadUpdate(updateInfo.apkUrl);
-                            // Keep alert open or show 'Downloading'? 
-                            // Usually native browser opens, so we can close alert or keep it.
-                            setAlertConfig(prev => ({ ...prev, visible: false }));
+                        onConfirm: async () => {
+                            // Show initial download state
+                            setAlertConfig({
+                                visible: true,
+                                title: "Baixando Atualização",
+                                message: "Iniciando download... 0%",
+                                type: "info",
+                                showCancel: false,
+                                useAppIcon: true
+                            });
+
+                            try {
+                                await UpdaterService.downloadUpdate(updateInfo.apkUrl, (progress) => {
+                                    const percent = Math.round(progress * 100);
+                                    setAlertConfig(prev => ({
+                                        ...prev,
+                                        message: `Baixando atualização... ${percent}%`
+                                    }));
+                                });
+                                // Close alert once download is done and installer is opened
+                                setAlertConfig(prev => ({ ...prev, visible: false }));
+                            } catch (err: any) {
+                                setAlertConfig({
+                                    visible: true,
+                                    title: "Erro no Download",
+                                    message: err.message || "Não foi possível baixar a atualização.",
+                                    type: "error",
+                                    confirmText: "OK",
+                                    onConfirm: () => setAlertConfig(prev => ({ ...prev, visible: false }))
+                                });
+                            }
                         }
                     });
                 } else {

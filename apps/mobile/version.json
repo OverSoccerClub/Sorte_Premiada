@@ -1,6 +1,7 @@
 ﻿{
-    "apkUrl":  "FezinhadeHoje.apk",
-    "build":  "72",
-    "version":  "1.1.76",
-    "force":  true
+    "apkUrl": "FezinhadeHoje.apk",
+    "build": "73",
+    "version": "1.1.77",
+    "force": true,
+    "notes": "Correções no sistema de conexão e melhorias na verificação de atualizações."
 }
