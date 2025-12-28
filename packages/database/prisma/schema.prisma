@@ -67,6 +67,7 @@ model Game {
   extractionTimes String[] @default([])
   lastSeries Int @default(0)
   extractionSeries ExtractionSeries[]
+  secondChanceDraws SecondChanceDraw[]
   
   // Risk and Financial Config
   prizeMultiplier Decimal @default(1000.0) // Multiplicador de Prêmio (ex: 1000x)
@@ -99,6 +100,16 @@ model Draw {
   createdAt DateTime @default(now())
 }
 
+model SecondChanceDraw {
+  id            String   @id @default(uuid())
+  gameId        String
+  game          Game     @relation(fields: [gameId], references: [id])
+  winningNumber Int
+  prizeAmount   Decimal
+  drawDate      DateTime // Which Saturday this refers to
+  createdAt     DateTime @default(now())
+}
+
 model ExtractionSeries {
   id        String   @id @default(uuid())
   gameId    String
@@ -123,6 +134,7 @@ model Ticket {
   hash      String?      // Unique hash for barcode/validation
   secondChanceNumber Int? // Número da Sorte / Segunda Chance
   secondChanceDrawDate DateTime?
+  secondChanceStatus   TicketStatus @default(PENDING) // Status específico para a Segunda Chance
   
   // Financial Snapshot
   commissionRate   Decimal @default(0) // Taxa aplicada no momento da venda

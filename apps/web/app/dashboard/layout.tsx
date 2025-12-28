@@ -27,6 +27,7 @@ const sidebarGroups = [
         items: [
             { icon: XCircle, label: "Cancelamentos", href: "/dashboard/cancellations" },
             { icon: ShieldAlert, label: "Gestão de Risco", href: "/dashboard/risk" },
+            { icon: Trophy, label: "Segunda Chance", href: "/dashboard/second-chance" },
         ]
     },
     {

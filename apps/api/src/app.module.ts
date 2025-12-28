@@ -18,6 +18,7 @@ import { AnnouncementsModule } from './announcements/announcements.module';
 import { SecurityModule } from './security/security.module';
 import { AuditModule } from './audit/audit.module';
 import { RedisModule } from './redis/redis.module';
+import { SecondChanceModule } from './second-chance/second-chance.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RedisModule } from './redis/redis.module';
     SecurityModule,
     AuditModule,
     RedisModule,
+    SecondChanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

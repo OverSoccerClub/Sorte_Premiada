@@ -26,6 +26,7 @@ export interface TicketData {
         dezena?: string;
     };
     status?: string;
+    secondChanceStatus?: string;
 }
 
 interface TicketContentProps {
@@ -159,6 +160,12 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         <Text style={tw`text-white text-center font-black text-xl uppercase`}>{data.secondChanceLabel || 'SEGUNDA CHANCE'}</Text>
                         <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA - {data.secondChanceDrawDate || 'SÁBADO'}</Text>
                     </View>
+
+                    {data.secondChanceStatus === 'WON' && (
+                        <View style={[tw`border-2 border-emerald-500 px-3 py-1 rounded absolute -right-4 -top-2 bg-emerald-50`, { transform: [{ rotate: '15deg' }] }]}>
+                            <Text style={tw`text-emerald-600 font-black text-xs uppercase`}>PREMIADO!</Text>
+                        </View>
+                    )}
                     <View style={tw`item-center mb-1`}>
                         <View style={tw`flex-row gap-5`}>
                             {scDigits.map((n, i) => (

@@ -377,6 +377,7 @@ export default function HistoryScreen() {
                     secondChanceNumber: selectedTicket.secondChanceNumber,
                     secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? new Date(selectedTicket.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                     secondChanceLabel: "SEGUNDA CHANCE",
+                    secondChanceStatus: selectedTicket.secondChanceStatus,
                     status: selectedTicket.status,
                     vendorName: selectedTicket.user?.name || selectedTicket.user?.username,
                     terminalId: selectedTicket.terminalId,

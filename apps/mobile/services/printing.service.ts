@@ -22,7 +22,7 @@ export const printTicket = async (
   printerType: PrinterType = 'BLE',
   imageUri?: string
 ) => {
-  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes } = data;
+  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus } = data;
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
@@ -143,6 +143,7 @@ export const printTicket = async (
             
             <div class="footer">
               <div>ID: ${ticketId}</div>
+              ${secondChanceStatus === 'WON' ? '<div style="color: green; font-weight: bold; border: 1px solid green; padding: 2px; margin-top: 5px;">GANHADOR SEGUNDA CHANCE</div>' : ''}
               <br/>
               <div>Este bilhete não possui valor fiscal.</div>
               <div>Boa Sorte!</div>
@@ -186,6 +187,10 @@ export const printTicket = async (
     // CANCELADO Watermark (Text style)
     if (status === 'CANCELLED') {
       receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "\n*** CANCELADO ***\n" + BOLD_OFF + NORMAL + "\n";
+    }
+
+    if (secondChanceStatus === 'WON') {
+      receipt += CENTER + BOLD_ON + "GANHADOR SEGUNDA CHANCE\n" + BOLD_OFF + NORMAL;
     }
 
     receipt += CENTER;
