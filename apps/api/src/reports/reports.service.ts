@@ -662,7 +662,7 @@ export class ReportsService {
         return this.prisma.dailyClose.findMany({ where, include: { closedByUser: true }, orderBy: { createdAt: 'desc' } });
     }
 
-    async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string) {
+    async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string, requestingUserId?: string) {
         const where: any = {};
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
