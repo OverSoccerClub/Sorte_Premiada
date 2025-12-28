@@ -517,12 +517,14 @@ export class TicketsService {
 
         console.log(`[TicketsService] Validating ticketId: "${originalId}" -> Sanitized: "${ticketId}"`);
 
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ticketId);
+
         const ticket = await this.prisma.ticket.findFirst({
             where: {
                 OR: [
-                    { id: ticketId },
-                    { hash: ticketId } // Support lookup by hash if needed, though Barcode uses ID
-                ]
+                    ...(isUuid ? [{ id: ticketId }] : []),
+                    { hash: ticketId }
+                ] as Prisma.TicketWhereInput[]
             },
             include: {
                 game: true,

@@ -425,17 +425,28 @@ export default function TwoXOneThousandReportPage() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${ticket.status === 'WON'
-                                                        ? 'bg-green-500/10 text-green-500 border-green-500/20'
-                                                        : ticket.status === 'PENDING'
-                                                            ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
-                                                            : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
-                                                        }`}>
-                                                        {ticket.status === 'WON' ? <CheckCircle className="w-3 h-3" /> :
-                                                            ticket.status === 'PENDING' ? <PlayCircle className="w-3 h-3" /> :
-                                                                <AlertCircle className="w-3 h-3" />}
-                                                        {ticket.status === 'PENDING' ? 'Pendente' : ticket.status === 'WON' ? 'Premiado' : ticket.status}
-                                                    </span>
+                                                    {(() => {
+                                                        const status = ticket.status || 'PENDING'
+                                                        const statusConfig: Record<string, { label: string, color: string, icon: any }> = {
+                                                            'PENDING': { label: 'Pendente', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20', icon: PlayCircle },
+                                                            'WON': { label: 'Premiado', color: 'bg-green-500/10 text-green-500 border-green-500/20', icon: CheckCircle },
+                                                            'PAID': { label: 'Pago', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', icon: CheckCircle },
+                                                            'LOST': { label: 'Expirado', color: 'bg-slate-500/10 text-slate-500 border-slate-500/20', icon: AlertCircle },
+                                                            'EXPIRED': { label: 'Expirado', color: 'bg-slate-500/10 text-slate-500 border-slate-500/20', icon: AlertCircle },
+                                                            'CANCELLED': { label: 'Cancelado', color: 'bg-red-500/10 text-red-500 border-red-500/20', icon: AlertCircle },
+                                                            'CANCELED': { label: 'Cancelado', color: 'bg-red-500/10 text-red-500 border-red-500/20', icon: AlertCircle },
+                                                            'CANCEL_REQUESTED': { label: 'Canc. Solicitado', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20', icon: AlertCircle },
+                                                        }
+                                                        const config = statusConfig[status] || { label: status, color: 'bg-slate-500/10 text-slate-500 border-slate-500/20', icon: AlertCircle }
+                                                        const Icon = config.icon
+
+                                                        return (
+                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${config.color}`}>
+                                                                <Icon className="w-3 h-3" />
+                                                                {config.label}
+                                                            </span>
+                                                        )
+                                                    })()}
                                                 </TableCell>
                                             </TableRow>
                                         )

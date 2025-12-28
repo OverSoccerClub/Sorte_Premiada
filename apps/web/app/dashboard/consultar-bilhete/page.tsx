@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { API_URL } from "@/lib/api"
-import { Search, Loader2, CheckCircle, XCircle, Clock, AlertTriangle } from "lucide-react"
+import { Search, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Ticket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
@@ -60,7 +60,7 @@ export default function ConsultarBilhetePage() {
     const getStatusBadge = (status: string) => {
         const map: Record<string, any> = {
             'WON': { label: 'Premiado', color: 'bg-emerald-500 hover:bg-emerald-600', icon: CheckCircle },
-            'LOST': { label: 'Não Premiado', color: 'bg-red-500 hover:bg-red-600', icon: XCircle },
+            'LOST': { label: 'Expirado', color: 'bg-red-500 hover:bg-red-600', icon: XCircle },
             'PENDING': { label: 'Aguardando Sorteio', color: 'bg-amber-500 hover:bg-amber-600', icon: Clock },
             'EXPIRED': { label: 'Expirado', color: 'bg-slate-500 hover:bg-slate-600', icon: Clock },
             'CANCELLED': { label: 'Cancelado', color: 'bg-slate-700 hover:bg-slate-800', icon: XCircle },

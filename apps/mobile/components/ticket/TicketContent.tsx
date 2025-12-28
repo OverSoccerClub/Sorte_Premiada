@@ -175,7 +175,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Barcode
                         value={data.ticketId || '000000000000'}
                         width={370}
-                        height={isCapture ? 45 : 90}
+                        height={isCapture ? 80 : 90}
                     />
                     <Text style={tw`font-bold text-[9px] text-black tracking-[4px] mt-1`}>{data.ticketId}</Text>
                 </View>
@@ -184,14 +184,14 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     tw`items-center justify-center w-full mt-2`,
                     isCapture && {
                         transform: [{ scaleY: 0.35 }],
-                        marginTop: -45,
-                        marginBottom: -45
+                        marginTop: -60, // Adjusted for larger QR
+                        marginBottom: -60
                     }
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
                             value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                            size={125}
+                            size={170}
                         />
                     </View>
                 </View>

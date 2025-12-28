@@ -403,7 +403,7 @@ export default function RelatoriosPage() {
                                                                 {{
                                                                     'PENDING': 'Aguardando',
                                                                     'WON': 'Premiado',
-                                                                    'LOST': 'Não Premiado',
+                                                                    'LOST': 'Expirado',
                                                                     'CANCELLED': 'Cancelado',
                                                                     'EXPIRED': 'Expirado'
                                                                 }[ticket.status] || ticket.status}

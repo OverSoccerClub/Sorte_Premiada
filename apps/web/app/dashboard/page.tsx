@@ -273,7 +273,7 @@ export default function DashboardPage() {
                                             status: {
                                                 'PENDING': 'Aguardando',
                                                 'WON': 'Premiado',
-                                                'LOST': 'Não Premiado',
+                                                'LOST': 'Expirado',
                                                 'CANCELLED': 'Cancelado',
                                                 'EXPIRED': 'Expirado'
                                             }[item.status] || item.status
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                                         {{
                                             'PENDING': 'Aguardando',
                                             'WON': 'Premiado',
-                                            'LOST': 'Não Premiado',
+                                            'LOST': 'Expirado',
                                             'CANCELLED': 'Cancelado',
                                             'EXPIRED': 'Expirado'
                                         }[item.status] || item.status}: {item.count}
