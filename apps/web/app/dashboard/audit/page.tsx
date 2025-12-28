@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { History, Search, Loader2, RefreshCw, Filter, User, Globe, Gamepad2, Info } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 import { Input } from "@/components/ui/input"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 import {
     Dialog,
     DialogContent,
@@ -39,6 +41,8 @@ export default function AuditLogsPage() {
     const [loading, setLoading] = useState(true)
     const [entityFilter, setEntityFilter] = useState("")
     const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert } = useAlert()
 
     const fetchLogs = async () => {
@@ -83,42 +87,30 @@ export default function AuditLogsPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <History className="w-8 h-8 text-blue-500" />
-                        </div>
-                        Logs de Auditoria
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Registro imutável de alterações administrativas do sistema.</p>
-                </div>
-                <div className="flex gap-2">
-                    <div className="relative">
+            <StandardPageHeader
+                icon={<History className="w-8 h-8 text-blue-500" />}
+                title="Logs de Auditoria"
+                description="Registro imutável de alterações administrativas do sistema."
+                onRefresh={fetchLogs}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="relative w-full sm:w-64">
                         <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             placeholder="Filtrar Entidade (ex: User, Game)..."
-                            className="pl-10 w-[250px]"
+                            className="pl-10 h-9 bg-background border-border text-xs font-semibold"
                             value={entityFilter}
-                            onChange={(e) => setEntityFilter(e.target.value)}
+                            onChange={(e) => {
+                                setEntityFilter(e.target.value)
+                                setPage(1)
+                            }}
                         />
                     </div>
-                    <Button variant="outline" onClick={fetchLogs} disabled={loading} className="gap-2">
-                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                        Atualizar
-                    </Button>
                 </div>
-            </div>
+            </StandardPageHeader>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Search className="w-5 h-5 text-blue-500" />
-                        Trilha de Auditoria
-                    </CardTitle>
-                    <CardDescription>Visualize o histórico detalhado de todas as mutações no banco de dados.</CardDescription>
-                </CardHeader>
                 <CardContent className="p-0">
                     {loading && logs.length === 0 ? (
                         <div className="flex justify-center py-12">
@@ -137,14 +129,19 @@ export default function AuditLogsPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {logs.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">
-                                            Nenhum log de auditoria encontrado.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    logs.map((log) => (
+                                {(() => {
+                                    const totalItems = logs.length;
+                                    const paginatedLogs = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                    if (logs.length === 0) return (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">
+                                                Nenhum log de auditoria encontrado.
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+
+                                    return paginatedLogs.map((log) => (
                                         <TableRow key={log.id}>
                                             <TableCell className="text-xs font-mono">
                                                 {new Date(log.createdAt).toLocaleString('pt-BR')}
@@ -166,44 +163,60 @@ export default function AuditLogsPage() {
                                                 {log.entityId}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Dialog>
-                                                    <DialogTrigger asChild>
-                                                        <Button variant="ghost" size="sm" onClick={() => setSelectedLog(log)}>
-                                                            Ver Diff
-                                                        </Button>
-                                                    </DialogTrigger>
-                                                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                                        <DialogHeader>
-                                                            <DialogTitle>Mural de Alterações</DialogTitle>
-                                                            <DialogDescription>
-                                                                Comparação entre o estado anterior e o novo.
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-                                                        <div className="grid grid-cols-2 gap-4 mt-4">
-                                                            <div className="space-y-2">
-                                                                <h4 className="text-xs font-bold text-red-500 uppercase">Estado Anterior</h4>
-                                                                <pre className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
-                                                                    {JSON.stringify(log.oldValue, null, 2)}
-                                                                </pre>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button variant="outline" size="sm" className="h-8 border-blue-500/30 text-blue-600 hover:bg-blue-50" onClick={() => setSelectedLog(log)}>
+                                                                Ver Diff
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                                            <DialogHeader>
+                                                                <DialogTitle>Mural de Alterações</DialogTitle>
+                                                                <DialogDescription>
+                                                                    Comparação entre o estado anterior e o novo.
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                                                <div className="space-y-2">
+                                                                    <h4 className="text-xs font-bold text-red-500 uppercase">Estado Anterior</h4>
+                                                                    <pre className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
+                                                                        {JSON.stringify(log.oldValue, null, 2)}
+                                                                    </pre>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <h4 className="text-xs font-bold text-emerald-500 uppercase">Novo Estado</h4>
+                                                                    <pre className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
+                                                                        {JSON.stringify(log.newValue, null, 2)}
+                                                                    </pre>
+                                                                </div>
                                                             </div>
-                                                            <div className="space-y-2">
-                                                                <h4 className="text-xs font-bold text-emerald-500 uppercase">Novo Estado</h4>
-                                                                <pre className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
-                                                                    {JSON.stringify(log.newValue, null, 2)}
-                                                                </pre>
-                                                            </div>
-                                                        </div>
-                                                    </DialogContent>
-                                                </Dialog>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
+                                    ));
+                                })()}
                             </TableBody>
                         </Table>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                        <StandardPagination
+                            currentPage={page}
+                            totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
+                            limit={limit}
+                            onPageChange={setPage}
+                            onLimitChange={(l) => {
+                                setLimit(l)
+                                setPage(1)
+                            }}
+                            totalItems={logs.length}
+                        />
+                            </TableBody>
+                        </Table>
+    )
+}
+                </CardContent >
+            </Card >
+        </div >
     )
 }

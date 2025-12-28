@@ -9,6 +9,8 @@ import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 
 interface LiabilityItem {
     number: string;
@@ -27,6 +29,8 @@ export default function RiskPage() {
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
     const [report, setReport] = useState<LiabilityItem[]>([])
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
 
     // Fetch Games on mount
     useEffect(() => {
@@ -84,38 +88,47 @@ export default function RiskPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-red-500/10 rounded-lg">
-                            <ShieldAlert className="w-8 h-8 text-red-500" />
-                        </div>
-                        Gestão de Risco
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Mapa de responsabilidade e exposição financeira por sorteio.</p>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto">
+            <StandardPageHeader
+                icon={<ShieldAlert className="w-8 h-8 text-red-500" />}
+                title="Gestão de Risco"
+                description="Mapa de responsabilidade e exposição financeira por sorteio."
+                onRefresh={() => {
+                    // Logic to manually refresh if needed, but useEffect handles it
+                    const fetchGames = async () => {
+                        const token = localStorage.getItem("token")
+                        const res = await fetch(`${API_URL}/games`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        })
+                        if (res.ok) {
+                            const data = await res.json()
+                            setGames(data)
+                        }
+                    }
+                    fetchGames()
+                }}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
                     <div className="flex-1 md:w-[200px]">
                         <Select value={selectedGame} onValueChange={setSelectedGame}>
-                            <SelectTrigger className="bg-card border-border">
+                            <SelectTrigger className="bg-background border-border h-9 text-xs font-semibold">
                                 <SelectValue placeholder="Selecionar Jogo" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-popover border-border">
                                 {games.map(g => (
-                                    <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                                    <SelectItem key={g.id} value={g.id} className="text-xs">{g.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
                     <input
                         type="date"
-                        className="bg-card border border-border p-2 rounded-md text-sm text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
+                        className="bg-background border border-border px-3 h-9 rounded-md text-xs font-semibold text-foreground focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
                     />
                 </div>
-            </div>
+            </StandardPageHeader>
 
             {/* Quick Stats */}
             <div className="grid gap-6 md:grid-cols-3">
@@ -215,48 +228,69 @@ export default function RiskPage() {
                 </Card>
 
                 {/* List of Numbers */}
-                <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm">
-                    <CardHeader>
-                        <CardTitle>Detalhamento por Número</CardTitle>
-                        <CardDescription>Lista completa de liablity descendente.</CardDescription>
+                <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm overflow-hidden flex flex-col">
+                    <CardHeader className="bg-muted/30 border-b border-border py-3">
+                        <CardTitle className="text-sm font-bold flex items-center gap-2 uppercase tracking-tight">
+                            <BadgeInfo className="w-4 h-4 text-emerald-500" />
+                            Detalhamento por Número
+                        </CardTitle>
+                        <CardDescription className="text-[10px]">Lista completa de responsabilidade descendente.</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0">
-                        <div className="max-h-[400px] overflow-y-auto">
+                    <CardContent className="p-0 flex-1">
+                        <div className="overflow-x-auto">
                             <table className="w-full text-sm">
-                                <thead className="bg-muted/50 text-muted-foreground sticky top-0 uppercase text-[10px] font-bold">
+                                <thead className="bg-muted/20 text-muted-foreground uppercase text-[10px] font-bold border-b border-border/60">
                                     <tr>
-                                        <th className="px-4 py-3 text-left">Número</th>
-                                        <th className="px-4 py-3 text-right">Potencial</th>
-                                        <th className="px-4 py-3 text-right">% Limite</th>
+                                        <th className="px-4 py-2 text-left">Número</th>
+                                        <th className="px-4 py-2 text-right">Potencial</th>
+                                        <th className="px-4 py-2 text-right">% Limite</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-border">
-                                    {report.map(item => (
-                                        <tr key={item.number} className="hover:bg-muted/20 transition-colors">
-                                            <td className="px-4 py-3 font-mono font-bold text-foreground">
-                                                {item.number}
-                                            </td>
-                                            <td className="px-4 py-3 text-right font-medium">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.liability)}
-                                            </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <span className={`text-xs font-bold ${item.liability > maxLiability * 0.8 ? 'text-red-500' : 'text-emerald-500'}`}>
-                                                    {((item.liability / maxLiability) * 100).toFixed(1)}%
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {report.length === 0 && (
-                                        <tr>
-                                            <td colSpan={3} className="px-4 py-10 text-center text-muted-foreground">
-                                                Sem dados para exibição.
-                                            </td>
-                                        </tr>
-                                    )}
+                                <tbody className="divide-y divide-border/50">
+                                    {(() => {
+                                        const paginated = limit === "all" ? report : report.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                        if (report.length === 0) return (
+                                            <tr>
+                                                <td colSpan={3} className="px-4 py-10 text-center text-muted-foreground italic font-medium text-xs">
+                                                    Sem dados para exibição.
+                                                </td>
+                                            </tr>
+                                        );
+
+                                        return paginated.map(item => (
+                                            <tr key={item.number} className="hover:bg-muted/30 transition-colors border-b border-border/40">
+                                                <td className="px-4 py-2.5 font-mono font-bold text-foreground text-xs">
+                                                    {item.number}
+                                                </td>
+                                                <td className="px-4 py-2.5 text-right font-bold text-xs">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.liability)}
+                                                </td>
+                                                <td className="px-4 py-2.5 text-right">
+                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.liability > maxLiability * 0.8 ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
+                                                        {((item.liability / maxLiability) * 100).toFixed(1)}%
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ));
+                                    })()}
                                 </tbody>
                             </table>
                         </div>
                     </CardContent>
+                    <div className="border-t border-border bg-muted/10">
+                        <StandardPagination
+                            currentPage={page}
+                            totalPages={limit === "all" ? 1 : Math.ceil(report.length / limit)}
+                            limit={limit}
+                            onPageChange={setPage}
+                            onLimitChange={(l) => {
+                                setLimit(l)
+                                setPage(1)
+                            }}
+                            totalItems={report.length}
+                        />
+                    </div>
                 </Card>
             </div>
         </div>

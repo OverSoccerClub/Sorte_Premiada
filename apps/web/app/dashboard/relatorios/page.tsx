@@ -16,6 +16,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 
 export default function RelatoriosPage() {
     const [cambistas, setCambistas] = useState<any[]>([])
@@ -32,7 +34,7 @@ export default function RelatoriosPage() {
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(20)
+    const [limit, setLimit] = useState<number | "all">(20)
     const [totalPages, setTotalPages] = useState(1)
 
     const fetchCambistas = async () => {
@@ -126,127 +128,109 @@ export default function RelatoriosPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <FileText className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        Prestação de Contas
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Confronte o caixa e visualize as vendas detalhadas por cambista.</p>
+            <StandardPageHeader
+                icon={<FileText className="w-8 h-8 text-emerald-500" />}
+                title="Vendas do Período"
+                description="Detalhamento das apostas realizadas."
+                onRefresh={() => handleSearch(true)}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <Input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="w-36 h-9 bg-background border-border shadow-sm text-xs font-semibold"
+                        />
+                        <span className="text-muted-foreground text-xs font-bold leading-none">-</span>
+                        <Input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="w-36 h-9 bg-background border-border shadow-sm text-xs font-semibold"
+                        />
+                    </div>
+
+                    <Select value={selectedGame} onValueChange={setSelectedGame}>
+                        <SelectTrigger className="w-44 h-9 bg-background border-border shadow-sm text-xs font-semibold">
+                            <SelectValue placeholder="Todos os jogos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todos os jogos</SelectItem>
+                            {games.map((g) => (
+                                <SelectItem key={g.id} value={g.id}>
+                                    {g.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={selectedCambista} onValueChange={setSelectedCambista}>
+                        <SelectTrigger className="w-48 h-9 bg-background border-border shadow-sm text-xs font-semibold">
+                            <Filter className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                            <SelectValue placeholder="Todos os cambistas" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60 overflow-y-auto">
+                            <SelectItem value="all">Todos os cambistas</SelectItem>
+                            {cambistas.map((c) => (
+                                <SelectItem key={c.id} value={c.id}>
+                                    {c.name || c.username}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => window.location.href = "/dashboard/relatorios/area"}
-                    >
-                        <MapPin className="w-4 h-4" />
-                        Relatório por Área
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => window.location.href = "/dashboard/relatorios/conferencia"}
-                    >
-                        <Calendar className="w-4 h-4" />
-                        Conferência de Caixa
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => window.location.href = "/dashboard/relatorios/daily-closes"}
-                    >
-                        <Calendar className="w-4 h-4" />
-                        Fechamentos
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => window.location.href = "/dashboard/relatorios/notifications"}
-                    >
-                        <FileText className="w-4 h-4" />
-                        Notificações
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => window.location.href = "/dashboard/relatorios/transactions"}
-                    >
-                        <Download className="w-4 h-4" />
-                        Exportar Transações
-                    </Button>
-                </div>
+            </StandardPageHeader>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    onClick={() => window.location.href = "/dashboard/relatorios/area"}
+                >
+                    <MapPin className="w-3.5 h-3.5" />
+                    Relatório por Área
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    onClick={() => window.location.href = "/dashboard/relatorios/conferencia"}
+                >
+                    <Calendar className="w-3.5 h-3.5" />
+                    Conferência de Caixa
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    onClick={() => window.location.href = "/dashboard/relatorios/daily-closes"}
+                >
+                    <Calendar className="w-3.5 h-3.5" />
+                    Fechamentos
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    onClick={() => window.location.href = "/dashboard/relatorios/notifications"}
+                >
+                    <FileText className="w-3.5 h-3.5" />
+                    Notificações
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    onClick={() => window.location.href = "/dashboard/relatorios/transactions"}
+                >
+                    <Download className="w-3.5 h-3.5" />
+                    Exportar Transações
+                </Button>
             </div>
 
-            <Card className="border-border shadow-sm bg-card">
-                <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-emerald-500" />
-                        Filtros do Relatório
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                        <div className="space-y-2">
-                            <Label>Selecione o Jogo</Label>
-                            <Select value={selectedGame} onValueChange={setSelectedGame}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Todos os jogos" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os jogos</SelectItem>
-                                    {games.map((g) => (
-                                        <SelectItem key={g.id} value={g.id}>
-                                            {g.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Selecione o Cambista</Label>
-                            <Select value={selectedCambista} onValueChange={setSelectedCambista}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Todos os cambistas" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os cambistas</SelectItem>
-                                    {cambistas.map((c) => (
-                                        <SelectItem key={c.id} value={c.id}>
-                                            {c.name || c.username}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select >
-                        </div >
-                        <div className="space-y-2">
-                            <Label>Data Inicial</Label>
-                            <Input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Data Final</Label>
-                            <Input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                            />
-                        </div>
-                        <Button
-                            onClick={() => handleSearch(true)}
-                            disabled={loading}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-900/10 w-full"
-                        >
-                            {loading ? "Pesquisando..." : "Pesquisar"}
-                        </Button>
-                    </div >
-                </CardContent >
-            </Card >
 
             {
                 ((tickets?.length || 0) > 0 || (granularSummary?.length || 0) > 0) && (
@@ -433,46 +417,17 @@ export default function RelatoriosPage() {
                                             </TableBody>
                                         </Table>
                                     </CardContent>
-                                    <div className="flex items-center justify-between px-4 py-4 border-t border-border bg-muted/30">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-muted-foreground">Exibir</span>
-                                            <Select value={String(limit)} onValueChange={(v) => { setLimit(Number(v)); setPage(1); }}>
-                                                <SelectTrigger className="w-[70px] h-8">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="5">5</SelectItem>
-                                                    <SelectItem value="10">10</SelectItem>
-                                                    <SelectItem value="15">15</SelectItem>
-                                                    <SelectItem value="20">20</SelectItem>
-                                                    <SelectItem value="50">50</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <span className="text-sm text-muted-foreground">por página</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                                disabled={page === 1}
-                                            >
-                                                Anterior
-                                            </Button>
-                                            <div className="text-sm font-medium">
-                                                Página {page} de {totalPages}
-                                            </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                                disabled={page === totalPages || totalPages === 0}
-                                            >
-                                                Próxima
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <StandardPagination
+                                        currentPage={page}
+                                        totalPages={totalPages}
+                                        limit={limit}
+                                        onPageChange={setPage}
+                                        onLimitChange={(l) => {
+                                            setLimit(l)
+                                            setPage(1)
+                                        }}
+                                        totalItems={tickets.length}
+                                    />
                                 </Card>
                             </TabsContent>
                         </Tabs>

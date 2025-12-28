@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ShieldAlert, ShieldCheck, Clock, AlertTriangle, CheckCircle2, Loader2, RefreshCw, AlertOctagon } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 
 interface SecurityLog {
     id: string
@@ -22,6 +24,8 @@ interface SecurityLog {
 export default function SecurityCenterPage() {
     const [logs, setLogs] = useState<SecurityLog[]>([])
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert } = useAlert()
 
     const fetchLogs = async () => {
@@ -81,21 +85,13 @@ export default function SecurityCenterPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-red-500/10 rounded-lg">
-                            <ShieldAlert className="w-8 h-8 text-red-500" />
-                        </div>
-                        Security Center
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Monitoramento de integridade e inteligência anti-fraude.</p>
-                </div>
-                <Button variant="outline" onClick={fetchLogs} disabled={loading} className="gap-2">
-                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    Atualizar
-                </Button>
-            </div>
+            <StandardPageHeader
+                icon={<ShieldAlert className="w-8 h-8 text-red-500" />}
+                title="Security Center"
+                description="Monitoramento de integridade e inteligência anti-fraude."
+                onRefresh={fetchLogs}
+                refreshing={loading}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-red-500/5 border-red-500/20">
@@ -142,81 +138,95 @@ export default function SecurityCenterPage() {
                 </Card>
             </div>
 
-            <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <RefreshCw className="w-5 h-5 text-red-500" />
-                        Atividade Recente
-                    </CardTitle>
-                    <CardDescription>Alertas gerados pelo sistema de inteligência anti-fraude.</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {loading && logs.length === 0 ? (
-                        <div className="flex justify-center py-12">
-                            <Loader2 className="h-8 w-8 animate-spin text-red-500" />
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/20">
-                                    <TableHead className="w-[150px]">Data/Hora</TableHead>
-                                    <TableHead className="w-[100px]">Gravidade</TableHead>
-                                    <TableHead className="w-[150px]">Evento</TableHead>
-                                    <TableHead>Mensagem</TableHead>
-                                    <TableHead className="text-right">Ação</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {logs.length === 0 ? (
+            <CardContent className="p-0">
+                {loading && logs.length === 0 ? (
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/20">
+                                <TableHead className="w-[150px]">Data/Hora</TableHead>
+                                <TableHead className="w-[100px]">Gravidade</TableHead>
+                                <TableHead className="w-[150px]">Evento</TableHead>
+                                <TableHead>Mensagem</TableHead>
+                                <TableHead className="text-right">Ação</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {(() => {
+                                const paginated = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                if (logs.length === 0) return (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground italic">
+                                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
                                             Nenhum alerta de segurança registrado.
                                         </TableCell>
                                     </TableRow>
-                                ) : (
-                                    logs.map((log) => (
-                                        <TableRow key={log.id} className={`${log.isResolved ? 'opacity-60 bg-muted/5' : ''}`}>
-                                            <TableCell className="text-xs font-mono">
-                                                {new Date(log.createdAt).toLocaleString('pt-BR')}
-                                            </TableCell>
-                                            <TableCell>
+                                );
+
+                                return paginated.map((log) => (
+                                    <TableRow key={log.id} className={`${log.isResolved ? 'opacity-60 bg-muted/5' : ''} border-b border-border/50 hover:bg-muted/30 transition-colors`}>
+                                        <TableCell className="text-[10px] font-bold font-mono text-muted-foreground pl-6">
+                                            <div className="flex flex-col">
+                                                <span>{new Date(log.createdAt).toLocaleDateString('pt-BR')}</span>
+                                                <span className="text-[9px] opacity-70">{new Date(log.createdAt).toLocaleTimeString('pt-BR')}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="scale-90 origin-left">
                                                 {getSeverityBadge(log.severity)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2 font-medium">
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-tight">
+                                                <div className="p-1.5 bg-muted rounded-md border border-border/50">
                                                     {getTypeIcon(log.type)}
-                                                    {log.type}
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="text-sm">
-                                                {log.message}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {!log.isResolved ? (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 gap-1.5"
-                                                        onClick={() => handleResolve(log.id)}
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4" />
-                                                        Resolver
-                                                    </Button>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground flex items-center justify-end gap-1">
-                                                        <ShieldCheck className="w-3 h-3" />
-                                                        Auditado
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                                                {log.type.replace(/_/g, ' ')}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-xs font-medium text-foreground max-w-[300px] truncate">
+                                            {log.message}
+                                        </TableCell>
+                                        <TableCell className="text-right pr-6">
+                                            {!log.isResolved ? (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="text-emerald-600 border-emerald-500/30 hover:bg-emerald-50 h-8 font-bold text-[10px] uppercase tracking-wider"
+                                                    onClick={() => handleResolve(log.id)}
+                                                >
+                                                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Resolver
+                                                </Button>
+                                            ) : (
+                                                <div className="flex items-center justify-end gap-1.5 text-emerald-600/70 font-bold text-[10px] uppercase">
+                                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                                    Auditado
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ));
+                            })()}
+                            <StandardPagination
+                                currentPage={page}
+                                totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
+                                limit={limit}
+                                onPageChange={setPage}
+                                onLimitChange={(l) => {
+                                    setLimit(l)
+                                    setPage(1)
+                                }}
+                                totalItems={logs.length}
+                            />
+                        </TableBody>
+                    </Table>
+                )
+                }
+            </CardContent >
+        </Card >
+        </div >
     )
 }

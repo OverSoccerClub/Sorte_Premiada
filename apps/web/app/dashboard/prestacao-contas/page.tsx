@@ -10,10 +10,16 @@ import { Loader2, CheckCircle2, XCircle, Search, Calendar, User, DollarSign, Fil
 import { useAlert } from "@/context/alert-context"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
+import { Input } from "@/components/ui/input"
 
 export default function VerificationPage() {
     const [pendingCloses, setPendingCloses] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [searchTerm, setSearchTerm] = useState("")
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert } = useAlert()
 
     const fetchPendingCloses = async () => {
@@ -72,104 +78,157 @@ export default function VerificationPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <CheckCircle2 className="w-8 h-8 text-blue-500" />
-                        </div>
-                        Verificação de Caixas
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Aprovação de fechamentos diários de cambistas.</p>
-                </div>
-            </div>
-
-            <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle className="text-base flex items-center gap-2">
-                            <Filter className="w-5 h-5 text-blue-500" />
-                            Pendentes de Aprovação
-                        </CardTitle>
-                        <CardDescription>Estes caixas foram fechados e aguardam sua conferência.</CardDescription>
+            <StandardPageHeader
+                icon={<CheckCircle2 className="w-8 h-8 text-blue-500" />}
+                title="Verificação de Caixas"
+                description="Aprovação de fechamentos diários de cambistas."
+                onRefresh={fetchPendingCloses}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Buscar cambista..."
+                            className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value)
+                                setPage(1)
+                            }}
+                        />
                     </div>
-                    <Button onClick={fetchPendingCloses} variant="outline" size="sm" className="gap-2">
-                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                        Atualizar Lista
-                    </Button>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {loading ? (
-                        <div className="flex justify-center py-12">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                    ) : pendingCloses.length === 0 ? (
-                        <div className="text-center py-16 text-muted-foreground flex flex-col items-center gap-3">
-                            <CheckCircle2 className="h-10 w-10 opacity-20" />
-                            <p>Nenhum fechamento pendente.</p>
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
-                                    <TableHead className="pl-6">Data</TableHead>
-                                    <TableHead>Cambista</TableHead>
-                                    <TableHead>Vendas</TableHead>
-                                    <TableHead>Saldo Final</TableHead>
-                                    <TableHead className="text-right pr-6">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {pendingCloses.map((item) => (
-                                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                </div>
+            </StandardPageHeader>
+
+            <CardContent className="p-0">
+                {loading ? (
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                ) : pendingCloses.length === 0 ? (
+                    <div className="text-center py-16 text-muted-foreground flex flex-col items-center gap-3">
+                        <CheckCircle2 className="h-10 w-10 opacity-20" />
+                        <p>Nenhum fechamento pendente.</p>
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
+                                <TableHead className="pl-6">Data</TableHead>
+                                <TableHead>Cambista</TableHead>
+                                <TableHead>Vendas</TableHead>
+                                <TableHead>Saldo Final</TableHead>
+                                <TableHead className="text-right pr-6">Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {(() => {
+                                const filtered = pendingCloses.filter(item =>
+                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                );
+
+                                const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                if (filtered.length === 0) return (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
+                                            Nenhum fechamento encontrado.
+                                        </TableCell>
+                                    </TableRow>
+                                );
+
+                                return paginated.map((item) => (
+                                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
                                         <TableCell className="pl-6">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                                {format(new Date(item.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase">
+                                                    <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                                                    {format(new Date(item.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                                                </div>
+                                                <div className="text-[10px] text-muted-foreground font-medium italic ml-5">
+                                                    {format(new Date(item.createdAt), "HH:mm", { locale: ptBR })}
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <User className="h-4 w-4 text-muted-foreground" />
-                                                <span className="font-medium">{item.closedByUser?.username || "Desconhecido"}</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold text-xs uppercase ring-1 ring-blue-500/20">
+                                                    {(item.closedByUser?.username || "U").substring(0, 2)}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-foreground text-sm uppercase">
+                                                        {item.closedByUser?.username || "Desconhecido"}
+                                                    </div>
+                                                    <div className="text-[10px] text-muted-foreground font-medium italic flex items-center gap-1">
+                                                        <User className="w-3 h-3 text-blue-500/50" />
+                                                        {item.closedByUser?.name || "Cambista"}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                                                {Number(item.totalSales).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-emerald-600 font-bold text-xs">
+                                                    {Number(item.totalSales).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground font-medium uppercase italic">Bruto</span>
+                                            </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-foreground font-bold">
-                                                {Number(item.finalBalance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-foreground font-bold text-xs">
+                                                    {Number(item.finalBalance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground font-medium uppercase italic">A Receber</span>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right pr-6">
                                             <div className="flex justify-end gap-2">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 h-8 font-normal"
+                                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 h-8 font-bold text-[10px] uppercase tracking-wider"
                                                     onClick={() => handleVerify(item.id, 'REJECTED')}
                                                 >
-                                                    <XCircle className="w-4 h-4 mr-1.5" /> Rejeitar
+                                                    <XCircle className="w-3.5 h-3.5 mr-1" /> Rejeitar
                                                 </Button>
                                                 <Button
                                                     size="sm"
-                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 font-normal"
+                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 font-bold text-[10px] uppercase tracking-wider shadow-sm"
                                                     onClick={() => handleVerify(item.id, 'VERIFIED')}
                                                 >
-                                                    <CheckCircle2 className="w-4 h-4 mr-1.5" /> Aprovar
+                                                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Aprovar
                                                 </Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                                ));
+                            })()}
+                            <StandardPagination
+                                currentPage={page}
+                                totalPages={limit === "all" ? 1 : Math.ceil(pendingCloses.filter(item =>
+                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length / limit)}
+                                limit={limit}
+                                onPageChange={setPage}
+                                onLimitChange={(l) => {
+                                    setLimit(l)
+                                    setPage(1)
+                                }}
+                                totalItems={pendingCloses.filter(item =>
+                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length}
+                            />
+                        </TableBody>
+                    </Table>
+                )
+                }
+            </CardContent >
+        </Card >
+        </div >
     )
 }

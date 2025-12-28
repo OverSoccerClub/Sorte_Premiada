@@ -14,6 +14,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, ShieldAlert, ShieldCheck, Ban, CheckCircle2, Shield } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
@@ -31,6 +33,9 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
+    const [searchTerm, setSearchTerm] = useState("")
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert } = useAlert()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -200,23 +205,36 @@ export default function UsersPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <Shield className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        Usuários Administrativos
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Gerencie administradores, supervisores e gerentes.</p>
+        <StandardPageHeader
+            icon={<Shield className="w-8 h-8 text-emerald-500" />}
+            title="Usuários Administrativos"
+            description="Gerencie administradores, supervisores e gerentes."
+            onRefresh={fetchUsers}
+            refreshing={loading}
+        >
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Buscar usuário..."
+                        className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value)
+                            setPage(1)
+                        }}
+                    />
                 </div>
-
+                <Button variant="outline" size="sm" className="h-9 border-border text-xs font-bold">
+                    <Filter className="h-4 w-4 text-muted-foreground mr-2" />
+                    Filtros
+                </Button>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button
                             onClick={() => handleOpenDialog()}
-                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20"
+                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
+                            size="sm"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Novo Usuário
@@ -358,128 +376,136 @@ export default function UsersPage() {
             </div>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <CardTitle className="flex items-center gap-2">
-                                <Users className="w-5 h-5 text-emerald-500" />
-                                Usuários do Sistema
-                            </CardTitle>
-                            <CardDescription>Lista de administradores e gestores do sistema.</CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
-                            <div className="relative w-full sm:w-64">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Buscar usuário..." className="pl-9 bg-background border-border h-9" />
-                            </div>
-                            <Button variant="outline" size="sm" className="h-9">
-                                <Filter className="h-4 w-4 text-muted-foreground mr-2" />
-                                Filtros
-                            </Button>
-                        </div>
-                    </div>
-                </CardHeader>
                 <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
-                                    <TableHead className="w-[300px]">Nome</TableHead>
-                                    <TableHead>Nível de Acesso</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {users.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                            Nenhum usuário encontrado.
-                                        </TableCell>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
+                                        <TableHead className="w-[300px]">Nome</TableHead>
+                                        <TableHead>Nível de Acesso</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Ações</TableHead>
                                     </TableRow>
-                                ) : (
-                                    users.map((user) => {
-                                        const isManuallyBlocked = user.isActive === false;
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        const filteredUsers = users.filter(u =>
+                                            u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        );
 
-                                        return (
-                                            <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
-                                                <TableCell className="font-medium">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
-                                                            {user.username.substring(0, 2)}
-                                                        </div>
-                                                        <div>
-                                                            <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                                <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
-                                                                {user.name || user.username}
-                                                            </div>
-                                                            <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                                <Mail className="w-3 h-3" />
-                                                                {user.email || "Sem email"}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
-                                                        <Shield className="w-3.5 h-3.5" />
-                                                        {user.role}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {isManuallyBlocked ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
-                                                            <Ban className="w-3.5 h-3.5" />
-                                                            Bloqueado
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
-                                                            <CheckCircle2 className="w-3.5 h-3.5" />
-                                                            Ativo
-                                                        </span>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
-                                                            onClick={() => handleToggleBlock(user)}
-                                                            title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
-                                                        >
-                                                            {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                            onClick={() => handleOpenDialog(user)}
-                                                            title="Editar"
-                                                        >
-                                                            <SquarePen className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => handleDelete(user.id)}
-                                                            title="Excluir"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
+                                        const paginatedUsers = limit === "all" ? filteredUsers : filteredUsers.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                        if (filteredUsers.length === 0) return (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                                    Nenhum usuário encontrado.
                                                 </TableCell>
                                             </TableRow>
                                         );
-                                    })
-                                )}
-                            </TableBody>
-                        </Table>
+
+                                        return paginatedUsers.map((user) => {
+                                            const isManuallyBlocked = user.isActive === false;
+
+                                            return (
+                                                <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
+                                                    <TableCell className="font-medium">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
+                                                                {user.username.substring(0, 2)}
+                                                            </div>
+                                                            <div>
+                                                                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                                    <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
+                                                                    {user.name || user.username}
+                                                                </div>
+                                                                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                                    <Mail className="w-3 h-3" />
+                                                                    {user.email || "Sem email"}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
+                                                            <Shield className="w-3.5 h-3.5" />
+                                                            {user.role}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isManuallyBlocked ? (
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
+                                                                <Ban className="w-3.5 h-3.5" />
+                                                                Bloqueado
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                                                Ativo
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                                onClick={() => handleToggleBlock(user)}
+                                                                title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
+                                                            >
+                                                                {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                                onClick={() => handleOpenDialog(user)}
+                                                                title="Editar"
+                                                            >
+                                                                <SquarePen className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                onClick={() => handleDelete(user.id)}
+                                                                title="Excluir"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        });
+                                    })()}
+                                </TableBody>
+                            </Table>
+                            <StandardPagination
+                                currentPage={page}
+                                totalPages={limit === "all" ? 1 : Math.ceil(users.filter(u =>
+                                    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length / limit)}
+                                limit={limit}
+                                onPageChange={setPage}
+                                onLimitChange={(l) => {
+                                    setLimit(l)
+                                    setPage(1)
+                                }}
+                                totalItems={users.filter(u =>
+                                    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length}
+                            />
                     )}
                 </CardContent>
             </Card>

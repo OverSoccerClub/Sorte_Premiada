@@ -14,6 +14,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Plus, Search, Loader2, Trash2, MapPin, Building2, Map, SquarePen, Settings2, Save } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 import { Badge } from "@/components/ui/badge"
+import { StandardPageHeader } from "@/components/standard-page-header"
+import { StandardPagination } from "@/components/standard-pagination"
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
@@ -54,6 +56,9 @@ export default function AreasPage() {
     const [isConfigOpen, setIsConfigOpen] = useState(false)
     const [selectedArea, setSelectedArea] = useState<Area | null>(null)
     const [areaConfigs, setAreaConfigs] = useState<Record<string, AreaConfig>>({})
+    const [searchTerm, setSearchTerm] = useState("")
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert, hideAlert } = useAlert()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -234,114 +239,123 @@ export default function AreasPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <MapPin className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        Gestão de Praças
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Gerencie as áreas de atuação e suas regras específicas.</p>
+        <StandardPageHeader
+            icon={<MapPin className="w-8 h-8 text-emerald-500" />}
+            title="Gestão de Praças"
+            description="Gerencie as áreas de atuação e suas regras específicas."
+            onRefresh={fetchAreas}
+            refreshing={loading}
+        >
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Buscar praça..."
+                        className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value)
+                            setPage(1)
+                        }}
+                    />
                 </div>
 
-                <div className="flex gap-2">
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button
-                                onClick={handleOpenDialog}
-                                className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20"
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Nova Praça
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] bg-popover border-border">
-                            <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2 text-foreground">
-                                    <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                        <MapPin className="w-5 h-5 text-emerald-500" />
-                                    </div>
-                                    {editingId ? "Editar Praça" : "Adicionar Nova Praça"}
-                                </DialogTitle>
-                                <DialogDescription className="text-muted-foreground">
-                                    {editingId ? "Atualize os dados da praça." : "Cadastre uma nova área de atuação (Cidade/Bairro)."}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="city"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Cidade</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input placeholder="Ex: São Paulo" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="state"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Estado (UF)</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Map className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input placeholder="Ex: SP" maxLength={2} className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            onClick={handleOpenDialog}
+                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
+                            size="sm"
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nova Praça
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] bg-popover border-border">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-foreground">
+                                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                    <MapPin className="w-5 h-5 text-emerald-500" />
+                                </div>
+                                {editingId ? "Editar Praça" : "Adicionar Nova Praça"}
+                            </DialogTitle>
+                            <DialogDescription className="text-muted-foreground">
+                                {editingId ? "Atualize os dados da praça." : "Cadastre uma nova área de atuação (Cidade/Bairro)."}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
-                                        name="name"
+                                        name="city"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-foreground">Nome da Área</FormLabel>
+                                                <FormLabel className="text-foreground">Cidade</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input placeholder="Ex: Centro, Zona Norte..." className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        <Building2 className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input placeholder="Ex: São Paulo" className="pl-9 bg-muted/50 border-input" {...field} />
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                    <DialogFooter>
-                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
-                                            Cancelar
-                                        </Button>
-                                        <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                                            {form.formState.isSubmitting ? (
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            ) : (
-                                                editingId ? <SquarePen className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />
-                                            )}
-                                            {editingId ? "Salvar Alterações" : "Criar Praça"}
-                                        </Button>
-                                    </DialogFooter>
-                                </form>
-                            </Form>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="state"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Estado (UF)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Map className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input placeholder="Ex: SP" maxLength={2} className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">Nome da Área</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input placeholder="Ex: Centro, Zona Norte..." className="pl-9 bg-muted/50 border-input" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <DialogFooter>
+                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
+                                        Cancelar
+                                    </Button>
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                        {form.formState.isSubmitting ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            editingId ? <SquarePen className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />
+                                        )}
+                                        {editingId ? "Salvar Alterações" : "Criar Praça"}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
             </div>
+        </StandardPageHeader>
 
-            {/* Modal de Configuração de Regras por Área */}
+            {/* Modal de Configuração de Regras por Área */ }
             <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
                 <DialogContent className="sm:max-w-[700px] bg-popover border-border">
                     <DialogHeader>
@@ -413,21 +427,6 @@ export default function AreasPage() {
             </Dialog>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <CardTitle className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-emerald-500" />
-                                Praças Cadastradas
-                            </CardTitle>
-                            <CardDescription>Gerencie as cidades e áreas onde seus cambistas atuam.</CardDescription>
-                        </div>
-                        <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Buscar praça..." className="pl-9 bg-background border-border h-9" />
-                        </div>
-                    </div>
-                </CardHeader>
                 <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-8">
@@ -444,14 +443,25 @@ export default function AreasPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {areas.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground italic">
-                                            Nenhuma praça cadastrada.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    areas.map((area) => (
+                                {(() => {
+                                    const filteredAreas = areas.filter(a =>
+                                        a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        a.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        a.state.toLowerCase().includes(searchTerm.toLowerCase())
+                                    );
+
+                                    const totalItems = filteredAreas.length;
+                                    const paginatedAreas = limit === "all" ? filteredAreas : filteredAreas.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                    if (filteredAreas.length === 0) return (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="h-24 text-center text-muted-foreground italic">
+                                                Nenhuma praça encontrada.
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+
+                                    return paginatedAreas.map((area) => (
                                         <TableRow key={area.id} className="hover:bg-muted/50 transition-colors">
                                             <TableCell className="font-medium text-foreground">
                                                 <div className="flex items-center gap-2">
@@ -502,14 +512,36 @@ export default function AreasPage() {
                                                 </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
+                                    ));
+                                })()}
                             </TableBody>
                         </Table>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                        <StandardPagination
+                            currentPage={page}
+                            totalPages={limit === "all" ? 1 : Math.ceil(areas.filter(a =>
+                                a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                a.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                a.state.toLowerCase().includes(searchTerm.toLowerCase())
+                            ).length / limit)}
+                            limit={limit}
+                            onPageChange={setPage}
+                            onLimitChange={(l) => {
+                                setLimit(l)
+                                setPage(1)
+                            }}
+                            totalItems={areas.filter(a =>
+                                a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                a.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                a.state.toLowerCase().includes(searchTerm.toLowerCase())
+                            ).length}
+                        />
+                            </TableBody>
+                        </Table>
+                    )
+}
+                </CardContent >
+            </Card >
+        </div >
     )
 }
 
