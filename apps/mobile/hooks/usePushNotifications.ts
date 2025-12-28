@@ -73,8 +73,9 @@ async function registerForPushNotificationsAsync() {
             const tokenData = await Notifications.getExpoPushTokenAsync();
             token = tokenData.data;
             console.log("Push Token:", token);
-        } catch (e) {
+        } catch (e: any) {
             console.error("Erro ao pegar token Expo:", e);
+            alert(`Erro Push: ${e.message}`);
         }
     } else {
         console.log('Precisa usar um dispositivo físico para Notificações Push');

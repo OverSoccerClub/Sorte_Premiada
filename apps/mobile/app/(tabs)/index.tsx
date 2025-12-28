@@ -4,7 +4,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { FinanceService } from "../../services/finance.service";
 import { CustomAlert } from "../../components/CustomAlert";
 import { ScreenLayout } from "../../components/ScreenLayout";
@@ -45,7 +45,14 @@ export default function Dashboard() {
     const BOTTOM_PADDING = insets.bottom + 120;
 
     // Push Notifications
-    const { expoPushToken } = usePushNotifications();
+    const { expoPushToken, notification } = usePushNotifications();
+
+    // Auto-refresh when notification arrives
+    useEffect(() => {
+        if (notification) {
+            fetchAnnouncements();
+        }
+    }, [notification]);
 
     useFocusEffect(
         useCallback(() => {
