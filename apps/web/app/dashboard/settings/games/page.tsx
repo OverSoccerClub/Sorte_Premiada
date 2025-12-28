@@ -176,11 +176,10 @@ export default function GameSettingsPage() {
     // Prize Functions
     const openPrizesModal = (game: any) => {
         setSelectedGame(game)
-        const currentPrizes = game.rules?.prizes || {}
         setPrizeValues({
-            milhar: currentPrizes.milhar || "10000",
-            centena: currentPrizes.centena || "100",
-            dezena: currentPrizes.dezena || "10"
+            milhar: game.prizeMilhar ? String(Number(game.prizeMilhar)) : "5000",
+            centena: game.prizeCentena ? String(Number(game.prizeCentena)) : "600",
+            dezena: game.prizeDezena ? String(Number(game.prizeDezena)) : "60"
         })
         setPrizesModalOpen(true)
     }
@@ -191,13 +190,10 @@ export default function GameSettingsPage() {
         try {
             const token = localStorage.getItem("token")
 
-            const updatedRules = {
-                ...(selectedGame.rules || {}),
-                prizes: {
-                    milhar: Number(prizeValues.milhar),
-                    centena: Number(prizeValues.centena),
-                    dezena: Number(prizeValues.dezena)
-                }
+            const payload = {
+                prizeMilhar: Number(prizeValues.milhar),
+                prizeCentena: Number(prizeValues.centena),
+                prizeDezena: Number(prizeValues.dezena)
             }
 
             const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
@@ -206,7 +202,7 @@ export default function GameSettingsPage() {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ rules: updatedRules })
+                body: JSON.stringify(payload)
             })
 
             if (res.ok) {

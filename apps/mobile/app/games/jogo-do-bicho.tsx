@@ -58,6 +58,7 @@ export default function JogoDoBichoScreen() {
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
+    const [gameConfig, setGameConfig] = useState<any>(null);
     const [isLoadingGame, setIsLoadingGame] = useState(true);
     const [modality, setModality] = useState<Modality>("GRUPO");
 
@@ -99,6 +100,7 @@ export default function JogoDoBichoScreen() {
                 );
                 if (game) {
                     setGameId(game.id);
+                    setGameConfig(game);
                     if (game.price) setGamePrice(Number(game.price));
                 } else {
                     showAlert("Jogo Indisponível", "Jogo do Bicho não encontrado no sistema.", "error");
@@ -210,7 +212,12 @@ export default function JogoDoBichoScreen() {
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined
+                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                prizes: gameConfig ? {
+                    milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toFixed(2).replace('.', ',')}` : undefined,
+                    centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toFixed(2).replace('.', ',')}` : undefined,
+                    dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toFixed(2).replace('.', ',')}` : undefined,
+                } : undefined
             };
             setLastTicket(ticketObj);
 

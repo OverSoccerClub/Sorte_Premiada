@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Game" ADD COLUMN     "prizeCentena" DECIMAL(65,30) DEFAULT 600,
+ADD COLUMN     "prizeDezena" DECIMAL(65,30) DEFAULT 60,
+ADD COLUMN     "prizeMilhar" DECIMAL(65,30) DEFAULT 5000;

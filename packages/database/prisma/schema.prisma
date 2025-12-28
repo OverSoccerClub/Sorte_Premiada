@@ -79,6 +79,12 @@ model Game {
   secondChanceWeekday    Int?  @default(6) // 0=Dom, 6=Sáb
   secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
   lastSecondChanceSeries Int @default(0)
+  
+  // Custom Prize Configuration (Printed on Ticket)
+  prizeMilhar   Decimal? @default(5000) // Prêmio para Milhar Seca
+  prizeCentena  Decimal? @default(600)  // Prêmio para Centena Seca
+  prizeDezena   Decimal? @default(60)   // Prêmio para Dezena Seca
+
   configs   AreaConfig[]
 }
 

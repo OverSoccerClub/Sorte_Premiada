@@ -20,6 +20,11 @@ export interface TicketData {
     secondChanceNumber?: number;
     secondChanceDrawDate?: string;
     secondChanceLabel?: string;
+    prizes?: {
+        milhar?: string;
+        centena?: string;
+        dezena?: string;
+    };
 }
 
 interface TicketContentProps {
@@ -95,6 +100,21 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2 items-center`}>
                     <Text style={tw`text-center font-black text-lg text-black uppercase`}>PRÊMIO MÁXIMO</Text>
                     <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
+                </View>
+            ) : data.prizes ? (
+                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2`}>
+                    <View style={tw`flex-row justify-between mb-1`}>
+                        <Text style={tw`font-bold text-[11px] text-black`}>MILHAR:</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.milhar}</Text>
+                    </View>
+                    <View style={tw`flex-row justify-between mb-1`}>
+                        <Text style={tw`font-bold text-[11px] text-black`}>CENTENA:</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.centena}</Text>
+                    </View>
+                    <View style={tw`flex-row justify-between`}>
+                        <Text style={tw`font-bold text-[11px] text-black`}>DEZENA:</Text>
+                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.dezena}</Text>
+                    </View>
                 </View>
             ) : (
                 <Text style={tw`text-center font-black text-[11px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
