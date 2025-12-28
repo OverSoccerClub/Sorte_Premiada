@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { TicketDetails } from "@/components/dashboard/tickets/TicketDetails"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
 import {
@@ -44,6 +46,11 @@ export default function TwoXOneThousandReportPage() {
         key: 'createdAt',
         direction: 'desc'
     })
+
+    // Modal state
+    const [selectedTicketResult, setSelectedTicketResult] = useState<any>(null)
+    const [detailsOpen, setDetailsOpen] = useState(false)
+    const [detailsLoading, setDetailsLoading] = useState(false)
 
     useEffect(() => {
         const init = async () => {
@@ -143,6 +150,33 @@ export default function TwoXOneThousandReportPage() {
         else label = `Extração ${timeStr}`
 
         return { label, time: timeStr, fullDate: date.toLocaleDateString('pt-BR') }
+    }
+
+    const handleTicketClick = async (ticketId: string) => {
+        setDetailsLoading(true)
+        setSelectedTicketResult(null)
+        setDetailsOpen(true)
+
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/tickets/validate/${ticketId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+
+            if (res.ok) {
+                const data = await res.json()
+                setSelectedTicketResult(data)
+            } else {
+                toast.error("Erro ao carregar detalhes do bilhete")
+                setDetailsOpen(false)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("Erro ao conectar com o servidor")
+            setDetailsOpen(false)
+        } finally {
+            setDetailsLoading(false)
+        }
     }
 
     const sortedTickets = useMemo(() => {
@@ -410,12 +444,13 @@ export default function TwoXOneThousandReportPage() {
                                                 <TableCell>
                                                     <div className="flex flex-wrap gap-1.5">
                                                         {ticket.numbers.map((n: string, i: number) => (
-                                                            <span
+                                                            <button
                                                                 key={i}
-                                                                className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-secondary text-secondary-foreground border border-border/50"
+                                                                onClick={() => handleTicketClick(ticket.hash || ticket.id)}
+                                                                className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-secondary text-secondary-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
                                                             >
                                                                 {n.toString().padStart(4, '0')}
-                                                            </span>
+                                                            </button>
                                                         ))}
                                                     </div>
                                                 </TableCell>
@@ -457,6 +492,19 @@ export default function TwoXOneThousandReportPage() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+             </Card>
+
+            <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+                <DialogContent className="sm:max-w-md p-0 border-none bg-transparent shadow-none">
+                     {detailsLoading ? (
+                         <div className="flex items-center justify-center p-8 bg-background rounded-lg border">
+                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                         </div>
+                     ) : selectedTicketResult && (
+                         <TicketDetails data={selectedTicketResult} />
+                     )}
+                </DialogContent>
+            </Dialog>
+        </div >
     )
 }
