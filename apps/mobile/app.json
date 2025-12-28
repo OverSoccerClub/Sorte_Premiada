@@ -2,7 +2,7 @@
     "expo": {
         "name": "Fezinha de Hoje",
         "slug": "sorte-premiada",
-        "version": "1.1.82",
+        "version": "1.1.83",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -39,7 +39,7 @@
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "package": "com.anonymous.sortepremiada",
-            "versionCode": 78
+            "versionCode": 79
         },
         "web": {
             "favicon": "./assets/favicon.png"

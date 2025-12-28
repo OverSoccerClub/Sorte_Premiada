@@ -492,17 +492,17 @@ export default function TwoXOneThousandReportPage() {
                     </div>
                 </CardContent>
             </Card>
-             </Card>
+
 
             <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
                 <DialogContent className="sm:max-w-md p-0 border-none bg-transparent shadow-none">
-                     {detailsLoading ? (
-                         <div className="flex items-center justify-center p-8 bg-background rounded-lg border">
-                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                         </div>
-                     ) : selectedTicketResult && (
-                         <TicketDetails data={selectedTicketResult} />
-                     )}
+                    {detailsLoading ? (
+                        <div className="flex items-center justify-center p-8 bg-background rounded-lg border">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        </div>
+                    ) : selectedTicketResult && (
+                        <TicketDetails data={selectedTicketResult} />
+                    )}
                 </DialogContent>
             </Dialog>
         </div >

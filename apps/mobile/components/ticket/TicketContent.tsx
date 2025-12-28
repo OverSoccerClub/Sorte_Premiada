@@ -50,7 +50,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             {/* Header */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
-                    <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-3`, { transform: [{ translateY: -5 }] }]} />
+                    <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-6`, { transform: [{ translateY: -5 }] }]} />
                     <View style={tw`items-end`}>
                         <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FEZINHA</Text>
                         <View style={tw`flex-row items-center -mt-2`}>
@@ -59,7 +59,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         </View>
                     </View>
                 </View>
-                <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
+                <Text style={tw`text-center font-black text-black text-xl mt-2 uppercase`}>
                     {data.gameName}
                 </Text>
                 <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
@@ -181,17 +181,17 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
 
                 <View style={[
-                    tw`items-center justify-center w-full mt-2`,
+                    tw`items-center justify-center w-full mt-6`,
                     isCapture && {
                         transform: [{ scaleY: 0.35 }],
-                        marginTop: -85, // Adjusted for larger QR
-                        marginBottom: -85
+                        marginTop: -95, // Adjusted for larger QR and movement
+                        marginBottom: -95
                     }
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
                             value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                            size={220}
+                            size={240}
                         />
                     </View>
                 </View>
