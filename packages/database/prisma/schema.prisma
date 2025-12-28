@@ -44,6 +44,9 @@ model User {
   // Hardened Security (MFA)
   twoFactorSecret  String?
   twoFactorEnabled Boolean @default(false)
+
+  // Announcements targeted to this user
+  targetedAnnouncements Announcement[] @relation("UserTargetedAnnouncements")
 }
 
 model Area {
@@ -277,6 +280,10 @@ model Announcement {
   type      String   @default("INFO") // INFO, WARNING, ALERT, SUCCESS
   isActive  Boolean  @default(true)
   expiresAt DateTime?
+  
+  targetUserId String?
+  targetUser   User?   @relation("UserTargetedAnnouncements", fields: [targetUserId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

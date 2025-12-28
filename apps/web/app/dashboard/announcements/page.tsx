@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Megaphone, SquarePen, Save, Clock, Info, AlertTriangle, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Megaphone, SquarePen, Save, Clock, Info, AlertTriangle, AlertCircle, CheckCircle2, Eye, EyeOff, Users, User } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 import { Badge } from "@/components/ui/badge"
 
@@ -23,10 +23,13 @@ const formSchema = z.object({
     type: z.string().default("INFO"),
     isActive: z.boolean().default(true),
     expiresAt: z.string().optional().nullable(),
+    targetType: z.string().default("GLOBAL"), // GLOBAL or USER
+    targetUserId: z.string().optional().nullable(),
 })
 
 export default function AnnouncementsPage() {
     const [announcements, setAnnouncements] = useState<any[]>([])
+    const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -40,8 +43,12 @@ export default function AnnouncementsPage() {
             type: "INFO",
             isActive: true,
             expiresAt: "",
+            targetType: "GLOBAL",
+            targetUserId: "",
         },
     })
+
+    const targetType = form.watch("targetType")
 
     const fetchAnnouncements = async () => {
         try {
@@ -62,8 +69,24 @@ export default function AnnouncementsPage() {
         }
     }
 
+    const fetchUsers = async () => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/users?role=CAMBISTA`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setUsers(data)
+            }
+        } catch (error) {
+            console.error("Failed to fetch users", error)
+        }
+    }
+
     useEffect(() => {
         fetchAnnouncements()
+        fetchUsers()
     }, [])
 
     const handleOpenDialog = (announcement?: any) => {
@@ -75,6 +98,8 @@ export default function AnnouncementsPage() {
                 type: announcement.type,
                 isActive: announcement.isActive,
                 expiresAt: announcement.expiresAt ? new Date(announcement.expiresAt).toISOString().split('T')[0] : "",
+                targetType: announcement.targetUserId ? "USER" : "GLOBAL",
+                targetUserId: announcement.targetUserId || "",
             })
         } else {
             setEditingId(null)
@@ -84,6 +109,8 @@ export default function AnnouncementsPage() {
                 type: "INFO",
                 isActive: true,
                 expiresAt: "",
+                targetType: "GLOBAL",
+                targetUserId: "",
             })
         }
         setIsDialogOpen(true)
@@ -100,8 +127,13 @@ export default function AnnouncementsPage() {
 
             const bodyData = {
                 ...values,
-                expiresAt: values.expiresAt ? new Date(values.expiresAt).toISOString() : null
+                expiresAt: values.expiresAt ? new Date(values.expiresAt).toISOString() : null,
+                targetUserId: values.targetType === "USER" ? values.targetUserId : null,
             }
+
+            // Remove targetType from payload if backend doesn't expect it (it's UI only state generally, but let's be clean)
+            // @ts-ignore
+            delete bodyData.targetType
 
             const res = await fetch(url, {
                 method: method,
@@ -196,9 +228,9 @@ export default function AnnouncementsPage() {
                         <div className="p-2 bg-emerald-500/10 rounded-lg">
                             <Megaphone className="w-8 h-8 text-emerald-500" />
                         </div>
-                        Avisos Globais
+                        Gestão de Avisos
                     </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Comunique-se com todos os cambistas instantaneamente.</p>
+                    <p className="text-muted-foreground mt-1 ml-14">Envie comunicados globais ou para cambistas específicos.</p>
                 </div>
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -211,13 +243,13 @@ export default function AnnouncementsPage() {
                             Novo Aviso
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px] bg-popover border-border">
+                    <DialogContent className="sm:max-w-[600px] bg-popover border-border">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 text-foreground">
                                 {editingId ? "Editar Aviso" : "Criar Novo Aviso"}
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
-                                O conteúdo será exibido para todos os usuários no aplicativo.
+                                Configure a mensagem e o público alvo.
                             </DialogDescription>
                         </DialogHeader>
                         <Form {...form}>
@@ -265,7 +297,7 @@ export default function AnnouncementsPage() {
                                         name="expiresAt"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Expira em (Opcional)</FormLabel>
+                                                <FormLabel>Expira em</FormLabel>
                                                 <FormControl>
                                                     <Input type="date" {...field} value={field.value || ""} />
                                                 </FormControl>
@@ -273,6 +305,66 @@ export default function AnnouncementsPage() {
                                             </FormItem>
                                         )}
                                     />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/20 rounded-xl border border-border/50">
+                                    <FormField
+                                        control={form.control}
+                                        name="targetType"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Público Alvo</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Selecione o destino" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="GLOBAL">
+                                                            <div className="flex items-center gap-2">
+                                                                <Users className="w-4 h-4 text-emerald-500" />
+                                                                <span>Todos (Global)</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                        <SelectItem value="USER">
+                                                            <div className="flex items-center gap-2">
+                                                                <User className="w-4 h-4 text-blue-500" />
+                                                                <span>Cambista Específico</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {targetType === "USER" && (
+                                        <FormField
+                                            control={form.control}
+                                            name="targetUserId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Selecionar Cambista</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Escolha um cambista" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="max-h-[200px]">
+                                                            {users.map((user) => (
+                                                                <SelectItem key={user.id} value={user.id}>
+                                                                    {user.name || user.username}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
                                 </div>
 
                                 <FormField
@@ -362,6 +454,7 @@ export default function AnnouncementsPage() {
                             <TableHeader>
                                 <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead>Publicação</TableHead>
+                                    <TableHead>Destino</TableHead>
                                     <TableHead>Título / Conteúdo</TableHead>
                                     <TableHead>Tipo</TableHead>
                                     <TableHead>Expirado</TableHead>
@@ -372,13 +465,14 @@ export default function AnnouncementsPage() {
                             <TableBody>
                                 {announcements.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">
+                                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground italic">
                                             Nenhum aviso cadastrado.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     announcements.map((item) => {
                                         const isExpired = item.expiresAt && new Date(item.expiresAt) < new Date();
+                                        const targetUser = users.find(u => u.id === item.targetUserId);
 
                                         return (
                                             <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
@@ -388,7 +482,20 @@ export default function AnnouncementsPage() {
                                                         <span>{new Date(item.createdAt).toLocaleTimeString()}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="max-w-[400px]">
+                                                <TableCell>
+                                                    {item.targetUserId ? (
+                                                        <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-200">
+                                                            <User className="w-3 h-3 mr-1" />
+                                                            {targetUser ? (targetUser.name || targetUser.username) : "Usuário Específico"}
+                                                        </Badge>
+                                                    ) : (
+                                                        <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-200">
+                                                            <Users className="w-3 h-3 mr-1" />
+                                                            Global
+                                                        </Badge>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="max-w-[300px]">
                                                     <div className="flex flex-col gap-1">
                                                         <span className="font-semibold text-foreground">{item.title}</span>
                                                         <span className="text-xs text-muted-foreground line-clamp-1">{item.content}</span>

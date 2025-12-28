@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { AnnouncementsService } from './announcements.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -22,8 +22,8 @@ export class AnnouncementsController {
     }
 
     @Get('active')
-    findAllActive() {
-        return this.announcementsService.findAllActive();
+    findAllActive(@Request() req) {
+        return this.announcementsService.findAllActive(req.user?.id);
     }
 
     @Get(':id')

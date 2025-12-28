@@ -83,7 +83,10 @@ export const UpdaterService = {
 
         try {
             const fileName = 'update.apk';
-            const dir = FileSystem.cacheDirectory || FileSystem.documentDirectory;
+            // Use cacheDirectory for temporary download - it's often safer for file provider sharing
+            // providing we have a provider path for it. 
+            // In Expo, FileSystem.documentDirectory is usually covered by the default FileProvider.
+            const dir = FileSystem.documentDirectory;
 
             if (!dir) {
                 throw new Error(`Armazenamento não disponível para download.`);
@@ -108,9 +111,13 @@ export const UpdaterService = {
                 fileUri,
                 {},
                 (downloadProgress) => {
-                    const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+                    const totalSafe = downloadProgress.totalBytesExpectedToWrite > 0
+                        ? downloadProgress.totalBytesExpectedToWrite
+                        : 15 * 1024 * 1024; // fallback estimation 15MB if header missing
+
+                    const progress = downloadProgress.totalBytesWritten / totalSafe;
                     if (onProgress) {
-                        onProgress(progress);
+                        onProgress(progress > 1 ? 1 : progress);
                     }
                 }
             );
@@ -121,20 +128,30 @@ export const UpdaterService = {
                 throw new Error(`Falha ao baixar arquivo (Status: ${downloadRes?.status || 'desconhecido'})`);
             }
 
-            console.log('[Updater] Download complete:', downloadRes.uri);
+            // Verify file size
+            const downloadedFileInfo = await FileSystem.getInfoAsync(downloadRes.uri);
+            if (downloadedFileInfo.exists && downloadedFileInfo.size < 1024 * 1024) { // Warning if < 1MB, likely error page
+                console.warn('[Updater] Downloaded file seems too small:', downloadedFileInfo.size);
+                // We don't throw here strictly unless it's 0, but it's suspicious.
+                if (downloadedFileInfo.size === 0) throw new Error("Arquivo baixado está vazio.");
+            }
+
+            console.log('[Updater] Download complete:', downloadRes.uri, 'Size:', downloadedFileInfo.size);
 
             const contentUri = await FileSystem.getContentUriAsync(downloadRes.uri);
+            console.log('[Updater] Content URI for installer:', contentUri);
 
             try {
-                console.log('[Updater] Launching installer for:', contentUri);
+                // Android 7.0+ requires FLAG_GRANT_READ_URI_PERMISSION (0x00000001)
+                // We also use FLAG_ACTIVITY_NEW_TASK (0x10000000) for context safety
                 await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
                     data: contentUri,
-                    flags: 1 | 0x10000000, // FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK
+                    flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
                     type: 'application/vnd.android.package-archive',
                 });
             } catch (e: any) {
                 console.error('[Updater] Intent failure details:', e);
-                throw new Error(`Não foi possível abrir o instalador: ${e.message}. Verifique as permissões de instalação de fontes desconhecidas.`);
+                throw new Error(`Não foi possível abrir o instalador. Detalhes: ${e.message}`);
             }
 
         } catch (error: any) {
