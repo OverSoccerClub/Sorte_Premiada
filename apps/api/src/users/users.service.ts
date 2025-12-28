@@ -1,3 +1,7 @@
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { FinanceService } from '../finance/finance.service';
+import { User, Prisma } from '@prisma/client';
 import { AuditLogService } from '../audit/audit-log.service';
 
 @Injectable()

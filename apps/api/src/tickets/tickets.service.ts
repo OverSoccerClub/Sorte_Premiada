@@ -1,4 +1,12 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { FinanceService } from '../finance/finance.service';
+import { SecurityService } from '../security/security.service';
 import { RedisService } from '../redis/redis.service';
+import { Prisma } from '@prisma/client';
+import * as dayjs from 'dayjs';
+import { getBrazilTime } from '../utils/date.util';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class TicketsService {
