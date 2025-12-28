@@ -271,14 +271,28 @@ export default function FinanceScreen() {
                             </Text>
                         </View>
                         <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}>
+                            <Text style={tw`text-blue-400 text-xs uppercase font-bold`}>Comissão Total</Text>
+                            <View style={tw`flex-row items-baseline gap-1`}>
+                                <Text style={tw`text-blue-400 text-lg font-bold mt-1`}>
+                                    {summary ? formatCurrency(summary.totalCommission) : "..."}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800 border-emerald-500/20`}>
+                            <Text style={tw`text-emerald-400 text-xs uppercase font-bold`}>Saldo Líquido</Text>
+                            <Text style={tw`text-emerald-400 text-xl font-bold mt-1`}>
+                                {summary ? formatCurrency(summary.netBalance) : "..."}
+                            </Text>
+                        </View>
+                        <View style={tw`w-[48%] bg-gray-800/20 p-4 rounded-xl border border-gray-800`}>
                             <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Créditos</Text>
-                            <Text style={tw`text-blue-400 text-lg font-bold mt-1`}>
+                            <Text style={tw`text-blue-400/70 text-base font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.totalCredits) : "..."}
                             </Text>
                         </View>
-                        <View style={tw`w-[48%] bg-surface p-4 rounded-xl border border-gray-800`}>
+                        <View style={tw`w-[48%] bg-gray-800/20 p-4 rounded-xl border border-gray-800`}>
                             <Text style={tw`text-gray-400 text-xs uppercase font-bold`}>Débitos</Text>
-                            <Text style={tw`text-red-400 text-lg font-bold mt-1`}>
+                            <Text style={tw`text-red-400/70 text-base font-bold mt-1`}>
                                 {summary ? formatCurrency(summary.totalDebits) : "..."}
                             </Text>
                         </View>

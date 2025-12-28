@@ -47,4 +47,10 @@ export class TicketsController {
     async validate(@Param('id') id: string) {
         return this.ticketsService.validateTicket(id);
     }
+
+    @Post(':id/redeem')
+    @UseGuards(JwtAuthGuard)
+    async redeem(@Request() req: any, @Param('id') id: string) {
+        return this.ticketsService.redeemPrize(id, req.user.userId);
+    }
 }

@@ -70,6 +70,7 @@ export class FinanceService {
         });
 
         const totalSales = tickets.reduce((sum, ticket) => sum + Number(ticket.amount), 0);
+        const totalCommission = tickets.reduce((sum, ticket) => sum + Number(ticket.commissionValue || 0), 0);
 
         // 2. Get Transactions
         const transactions = await this.prisma.transaction.findMany({
@@ -96,7 +97,15 @@ export class FinanceService {
         // Per user request: Tickets Sales count as Credits
         const totalCredits = manualCredits + totalSales;
 
+        // Cash in Hand
         const finalBalance = totalCredits - totalDebits;
+
+        // Net Payable (What the user owes the house)
+        // = Cash in Hand - Commission
+        // (Assuming Prizes Paid are already in totalDebits if paid manually, or if we subtract prizes... 
+        //  If prize paid via app validation flow later, we might deduct here strictly. 
+        //  For now, standard flow: Balance - Commission)
+        const netBalance = finalBalance - totalCommission;
 
         // Combine Transactions and Tickets for the list
         const ticketTransactions = tickets.map(t => ({
@@ -123,9 +132,11 @@ export class FinanceService {
             salesLimit: user?.salesLimit ? Number(user.salesLimit) : null,
             limitOverrideExpiresAt: user?.limitOverrideExpiresAt,
             totalSales,
+            totalCommission, // New field in summary
             totalCredits,
             totalDebits,
             finalBalance,
+            netBalance, // New field in summary
             transactions: allTransactions,
             tickets: tickets.map(t => ({
                 id: t.id,
@@ -184,7 +195,8 @@ export class FinanceService {
                         totalCredits: summary.totalCredits,
                         totalDebits: summary.totalDebits,
                         finalBalance: summary.finalBalance,
-                        netBalance: summary.finalBalance,
+                        netBalance: summary.netBalance,
+                        totalCommission: summary.totalCommission,
                         status: 'PENDING',
                         verifiedByUserId: null,
                         verifiedAt: null
@@ -202,7 +214,8 @@ export class FinanceService {
                 totalDebits: summary.totalDebits,
                 finalBalance: summary.finalBalance,
                 closedByUserId: userId,
-                netBalance: summary.finalBalance,
+                netBalance: summary.netBalance,
+                totalCommission: summary.totalCommission,
                 status: 'PENDING', // Default to PENDING
             },
         });
@@ -241,7 +254,8 @@ export class FinanceService {
                 totalDebits: summary.totalDebits,
                 finalBalance: summary.finalBalance,
                 closedByUserId: targetUserId,
-                netBalance: summary.finalBalance,
+                netBalance: summary.netBalance,
+                totalCommission: summary.totalCommission,
                 status: autoVerify ? 'VERIFIED' : 'PENDING',
                 verifiedByUserId: autoVerify ? adminId : null,
                 verifiedAt: autoVerify ? new Date() : null,

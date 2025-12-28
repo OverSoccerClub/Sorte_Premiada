@@ -30,6 +30,8 @@ export interface FinanceSummary {
     isClosed: boolean;
     salesLimit?: number;
     limitOverrideExpiresAt?: string;
+    totalCommission: number;
+    netBalance: number;
 }
 
 export const FinanceService = {
@@ -99,6 +101,43 @@ export const FinanceService = {
             return null;
         } catch (e) {
             console.error(e);
+            return null;
+        }
+    },
+
+    async collectCash(token: string, data: { amount: number, cobradorId: string, securityPin: string, cambistaId?: string }): Promise<{ success: boolean; data?: any; error?: string }> {
+        try {
+            const res = await fetch(`${AppConfig.api.baseUrl}/cash-collection/collect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                const json = await res.json();
+                return { success: true, data: json };
+            } else {
+                const err = await res.json();
+                return { success: false, error: err.message || "Erro ao processar sangria" };
+            }
+        } catch (e) {
+            console.error("Error collecting cash", e);
+            return { success: false, error: "Erro de conexão" };
+        }
+    },
+
+    async getBalance(token: string, cambistaId: string): Promise<{ totalBalance: number, totalCommission: number, netBalance: number } | null> {
+        try {
+            const res = await fetch(`${AppConfig.api.baseUrl}/cash-collection/balance/${cambistaId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) return await res.json();
+            return null;
+        } catch (e) {
+            console.error("Error fetching balance", e);
             return null;
         }
     }

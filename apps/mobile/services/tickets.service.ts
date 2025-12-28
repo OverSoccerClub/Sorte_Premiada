@@ -8,6 +8,7 @@ export interface Ticket {
     status: 'PENDING' | 'PAID' | 'CANCELLED' | 'WON' | 'LOST' | 'EXPIRED';
     drawDate?: string;
     hash?: string;
+    series?: string; // Added series field
     createdAt: string;
 }
 

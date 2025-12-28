@@ -16,10 +16,10 @@ export class TicketsService {
     async create(data: any) {
         // Check if day is closed
         const userId = data.user?.connect?.id;
-        if (userId) {
-            // Validate Sales Eligibility (Limit & Previous Box Status)
-            await this.financeService.validateSalesEligibility(userId, Number(data.amount || 0));
-        }
+        if (!userId) throw new BadRequestException("User ID required");
+
+        // Validate Sales Eligibility (Limit & Previous Box Status)
+        await this.financeService.validateSalesEligibility(userId, Number(data.amount || 0));
 
         console.log("DEBUG CREATE TICKET:", JSON.stringify(data, null, 2));
 
@@ -36,28 +36,41 @@ export class TicketsService {
         if (!game) throw new Error("Game not found");
         const rules = (game.rules as any) || {};
 
+        // Fetch User for Commission Rate
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { commissionRate: true }
+        });
+        const commissionRate = user?.commissionRate ? Number(user.commissionRate) : 0;
+
+        // Calc Financials
+        const amount = Number(data.amount || 0);
+        const commissionValue = amount * (commissionRate / 100);
+        const netValue = amount - commissionValue; // What the cambista owes
+
+        // Prize Calc (Estimated per winning number)
+        const numberCount = data.numbers ? data.numbers.length : 1;
+        const betPerNumber = numberCount > 0 ? amount / numberCount : 0;
+        const multiplier = game.prizeMultiplier ? Number(game.prizeMultiplier) : 1000;
+        const maxLiability = game.maxLiability ? Number(game.maxLiability) : 5000;
+
+        const possiblePrize = betPerNumber * multiplier;
+
         let drawDate: Date | undefined;
 
         // Determine Draw Date Logic (Shared)
         try {
-            // If it's a specific game type like JB, maybe logic differs, but generally we need a declared Draw Date.
-            // 2x500 and 2x1000 use extraction times.
             drawDate = await this.getNextDrawDate(gameId);
         } catch (e) {
             console.warn(`[TicketsService] Could not calculate next draw date: ${e} `);
         }
 
         // --- BUSINESS RULE 2: RESTRICTED MODE (Auto-Sequence) ---
-        // If enabled, and user sent exactly 1 number (Milhar), fill the rest.
-        // Applies primarily to "2x1000" or maybe "JB-MILHAR" if requested. 
-        // User request mentions: "usuario escolhe a 1a milhar... o sistema escolhe as outras 3... padrao de sequencia terminologia 578"
-
         if (rules.restrictedMode && data.numbers && data.numbers.length === 1 && (data.gameType === '2x1000' || data.gameType === '2x500' || data.gameType.includes('MILHAR'))) {
             const firstNum = data.numbers[0];
-            const suffix = firstNum % 1000; // Get last 3 digits (000-999)
+            const suffix = firstNum % 1000;
 
-            // Generate 3 other numbers with same suffix from 0000-9999
-            // Logic: Find all matches, remove used, pick 3 random.
+            // Generate 3 other numbers
             const possible: number[] = [];
             for (let i = 0; i <= 9; i++) {
                 const candidate = i * 1000 + suffix;
@@ -66,20 +79,59 @@ export class TicketsService {
                 }
             }
 
-            // Shuffle and take 3
             const others = possible.sort(() => 0.5 - Math.random()).slice(0, 3);
             data.numbers = [firstNum, ...others].sort((a, b) => a - b);
 
-            console.log(`[TicketsService] restrictedMode applied.Seed: ${firstNum} -> Result: ${data.numbers.join(', ')} `);
+            // Recalc specifics because numbers changed (count became 4)
+            // But wait, amount is total. If numbers changed from 1 to 4, betPerNumber changes?
+            // Usually Restricted Mode implies buying a "Block" of 4 numbers for the price of... ?
+            // User: "usuario escolhe a 1a milhar... o sistema escolhe as outras 3"
+            // If user input Amount=5.00 for 1 number, and we expanded to 4, is it 5.00 total for 4 numbers (1.25 each)?
+            // YES, assume Amount is Total Ticket Price.
+        }
+
+        // --- BUSINESS RULE: MAX LIABILITY CHECK (Risk Management) ---
+        if (drawDate && data.numbers && data.numbers.length > 0) {
+            // We must ensure that for EACH number picked, the total potential payout (including this new bet) does not exceed maxLiability.
+            // currentLiability = Sum of (betPerNumber * multiplier) for all tickets having this number in this draw.
+
+            // Optimization: Check only the new numbers.
+            // Note: This can be slow if we have many tickets. 
+            // Better approach: maintain a separate liability table. But for now, we query.
+
+            const currentBetPerNum = (Number(data.amount) / data.numbers.length);
+            const currentPotentialWin = currentBetPerNum * multiplier;
+
+            // We can check aggregate purely on DB?
+            // "Give me sum of amount/count where numbers has X" - hard in Prisma/SQL standard without normalization.
+            // Fallback: Just Fetch all winning tickets for these numbers? No, too many.
+            // Approximation: 
+            // Let's rely on `Ticket` records. We can't sum `possiblePrize` efficiently because it's per ticket not per number.
+            // But `possiblePrize` stored on ticket IS "Prize per winning number" (as we defined above).
+            // So for a number X, finding all tickets that have X, we sum their `possiblePrize`.
+
+            for (const num of data.numbers) {
+                // Find tickets with this number for this draw
+                const relevantTickets = await this.prisma.ticket.findMany({
+                    where: {
+                        gameId: gameId,
+                        drawDate: drawDate,
+                        numbers: { has: Number(num) },
+                        status: { not: 'CANCELLED' }
+                    },
+                    select: { possiblePrize: true }
+                });
+
+                const existingLiability = relevantTickets.reduce((sum, t) => sum + Number(t.possiblePrize || 0), 0);
+
+                if (existingLiability + currentPotentialWin > maxLiability) {
+                    throw new BadRequestException(`Limite de risco excedido para a milhar ${num}. Banca cheia. Tente outro número.`);
+                }
+            }
         }
 
         // --- BUSINESS RULE 1: GLOBAL UNIQUENESS ---
-        // If enabled, NO one else can have bought these numbers for this draw.
-        // This is stricter than `validateNumbersAvailability` which usually checks availability for specific Raffle games.
-        // This applies generally if checks are enabled.
-
         if (rules.globalCheck && drawDate && data.numbers && data.numbers.length > 0) {
-            // Check if ANY of these numbers are already sold for this Game/Draw
             const soldSet = await this.getSoldNumbers(gameId, drawDate);
             const conflicts = data.numbers.filter((n: number) => soldSet.has(n));
 
@@ -88,24 +140,17 @@ export class TicketsService {
             }
         }
 
-        // Continue with standard Type-specific logic...
-
         // 2x1000 Special Logic
         if (data.gameType === '2x1000') {
-            // Enforce 4 numbers per ticket
             const NUMBERS_PER_TICKET = 4;
             const isAutoPick = !data.numbers || data.numbers.length === 0;
 
             if (isAutoPick) {
-                // Should we respect globalCheck here? generateRandomAvailableNumbers DOES check availability.
-                // But availability check inside it uses getSoldNumbers which is the same source.
                 data.numbers = await this.generateRandomAvailableNumbers(gameId, NUMBERS_PER_TICKET, drawDate!);
             } else {
                 if (data.numbers.length !== NUMBERS_PER_TICKET) {
                     throw new Error(`Ticket must have exactly ${NUMBERS_PER_TICKET} thousands.`);
                 }
-                // If globalCheck was NOT enabled, 2x1000 inherently checks availability anyway.
-                // But avoiding double checking if we just did it above.
                 if (!rules.globalCheck) {
                     await this.validateNumbersAvailability(gameId, data.numbers, drawDate!);
                 }
@@ -146,22 +191,14 @@ export class TicketsService {
                     throw new BadRequestException(`Modalidade inválida: ${modality} `);
             }
         }
-        // Fallback validation for other games (existing logic)
-        else if (data.numbers && (data.numbers as number[]).length < 6) {
-            // Basic validation, can be improved
-        }
 
-        // FIX: Ensure drawDate is calculated for ALL game types if not already set
         if (!drawDate) {
-            // Redundant with top calc, but safe
-            try {
-                drawDate = await this.getNextDrawDate(gameId);
-            } catch { }
+            try { drawDate = await this.getNextDrawDate(gameId); } catch { }
         }
 
         try {
             const createData: any = {
-                userId: data.user.connect.id,
+                userId: userId,
                 gameType: data.gameType,
                 numbers: data.numbers,
                 amount: data.amount,
@@ -169,46 +206,40 @@ export class TicketsService {
                 drawDate: drawDate,
                 hash: this.generateTicketCode(8),
                 gameId: gameId,
+                // New Financials
+                commissionRate: commissionRate,
+                commissionValue: commissionValue,
+                netValue: netValue,
+                possiblePrize: possiblePrize
             };
 
-            // --- SECOND CHANCE LOGIC ---
+            // Second Chance ...
             if (game.secondChanceEnabled && game.secondChanceRangeStart && game.secondChanceRangeEnd) {
                 try {
                     const scDrawDate = this.getNextSecondChanceDate(
                         game.secondChanceWeekday ?? 6,
                         game.secondChanceDrawTime || '19:00'
                     );
-
                     const scNumber = await this.generateUniqueSecondChanceNumber(
                         gameId,
                         scDrawDate,
                         game.secondChanceRangeStart,
                         game.secondChanceRangeEnd
                     );
-
                     createData['secondChanceDrawDate'] = scDrawDate;
                     createData['secondChanceNumber'] = scNumber;
-
-                    console.log(`[TicketsService] Second Chance Assigned: ${scNumber} for ${scDrawDate.toISOString()}`);
-                } catch (scError) {
-                    console.error("[TicketsService] Failed to generate Second Chance number:", scError);
-                    // Decide: Fail ticket creation or allow without second chance?
-                    // User said "precisamos criar uma logica...", implies it's required if enabled.
-                    throw new BadRequestException("Não foi possível gerar o número da sorte/segunda chance. Tente novamente.");
+                } catch (e) {
+                    throw new BadRequestException("Erro ao gerar segunda chance.");
                 }
             }
 
-            console.log("DEBUG PRISMA DATA:", JSON.stringify(createData, null, 2));
+            console.log("DEBUG PRISMA DATA (With Financials):", JSON.stringify(createData, null, 2));
 
             return await this.prisma.ticket.create({
                 data: createData
             });
         } catch (error) {
-            console.error("Error creating ticket in Prisma:", error);
-            if (error instanceof Error) {
-                console.error("Error Message:", error.message);
-                console.error("Error Stack:", error.stack);
-            }
+            console.error("Error creating ticket:", error);
             throw error;
         }
     }
@@ -443,6 +474,12 @@ export class TicketsService {
                 message: 'Bilhete Premiado!',
                 ticket
             };
+        } else if (ticket.status === 'PAID') {
+            return {
+                status: 'PAID',
+                message: 'Bilhete já pago.',
+                ticket
+            };
         } else if (ticket.status === 'LOST') {
             return {
                 status: 'LOST',
@@ -457,6 +494,29 @@ export class TicketsService {
                 ticket
             };
         }
+    }
+
+    /**
+     * Mark a WON ticket as PAID.
+     * STRICT RULE: Only the cambista who sold the ticket can pay it out.
+     */
+    async redeemPrize(ticketId: string, loggedUserId: string) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId }
+        });
+
+        if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
+        if (ticket.status !== 'WON') throw new BadRequestException(`Status inválido para pagamento: ${ticket.status}`);
+
+        // STRICT OWNERSHIP CHECK
+        if (ticket.userId !== loggedUserId) {
+            throw new BadRequestException("Este prêmio só pode ser pago pelo Cambista que realizou a venda.");
+        }
+
+        return this.prisma.ticket.update({
+            where: { id: ticketId },
+            data: { status: 'PAID' }
+        });
     }
 
     private getNextSecondChanceDate(weekday: number, timeStr: string): Date {

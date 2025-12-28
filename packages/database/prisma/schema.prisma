@@ -34,6 +34,7 @@ model User {
   areaId       String?
   area         Area?    @relation(fields: [areaId], references: [id])
   isActive     Boolean  @default(true) // Controla bloqueio manual do cambista
+  commissionRate Decimal? @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
 }
 
 model Area {
@@ -56,6 +57,10 @@ model Game {
   extractionTimes String[] @default([])
   lastSeries Int @default(0)
   extractionSeries ExtractionSeries[]
+  
+  // Risk and Financial Config
+  prizeMultiplier Decimal @default(1000.0) // Multiplicador de Prêmio (ex: 1000x)
+  maxLiability    Decimal @default(5000.0) // Limite máximo de prêmio acumulado por milhar
   
   // Configuração Segunda Chance (Sorteio Semanal/Sábado)
   secondChanceEnabled Boolean @default(false)
@@ -100,6 +105,13 @@ model Ticket {
   hash      String?      // Unique hash for barcode/validation
   secondChanceNumber Int? // Número da Sorte / Segunda Chance
   secondChanceDrawDate DateTime?
+  
+  // Financial Snapshot
+  commissionRate   Decimal @default(0) // Taxa aplicada no momento da venda
+  commissionValue  Decimal @default(0) // Valor monetário da comissão
+  netValue         Decimal @default(0) // Valor líquido (Amount - Commission)
+  possiblePrize    Decimal @default(0) // Prêmio estimado se ganhar
+  
   createdAt DateTime @default(now())
 }
 

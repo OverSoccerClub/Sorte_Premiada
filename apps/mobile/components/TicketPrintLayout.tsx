@@ -17,11 +17,12 @@ interface TicketPrintLayoutProps {
     drawDate?: string;
     hash?: string;
 
-    series?: number; // New prop
+    series?: string; // Changed to string
     fixPrinterStretch?: boolean; // New prop for conditional scaling
     secondChanceNumber?: number; // Dynamic Second Chance Number
     secondChanceDrawDate?: string; // Date string
     secondChanceLabel?: string;
+    possiblePrize?: string;
 }
 
 // Helper para converter números em texto (simplificado para 0-99 para o layout)
@@ -44,7 +45,8 @@ export const TicketPrintLayout = ({
     fixPrinterStretch = false, // Default to false (normal aspect ratio)
     secondChanceNumber,
     secondChanceDrawDate = "SÁBADO",
-    secondChanceLabel = "SEGUNDA CHANCE"
+    secondChanceLabel = "SEGUNDA CHANCE",
+    possiblePrize
 }: TicketPrintLayoutProps) => {
 
     // Ordenar números
@@ -72,7 +74,7 @@ export const TicketPrintLayout = ({
                 </View>
                 {/* Info Sorteio */}
                 <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
-                    SORTEIO {ticketId.substring(0, 4)} - {drawDate || date.split(' ')[0]} - 19H
+                    SORTEIO {hash || ticketId.substring(0, 8)} - {drawDate || date.split(' ')[0]} - 19H
                 </Text>
             </View>
 
@@ -119,9 +121,20 @@ export const TicketPrintLayout = ({
             <Text style={tw`text-center font-bold text-[11px] text-black mb-1 uppercase`}>
                 VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:
             </Text>
-            <Text style={tw`text-center font-black text-[11px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
-                MILHAR: R$ 1.000,00 • CENTENA: R$ 100,00 • DEZENA: R$ 10,00
-            </Text>
+            {possiblePrize ? (
+                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2 items-center`}>
+                    <Text style={tw`text-center font-black text-lg text-black uppercase`}>
+                        PRÊMIO MÁXIMO
+                    </Text>
+                    <Text style={tw`text-center font-black text-2xl text-black`}>
+                        {possiblePrize}
+                    </Text>
+                </View>
+            ) : (
+                <Text style={tw`text-center font-black text-[11px] text-black mb-3 border-b-2 border-black pb-1 mx-2`}>
+                    MILHAR: R$ 1.000,00 • CENTENA: R$ 100,00 • DEZENA: R$ 10,00
+                </Text>
+            )}
 
             {/* Segunda Chance - ONLY SHOW IF NUMBER IS PRESENT */}
             {secondChanceNumber !== undefined && secondChanceNumber !== null && (
@@ -157,8 +170,8 @@ export const TicketPrintLayout = ({
 
                 {/* Row 1: Bilhete | Série | Preço */}
                 <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {ticketId.substring(0, 4)}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {series?.toString().padStart(4, '0') || '----'}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {hash || ticketId.substring(0, 8)}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {series || '----'}</Text>
                     <Text style={tw`text-[12px] text-black font-bold`}>Preço: {price}</Text>
                 </View>
 
@@ -202,17 +215,17 @@ export const TicketPrintLayout = ({
                     style={[
                         tw`items-center justify-center w-full mt-2`,
                         fixPrinterStretch && {
-                            transform: [{ scaleY: 0.5 }],
-                            marginTop: -35,
-                            marginBottom: -35
+                            transform: [{ scaleY: 0.38 }], // More aggressive scale to ensure it's "square" on the printer
+                            marginTop: -40,
+                            marginBottom: -40
                         }
                     ]}
                     collapsable={false}
                 >
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
-                            value={`https://www.fezinhadehoje.com.br/sorteio/${ticketId}`}
-                            size={150}
+                            value={`https://www.fezinhadehoje.com.br/sorteio/${hash || ticketId}`}
+                            size={100} // Slightly smaller base size
                         />
                     </View>
                 </View>

@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Linking, 
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import tw from "../../lib/tailwind";
-import { useAuth } from "../../context/AuthContext";
-import { CustomAlert, AlertType } from "../../components/CustomAlert";
-import { VersionFooter } from "../../components/VersionFooter";
+import tw from "../lib/tailwind";
+import { useAuth } from "../context/AuthContext";
+import { CustomAlert, AlertType } from "../components/CustomAlert";
+import { VersionFooter } from "../components/VersionFooter";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { ScreenLayout } from "../../components/ScreenLayout";
-import { FormField } from "../../components/FormField";
+import { ScreenLayout } from "../components/ScreenLayout";
+import { FormField } from "../components/FormField";
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");

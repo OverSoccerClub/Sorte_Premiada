@@ -20,7 +20,7 @@ import { printTicket } from "../../services/printing.service";
 import { ReceiptModal } from "../../components/ReceiptModal";
 
 
-export default function Game2x500Screen() {
+export default function Game2x1000Screen() {
     const router = useRouter();
     const { token, user } = useAuth();
     const { show, hide } = useLoading();
@@ -29,7 +29,7 @@ export default function Game2x500Screen() {
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
-    const [gameName, setGameName] = useState<string>("Jogo 2x500");
+    const [gameName, setGameName] = useState<string>("Jogo 2x1000");
     const [isLoadingGame, setIsLoadingGame] = useState(true);
     const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
@@ -235,21 +235,27 @@ export default function Game2x500Screen() {
             if (isRestrictedMode) {
                 // In restricted mode, we allow 1 (auto-complete) OR 4 (full manual)
                 if (selectedNumbers.length === 1) {
-                    // +3 Auto Logic: Generating 3 random numbers to complete the bet
+                    // +3 Auto Logic: Generating 3 numbers with SAME ENDING (Last 2 digits)
+                    const firstNum = selectedNumbers[0];
+                    const suffix = firstNum % 100; // Get last 2 digits (e.g., 4578 -> 78)
+
                     const available = [];
-                    for (let i = 0; i < 10000; i++) {
+                    // Only scan numbers that end with the same suffix
+                    // Optimization: We can jump by 100 starting from suffix
+                    // e.g. if suffix is 78, check 78, 178, 278... 9978
+                    for (let i = suffix; i < 10000; i += 100) {
                         if (!soldNumbers.has(i) && !selectedNumbers.includes(i)) {
                             available.push(i);
                         }
                     }
 
                     if (available.length < 3) {
-                        showAlert("Esgotado", "Não há números suficientes para completar a aposta.", "error");
+                        showAlert("Esgotado", `Não há números suficientes terminados em ${suffix.toString().padStart(2, '0')} para completar a aposta.`, "error");
                         return;
                     }
 
                     const newNumbers = [...selectedNumbers];
-                    // Pick 3 random
+                    // Pick 3 random from the filtered list
                     for (let k = 0; k < 3; k++) {
                         const randomIndex = Math.floor(Math.random() * available.length);
                         const num = available[randomIndex];
@@ -299,7 +305,7 @@ export default function Game2x500Screen() {
         try {
             const API_URL = AppConfig.api.baseUrl;
             const payload = {
-                gameType: "2x500",
+                gameType: "2x1000",
                 numbers: selectedNumbers, // Always use selected numbers (explicit)
                 amount: 10.00,
                 game: { connect: { id: gameId } } // Backend expects gameId logic? No, check my backend fix.
@@ -346,14 +352,18 @@ export default function Game2x500Screen() {
 
             // Prepare Receipt Data & Auto Print
             setLastTicket({
-                gameName: "2x500",
+                gameName: "2x1000",
                 numbers: finalNumbers,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 id: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
-                series: drawSeries
+                series: drawSeries,
+                possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,
+                secondChanceNumber: ticketData.secondChanceNumber,
+                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                secondChanceLabel: "SEGUNDA CHANCE"
             });
 
             // 1. Show Standard Loading
@@ -378,9 +388,10 @@ export default function Game2x500Screen() {
                         ticketData.hash || ticketData.id,
                         new Date(),
                         gamePrice,
-                        "2x500",
+                        "2x1000",
                         printerType,
-                        uri // Pass the image!
+                        uri, // Pass the image!
+                        ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined
                     );
                 } catch (err) {
                     console.error("Print failed", err);
@@ -422,9 +433,10 @@ export default function Game2x500Screen() {
             lastTicket.id,
             new Date(), // Current date for print or parse from lastTicket.date if needed
             gamePrice,
-            "2x500",
+            "2x1000",
             printerType,
-            imageUri
+            imageUri,
+            lastTicket.possiblePrize
         );
         if (success) {
             showAlert("Sucesso", "Bilhete enviado para impressão!", "success");
@@ -531,7 +543,7 @@ export default function Game2x500Screen() {
                     <ViewShot ref={printViewShotRef} options={{ format: "png", quality: 1.0, result: "tmpfile" }} style={{ backgroundColor: '#ffffff', width: 384 }}>
                         {lastTicket && (
                             <TicketPrintLayout
-                                gameName="2x500"
+                                gameName="2x1000"
                                 numbers={lastTicket.numbers}
                                 price={lastTicket.price}
                                 date={lastTicket.date}
@@ -672,7 +684,7 @@ export default function Game2x500Screen() {
 
                             <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl items-center`}>
                                 <TicketPreview
-                                    gameName="2x500"
+                                    gameName="2x1000"
                                     numbers={selectedNumbers}
                                     price="R$ 10,00"
                                     series={drawSeries}

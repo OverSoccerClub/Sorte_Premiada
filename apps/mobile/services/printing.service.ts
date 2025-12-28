@@ -22,7 +22,8 @@ export const printTicket = async (
   amount: string | number,
   gameType: string,
   printerType: PrinterType = 'BLE',
-  imageUri?: string
+  imageUri?: string,
+  possiblePrize?: string
 ) => {
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameType}, Type: ${printerType}, Image: ${!!imageUri}`);
@@ -63,7 +64,7 @@ export const printTicket = async (
 
     // Determine padding based on game type
     let padLength = 2;
-    if (gameType.includes("2x500") || gameType.includes("MILHAR")) padLength = 4;
+    if (gameType.includes("2x1000") || gameType.includes("MILHAR")) padLength = 4;
     else if (gameType.includes("CENTENA")) padLength = 3;
 
     // Format numbers like 08 13 16 ... (No brackets, as per image)
@@ -109,6 +110,12 @@ export const printTicket = async (
             </div>
             
             <div class="dashed"></div>
+            
+            ${possiblePrize ? `
+            <div class="bold">PRÊMIO MÁXIMO</div>
+            <div class="bold big">${possiblePrize}</div>
+            <div class="dashed"></div>
+            ` : ''}
             
             <div class="flex">
               <span class="bold">TOTAL A PAGAR</span>
@@ -196,6 +203,13 @@ export const printTicket = async (
       receipt += DOUBLE_HEIGHT + BOLD_ON + line + BOLD_OFF + NORMAL + "\n";
     }
     receipt += "\n";
+
+    // Possible Prize
+    if (possiblePrize) {
+      receipt += "- - - - - - - - - - - - - - - -\n";
+      receipt += BOLD_ON + "PREMIO MAXIMO" + BOLD_OFF + "\n";
+      receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + possiblePrize + BOLD_OFF + NORMAL + "\n";
+    }
 
     // Price
     receipt += "- - - - - - - - - - - - - - - -\n";

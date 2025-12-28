@@ -26,6 +26,13 @@ export class DrawsController {
         return this.drawsService.findAll();
     }
 
+    @Get('liability-report')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    getLiabilityReport(@Query('gameId') gameId: string, @Query('drawDate') drawDate: string) {
+        return this.drawsService.getLiabilityReport(gameId, drawDate);
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.drawsService.findOne(id);

@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff, DollarSign } from "lucide-react"
+import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff, DollarSign, Percent } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 
 const ACCOUNTABILITY_ALARM_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
@@ -24,6 +24,7 @@ const formSchema = z.object({
     email: z.union([z.string().email({ message: "Email inválido." }), z.literal('')]),
     areaId: z.string().optional(),
     salesLimit: z.coerce.number().min(0).optional(),
+    commissionRate: z.coerce.number().min(0).max(100).optional(),
     accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
     isActive: z.boolean().default(true),
 })
@@ -64,6 +65,7 @@ export default function CambistasPage() {
             email: "",
             areaId: undefined,
             salesLimit: 1000,
+            commissionRate: 10,
             accountabilityLimitHours: 24,
             isActive: true,
         },
@@ -120,6 +122,7 @@ export default function CambistasPage() {
                 password: "", // Password is optional on edit
                 areaId: cambista.areaId || undefined,
                 salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
+                commissionRate: cambista.commissionRate ? Number(cambista.commissionRate) : 10,
                 accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
                 isActive: cambista.isActive ?? true,
             })
@@ -132,6 +135,7 @@ export default function CambistasPage() {
                 password: "",
                 areaId: undefined,
                 salesLimit: 1000,
+                commissionRate: 10,
                 accountabilityLimitHours: 24,
                 isActive: true,
             })
@@ -399,6 +403,22 @@ export default function CambistasPage() {
                                             </FormItem>
                                         )}
                                     />
+                                    <FormField
+                                        control={form.control}
+                                        name="commissionRate"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Comissão (%)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Percent className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input type="number" step="1" placeholder="10" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                                 <FormField
                                     control={form.control}
@@ -481,8 +501,8 @@ export default function CambistasPage() {
                                 <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
                                     <TableHead className="w-[300px]">Nome</TableHead>
                                     <TableHead>Praça</TableHead>
+                                    <TableHead>Limite / Comissão</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Role</TableHead>
                                     <TableHead className="text-right">Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -528,6 +548,18 @@ export default function CambistasPage() {
                                                 )}
                                             </TableCell>
                                             <TableCell>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
+                                                        <DollarSign className="w-3 h-3 text-emerald-500" />
+                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cambista.salesLimit || 0)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                        <Percent className="w-3 h-3 text-blue-500" />
+                                                        {cambista.commissionRate || 0}% de comissão
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
                                                 {isManuallyBlocked ? (
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
                                                         <Ban className="w-3.5 h-3.5" />
@@ -549,12 +581,6 @@ export default function CambistasPage() {
                                                         Ativo
                                                     </span>
                                                 )}
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                                    {cambista.role}
-                                                </div>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">

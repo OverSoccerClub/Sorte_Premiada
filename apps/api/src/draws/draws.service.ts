@@ -84,13 +84,7 @@ export class DrawsService {
     private async processDrawResults(tx: Prisma.TransactionClient, draw: any) {
         if (!draw.numbers || draw.numbers.length === 0) return;
 
-        // Find all PENDING tickets for this game and draw date
-        // Also include already processed ones if we are re-processing via Update? 
-        // Ideally yes, but for now let's focus on PENDING to avoid re-crediting or confusing states.
-        // However, if we edited the draw, we might need to re-evaluate EVERYONE?
-        // Risky. Let's stick to PENDING for first pass or if explicitly requested.
-        // But if I put wrong numbers and fix them, I want to fix the tickets. 
-        // Let's allow checking non-cancelled tickets.
+        // Find tickets
         const tickets = await tx.ticket.findMany({
             where: {
                 gameId: draw.gameId,
@@ -107,19 +101,55 @@ export class DrawsService {
         for (const ticket of tickets) {
             const ticketNumbers = (ticket.numbers as number[]);
 
-            // "Match Any" Logic
+            // "Match Any" Logic (2x1000/JB general rule)
+            // If explicit rules needed per game type, add logic here.
+            // For 2x1000, usually matching "The Thousand" extracted.
             const hasMatch = ticketNumbers.some(n => drawNumbers.has(n));
             const newStatus = hasMatch ? 'WON' : 'LOST';
 
-            // Only update if status changed to avoid redundant DB writes
+            // Only update if status changed to avoid redundant DB writes & Double Credits.
+            // We must compare with current DB status.
             if (ticket.status !== newStatus) {
+                // If it becomes WON, we Credit the Cambista (He pays the Punter, so House owes him)
+                if (newStatus === 'WON' && ticket.status !== 'WON') {
+                    const prizeValue = Number(ticket.possiblePrize || 0);
+                    if (prizeValue > 0) {
+                        await tx.transaction.create({
+                            data: {
+                                userId: ticket.userId,
+                                amount: prizeValue,
+                                type: 'CREDIT', // We credit the Cambista
+                                description: `Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
+                            }
+                        });
+                    }
+                    wonCount++;
+                }
+
+                // If it WAS WON and now LOST (Correction), we Debit back.
+                if (ticket.status === 'WON' && newStatus === 'LOST') {
+                    const prizeValue = Number(ticket.possiblePrize || 0);
+                    if (prizeValue > 0) {
+                        await tx.transaction.create({
+                            data: {
+                                userId: ticket.userId,
+                                amount: prizeValue,
+                                type: 'DEBIT', // Reversal
+                                description: `Estorno Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
+                            }
+                        });
+                    }
+                    lostCount++;
+                }
+
+                if (newStatus === 'LOST' && ticket.status !== 'WON') {
+                    lostCount++;
+                }
+
                 await tx.ticket.update({
                     where: { id: ticket.id },
                     data: { status: newStatus }
                 });
-
-                if (newStatus === 'WON') wonCount++;
-                else lostCount++;
             }
         }
         console.log(`[ProcessResults] Draw ${draw.id} Re-calculed: ${wonCount} Won, ${lostCount} Lost.`);
@@ -151,10 +181,7 @@ export class DrawsService {
 
         // Trigger result processing if numbers are present
         if (updatedDraw.numbers && (updatedDraw.numbers as number[]).length > 0) {
-            // We need a transaction client if we want to follow the pattern, 
-            // but since we are not in a transaction here, we pass the main prisma service.
-            // processDrawResults expects Prisma.TransactionClient, which PrismaService satisfies compatible interface wise usually 
-            // but strict typing might complain. Let's cast or adjust.
+            // Re-use main prisma as tx client
             await this.processDrawResults(this.prisma, updatedDraw);
         }
 
@@ -164,6 +191,7 @@ export class DrawsService {
     async remove(id: string) {
         return this.prisma.draw.delete({ where: { id } });
     }
+
     async getDrawDetails(id: string) {
         const draw = await this.prisma.draw.findUnique({
             where: { id },
@@ -174,12 +202,10 @@ export class DrawsService {
 
         // Find tickets for this draw
         // Calculate timezone offsets to handle legacy data mismatch
-        // Bug: Some tickets might have been saved as UTC-3 (server time) while Draw is UTC (or vice versa), resulting in exactly 3h difference.
         const exactDate = draw.drawDate;
         const minus3h = new Date(exactDate.getTime() - 3 * 60 * 60 * 1000);
         const plus3h = new Date(exactDate.getTime() + 3 * 60 * 60 * 1000);
 
-        // Find tickets for this draw with tolerance for timezone bug
         const tickets = await this.prisma.ticket.findMany({
             where: {
                 gameId: draw.gameId,
@@ -201,27 +227,50 @@ export class DrawsService {
 
         // Calculate stats
         const totalSales = tickets.reduce((sum, t) => sum + Number(t.amount), 0);
-        const totalPrizes = tickets.filter(t => t.status === 'WON').reduce((sum, t) => {
-            // Assuming prize calculation logic is elsewhere or we should strictly look at paid prizes?
-            // Since we don't store prize amount on ticket yet (only status), we might need to estimate or 
-            // if 'amount' is the bet amount.
-            // Wait, standard lottery: Prize is defined by Game Rules * Bet Amount or Fixed per winner?
-            // The current system seems to lack "Prize Amount" field on Ticket model (it has 'amount' which is bet cost).
-            // Let's check schema again. Ticket has 'amount' (Decimal). No 'prizeAmount'.
-            // However, the User Request says "qual valor do premio". 
-            // For now, let's just return the tickets list and the frontend can infer or we just explicitly return empty prize if not stored.
-            // actually, let's just list the tickets.
-            return sum;
-        }, 0);
+        const totalPrizes = tickets
+            .filter(t => t.status === 'WON')
+            .reduce((sum, t) => sum + Number(t.possiblePrize || 0), 0);
 
         return {
             draw,
             tickets,
             stats: {
                 totalSales,
+                totalPrizes,
                 ticketCount: tickets.length,
                 winningCount: tickets.filter(t => t.status === 'WON').length
             }
         };
+    }
+
+    /**
+     * Calculates the total potential payout (liability) for each number in a specific draw.
+     * Essential for the Admin Risk Dashboard.
+     */
+    async getLiabilityReport(gameId: string, drawDate: string) {
+        const date = new Date(drawDate);
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                gameId,
+                drawDate: date,
+                status: { in: ['PENDING', 'WON', 'PAID'] } // include active bets
+            }
+        });
+
+        const liabilityMap: Record<string, number> = {};
+
+        tickets.forEach(ticket => {
+            ticket.numbers.forEach(num => {
+                const numStr = num.toString().padStart(4, '0');
+                liabilityMap[numStr] = (liabilityMap[numStr] || 0) + Number(ticket.possiblePrize || 0);
+            });
+        });
+
+        // Convert to array and sort by risk (liability)
+        const report = Object.entries(liabilityMap)
+            .map(([number, liability]) => ({ number, liability }))
+            .sort((a, b) => b.liability - a.liability);
+
+        return report;
     }
 }

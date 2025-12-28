@@ -152,12 +152,15 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                 type: 'DEBIT' as const
             }; // Fixed TS error by adding as const or explicit casting if needed. using generic obj for now.
 
-            // 1. Create Transaction
-            const result = await FinanceService.createTransaction(
+            // 1. Create Transaction via Specialized Cash Collection Endpoint
+            const result = await FinanceService.collectCash(
                 token || '',
-                { ...transactionData, type: 'DEBIT' },
-                selectedCobrador?.id,
-                pin
+                {
+                    amount: val,
+                    cobradorId: selectedCobrador?.id || '',
+                    securityPin: pin,
+                    cambistaId: user?.id
+                }
             );
 
             if (result.success) {

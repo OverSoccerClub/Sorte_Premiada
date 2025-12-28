@@ -159,10 +159,10 @@ export default function HistoryScreen() {
                 <Text style={tw`text-gray-400 text-xs mb-1 uppercase tracking-wider`}>Números</Text>
                 <View style={tw`flex-row flex-wrap gap-2`}>
                     {item.numbers.sort((a, b) => a - b).map((num, idx) => {
-                        const is2x500 = item.gameType === '2x500';
+                        const is2x1000 = item.gameType === '2x1000';
                         return (
                             <Text key={idx} style={tw`text-white font-mono font-bold`}>
-                                {num.toString().padStart(is2x500 ? 4 : 2, '0')}
+                                {num.toString().padStart(is2x1000 ? 4 : 2, '0')}
                             </Text>
                         );
                     })}
@@ -328,7 +328,12 @@ export default function HistoryScreen() {
                     id: selectedTicket.id,
                     hash: selectedTicket.hash,
                     date: new Date(selectedTicket.createdAt).toLocaleString(),
-                    drawDate: selectedTicket.drawDate ? new Date(selectedTicket.drawDate).toLocaleString() : undefined
+                    drawDate: selectedTicket.drawDate ? new Date(selectedTicket.drawDate).toLocaleString() : undefined,
+                    series: selectedTicket.series,
+                    possiblePrize: selectedTicket.possiblePrize ? `R$ ${Number(selectedTicket.possiblePrize).toFixed(2).replace('.', ',')}` : undefined,
+                    secondChanceNumber: selectedTicket.secondChanceNumber,
+                    secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? new Date(selectedTicket.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                    secondChanceLabel: "SEGUNDA CHANCE"
                 } : null}
                 onPrint={async (imageUri) => {
                     if (!selectedTicket) return;

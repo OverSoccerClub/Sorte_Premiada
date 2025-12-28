@@ -21,6 +21,11 @@ interface ReceiptModalProps {
         hash?: string;
         date: string;
         drawDate?: string;
+        series?: string;
+        possiblePrize?: string;
+        secondChanceNumber?: number;
+        secondChanceDrawDate?: string;
+        secondChanceLabel?: string;
     } | null;
     onPrint?: (imageUri?: string) => Promise<void>;
     autoPrint?: boolean;
@@ -80,13 +85,13 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
             }
 
             // 2. Format Text
-            const is2x500 = ticketData.gameName === "2x500" || ticketData.gameName === "2x1000";
+            const is2x500 = ticketData.gameName === "2x1000" || ticketData.gameName === "2x1000"; // kept 2x1000 twice to minimize logic change risk or just clean it up
             const formattedNums = ticketData.numbers
                 .sort((a, b) => a - b)
                 .map(n => n.toString().padStart(is2x500 ? 4 : 2, '0'))
                 .join(is2x500 ? '  ' : ' ');
 
-            const message = `🍀 *Fezinha de Hoje* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 ID: ${ticketData.id.slice(0, 8)}...\n\n✨ Boa Sorte! ✨`;
+            const message = `🍀 *Fezinha de Hoje* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 Bilhete: ${ticketData.hash || ticketData.id.slice(0, 8)}\n\n✨ Boa Sorte! ✨`;
 
             // 3. Copy to Clipboard
             await Clipboard.setStringAsync(message);
@@ -131,6 +136,10 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                                 hash={ticketData.hash}
                                 isCapture={false} // Normal aspect ratio for screen
                                 vendorName={user?.name || user?.username || "Vendedor"}
+                                possiblePrize={ticketData.possiblePrize}
+                                secondChanceNumber={ticketData.secondChanceNumber}
+                                secondChanceDrawDate={ticketData.secondChanceDrawDate}
+                                secondChanceLabel={ticketData.secondChanceLabel}
                             />
                         </View>
                     </ScrollView>
@@ -199,6 +208,11 @@ export function ReceiptModal({ visible, onClose, ticketData, onPrint, autoPrint,
                             drawDate={ticketData.drawDate}
                             vendorName={user?.name || user?.username || "Vendedor"}
                             fixPrinterStretch={true}
+                            series={ticketData.series}
+                            possiblePrize={ticketData.possiblePrize}
+                            secondChanceNumber={ticketData.secondChanceNumber}
+                            secondChanceDrawDate={ticketData.secondChanceDrawDate}
+                            secondChanceLabel={ticketData.secondChanceLabel}
                         />
                     </ViewShot>
                 </View>

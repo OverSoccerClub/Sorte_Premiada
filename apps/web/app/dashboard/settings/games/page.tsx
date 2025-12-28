@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield, Settings2 } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield, Settings2, Activity } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -29,7 +29,7 @@ export default function GameSettingsPage() {
 
     // Rules Editing State
     const [rulesModalOpen, setRulesModalOpen] = useState(false)
-    const [rulesValues, setRulesValues] = useState({ globalCheck: false, restrictedMode: false })
+    const [rulesValues, setRulesValues] = useState({ globalCheck: false, restrictedMode: false, maxLiability: "5000", prizeMultiplier: "1000" })
 
     // Prize Editing State
     const [prizesModalOpen, setPrizesModalOpen] = useState(false)
@@ -229,7 +229,9 @@ export default function GameSettingsPage() {
         const currentRules = game.rules || {}
         setRulesValues({
             globalCheck: !!currentRules.globalCheck,
-            restrictedMode: !!currentRules.restrictedMode
+            restrictedMode: !!currentRules.restrictedMode,
+            maxLiability: game.maxLiability ? String(game.maxLiability) : "5000",
+            prizeMultiplier: game.prizeMultiplier ? String(game.prizeMultiplier) : "1000"
         })
         setRulesModalOpen(true)
     }
@@ -246,13 +248,19 @@ export default function GameSettingsPage() {
                 restrictedMode: rulesValues.restrictedMode
             }
 
+            const payload = {
+                rules: updatedRules,
+                maxLiability: Number(rulesValues.maxLiability),
+                prizeMultiplier: Number(rulesValues.prizeMultiplier)
+            }
+
             const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ rules: updatedRules })
+                body: JSON.stringify(payload)
             })
 
             if (res.ok) {
@@ -583,6 +591,35 @@ export default function GameSettingsPage() {
                                 onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
                                 className="data-[state=checked]:bg-emerald-600"
                             />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                            <div className="space-y-2">
+                                <Label className="flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-red-500" />
+                                    Limite de Risco (R$)
+                                </Label>
+                                <Input
+                                    type="number"
+                                    value={rulesValues.maxLiability}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, maxLiability: e.target.value })}
+                                    placeholder="Ex: 5000"
+                                />
+                                <p className="text-[10px] text-muted-foreground whitespace-nowrap">Máximo de prêmios por número/sorteio.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-emerald-500" />
+                                    Multiplicador
+                                </Label>
+                                <Input
+                                    type="number"
+                                    value={rulesValues.prizeMultiplier}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, prizeMultiplier: e.target.value })}
+                                    placeholder="Ex: 1000"
+                                />
+                                <p className="text-[10px] text-muted-foreground whitespace-nowrap text-wrap">Multiplica o valor da aposta no prêmio.</p>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

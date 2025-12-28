@@ -12,7 +12,7 @@ import { ScreenLayout } from "../../components/ScreenLayout";
 const { height } = Dimensions.get("window");
 
 const games = [
-    { id: "2x500", name: "2x1000", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
+    { id: "2x1000", name: "2x1000", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
     { id: "jb", name: "Jogo do Bicho", color: "bg-amber-600", icon: "paw-outline", borderColor: "border-amber-500/30" },
 ];
 
@@ -71,8 +71,8 @@ export default function Dashboard() {
             return;
         }
 
-        if (gameId === "2x500") {
-            router.push("/games/2x500");
+        if (gameId === "2x1000") {
+            router.push("/games/2x1000");
         } else if (gameId === "jb") {
             router.push("/games/jogo-do-bicho");
         } else {
@@ -114,24 +114,24 @@ export default function Dashboard() {
                 <Text style={tw`text-lg font-bold text-white uppercase tracking-wider`}>Jogos Disponíveis</Text>
             </View>
 
-            <View style={tw`w-[90%] flex-row flex-wrap justify-between mt-2`}>
+            <View style={tw`w-[90%] flex-row justify-center gap-4 mt-2`}>
                 {games.map((game) => (
                     <TouchableOpacity
                         key={game.id}
-                        style={tw`w-[48%] bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${game.borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
+                        style={tw`flex-1 bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${game.borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
                         onPress={() => handleGamePress(game.id, game.name)}
                         activeOpacity={0.8}
                     >
                         <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 rotate-3`}>
                             <Ionicons name={game.icon as any} size={32} color="white" />
                         </View>
-                        <Text style={tw`font-bold text-lg text-white`}>{game.name}</Text>
+                        <Text style={tw`font-bold text-lg text-white text-center`}>{game.name}</Text>
                     </TouchableOpacity>
                 ))}
             </View>
 
             {/* Botão de Validação */}
-            <View style={tw`w-[90%] mt-2`}>
+            <View style={tw`w-[90%] mt-0`}>
                 <TouchableOpacity
                     style={tw`w-full bg-slate-800 p-4 rounded-2xl mb-4 shadow-lg border border-slate-700 flex-row items-center justify-center gap-3 active:bg-slate-700`}
                     onPress={() => router.push("/validate")}

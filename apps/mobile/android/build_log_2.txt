@@ -11,8 +11,8 @@
 > Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
 > Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
 > Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
-> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-updates-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
 > Task :expo-updates-gradle-plugin:pluginDescriptors UP-TO-DATE
 > Task :expo-updates-gradle-plugin:processResources UP-TO-DATE
 > Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
@@ -189,30 +189,31 @@ Proceeding without mode-specific .env
 > Task :app:createBundleReleaseJsAndAssets
 Starting Metro Bundler
 warning: Bundler cache is empty, rebuilding (this may take a minute)
-Error: Unable to resolve module ../../lib/tailwind from C:\Projetos\App\MegaSena\apps\mobile\app\index.tsx: 
+Android Bundling failed 35555ms index.js (1851 modules)
+Error: Unable to resolve module ../../context/AuthContext from C:\Projetos\App\MegaSena\apps\mobile\app\index.tsx: 
 
 None of these files exist:
-  * ..\lib\tailwind(.android.ts|.native.ts|.ts|.android.tsx|.native.tsx|.tsx|.android.mjs|.native.mjs|.mjs|.android.js|.native.js|.js|.android.jsx|.native.jsx|.jsx|.android.json|.native.json|.json|.android.cjs|.native.cjs|.cjs|.android.scss|.native.scss|.scss|.android.sass|.native.sass|.sass|.android.css|.native.css|.css)
-  * ..\lib\tailwind
-[0m [90m 4 |[39m [36mimport[39m { useSafeAreaInsets } [36mfrom[39m [32m"react-native-safe-area-context"[39m[33m;[39m
- [90m 5 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m"expo-status-bar"[39m[33m;[39m
-[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m tw [36mfrom[39m [32m"../../lib/tailwind"[39m[33m;[39m
- [90m   |[39m                 [31m[1m^[22m[39m
- [90m 7 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../../context/AuthContext"[39m[33m;[39m
- [90m 8 |[39m [36mimport[39m { [33mCustomAlert[39m[33m,[39m [33mAlertType[39m } [36mfrom[39m [32m"../../components/CustomAlert"[39m[33m;[39m
- [90m 9 |[39m [36mimport[39m { [33mVersionFooter[39m } [36mfrom[39m [32m"../../components/VersionFooter"[39m[33m;[39m[0m
-Error: Unable to resolve module ../../lib/tailwind from C:\Projetos\App\MegaSena\apps\mobile\app\index.tsx: 
+  * ..\context\AuthContext(.android.ts|.native.ts|.ts|.android.tsx|.native.tsx|.tsx|.android.mjs|.native.mjs|.mjs|.android.js|.native.js|.js|.android.jsx|.native.jsx|.jsx|.android.json|.native.json|.json|.android.cjs|.native.cjs|.cjs|.android.scss|.native.scss|.scss|.android.sass|.native.sass|.sass|.android.css|.native.css|.css)
+  * ..\context\AuthContext
+[0m [90m  5 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m"expo-status-bar"[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m tw [36mfrom[39m [32m"../lib/tailwind"[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../../context/AuthContext"[39m[33m;[39m
+ [90m    |[39m                          [31m[1m^[22m[39m
+ [90m  8 |[39m [36mimport[39m { [33mCustomAlert[39m[33m,[39m [33mAlertType[39m } [36mfrom[39m [32m"../../components/CustomAlert"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { [33mVersionFooter[39m } [36mfrom[39m [32m"../../components/VersionFooter"[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m { [33mIonicons[39m[33m,[39m [33mMaterialCommunityIcons[39m } [36mfrom[39m [32m"@expo/vector-icons"[39m[33m;[39m[0m
+Error: Unable to resolve module ../../context/AuthContext from C:\Projetos\App\MegaSena\apps\mobile\app\index.tsx: 
 
 None of these files exist:
-  * ..\lib\tailwind(.android.ts|.native.ts|.ts|.android.tsx|.native.tsx|.tsx|.android.mjs|.native.mjs|.mjs|.android.js|.native.js|.js|.android.jsx|.native.jsx|.jsx|.android.json|.native.json|.json|.android.cjs|.native.cjs|.cjs|.android.scss|.native.scss|.scss|.android.sass|.native.sass|.sass|.android.css|.native.css|.css)
-  * ..\lib\tailwind
-[0m [90m 4 |[39m [36mimport[39m { useSafeAreaInsets } [36mfrom[39m [32m"react-native-safe-area-context"[39m[33m;[39m
- [90m 5 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m"expo-status-bar"[39m[33m;[39m
-[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m tw [36mfrom[39m [32m"../../lib/tailwind"[39m[33m;[39m
- [90m   |[39m                 [31m[1m^[22m[39m
- [90m 7 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../../context/AuthContext"[39m[33m;[39m
- [90m 8 |[39m [36mimport[39m { [33mCustomAlert[39m[33m,[39m [33mAlertType[39m } [36mfrom[39m [32m"../../components/CustomAlert"[39m[33m;[39m
- [90m 9 |[39m [36mimport[39m { [33mVersionFooter[39m } [36mfrom[39m [32m"../../components/VersionFooter"[39m[33m;[39m[0m
+  * ..\context\AuthContext(.android.ts|.native.ts|.ts|.android.tsx|.native.tsx|.tsx|.android.mjs|.native.mjs|.mjs|.android.js|.native.js|.js|.android.jsx|.native.jsx|.jsx|.android.json|.native.json|.json|.android.cjs|.native.cjs|.cjs|.android.scss|.native.scss|.scss|.android.sass|.native.sass|.sass|.android.css|.native.css|.css)
+  * ..\context\AuthContext
+[0m [90m  5 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m"expo-status-bar"[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m tw [36mfrom[39m [32m"../lib/tailwind"[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../../context/AuthContext"[39m[33m;[39m
+ [90m    |[39m                          [31m[1m^[22m[39m
+ [90m  8 |[39m [36mimport[39m { [33mCustomAlert[39m[33m,[39m [33mAlertType[39m } [36mfrom[39m [32m"../../components/CustomAlert"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { [33mVersionFooter[39m } [36mfrom[39m [32m"../../components/VersionFooter"[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m { [33mIonicons[39m[33m,[39m [33mMaterialCommunityIcons[39m } [36mfrom[39m [32m"@expo/vector-icons"[39m[33m;[39m[0m
     at ModuleResolver.resolveDependency (C:\Projetos\App\MegaSena\node_modules\metro\src\node-haste\DependencyGraph\ModuleResolution.js:114:15)
     at DependencyGraph.resolveDependency (C:\Projetos\App\MegaSena\node_modules\metro\src\node-haste\DependencyGraph.js:248:43)
     at C:\Projetos\App\MegaSena\node_modules\metro\src\lib\transformHelpers.js:165:21
@@ -399,5 +400,5 @@ Caused by: org.gradle.process.internal.ExecException: Process 'command 'cmd'' fi
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 
 
-BUILD FAILED in 1m 28s
+BUILD FAILED in 1m 34s
 62 actionable tasks: 7 executed, 55 up-to-date
