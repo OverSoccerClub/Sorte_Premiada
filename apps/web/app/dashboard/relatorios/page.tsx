@@ -434,6 +434,6 @@ export default function RelatoriosPage() {
                     </div>
                 )
             }
-        </div >
+        </div>
     )
 }

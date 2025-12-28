@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
-import { AppConfig } from "../../AppConfig"
+import { API_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -80,7 +80,7 @@ export default function CobradoresPage() {
 
     const fetchAreas = async () => {
         try {
-            const res = await fetch(`${AppConfig.api.baseUrl}/areas`, {
+            const res = await fetch(`${API_URL}/areas`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             if (res.ok) {
@@ -94,7 +94,7 @@ export default function CobradoresPage() {
 
     const fetchCobradores = async () => {
         try {
-            const res = await fetch(`${AppConfig.api.baseUrl}/users`, {
+            const res = await fetch(`${API_URL}/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             if (res.ok) {
@@ -132,8 +132,8 @@ export default function CobradoresPage() {
         // We need separate create/update logic usually, or backend ignores empty password on update.
 
         const url = editingUser
-            ? `${AppConfig.api.baseUrl}/users/${editingUser.id}`
-            : `${AppConfig.api.baseUrl}/users`
+            ? `${API_URL}/users/${editingUser.id}`
+            : `${API_URL}/users`
 
         const method = editingUser ? 'PATCH' : 'POST'
 
@@ -190,7 +190,7 @@ export default function CobradoresPage() {
             true, // showCancel
             async () => {
                 try {
-                    const res = await fetch(`${AppConfig.api.baseUrl}/users/${id}`, {
+                    const res = await fetch(`${API_URL}/users/${id}`, {
                         method: 'DELETE',
                         headers: { Authorization: `Bearer ${token}` }
                     })
@@ -348,146 +348,149 @@ export default function CobradoresPage() {
                 </div>
             </StandardPageHeader>
 
-            <CardContent className="p-0">
-                {loading ? (
-                    <div className="flex justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
-                    </div>
-                ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
-                                    <TableHead>Nome</TableHead>
-                                    <TableHead>Praça</TableHead>
-                                    <TableHead>Matrícula (Usuário)</TableHead>
-                                    <TableHead>PIN de Segurança</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {(() => {
-                                    const filtered = cobradores.filter(c =>
-                                        c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                        c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                        c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                        c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                        c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                                    );
+            <Card className="border-border shadow-sm bg-card">
+                <CardContent className="p-0">
+                    {loading ? (
+                        <div className="flex justify-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                        </div>
+                    ) : (
+                        <>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
+                                        <TableHead>Nome</TableHead>
+                                        <TableHead>Praça</TableHead>
+                                        <TableHead>Matrícula (Usuário)</TableHead>
+                                        <TableHead>PIN de Segurança</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Ações</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        const filtered = cobradores.filter(c =>
+                                            c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        );
 
-                                    const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
+                                        const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
 
-                                    if (filtered.length === 0) return (
-                                        <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic font-medium">
-                                                Nenhum cobrador encontrado.
-                                            </TableCell>
-                                        </TableRow>
-                                    );
+                                        if (filtered.length === 0) return (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic font-medium">
+                                                    Nenhum cobrador encontrado.
+                                                </TableCell>
+                                            </TableRow>
+                                        );
 
-                                    return paginated.map((user) => (
-                                        <TableRow key={user.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-1 ring-emerald-500/20">
-                                                        {user.username.substring(0, 2)}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-foreground flex items-center gap-1.5 text-sm">
-                                                            {user.name || user.username}
+                                        return paginated.map((user) => (
+                                            <TableRow key={user.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-1 ring-emerald-500/20">
+                                                            {user.username.substring(0, 2)}
                                                         </div>
-                                                        <div className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono italic">
-                                                            <Mail className="w-3 h-3 text-emerald-500/50" />
-                                                            {user.email || "Sem email"}
+                                                        <div>
+                                                            <div className="font-bold text-foreground flex items-center gap-1.5 text-sm">
+                                                                {user.name || user.username}
+                                                            </div>
+                                                            <div className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono italic">
+                                                                <Mail className="w-3 h-3 text-emerald-500/50" />
+                                                                {user.email || "Sem email"}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {user.area ? (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-foreground font-bold text-xs">{user.area.city}</span>
-                                                        <span className="text-muted-foreground text-[10px] font-medium italic">{user.area.name}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.area ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-foreground font-bold text-xs">{user.area.city}</span>
+                                                            <span className="text-muted-foreground text-[10px] font-medium italic">{user.area.name}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <Badge variant="outline" className="text-[10px] font-medium text-muted-foreground border-dashed">Sem praça</Badge>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="secondary" className="font-mono bg-muted/50 text-emerald-700 hover:bg-muted font-bold text-[10px] px-2 py-0.5">
+                                                        @{user.username}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.securityPin ? (
+                                                        <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md border border-emerald-100/50">
+                                                            <Lock className="h-3 w-3" />
+                                                            <span className="text-[10px] font-bold">DEFINIDO</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2 text-red-500 bg-red-50 w-fit px-2 py-1 rounded-md border border-red-100/50">
+                                                            <Lock className="h-3 w-3" />
+                                                            <span className="text-[10px] font-bold">PENDENTE</span>
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 gap-1.5 uppercase">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                        Ativo
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-emerald-600 border-emerald-500/30 hover:bg-emerald-50"
+                                                            onClick={() => handleEdit(user)}
+                                                        >
+                                                            <SquarePen className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-red-600 border-red-500/30 hover:bg-red-50"
+                                                            onClick={() => handleDelete(user.id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
-                                                ) : (
-                                                    <Badge variant="outline" className="text-[10px] font-medium text-muted-foreground border-dashed">Sem praça</Badge>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="secondary" className="font-mono bg-muted/50 text-emerald-700 hover:bg-muted font-bold text-[10px] px-2 py-0.5">
-                                                    @{user.username}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                {user.securityPin ? (
-                                                    <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-md border border-emerald-100/50">
-                                                        <Lock className="h-3 w-3" />
-                                                        <span className="text-[10px] font-bold">DEFINIDO</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center gap-2 text-red-500 bg-red-50 w-fit px-2 py-1 rounded-md border border-red-100/50">
-                                                        <Lock className="h-3 w-3" />
-                                                        <span className="text-[10px] font-bold">PENDENTE</span>
-                                                    </div>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 gap-1.5 uppercase">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                    Ativo
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-emerald-600 border-emerald-500/30 hover:bg-emerald-50"
-                                                        onClick={() => handleEdit(user)}
-                                                    >
-                                                        <SquarePen className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0 text-red-600 border-red-500/30 hover:bg-red-50"
-                                                        onClick={() => handleDelete(user.id)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ));
-                                })()}
-                            </TableBody>
-                        </Table>
-                        <StandardPagination
-                            currentPage={page}
-                            totalPages={limit === "all" ? 1 : Math.ceil(cobradores.filter(c =>
-                                c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                            ).length / limit)}
-                            limit={limit}
-                            onPageChange={setPage}
-                            onLimitChange={(l) => {
-                                setLimit(l)
-                                setPage(1)
-                            }}
-                            totalItems={cobradores.filter(c =>
-                                c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                            ).length}
-                        />
-                )}
-            </CardContent>
-        </Card >
-        </div >
+                                                </TableCell>
+                                            </TableRow>
+                                        ));
+                                    })()}
+                                </TableBody>
+                            </Table>
+                            <StandardPagination
+                                currentPage={page}
+                                totalPages={limit === "all" ? 1 : Math.ceil(cobradores.filter(c =>
+                                    c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length / limit)}
+                                limit={limit}
+                                onPageChange={setPage}
+                                onLimitChange={(l) => {
+                                    setLimit(l)
+                                    setPage(1)
+                                }}
+                                totalItems={cobradores.filter(c =>
+                                    c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.area?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    c.area?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length}
+                            />
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     )
 }

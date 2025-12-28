@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 

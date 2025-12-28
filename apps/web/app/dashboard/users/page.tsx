@@ -205,310 +205,316 @@ export default function UsersPage() {
     }
 
     return (
-        <StandardPageHeader
-            icon={<Shield className="w-8 h-8 text-emerald-500" />}
-            title="Usuários Administrativos"
-            description="Gerencie administradores, supervisores e gerentes."
-            onRefresh={fetchUsers}
-            refreshing={loading}
-        >
-            <div className="flex flex-wrap items-center gap-3">
-                <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Buscar usuário..."
-                        className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value)
-                            setPage(1)
-                        }}
-                    />
-                </div>
-                <Button variant="outline" size="sm" className="h-9 border-border text-xs font-bold">
-                    <Filter className="h-4 w-4 text-muted-foreground mr-2" />
-                    Filtros
-                </Button>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button
-                            onClick={() => handleOpenDialog()}
-                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
-                            size="sm"
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Novo Usuário
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-popover border-border">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2 text-foreground">
-                                {editingId ? (
-                                    <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <SquarePen className="w-5 h-5 text-emerald-500" />
-                                        </div>
-                                        Editar Usuário
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <UserPlus className="w-5 h-5 text-emerald-500" />
-                                        </div>
-                                        Adicionar Novo Usuário
-                                    </>
-                                )}
-                            </DialogTitle>
-                            <DialogDescription className="text-muted-foreground">
-                                {editingId ? "Atualize os dados do usuário." : "Crie uma conta para um novo administrador ou gerente."}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Nome Completo</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="Nome do usuário" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="username"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="usuario.admin" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="email@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="role"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                        <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <SelectValue placeholder="Selecione o nível" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="ADMIN">Administrador (ADMIN)</SelectItem>
-                                                    <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                                                    <SelectItem value="GERENTE">Gerente</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground flex justify-between">
-                                                Senha
-                                                {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <DialogFooter className="gap-2 sm:gap-0">
-                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
-                                        Cancelar
-                                    </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                                        {form.formState.isSubmitting ? (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        ) : (
-                                            editingId ? <Save className="mr-2 h-4 w-4" /> : <UserPlus className="mr-2 h-4 w-4" />
-                                        )}
-                                        {editingId ? "Salvar Alterações" : "Criar Conta"}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
-            </div>
-
-            <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardContent className="p-0">
-                    {loading ? (
-                        <div className="flex justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <>
+            <div className="space-y-6">
+                <StandardPageHeader
+                    icon={<Shield className="w-8 h-8 text-emerald-500" />}
+                    title="Usuários Administrativos"
+                    description="Gerencie administradores, supervisores e gerentes."
+                    onRefresh={fetchUsers}
+                    refreshing={loading}
+                >
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="relative w-full sm:w-64">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar usuário..."
+                                className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value)
+                                    setPage(1)
+                                }}
+                            />
                         </div>
-                    ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
-                                        <TableHead className="w-[300px]">Nome</TableHead>
-                                        <TableHead>Nível de Acesso</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Ações</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(() => {
-                                        const filteredUsers = users.filter(u =>
-                                            u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-                                        );
-
-                                        const paginatedUsers = limit === "all" ? filteredUsers : filteredUsers.slice((page - 1) * limit, Number(page) * Number(limit));
-
-                                        if (filteredUsers.length === 0) return (
-                                            <TableRow>
-                                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                                    Nenhum usuário encontrado.
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-
-                                        return paginatedUsers.map((user) => {
-                                            const isManuallyBlocked = user.isActive === false;
-
-                                            return (
-                                                <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
-                                                    <TableCell className="font-medium">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
-                                                                {user.username.substring(0, 2)}
-                                                            </div>
-                                                            <div>
-                                                                <div className="font-semibold text-foreground flex items-center gap-1.5">
-                                                                    <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
-                                                                    {user.name || user.username}
-                                                                </div>
-                                                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                                    <Mail className="w-3 h-3" />
-                                                                    {user.email || "Sem email"}
-                                                                </div>
-                                                            </div>
+                        <Button variant="outline" size="sm" className="h-9 border-border text-xs font-bold">
+                            <Filter className="h-4 w-4 text-muted-foreground mr-2" />
+                            Filtros
+                        </Button>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    onClick={() => handleOpenDialog()}
+                                    className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
+                                    size="sm"
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Novo Usuário
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] bg-popover border-border">
+                                <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-2 text-foreground">
+                                        {editingId ? (
+                                            <>
+                                                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                                    <SquarePen className="w-5 h-5 text-emerald-500" />
+                                                </div>
+                                                Editar Usuário
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                                    <UserPlus className="w-5 h-5 text-emerald-500" />
+                                                </div>
+                                                Adicionar Novo Usuário
+                                            </>
+                                        )}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-muted-foreground">
+                                        {editingId ? "Atualize os dados do usuário." : "Crie uma conta para um novo administrador ou gerente."}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="name"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Nome Completo</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input placeholder="Nome do usuário" className="pl-9 bg-muted/50 border-input" {...field} />
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
-                                                            <Shield className="w-3.5 h-3.5" />
-                                                            {user.role}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {isManuallyBlocked ? (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
-                                                                <Ban className="w-3.5 h-3.5" />
-                                                                Bloqueado
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
-                                                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                                                Ativo
-                                                            </span>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
-                                                                onClick={() => handleToggleBlock(user)}
-                                                                title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
-                                                            >
-                                                                {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                                onClick={() => handleOpenDialog(user)}
-                                                                title="Editar"
-                                                            >
-                                                                <SquarePen className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                onClick={() => handleDelete(user.id)}
-                                                                title="Excluir"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="username"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input placeholder="usuario.admin" className="pl-9 bg-muted/50 border-input" {...field} />
                                                         </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input placeholder="email@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="role"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                <SelectValue placeholder="Selecione o nível" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="ADMIN">Administrador (ADMIN)</SelectItem>
+                                                            <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                                                            <SelectItem value="GERENTE">Gerente</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground flex justify-between">
+                                                        Senha
+                                                        {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <DialogFooter className="gap-2 sm:gap-0">
+                                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
+                                                Cancelar
+                                            </Button>
+                                            <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                                {form.formState.isSubmitting ? (
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    editingId ? <Save className="mr-2 h-4 w-4" /> : <UserPlus className="mr-2 h-4 w-4" />
+                                                )}
+                                                {editingId ? "Salvar Alterações" : "Criar Conta"}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </StandardPageHeader>
+
+                <Card className="border-border shadow-sm bg-card overflow-hidden">
+                    <CardContent className="p-0">
+                        {loading ? (
+                            <div className="flex justify-center py-8">
+                                <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                            </div>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
+                                            <TableHead className="w-[300px]">Nome</TableHead>
+                                            <TableHead>Nível de Acesso</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Ações</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {(() => {
+                                            const filteredUsers = users.filter(u =>
+                                                u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                            );
+
+                                            const paginatedUsers = limit === "all" ? filteredUsers : filteredUsers.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                            if (filteredUsers.length === 0) return (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                                        Nenhum usuário encontrado.
                                                     </TableCell>
                                                 </TableRow>
                                             );
-                                        });
-                                    })()}
-                                </TableBody>
-                            </Table>
-                            <StandardPagination
-                                currentPage={page}
-                                totalPages={limit === "all" ? 1 : Math.ceil(users.filter(u =>
-                                    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-                                ).length / limit)}
-                                limit={limit}
-                                onPageChange={setPage}
-                                onLimitChange={(l) => {
-                                    setLimit(l)
-                                    setPage(1)
-                                }}
-                                totalItems={users.filter(u =>
-                                    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-                                ).length}
-                            />
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+
+                                            return paginatedUsers.map((user) => {
+                                                const isManuallyBlocked = user.isActive === false;
+
+                                                return (
+                                                    <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
+                                                        <TableCell className="font-medium">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ring-2 ${isManuallyBlocked ? 'bg-red-100 text-red-600 ring-red-500/20' : 'bg-emerald-100 text-emerald-600 ring-emerald-500/20'}`}>
+                                                                    {user.username.substring(0, 2)}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                                                        <User className={`w-3.5 h-3.5 ${isManuallyBlocked ? 'text-red-500' : 'text-emerald-500'}`} />
+                                                                        {user.name || user.username}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                                        <Mail className="w-3 h-3" />
+                                                                        {user.email || "Sem email"}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground border border-border gap-1.5">
+                                                                <Shield className="w-3.5 h-3.5" />
+                                                                {user.role}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {isManuallyBlocked ? (
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 gap-1.5">
+                                                                    <Ban className="w-3.5 h-3.5" />
+                                                                    Bloqueado
+                                                                </span>
+                                                            ) : (
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1.5">
+                                                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                                                    Ativo
+                                                                </span>
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className={`h-8 w-8 p-0 ${isManuallyBlocked ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 border-amber-200'}`}
+                                                                    onClick={() => handleToggleBlock(user)}
+                                                                    title={isManuallyBlocked ? "Desbloquear Usuário" : "Bloquear Usuário"}
+                                                                >
+                                                                    {isManuallyBlocked ? <ShieldCheck className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                                    onClick={() => handleOpenDialog(user)}
+                                                                    title="Editar"
+                                                                >
+                                                                    <SquarePen className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                    onClick={() => handleDelete(user.id)}
+                                                                    title="Excluir"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            });
+                                        })()}
+                                    </TableBody>
+                                </Table>
+                                <StandardPagination
+                                    currentPage={page}
+                                    totalPages={limit === "all" ? 1 : Math.ceil(users.filter(u =>
+                                        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                    ).length / limit)}
+                                    limit={limit}
+                                    onPageChange={setPage}
+                                    onLimitChange={(l) => {
+                                        setLimit(l)
+                                        setPage(1)
+                                    }}
+                                    totalItems={users.filter(u =>
+                                        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                                    ).length}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     )
 }

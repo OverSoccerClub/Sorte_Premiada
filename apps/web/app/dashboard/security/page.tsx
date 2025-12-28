@@ -138,95 +138,96 @@ export default function SecurityCenterPage() {
                 </Card>
             </div>
 
-            <CardContent className="p-0">
-                {loading && logs.length === 0 ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-red-500" />
-                    </div>
-                ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-muted/20">
-                                <TableHead className="w-[150px]">Data/Hora</TableHead>
-                                <TableHead className="w-[100px]">Gravidade</TableHead>
-                                <TableHead className="w-[150px]">Evento</TableHead>
-                                <TableHead>Mensagem</TableHead>
-                                <TableHead className="text-right">Ação</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {(() => {
-                                const paginated = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
+            <Card className="border-border shadow-sm bg-card">
+                <CardContent className="p-0">
+                    {loading && logs.length === 0 ? (
+                        <div className="flex justify-center py-12">
+                            <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+                        </div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-muted/20">
+                                    <TableHead className="w-[150px]">Data/Hora</TableHead>
+                                    <TableHead className="w-[100px]">Gravidade</TableHead>
+                                    <TableHead className="w-[150px]">Evento</TableHead>
+                                    <TableHead>Mensagem</TableHead>
+                                    <TableHead className="text-right">Ação</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {(() => {
+                                    const paginated = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
 
-                                if (logs.length === 0) return (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
-                                            Nenhum alerta de segurança registrado.
-                                        </TableCell>
-                                    </TableRow>
-                                );
+                                    if (logs.length === 0) return (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
+                                                Nenhum alerta de segurança registrado.
+                                            </TableCell>
+                                        </TableRow>
+                                    );
 
-                                return paginated.map((log) => (
-                                    <TableRow key={log.id} className={`${log.isResolved ? 'opacity-60 bg-muted/5' : ''} border-b border-border/50 hover:bg-muted/30 transition-colors`}>
-                                        <TableCell className="text-[10px] font-bold font-mono text-muted-foreground pl-6">
-                                            <div className="flex flex-col">
-                                                <span>{new Date(log.createdAt).toLocaleDateString('pt-BR')}</span>
-                                                <span className="text-[9px] opacity-70">{new Date(log.createdAt).toLocaleTimeString('pt-BR')}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="scale-90 origin-left">
-                                                {getSeverityBadge(log.severity)}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-tight">
-                                                <div className="p-1.5 bg-muted rounded-md border border-border/50">
-                                                    {getTypeIcon(log.type)}
+                                    return paginated.map((log) => (
+                                        <TableRow key={log.id} className={`${log.isResolved ? 'opacity-60 bg-muted/5' : ''} border-b border-border/50 hover:bg-muted/30 transition-colors`}>
+                                            <TableCell className="text-[10px] font-bold font-mono text-muted-foreground pl-6">
+                                                <div className="flex flex-col">
+                                                    <span>{new Date(log.createdAt).toLocaleDateString('pt-BR')}</span>
+                                                    <span className="text-[9px] opacity-70">{new Date(log.createdAt).toLocaleTimeString('pt-BR')}</span>
                                                 </div>
-                                                {log.type.replace(/_/g, ' ')}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-xs font-medium text-foreground max-w-[300px] truncate">
-                                            {log.message}
-                                        </TableCell>
-                                        <TableCell className="text-right pr-6">
-                                            {!log.isResolved ? (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="text-emerald-600 border-emerald-500/30 hover:bg-emerald-50 h-8 font-bold text-[10px] uppercase tracking-wider"
-                                                    onClick={() => handleResolve(log.id)}
-                                                >
-                                                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Resolver
-                                                </Button>
-                                            ) : (
-                                                <div className="flex items-center justify-end gap-1.5 text-emerald-600/70 font-bold text-[10px] uppercase">
-                                                    <ShieldCheck className="w-3.5 h-3.5" />
-                                                    Auditado
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="scale-90 origin-left">
+                                                    {getSeverityBadge(log.severity)}
                                                 </div>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ));
-                            })()}
-                            <StandardPagination
-                                currentPage={page}
-                                totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
-                                limit={limit}
-                                onPageChange={setPage}
-                                onLimitChange={(l) => {
-                                    setLimit(l)
-                                    setPage(1)
-                                }}
-                                totalItems={logs.length}
-                            />
-                        </TableBody>
-                    </Table>
-                )
-                }
-            </CardContent >
-        </Card >
-        </div >
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-tight">
+                                                    <div className="p-1.5 bg-muted rounded-md border border-border/50">
+                                                        {getTypeIcon(log.type)}
+                                                    </div>
+                                                    {log.type.replace(/_/g, ' ')}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-xs font-medium text-foreground max-w-[300px] truncate">
+                                                {log.message}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-6">
+                                                {!log.isResolved ? (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="text-emerald-600 border-emerald-500/30 hover:bg-emerald-50 h-8 font-bold text-[10px] uppercase tracking-wider"
+                                                        onClick={() => handleResolve(log.id)}
+                                                    >
+                                                        <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Resolver
+                                                    </Button>
+                                                ) : (
+                                                    <div className="flex items-center justify-end gap-1.5 text-emerald-600/70 font-bold text-[10px] uppercase">
+                                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                                        Auditado
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ));
+                                })()}
+                            </TableBody>
+                        </Table>
+                    )}
+                </CardContent>
+            </Card>
+
+            <StandardPagination
+                currentPage={page}
+                totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
+                limit={limit}
+                onPageChange={setPage}
+                onLimitChange={(l) => {
+                    setLimit(l)
+                    setPage(1)
+                }}
+                totalItems={logs.length}
+            />
+        </div>
     )
 }

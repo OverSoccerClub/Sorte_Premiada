@@ -126,14 +126,15 @@ export const UpdaterService = {
             const contentUri = await FileSystem.getContentUriAsync(downloadRes.uri);
 
             try {
+                console.log('[Updater] Launching installer for:', contentUri);
                 await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
                     data: contentUri,
-                    flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+                    flags: 1 | 0x10000000, // FLAG_GRANT_READ_URI_PERMISSION | FLAG_ACTIVITY_NEW_TASK
                     type: 'application/vnd.android.package-archive',
                 });
             } catch (e: any) {
-                console.warn('[Updater] Intent failure:', e.message);
-                throw new Error("Não foi possível abrir o instalador. Verifique as permissões de instalação de fontes desconhecidas.");
+                console.error('[Updater] Intent failure details:', e);
+                throw new Error(`Não foi possível abrir o instalador: ${e.message}. Verifique as permissões de instalação de fontes desconhecidas.`);
             }
 
         } catch (error: any) {

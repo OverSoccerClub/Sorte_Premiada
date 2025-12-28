@@ -5,10 +5,11 @@ import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Check, X, XCircle, RefreshCcw, AlertCircle, Clock } from "lucide-react"
+import { Check, X, XCircle, RefreshCcw, AlertCircle, Clock, Search } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 
@@ -98,6 +99,7 @@ export default function CancellationsPage() {
     };
 
     return (
+        <div className="space-y-6">
             <StandardPageHeader
                 icon={<XCircle className="w-8 h-8 text-red-500" />}
                 title="Solicitações de Cancelamento"
@@ -254,119 +256,115 @@ export default function CancellationsPage() {
                                     t.id.toLowerCase().includes(search.toLowerCase())
                                 ).length}
                             />
-                                </TableBody>
-                            </Table>
                         </CardContent>
                     </Card>
-                </TabsContent >
+                </TabsContent>
 
-        <TabsContent value="history">
-            <Card className="border-border shadow-sm bg-card">
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader className="bg-muted/20 hover:bg-muted/30 border-b border-border/60">
-                            <TableRow>
-                                <TableHead className="w-[150px]">ID / Bilhete</TableHead>
-                                <TableHead>Cambista</TableHead>
-                                <TableHead>Data Venda</TableHead>
-                                <TableHead>Sorteio</TableHead>
-                                <TableHead>Valor</TableHead>
-                                <TableHead>Motivo</TableHead>
-                                <TableHead className="text-right">Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {(() => {
-                                const filtered = history.filter(t =>
+                <TabsContent value="history">
+                    <Card className="border-border shadow-sm bg-card">
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader className="bg-muted/20 hover:bg-muted/30 border-b border-border/60">
+                                    <TableRow>
+                                        <TableHead className="w-[150px]">ID / Bilhete</TableHead>
+                                        <TableHead>Cambista</TableHead>
+                                        <TableHead>Data Venda</TableHead>
+                                        <TableHead>Sorteio</TableHead>
+                                        <TableHead>Valor</TableHead>
+                                        <TableHead>Motivo</TableHead>
+                                        <TableHead className="text-right">Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        const filtered = history.filter(t =>
+                                            t.user.name?.toLowerCase().includes(search.toLowerCase()) ||
+                                            t.user.username.toLowerCase().includes(search.toLowerCase()) ||
+                                            t.hash?.toLowerCase().includes(search.toLowerCase()) ||
+                                            t.id.toLowerCase().includes(search.toLowerCase())
+                                        );
+
+                                        const paginated = historyLimit === "all" ? filtered : filtered.slice((historyPage - 1) * historyLimit, Number(historyPage) * Number(historyLimit));
+
+                                        if (loading) return (
+                                            <TableRow>
+                                                <TableCell colSpan={7} className="h-24 text-center">
+                                                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                                        <RefreshCcw className="w-4 h-4 animate-spin" />
+                                                        Carregando...
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+
+                                        if (filtered.length === 0) return (
+                                            <TableRow>
+                                                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground italic">
+                                                    Nenhum bilhete cancelado no histórico.
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+
+                                        return paginated.map((ticket) => (
+                                            <TableRow key={ticket.id} className="hover:bg-muted/10 transition-colors border-b border-border/50">
+                                                <TableCell className="font-mono text-xs">
+                                                    <div className="font-bold text-foreground">{ticket.hash || ticket.id.slice(0, 8)}</div>
+                                                    <div className="text-[10px] text-muted-foreground font-semibold">{ticket.gameType}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="font-bold text-foreground text-sm">{ticket.user.name || ticket.user.username}</div>
+                                                    <div className="text-[10px] text-muted-foreground font-mono">@{ticket.user.username}</div>
+                                                </TableCell>
+                                                <TableCell className="text-xs">
+                                                    <div className="flex items-center gap-1 font-medium text-muted-foreground">
+                                                        <Clock className="w-3 h-3 text-red-500" />
+                                                        {new Date(ticket.createdAt).toLocaleString('pt-BR')}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-xs font-semibold text-muted-foreground">
+                                                    {new Date(ticket.drawDate).toLocaleString('pt-BR')}
+                                                </TableCell>
+                                                <TableCell className="font-bold text-foreground">
+                                                    {formatCurrency(ticket.amount)}
+                                                </TableCell>
+                                                <TableCell className="text-[10px] text-muted-foreground italic max-w-[150px] truncate">
+                                                    {ticket.cancellationReason || "---"}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 uppercase text-[9px] font-bold px-1.5 py-0 h-5">
+                                                        Cancelado
+                                                    </Badge>
+                                                </TableCell>
+                                            </TableRow>
+                                        ));
+                                    })()}
+                                </TableBody>
+                            </Table>
+                            <StandardPagination
+                                currentPage={historyPage}
+                                totalPages={historyLimit === "all" ? 1 : Math.ceil(history.filter(t =>
                                     t.user.name?.toLowerCase().includes(search.toLowerCase()) ||
                                     t.user.username.toLowerCase().includes(search.toLowerCase()) ||
                                     t.hash?.toLowerCase().includes(search.toLowerCase()) ||
                                     t.id.toLowerCase().includes(search.toLowerCase())
-                                );
-
-                                const paginated = historyLimit === "all" ? filtered : filtered.slice((historyPage - 1) * historyLimit, Number(historyPage) * Number(historyLimit));
-
-                                if (loading) return (
-                                    <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center">
-                                            <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                                <RefreshCcw className="w-4 h-4 animate-spin" />
-                                                Carregando...
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-
-                                if (filtered.length === 0) return (
-                                    <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground italic">
-                                            Nenhum bilhete cancelado no histórico.
-                                        </TableCell>
-                                    </TableRow>
-                                );
-
-                                return paginated.map((ticket) => (
-                                    <TableRow key={ticket.id} className="hover:bg-muted/10 transition-colors border-b border-border/50">
-                                        <TableCell className="font-mono text-xs">
-                                            <div className="font-bold text-foreground">{ticket.hash || ticket.id.slice(0, 8)}</div>
-                                            <div className="text-[10px] text-muted-foreground font-semibold">{ticket.gameType}</div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="font-bold text-foreground text-sm">{ticket.user.name || ticket.user.username}</div>
-                                            <div className="text-[10px] text-muted-foreground font-mono">@{ticket.user.username}</div>
-                                        </TableCell>
-                                        <TableCell className="text-xs">
-                                            <div className="flex items-center gap-1 font-medium text-muted-foreground">
-                                                <Clock className="w-3 h-3 text-red-500" />
-                                                {new Date(ticket.createdAt).toLocaleString('pt-BR')}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-xs font-semibold text-muted-foreground">
-                                            {new Date(ticket.drawDate).toLocaleString('pt-BR')}
-                                        </TableCell>
-                                        <TableCell className="font-bold text-foreground">
-                                            {formatCurrency(ticket.amount)}
-                                        </TableCell>
-                                        <TableCell className="text-[10px] text-muted-foreground italic max-w-[150px] truncate">
-                                            {ticket.cancellationReason || "---"}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 uppercase text-[9px] font-bold px-1.5 py-0 h-5">
-                                                Cancelado
-                                            </Badge>
-                                        </TableCell>
-                                    </TableRow>
-                                ));
-                            })()}
-                        </TableBody>
-                    </Table>
-                    <StandardPagination
-                        currentPage={historyPage}
-                        totalPages={historyLimit === "all" ? 1 : Math.ceil(history.filter(t =>
-                            t.user.name?.toLowerCase().includes(search.toLowerCase()) ||
-                            t.user.username.toLowerCase().includes(search.toLowerCase()) ||
-                            t.hash?.toLowerCase().includes(search.toLowerCase()) ||
-                            t.id.toLowerCase().includes(search.toLowerCase())
-                        ).length / historyLimit)}
-                        limit={historyLimit}
-                        onPageChange={setHistoryPage}
-                        onLimitChange={(l) => {
-                            setHistoryLimit(l)
-                            setHistoryPage(1)
-                        }}
-                        totalItems={history.filter(t =>
-                            t.user.name?.toLowerCase().includes(search.toLowerCase()) ||
-                            t.user.username.toLowerCase().includes(search.toLowerCase()) ||
-                            t.hash?.toLowerCase().includes(search.toLowerCase()) ||
-                            t.id.toLowerCase().includes(search.toLowerCase())
-                        ).length}
-                    />
-                </TableBody>
-            </Table>
-        </CardContent>
-                    </Card >
-                </TabsContent >
-            </Tabs >
-        </div >
+                                ).length / historyLimit)}
+                                limit={historyLimit}
+                                onPageChange={setHistoryPage}
+                                onLimitChange={(l) => {
+                                    setHistoryLimit(l)
+                                    setHistoryPage(1)
+                                }}
+                                totalItems={history.filter(t =>
+                                    t.user.name?.toLowerCase().includes(search.toLowerCase()) ||
+                                    t.user.username.toLowerCase().includes(search.toLowerCase()) ||
+                                    t.hash?.toLowerCase().includes(search.toLowerCase()) ||
+                                    t.id.toLowerCase().includes(search.toLowerCase())
+                                ).length}
+                            />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+        </div>
     );
 }

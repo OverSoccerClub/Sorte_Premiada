@@ -19,7 +19,7 @@ export const TicketPrintManager = forwardRef<ViewShot, TicketPrintManagerProps>(
 
     return (
         <View
-            style={{ position: 'absolute', top: -3000, left: 0, width: 384, opacity: 0 }}
+            style={{ position: 'absolute', top: -5000, left: -5000 }}
             pointerEvents="none"
         >
             <ViewShot

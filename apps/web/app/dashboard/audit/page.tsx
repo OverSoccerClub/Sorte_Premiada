@@ -87,6 +87,7 @@ export default function AuditLogsPage() {
     }
 
     return (
+        <div className="space-y-6">
             <StandardPageHeader
                 icon={<History className="w-8 h-8 text-blue-500" />}
                 title="Logs de Auditoria"
@@ -117,106 +118,105 @@ export default function AuditLogsPage() {
                             <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/20">
-                                    <TableHead className="w-[180px]">Data/Hora</TableHead>
-                                    <TableHead className="w-[120px]">Administrador</TableHead>
-                                    <TableHead className="w-[100px]">Ação</TableHead>
-                                    <TableHead className="w-[150px]">Entidade</TableHead>
-                                    <TableHead>Ref ID</TableHead>
-                                    <TableHead className="text-right">Detalhes</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {(() => {
-                                    const totalItems = logs.length;
-                                    const paginatedLogs = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
+                        <>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-muted/20">
+                                        <TableHead className="w-[180px]">Data/Hora</TableHead>
+                                        <TableHead className="w-[120px]">Administrador</TableHead>
+                                        <TableHead className="w-[100px]">Ação</TableHead>
+                                        <TableHead className="w-[150px]">Entidade</TableHead>
+                                        <TableHead>Ref ID</TableHead>
+                                        <TableHead className="text-right">Detalhes</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        const totalItems = logs.length;
+                                        const paginatedLogs = limit === "all" ? logs : logs.slice((page - 1) * limit, Number(page) * Number(limit));
 
-                                    if (logs.length === 0) return (
-                                        <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">
-                                                Nenhum log de auditoria encontrado.
-                                            </TableCell>
-                                        </TableRow>
-                                    );
+                                        if (logs.length === 0) return (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">
+                                                    Nenhum log de auditoria encontrado.
+                                                </TableCell>
+                                            </TableRow>
+                                        );
 
-                                    return paginatedLogs.map((log) => (
-                                        <TableRow key={log.id}>
-                                            <TableCell className="text-xs font-mono">
-                                                {new Date(log.createdAt).toLocaleString('pt-BR')}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="text-sm font-medium">{log.user?.name || "Sistema"}</div>
-                                                <div className="text-[10px] text-muted-foreground font-mono">{log.ipAddress}</div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {getActionBadge(log.action)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    {getEntityIcon(log.entity)}
-                                                    {log.entity}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[150px]">
-                                                {log.entityId}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant="outline" size="sm" className="h-8 border-blue-500/30 text-blue-600 hover:bg-blue-50" onClick={() => setSelectedLog(log)}>
-                                                                Ver Diff
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Mural de Alterações</DialogTitle>
-                                                                <DialogDescription>
-                                                                    Comparação entre o estado anterior e o novo.
-                                                                </DialogDescription>
-                                                            </DialogHeader>
-                                                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                                                <div className="space-y-2">
-                                                                    <h4 className="text-xs font-bold text-red-500 uppercase">Estado Anterior</h4>
-                                                                    <pre className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
-                                                                        {JSON.stringify(log.oldValue, null, 2)}
-                                                                    </pre>
+                                        return paginatedLogs.map((log) => (
+                                            <TableRow key={log.id}>
+                                                <TableCell className="text-xs font-mono">
+                                                    {new Date(log.createdAt).toLocaleString('pt-BR')}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="text-sm font-medium">{log.user?.name || "Sistema"}</div>
+                                                    <div className="text-[10px] text-muted-foreground font-mono">{log.ipAddress}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {getActionBadge(log.action)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        {getEntityIcon(log.entity)}
+                                                        {log.entity}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[150px]">
+                                                    {log.entityId}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="outline" size="sm" className="h-8 border-blue-500/30 text-blue-600 hover:bg-blue-50" onClick={() => setSelectedLog(log)}>
+                                                                    Ver Diff
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Mural de Alterações</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Comparação entre o estado anterior e o novo.
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                                                    <div className="space-y-2">
+                                                                        <h4 className="text-xs font-bold text-red-500 uppercase">Estado Anterior</h4>
+                                                                        <pre className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
+                                                                            {JSON.stringify(log.oldValue, null, 2)}
+                                                                        </pre>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <h4 className="text-xs font-bold text-emerald-500 uppercase">Novo Estado</h4>
+                                                                        <pre className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
+                                                                            {JSON.stringify(log.newValue, null, 2)}
+                                                                        </pre>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="space-y-2">
-                                                                    <h4 className="text-xs font-bold text-emerald-500 uppercase">Novo Estado</h4>
-                                                                    <pre className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-[10px] font-mono overflow-auto max-h-[400px]">
-                                                                        {JSON.stringify(log.newValue, null, 2)}
-                                                                    </pre>
-                                                                </div>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ));
-                                })()}
-                            </TableBody>
-                        </Table>
-                        <StandardPagination
-                            currentPage={page}
-                            totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
-                            limit={limit}
-                            onPageChange={setPage}
-                            onLimitChange={(l) => {
-                                setLimit(l)
-                                setPage(1)
-                            }}
-                            totalItems={logs.length}
-                        />
-                            </TableBody>
-                        </Table>
-    )
-}
-                </CardContent >
-            </Card >
-        </div >
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ));
+                                    })()}
+                                </TableBody>
+                            </Table>
+                            <StandardPagination
+                                currentPage={page}
+                                totalPages={limit === "all" ? 1 : Math.ceil(logs.length / limit)}
+                                limit={limit}
+                                onPageChange={setPage}
+                                onLimitChange={(l) => {
+                                    setLimit(l)
+                                    setPage(1)
+                                }}
+                                totalItems={logs.length}
+                            />
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     )
 }

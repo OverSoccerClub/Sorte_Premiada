@@ -47,34 +47,6 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
-            {data.status === 'CANCELLED' && (
-                <View
-                    pointerEvents="none"
-                    style={[
-                        tw`absolute items-center justify-center`,
-                        {
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            zIndex: 50,
-                            overflow: 'hidden'
-                        }
-                    ]}
-                >
-                    <Text style={[
-                        tw`text-red-500 font-black opacity-30`,
-                        {
-                            fontSize: 70,
-                            transform: [{ rotate: '-45deg' }],
-                            textAlign: 'center',
-                            borderWidth: 5,
-                            borderColor: 'rgba(239, 68, 68, 0.3)',
-                            padding: 10,
-                            borderRadius: 10,
-                        }
-                    ]}>
-                        CANCELADO
-                    </Text>
-                </View>
-            )}
             {/* Header */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
@@ -224,6 +196,40 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </View>
                 </View>
             </View>
+
+            {/* OVERLAY WATERMARK (Rendered last to be on top) */}
+            {data.status === 'CANCELLED' && (
+                <View
+                    pointerEvents="none"
+                    style={[
+                        tw`absolute items-center justify-center`,
+                        {
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            zIndex: 100,
+                            overflow: 'hidden'
+                        }
+                    ]}
+                >
+                    <View style={{
+                        transform: [{ rotate: '-45deg' }],
+                        borderWidth: 10,
+                        borderColor: 'rgba(180, 0, 0, 0.7)', // Darker and more opaque
+                        padding: 15,
+                        borderRadius: 20,
+                    }}>
+                        <Text style={[
+                            tw`text-red-800 font-black`,
+                            {
+                                fontSize: 80,
+                                textAlign: 'center',
+                                opacity: 0.8, // Much higher opacity for capture
+                            }
+                        ]}>
+                            CANCELADO
+                        </Text>
+                    </View>
+                </View>
+            )}
         </View>
     );
 };

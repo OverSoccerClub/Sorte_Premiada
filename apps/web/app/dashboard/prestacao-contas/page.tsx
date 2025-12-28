@@ -101,111 +101,115 @@ export default function VerificationPage() {
                 </div>
             </StandardPageHeader>
 
-            <CardContent className="p-0">
-                {loading ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                ) : pendingCloses.length === 0 ? (
-                    <div className="text-center py-16 text-muted-foreground flex flex-col items-center gap-3">
-                        <CheckCircle2 className="h-10 w-10 opacity-20" />
-                        <p>Nenhum fechamento pendente.</p>
-                    </div>
-                ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
-                                <TableHead className="pl-6">Data</TableHead>
-                                <TableHead>Cambista</TableHead>
-                                <TableHead>Vendas</TableHead>
-                                <TableHead>Saldo Final</TableHead>
-                                <TableHead className="text-right pr-6">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {(() => {
-                                const filtered = pendingCloses.filter(item =>
-                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                                );
-
-                                const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
-
-                                if (filtered.length === 0) return (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
-                                            Nenhum fechamento encontrado.
-                                        </TableCell>
+            <Card className="border-border shadow-sm bg-card overflow-hidden">
+                <CardContent className="p-0">
+                    {loading ? (
+                        <div className="flex justify-center py-12">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    ) : pendingCloses.length === 0 ? (
+                        <div className="text-center py-16 text-muted-foreground flex flex-col items-center gap-3">
+                            <CheckCircle2 className="h-10 w-10 opacity-20" />
+                            <p>Nenhum fechamento pendente.</p>
+                        </div>
+                    ) : (
+                        <>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
+                                        <TableHead className="pl-6">Data</TableHead>
+                                        <TableHead>Cambista</TableHead>
+                                        <TableHead>Vendas</TableHead>
+                                        <TableHead>Saldo Final</TableHead>
+                                        <TableHead className="text-right pr-6">Ações</TableHead>
                                     </TableRow>
-                                );
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        const filtered = pendingCloses.filter(item =>
+                                            item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        );
 
-                                return paginated.map((item) => (
-                                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
-                                        <TableCell className="pl-6">
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase">
-                                                    <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                                                    {format(new Date(item.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                                                </div>
-                                                <div className="text-[10px] text-muted-foreground font-medium italic ml-5">
-                                                    {format(new Date(item.createdAt), "HH:mm", { locale: ptBR })}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold text-xs uppercase ring-1 ring-blue-500/20">
-                                                    {(item.closedByUser?.username || "U").substring(0, 2)}
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-foreground text-sm uppercase">
-                                                        {item.closedByUser?.username || "Desconhecido"}
+                                        const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
+
+                                        if (filtered.length === 0) return (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic font-medium">
+                                                    Nenhum fechamento encontrado.
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+
+                                        return paginated.map((item) => (
+                                            <TableRow key={item.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
+                                                <TableCell className="pl-6">
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase">
+                                                            <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                                                            {format(new Date(item.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                                                        </div>
+                                                        <div className="text-[10px] text-muted-foreground font-medium italic ml-5">
+                                                            {format(new Date(item.createdAt), "HH:mm", { locale: ptBR })}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-[10px] text-muted-foreground font-medium italic flex items-center gap-1">
-                                                        <User className="w-3 h-3 text-blue-500/50" />
-                                                        {item.closedByUser?.name || "Cambista"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold text-xs uppercase ring-1 ring-blue-500/20">
+                                                            {(item.closedByUser?.username || "U").substring(0, 2)}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-bold text-foreground text-sm uppercase">
+                                                                {item.closedByUser?.username || "Desconhecido"}
+                                                            </div>
+                                                            <div className="text-[10px] text-muted-foreground font-medium italic flex items-center gap-1">
+                                                                <User className="w-3 h-3 text-blue-500/50" />
+                                                                {item.closedByUser?.name || "Cambista"}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="text-emerald-600 font-bold text-xs">
-                                                    {Number(item.totalSales).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                </span>
-                                                <span className="text-[10px] text-muted-foreground font-medium uppercase italic">Bruto</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="text-foreground font-bold text-xs">
-                                                    {Number(item.finalBalance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                </span>
-                                                <span className="text-[10px] text-muted-foreground font-medium uppercase italic">A Receber</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right pr-6">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 h-8 font-bold text-[10px] uppercase tracking-wider"
-                                                    onClick={() => handleVerify(item.id, 'REJECTED')}
-                                                >
-                                                    <XCircle className="w-3.5 h-3.5 mr-1" /> Rejeitar
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 font-bold text-[10px] uppercase tracking-wider shadow-sm"
-                                                    onClick={() => handleVerify(item.id, 'VERIFIED')}
-                                                >
-                                                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Aprovar
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ));
-                            })()}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-emerald-600 font-bold text-xs">
+                                                            {Number(item.totalSales).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                        </span>
+                                                        <span className="text-[10px] text-muted-foreground font-medium uppercase italic">Bruto</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-foreground font-bold text-xs">
+                                                            {Number(item.finalBalance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                        </span>
+                                                        <span className="text-[10px] text-muted-foreground font-medium uppercase italic">A Receber</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right pr-6">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 h-8 font-bold text-[10px] uppercase tracking-wider"
+                                                            onClick={() => handleVerify(item.id, 'REJECTED')}
+                                                        >
+                                                            <XCircle className="w-3.5 h-3.5 mr-1" /> Rejeitar
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 font-bold text-[10px] uppercase tracking-wider shadow-sm"
+                                                            onClick={() => handleVerify(item.id, 'VERIFIED')}
+                                                        >
+                                                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Aprovar
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ));
+                                    })()}
+                                </TableBody>
+                            </Table>
                             <StandardPagination
                                 currentPage={page}
                                 totalPages={limit === "all" ? 1 : Math.ceil(pendingCloses.filter(item =>
@@ -223,12 +227,10 @@ export default function VerificationPage() {
                                     item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
                                 ).length}
                             />
-                        </TableBody>
-                    </Table>
-                )
-                }
-            </CardContent >
-        </Card >
-        </div >
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     )
 }

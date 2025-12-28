@@ -186,7 +186,8 @@ export const printTicket = async (
 
     // CANCELADO Watermark (Text style)
     if (status === 'CANCELLED') {
-      receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "\n*** CANCELADO ***\n" + BOLD_OFF + NORMAL + "\n";
+      receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "\n*** BILHETE CANCELADO ***\n" + BOLD_OFF + NORMAL + "\n";
+      receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "--- SEM VALOR ---\n" + BOLD_OFF + NORMAL + "\n";
     }
 
     if (secondChanceStatus === 'WON') {
@@ -230,7 +231,13 @@ export const printTicket = async (
     receipt += CENTER + "\n";
     receipt += "|| ||| || |||| ||| || ||||| ||||\n";
     receipt += FONT_B + `ID: ${ticketId}\n`;
-    receipt += "\nEste bilhete não possui valor fiscal.\nBoa Sorte!\n" + FONT_A + "\n\n\n";
+    receipt += "\nEste bilhete não possui valor fiscal.\nBoa Sorte!\n" + FONT_A + "\n";
+
+    if (status === 'CANCELLED') {
+      receipt += CENTER + DOUBLE_WIDTH_HEIGHT + BOLD_ON + "\n*** CANCELADO ***\n" + BOLD_OFF + NORMAL + "\n";
+    }
+
+    receipt += "\n\n\n";
 
     if (BLEPrinter.printBill) await BLEPrinter.printBill(receipt);
     else if (BLEPrinter.printText) await BLEPrinter.printText(receipt);

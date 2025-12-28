@@ -167,156 +167,153 @@ export default function DrawsSettingsPage() {
     }
 
     return (
-        <StandardPageHeader
-            icon={<Calendar className="w-8 h-8 text-emerald-500" />}
-            title="Gestão de Sorteios"
-            description="Agende e gerencie os resultados dos sorteios."
-            onRefresh={() => selectedGameId && fetchDraws(selectedGameId)}
-            refreshing={loading}
-        >
-            <div className="flex flex-wrap items-center gap-3">
-                <Select value={selectedGameId} onValueChange={setSelectedGameId}>
-                    <SelectTrigger className="w-64 h-9 bg-background border-border shadow-sm text-xs font-semibold">
-                        <SelectValue placeholder="Selecione um jogo..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
-                    </SelectContent>
-                </Select>
+        <div className="space-y-6">
+            <StandardPageHeader
+                icon={<Calendar className="w-8 h-8 text-emerald-500" />}
+                title="Gestão de Sorteios"
+                description="Agende e gerencie os resultados dos sorteios."
+                onRefresh={() => selectedGameId && fetchDraws(selectedGameId)}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
+                    <Select value={selectedGameId} onValueChange={setSelectedGameId}>
+                        <SelectTrigger className="w-64 h-9 bg-background border-border shadow-sm text-xs font-semibold">
+                            <SelectValue placeholder="Selecione um jogo..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
 
-                {selectedGameId && (
-                    <Button
-                        onClick={() => handleOpenModal(null)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-9"
-                        size="sm"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Novo Sorteio
-                    </Button>
-                )}
-            </div>
-        </StandardPageHeader>
+                    {selectedGameId && (
+                        <Button
+                            onClick={() => handleOpenModal(null)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white h-9"
+                            size="sm"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Sorteio
+                        </Button>
+                    )}
+                </div>
+            </StandardPageHeader>
 
-            {
-        selectedGameId && (
-            <Card className="border-border shadow-sm bg-card overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b border-border">
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <Trophy className="w-5 h-5 text-emerald-500" />
-                        Sorteios Agendados / Realizados
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
-                                <TableHead className="pl-6">Série</TableHead>
-                                <TableHead>Data / Hora</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Números Sorteados</TableHead>
-                                <TableHead className="text-right pr-6">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {(() => {
-                                const totalItems = (draws || []).length;
-                                const totalPages = mainLimit === "all" ? 1 : Math.ceil(totalItems / mainLimit);
-                                const paginatedDraws = mainLimit === "all" ? (draws || []) : (draws || []).slice((mainPage - 1) * mainLimit, mainPage * mainLimit);
+            {selectedGameId && (
+                <Card className="border-border shadow-sm bg-card overflow-hidden">
+                    <CardHeader className="bg-muted/30 border-b border-border">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-emerald-500" />
+                            Sorteios Agendados / Realizados
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
+                                    <TableHead className="pl-6">Série</TableHead>
+                                    <TableHead>Data / Hora</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Números Sorteados</TableHead>
+                                    <TableHead className="text-right pr-6">Ações</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {(() => {
+                                    const totalItems = (draws || []).length;
+                                    const totalPages = mainLimit === "all" ? 1 : Math.ceil(totalItems / mainLimit);
+                                    const paginatedDraws = mainLimit === "all" ? (draws || []) : (draws || []).slice((mainPage - 1) * mainLimit, mainPage * mainLimit);
 
-                                if (loading) return (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">
-                                            <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
-                                        </TableCell>
-                                    </TableRow>
-                                );
+                                    if (loading) return (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center">
+                                                <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
+                                            </TableCell>
+                                        </TableRow>
+                                    );
 
-                                if (totalItems === 0) return (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                            Nenhum sorteio encontrado.
-                                        </TableCell>
-                                    </TableRow>
-                                );
+                                    if (totalItems === 0) return (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                                Nenhum sorteio encontrado.
+                                            </TableCell>
+                                        </TableRow>
+                                    );
 
-                                return (
-                                    <>
-                                        {paginatedDraws.map(draw => (
-                                            <TableRow key={draw.id} className="hover:bg-muted/50 transition-colors">
-                                                <TableCell className="pl-6">
-                                                    <Badge variant="outline" className="font-mono bg-background">
-                                                        #{draw.series?.toString().padStart(4, '0') || '---'}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-1.5 text-foreground font-medium">
-                                                        <Calendar className="w-4 h-4 text-emerald-500" />
-                                                        {new Date(draw.drawDate).toLocaleString('pt-BR')}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {new Date(draw.drawDate) > new Date() ?
-                                                        <span className="inline-flex items-center gap-1.5 text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-yellow-200">
-                                                            <Clock className="w-3 h-3" />
-                                                            Agendado
-                                                        </span> :
-                                                        draw.numbers && draw.numbers.length > 0 ?
-                                                            <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-emerald-200">
-                                                                <CheckCircle className="w-3 h-3" />
-                                                                Realizado
+                                    return (
+                                        <>
+                                            {paginatedDraws.map(draw => (
+                                                <TableRow key={draw.id} className="hover:bg-muted/50 transition-colors">
+                                                    <TableCell className="pl-6">
+                                                        <Badge variant="outline" className="font-mono bg-background">
+                                                            #{draw.series?.toString().padStart(4, '0') || '---'}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-1.5 text-foreground font-medium">
+                                                            <Calendar className="w-4 h-4 text-emerald-500" />
+                                                            {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Date(draw.drawDate) > new Date() ?
+                                                            <span className="inline-flex items-center gap-1.5 text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-yellow-200">
+                                                                <Clock className="w-3 h-3" />
+                                                                Agendado
                                                             </span> :
-                                                            <span className="inline-flex items-center gap-1.5 text-gray-600 bg-gray-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-gray-200">
-                                                                <AlertCircle className="w-3 h-3" />
-                                                                Pendente
-                                                            </span>
-                                                    }
-                                                </TableCell>
-                                                <TableCell>
-                                                    {draw.numbers && draw.numbers.length > 0 ?
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="p-1 bg-yellow-100 rounded text-yellow-600 border border-yellow-200">
-                                                                <Trophy className="w-3 h-3" />
-                                                            </div>
-                                                            <span className="font-mono text-sm tracking-widest font-bold">{draw.numbers.join(' - ')}</span>
-                                                        </div> :
-                                                        <span className="text-muted-foreground italic text-xs pl-2">-</span>
-                                                    }
-                                                </TableCell>
-                                                <TableCell className="text-right flex justify-end gap-2 pr-6 py-2">
-                                                    <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200" onClick={() => handleOpenDetails(draw.id)} title="Ver Detalhes">
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200" onClick={() => handleOpenModal(draw)}>
-                                                        <SquarePen className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleDelete(draw.id)}>
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </>
-                                );
-                            })()}
-                        </TableBody>
-                    </Table>
-                    <StandardPagination
-                        currentPage={mainPage}
-                        totalPages={mainLimit === "all" ? 1 : Math.ceil((draws || []).length / mainLimit)}
-                        limit={mainLimit}
-                        onPageChange={setMainPage}
-                        onLimitChange={(l) => {
-                            setMainLimit(l)
-                            setMainPage(1)
-                        }}
-                        totalItems={(draws || []).length}
-                    />
-                </TableBody>
-            </Table>
-                    </CardContent >
-                </Card >
-            )
-    }
+                                                            draw.numbers && draw.numbers.length > 0 ?
+                                                                <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-emerald-200">
+                                                                    <CheckCircle className="w-3 h-3" />
+                                                                    Realizado
+                                                                </span> :
+                                                                <span className="inline-flex items-center gap-1.5 text-gray-600 bg-gray-50 px-2 py-0.5 rounded-full text-xs font-bold w-fit border border-gray-200">
+                                                                    <AlertCircle className="w-3 h-3" />
+                                                                    Pendente
+                                                                </span>
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {draw.numbers && draw.numbers.length > 0 ?
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="p-1 bg-yellow-100 rounded text-yellow-600 border border-yellow-200">
+                                                                    <Trophy className="w-3 h-3" />
+                                                                </div>
+                                                                <span className="font-mono text-sm tracking-widest font-bold">{draw.numbers.join(' - ')}</span>
+                                                            </div> :
+                                                            <span className="text-muted-foreground italic text-xs pl-2">-</span>
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell className="text-right flex justify-end gap-2 pr-6 py-2">
+                                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200" onClick={() => handleOpenDetails(draw.id)} title="Ver Detalhes">
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200" onClick={() => handleOpenModal(draw)}>
+                                                            <SquarePen className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleDelete(draw.id)}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </>
+                                    );
+                                })()}
+                            </TableBody>
+                        </Table>
+                        <StandardPagination
+                            currentPage={mainPage}
+                            totalPages={mainLimit === "all" ? 1 : Math.ceil((draws || []).length / mainLimit)}
+                            limit={mainLimit}
+                            onPageChange={setMainPage}
+                            onLimitChange={(l) => {
+                                setMainLimit(l)
+                                setMainPage(1)
+                            }}
+                            totalItems={(draws || []).length}
+                        />
+                    </CardContent>
+                </Card>
+            )}
 
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
                 <DialogContent>
@@ -484,6 +481,6 @@ export default function DrawsSettingsPage() {
                     )}
                 </DialogContent>
             </Dialog>
-        </div >
+        </div>
     )
 }

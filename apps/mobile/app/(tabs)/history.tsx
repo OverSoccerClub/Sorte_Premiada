@@ -111,7 +111,7 @@ export default function HistoryScreen() {
         switch (status) {
             case 'PENDING': return 'Em Aberto';
             case 'WON': return 'Premiado';
-            case 'CANCELLED': return '實 Cancelado';
+            case 'CANCELLED': return 'Cancelado';
             case 'CANCEL_REQUESTED': return 'Cancel. Pendente';
             case 'LOST': return 'Não Premiado';
             case 'EXPIRED': return 'Expirado';

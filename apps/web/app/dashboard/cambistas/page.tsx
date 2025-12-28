@@ -259,260 +259,262 @@ export default function CambistasPage() {
     }
 
     return (
-        <StandardPageHeader
-            icon={<Users className="w-8 h-8 text-emerald-500" />}
-            title="Cambistas"
-            description="Gerencie sua equipe de vendas e monitore o desempenho."
-            onRefresh={fetchCambistas}
-            refreshing={loading}
-        >
-            <div className="flex flex-wrap items-center gap-3">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAudioEnabled(!audioEnabled)}
-                    className={`h-9 border-border text-xs font-bold transition-all ${audioEnabled ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-background text-muted-foreground"}`}
-                >
-                    {audioEnabled ? <Bell className="h-4 w-4 mr-2" /> : <BellOff className="h-4 w-4 mr-2" />}
-                    {audioEnabled ? "Alerta Ativo" : "Alerta Sonoro"}
-                </Button>
+        <div className="space-y-6">
+            <StandardPageHeader
+                icon={<Users className="w-8 h-8 text-emerald-500" />}
+                title="Cambistas"
+                description="Gerencie sua equipe de vendas e monitore o desempenho."
+                onRefresh={fetchCambistas}
+                refreshing={loading}
+            >
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAudioEnabled(!audioEnabled)}
+                        className={`h-9 border-border text-xs font-bold transition-all ${audioEnabled ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-background text-muted-foreground"}`}
+                    >
+                        {audioEnabled ? <Bell className="h-4 w-4 mr-2" /> : <BellOff className="h-4 w-4 mr-2" />}
+                        {audioEnabled ? "Alerta Ativo" : "Alerta Sonoro"}
+                    </Button>
 
-                <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Buscar cambista..."
-                        className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value)
-                            setPage(1)
-                        }}
-                    />
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Buscar cambista..."
+                            className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value)
+                                setPage(1)
+                            }}
+                        />
+                    </div>
+
+                    <Button variant="outline" size="sm" className="h-9 border-border text-xs font-bold">
+                        <Filter className="h-4 w-4 text-slate-500 mr-2" />
+                        Filtros
+                    </Button>
+
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button
+                                onClick={() => handleOpenDialog()}
+                                className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
+                                size="sm"
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Novo Cambista
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] bg-popover border-border">
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2 text-foreground">
+                                    {editingId ? (
+                                        <>
+                                            <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                                <SquarePen className="w-5 h-5 text-emerald-500" />
+                                            </div>
+                                            Editar Cambista
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                                <UserPlus className="w-5 h-5 text-emerald-500" />
+                                            </div>
+                                            Adicionar Novo Cambista
+                                        </>
+                                    )}
+                                </DialogTitle>
+                                <DialogDescription className="text-muted-foreground">
+                                    {editingId ? "Atualize os dados do vendedor." : "Crie uma conta para um novo vendedor."}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Nome Completo</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input placeholder="João da Silva" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="username"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input placeholder="joaosilva" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input placeholder="joao@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="areaId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Praça (Área)</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                            <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <SelectValue placeholder="Selecione uma praça" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {areas.map((area) => (
+                                                            <SelectItem key={area.id} value={area.id}>
+                                                                {area.city} - {area.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="salesLimit"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Limite Diário (R$)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="accountabilityLimitHours"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Prazo Prest. Contas (h)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="number" step="1" placeholder="24" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="commissionRate"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Comissão (%)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Percent className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="number" step="1" placeholder="10" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="canCancelTickets"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-muted/30">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel className="text-foreground">Autorizar Cancelamento</FormLabel>
+                                                        <p className="text-[0.7rem] text-muted-foreground mr-2">
+                                                            Permite ao cambista cancelar bilhetes dentro do prazo de tolerância.
+                                                        </p>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground flex justify-between">
+                                                    Senha
+                                                    {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                        <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                    </div>
+                                                </FormControl>
+                                                {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <DialogFooter className="gap-2 sm:gap-0">
+                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
+                                            Cancelar
+                                        </Button>
+                                        <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                            {form.formState.isSubmitting ? (
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            ) : (
+                                                editingId ? <Save className="mr-2 h-4 w-4" /> : <UserPlus className="mr-2 h-4 w-4" />
+                                            )}
+                                            {editingId ? "Salvar Alterações" : "Criar Conta"}
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-
-                <Button variant="outline" size="sm" className="h-9 border-border text-xs font-bold">
-                    <Filter className="h-4 w-4 text-slate-500 mr-2" />
-                    Filtros
-                </Button>
-
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button
-                            onClick={() => handleOpenDialog()}
-                            className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-900/20 h-9"
-                            size="sm"
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Novo Cambista
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-popover border-border">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2 text-foreground">
-                                {editingId ? (
-                                    <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <SquarePen className="w-5 h-5 text-emerald-500" />
-                                        </div>
-                                        Editar Cambista
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                            <UserPlus className="w-5 h-5 text-emerald-500" />
-                                        </div>
-                                        Adicionar Novo Cambista
-                                    </>
-                                )}
-                            </DialogTitle>
-                            <DialogDescription className="text-muted-foreground">
-                                {editingId ? "Atualize os dados do vendedor." : "Crie uma conta para um novo vendedor."}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Nome Completo</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="João da Silva" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="username"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="joaosilva" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input placeholder="joao@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="areaId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground">Praça (Área)</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <SelectValue placeholder="Selecione uma praça" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {areas.map((area) => (
-                                                        <SelectItem key={area.id} value={area.id}>
-                                                            {area.city} - {area.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="salesLimit"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-foreground">Limite Diário (R$)</FormLabel>
-                                                <FormControl>
-                                                    <div className="relative">
-                                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input type="number" step="0.01" placeholder="1000.00" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="accountabilityLimitHours"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-foreground">Prazo Prest. Contas (h)</FormLabel>
-                                                <FormControl>
-                                                    <div className="relative">
-                                                        <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input type="number" step="1" placeholder="24" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="commissionRate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-foreground">Comissão (%)</FormLabel>
-                                                <FormControl>
-                                                    <div className="relative">
-                                                        <Percent className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <Input type="number" step="1" placeholder="10" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="canCancelTickets"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-muted/30">
-                                                <div className="space-y-0.5">
-                                                    <FormLabel className="text-foreground">Autorizar Cancelamento</FormLabel>
-                                                    <p className="text-[0.7rem] text-muted-foreground mr-2">
-                                                        Permite ao cambista cancelar bilhetes dentro do prazo de tolerância.
-                                                    </p>
-                                                </div>
-                                                <FormControl>
-                                                    <Switch
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-foreground flex justify-between">
-                                                Senha
-                                                {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <DialogFooter className="gap-2 sm:gap-0">
-                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
-                                        Cancelar
-                                    </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                                        {form.formState.isSubmitting ? (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        ) : (
-                                            editingId ? <Save className="mr-2 h-4 w-4" /> : <UserPlus className="mr-2 h-4 w-4" />
-                                        )}
-                                        {editingId ? "Salvar Alterações" : "Criar Conta"}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
-            </div>
+            </StandardPageHeader>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
                 <CardContent className="p-0">
@@ -521,17 +523,18 @@ export default function CambistasPage() {
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
-                                    <TableHead className="w-[300px]">Nome</TableHead>
-                                    <TableHead>Praça</TableHead>
-                                    <TableHead>Limite / Comissão</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
+                        <>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-muted/50 border-b border-border/60 bg-muted/20">
+                                        <TableHead className="w-[300px]">Nome</TableHead>
+                                        <TableHead>Praça</TableHead>
+                                        <TableHead>Limite / Comissão</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Ações</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {(() => {
                                         const filteredCambistas = cambistas.filter(c =>
                                             c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -682,11 +685,11 @@ export default function CambistasPage() {
                                     c.email?.toLowerCase().includes(searchTerm.toLowerCase())
                                 ).length}
                             />
-                            </TableBody>
-            </Table>
-                    )}
-        </CardContent>
-            </Card >
-        </div >
+                        </>
+                    )
+                    }
+                </CardContent>
+            </Card>
+        </div>
     )
 }
