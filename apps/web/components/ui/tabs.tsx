@@ -16,9 +16,18 @@ const Tabs = React.forwardRef<
         defaultValue?: string
         onValueChange?: (value: string) => void
     }
->(({ className, value, onValueChange, ...props }, ref) => {
+>(({ className, value, defaultValue, onValueChange, ...props }, ref) => {
+    const [selected, setSelected] = React.useState(value || defaultValue)
+
+    const handleValueChange = (newValue: string) => {
+        if (value === undefined) {
+            setSelected(newValue)
+        }
+        onValueChange?.(newValue)
+    }
+
     return (
-        <TabsContext.Provider value={{ value, onValueChange }}>
+        <TabsContext.Provider value={{ value: value !== undefined ? value : selected, onValueChange: handleValueChange }}>
             <div ref={ref} className={cn("", className)} {...props} />
         </TabsContext.Provider>
     )
