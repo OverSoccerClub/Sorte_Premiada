@@ -1,8 +1,7 @@
-
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, TicketStatus } from '@repo/database';
-import { toBrazilTime } from '../utils/date.util';
+import { toBrazilTime, dayjs } from '../utils/date.util';
 
 @Injectable()
 export class SecondChanceService {
@@ -30,11 +29,17 @@ export class SecondChanceService {
     }
 
     private async processWinners(tx: Prisma.TransactionClient, draw: any) {
-        // Find tickets for the same game, same Saturday, with matching number
+        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
+        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+
+        // Find tickets for the same game, same range of day, with matching number
         const tickets = await tx.ticket.findMany({
             where: {
                 gameId: draw.gameId,
-                secondChanceDrawDate: draw.drawDate,
+                secondChanceDrawDate: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                },
                 secondChanceNumber: draw.winningNumber,
                 status: { not: 'CANCELLED' }
             }
@@ -75,10 +80,16 @@ export class SecondChanceService {
 
         if (!draw) throw new BadRequestException("Sorteio não encontrado");
 
+        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
+        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+
         return this.prisma.ticket.findMany({
             where: {
                 gameId: draw.gameId,
-                secondChanceDrawDate: draw.drawDate,
+                secondChanceDrawDate: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                },
                 secondChanceNumber: draw.winningNumber,
                 status: { not: 'CANCELLED' }
             },
@@ -87,6 +98,34 @@ export class SecondChanceService {
                     include: { area: true }
                 }
             }
+        });
+    }
+
+    async findParticipants(drawId: string) {
+        const draw = await this.prisma.secondChanceDraw.findUnique({
+            where: { id: drawId }
+        });
+
+        if (!draw) throw new BadRequestException("Sorteio não encontrado");
+
+        const startOfDay = dayjs(draw.drawDate).startOf('day').toDate();
+        const endOfDay = dayjs(draw.drawDate).endOf('day').toDate();
+
+        return this.prisma.ticket.findMany({
+            where: {
+                gameId: draw.gameId,
+                secondChanceDrawDate: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                },
+                status: { not: 'CANCELLED' }
+            },
+            include: {
+                user: {
+                    select: { name: true, username: true, area: { select: { name: true } } }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
         });
     }
 

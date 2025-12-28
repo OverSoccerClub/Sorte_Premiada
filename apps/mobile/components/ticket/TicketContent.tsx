@@ -63,7 +63,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     {data.gameName}
                 </Text>
                 <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
-                    SORTEIO {displayTicketId} - {data.drawDate || data.date.split(' ')[0]} - 19H
+                    SORTEIO {data.drawDate || data.date.split(' ')[0]} - 19H
                 </Text>
             </View>
 
@@ -177,15 +177,17 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         width={370}
                         height={isCapture ? 80 : 90}
                     />
-                    <Text style={tw`font-bold text-[9px] text-black tracking-[4px] mt-1`}>{data.ticketId}</Text>
+                    <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
+                        <Text style={tw`font-black text-2xl text-white tracking-[3px]`}>{displayTicketId}</Text>
+                    </View>
                 </View>
 
                 <View style={[
-                    tw`items-center justify-center w-full mt-6`,
+                    tw`items-center justify-center w-full mt-2`,
                     isCapture && {
                         transform: [{ scaleY: 0.35 }],
-                        marginTop: -95, // Adjusted for larger QR and movement
-                        marginBottom: -95
+                        marginTop: -90,
+                        marginBottom: -90
                     }
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>

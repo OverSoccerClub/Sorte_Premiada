@@ -22,9 +22,11 @@ export default function SecondChancePage() {
 
     // Details Modal State
     const [detailModalOpen, setDetailModalOpen] = useState(false)
+    const [detailType, setDetailType] = useState<'winners' | 'participants'>('winners')
     const [winners, setWinners] = useState<any[]>([])
+    const [participants, setParticipants] = useState<any[]>([])
     const [selectedDraw, setSelectedDraw] = useState<any>(null)
-    const [loadingWinners, setLoadingWinners] = useState(false)
+    const [loadingDetails, setLoadingDetails] = useState(false)
 
     // Form State
     const [selectedGameId, setSelectedGameId] = useState("")
@@ -69,8 +71,9 @@ export default function SecondChancePage() {
 
     const handleOpenWinners = async (draw: any) => {
         setSelectedDraw(draw)
+        setDetailType('winners')
         setDetailModalOpen(true)
-        setLoadingWinners(true)
+        setLoadingDetails(true)
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/second-chance-draws/${draw.id}/winners`, {
@@ -84,7 +87,29 @@ export default function SecondChancePage() {
         } catch (error) {
             toast.error("Erro de conexão")
         } finally {
-            setLoadingWinners(false)
+            setLoadingDetails(false)
+        }
+    }
+
+    const handleOpenParticipants = async (draw: any) => {
+        setSelectedDraw(draw)
+        setDetailType('participants')
+        setDetailModalOpen(true)
+        setLoadingDetails(true)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/second-chance-draws/${draw.id}/participants`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                setParticipants(await res.json())
+            } else {
+                toast.error("Erro ao carregar participantes")
+            }
+        } catch (error) {
+            toast.error("Erro de conexão")
+        } finally {
+            setLoadingDetails(false)
         }
     }
 
@@ -212,6 +237,15 @@ export default function SecondChancePage() {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
+                                                    className="h-8 gap-2 text-primary border-primary/20 hover:bg-primary/5"
+                                                    onClick={() => handleOpenParticipants(draw)}
+                                                >
+                                                    <Hash className="w-4 h-4" />
+                                                    Participantes
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
                                                     className="h-8 gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
                                                     onClick={() => handleOpenWinners(draw)}
                                                 >
@@ -302,13 +336,13 @@ export default function SecondChancePage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Modal: Ganhadores */}
+            {/* Modal: Detalhes (Ganhadores ou Participantes) */}
             <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
                 <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Trophy className="w-5 h-5 text-yellow-500" />
-                            Ganhadores: Sorteio {selectedDraw && new Date(selectedDraw.drawDate).toLocaleDateString('pt-BR')}
+                            {detailType === 'winners' ? <Trophy className="w-5 h-5 text-yellow-500" /> : <Hash className="w-5 h-5 text-blue-500" />}
+                            {detailType === 'winners' ? "Ganhadores" : "Participantes"}: Sorteio {selectedDraw && new Date(selectedDraw.drawDate).toLocaleDateString('pt-BR')}
                         </DialogTitle>
                         <CardDescription>
                             Número: <span className="font-bold text-foreground font-mono">{selectedDraw?.winningNumber.toString().padStart(4, '0')}</span> •
@@ -321,47 +355,53 @@ export default function SecondChancePage() {
                             <TableHeader className="bg-muted/50 sticky top-0 z-10">
                                 <TableRow>
                                     <TableHead className="pl-4">Bilhete/Hash</TableHead>
+                                    <TableHead>Número SC</TableHead>
                                     <TableHead>Cambista</TableHead>
                                     <TableHead>Área / Cidade</TableHead>
                                     <TableHead className="text-right pr-4">Valor Aposta</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {loadingWinners ? (
+                                {loadingDetails ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-32 text-center">
+                                        <TableCell colSpan={5} className="h-32 text-center">
                                             <Loader2 className="h-8 w-8 animate-spin mx-auto text-yellow-500" />
                                         </TableCell>
                                     </TableRow>
-                                ) : winners.length === 0 ? (
+                                ) : (detailType === 'winners' ? winners : participants).length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
-                                            Nenhum ganhador para este sorteio.
+                                        <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                                            A lista está vazia.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    winners.map((winner) => (
-                                        <TableRow key={winner.id}>
+                                    (detailType === 'winners' ? winners : participants).map((item) => (
+                                        <TableRow key={item.id} className={detailType === 'winners' ? 'bg-yellow-50/50' : ''}>
                                             <TableCell className="pl-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-mono text-xs font-bold">{winner.id.slice(0, 8)}</span>
-                                                    <span className="text-[10px] text-muted-foreground uppercase">{winner.hash}</span>
+                                                    <span className="font-mono text-xs font-bold">{item.id.slice(0, 8)}</span>
+                                                    <span className="text-[10px] text-muted-foreground uppercase">{item.hash}</span>
                                                 </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline" className={`font-mono text-xs ${item.secondChanceNumber === selectedDraw?.winningNumber ? 'bg-green-100 text-green-700 border-green-300' : 'text-muted-foreground'}`}>
+                                                    {item.secondChanceNumber}
+                                                </Badge>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <User className="w-3 h-3 text-muted-foreground" />
-                                                    <span className="font-medium">{winner.user?.name || winner.user?.username}</span>
+                                                    <span className="font-medium">{item.user?.name || item.user?.username}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <MapPin className="w-3 h-3 text-muted-foreground" />
-                                                    <span className="text-sm">{winner.user?.area?.name || winner.user?.area?.city || '---'}</span>
+                                                    <span className="text-sm">{item.user?.area?.name || item.user?.area?.city || '---'}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right pr-4">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(winner.amount))}
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(item.amount))}
                                             </TableCell>
                                         </TableRow>
                                     ))

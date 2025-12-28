@@ -30,6 +30,13 @@ export class SecondChanceController {
         return this.service.findWinners(id);
     }
 
+    @Get(':id/participants')
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN)
+    findParticipants(@Param('id') id: string) {
+        return this.service.findParticipants(id);
+    }
+
     @Delete(':id')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
