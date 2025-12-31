@@ -47,7 +47,10 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
     // Let's implement a continuous spin style:
 
     return (
-        <div className="relative overflow-hidden h-20 w-16 bg-muted rounded-md border border-border flex justify-center items-center shadow-inner">
+        <div
+            className="relative overflow-hidden w-16 bg-muted rounded-md border border-border flex justify-center items-center shadow-inner"
+            style={{ height: HEIGHT }}
+        >
             <motion.div
                 className="flex flex-col items-center"
                 initial={{ y: 0 }}
@@ -80,8 +83,9 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                             key={i}
                             className={cn(
                                 "flex items-center justify-center font-mono font-black text-5xl",
-                                "h-20 w-full text-white drop-shadow-md"
+                                "w-full text-white drop-shadow-md"
                             )}
+                            style={{ height: HEIGHT, minHeight: HEIGHT }} // Force exact pixel height
                         >
                             {i % 10}
                         </div>
