@@ -3,14 +3,15 @@
 import { DrawDigit } from "./DrawDigit";
 
 interface DrawGroupProps {
-    value: number; // 0 to 9999
+    value: number | null; // null triggers ???
     isSpinning: boolean;
 }
 
 export function DrawGroup({ value, isSpinning }: DrawGroupProps) {
-    // Pad with zeros to ensure 4 digits
-    const strValue = value.toString().padStart(4, "0");
-    const digits = strValue.split("").map(Number); // [1, 2, 3, 4]
+    // If null, we use placeholders '?'
+    const digits = value === null
+        ? ['?', '?', '?', '?']
+        : value.toString().padStart(4, "0").split("").map(Number);
 
     return (
         <div className="flex gap-2 p-4 bg-muted/20 rounded-xl border border-border/50 shadow-sm">

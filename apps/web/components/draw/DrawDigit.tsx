@@ -8,7 +8,7 @@ const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; //
 const HEIGHT = 80; // Height of each number container
 
 interface DrawDigitProps {
-    value: number;
+    value: number | string;
     isSpinning: boolean;
     delay?: number;
 }
@@ -25,27 +25,18 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
 
     useEffect(() => {
         if (isSpinning) {
-            // While spinning, we just want to create motion
-            // Since we can't easily infinite loop with this spring setup, 
-            // we might just animate to a very large number or use a simpler loop
-            // But for a realistic slot machine, we usually just want to land on the number after some time.
-
-            // Let's simulate spinning by moving to a random far position? 
-            // Or better: Use controls to loop?
-
-            // Simpler approach:
-            // When spinning starts, we just want it to blur and look moving.
-            // When spinning stops, we land on the target.
+            // Spinning state is handled by the animate prop directly
         } else {
-            // Calculate position to land on 'value'
-            // We want to land on the second set of numbers to ensure we scrolled past the first
-            const index = value + 10;
-            const newY = -(index * HEIGHT);
-
-            // Add some extra rotations based on delay to stagger the stop
-            const extraRotations = delay * 20 * HEIGHT;
-
-            setTargetY(newY);
+            if (typeof value === 'number') {
+                // Calculate position to land on 'value'
+                // We want to land on the second set of numbers to ensure we scrolled past the first
+                const index = value + 10;
+                const newY = -(index * HEIGHT);
+                setTargetY(newY);
+            } else {
+                // Reset to 0 or specific position for placeholder
+                setTargetY(0);
+            }
         }
     }, [value, isSpinning, delay]);
 
@@ -68,7 +59,7 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                         ease: "linear"
                     }
                 } : {
-                    y: -(value * HEIGHT),
+                    y: typeof value === 'number' ? -(value * HEIGHT) : 0,
                     transition: {
                         type: "spring",
                         stiffness: 60,
@@ -76,28 +67,25 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                         delay: delay * 0.2 // Stagger stops
                     }
                 }}
-                style={{
-                    // When stopping, we might want to ensure we land on the specific number.
-                    // The logic above is a bit simplified. If we want perfect slot machine logic:
-                    // 1. Indefinite spin
-                    // 2. On stop, animate from current pos to target pos.
-
-                    // Simplification for MVP: Just animate to target with big offset
-                }}
             >
-                {/* Render a long strip of numbers */}
-                {/* To make it truly seamless we need a lot of numbers or a virtualized list */}
-                {Array.from({ length: 30 }).map((_, i) => (
-                    <div
-                        key={i}
-                        className={cn(
-                            "flex items-center justify-center font-mono font-bold text-4xl text-foreground",
-                            "h-20 w-full"
-                        )}
-                    >
-                        {i % 10}
+                {value === '?' ? (
+                    <div className="flex items-center justify-center font-mono font-bold text-4xl text-foreground/50 h-20 w-full">
+                        ?
                     </div>
-                ))}
+                ) : (
+                    /* Render a long strip of numbers */
+                    Array.from({ length: 30 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className={cn(
+                                "flex items-center justify-center font-mono font-bold text-4xl text-foreground",
+                                "h-20 w-full"
+                            )}
+                        >
+                            {i % 10}
+                        </div>
+                    ))
+                )}
             </motion.div>
 
             {/* Overlay gradient for depth */}
