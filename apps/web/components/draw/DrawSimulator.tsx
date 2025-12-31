@@ -1,110 +1,187 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { DrawGroup } from "./DrawGroup";
 import { CountdownOverlay } from "./CountdownOverlay";
 import { VerificationResult } from "./VerificationResult";
+import { Confetti } from "./Confetti";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Dices, RotateCw, Ticket, Play, ArrowRight } from "lucide-react";
+import { Sparkles, Play, RotateCw, Ticket, Clock, Megaphone } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function DrawSimulator() {
     const [isRunning, setIsRunning] = useState(false);
-    const [activeDrawIndex, setActiveDrawIndex] = useState<number | null>(null);
-    const [highlightedResult, setHighlightedResult] = useState<{ number: number, index: number } | null>(null);
-    const [preparingNext, setPreparingNext] = useState(false);
 
-    // Sequence State Machine
+    // State for the overarching flow
     const [sequenceState, setSequenceState] = useState<{
-        step: 'idle' | 'countdown' | 'drawing' | 'highlighting' | 'verifying' | 'preparing',
-        index: number
-    }>({ step: 'idle', index: 0 });
+        step: 'idle' | 'countdown' | 'drawing' | 'celebrating' | 'highlighting' | 'verifying' | 'preparing',
+        fezinhaIndex: number,
+        digitIndex: number // 0-3
+    }>({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
 
-    // Data State
-    const [results, setResults] = useState<(number | null)[]>([null, null, null, null]);
-    const [history, setHistory] = useState<number[][]>([]);
-    const currentSequenceResults = useRef<(number | null)[]>([null, null, null, null]);
+    // Data for the 4 Fezinhas
+    // Each entry is an array of 4 digits (or '?' placeholders)
+    const [displayValues, setDisplayValues] = useState<(string | number)[][]>([
+        ['?', '?', '?', '?'],
+        ['?', '?', '?', '?'],
+        ['?', '?', '?', '?'],
+        ['?', '?', '?', '?']
+    ]);
+
+    // Actual results stored secretly
+    const currentSequenceResults = useRef<number[]>([0, 0, 0, 0]);
+
+    const [history, setHistory] = useState<{ numbers: number[], timestamp: Date }[]>([]);
+    const [statusText, setStatusText] = useState("Aguardando início...");
 
     const startSequence = () => {
-        setResults([null, null, null, null]);
-        currentSequenceResults.current = [null, null, null, null];
-        setSequenceState({ step: 'countdown', index: 0 });
+        // Initialize secret results
+        currentSequenceResults.current = Array.from({ length: 4 }).map(() => Math.floor(Math.random() * 10000));
+
+        // Reset display
+        setDisplayValues([
+            ['?', '?', '?', '?'], ['?', '?', '?', '?'], ['?', '?', '?', '?'], ['?', '?', '?', '?']
+        ]);
+
         setIsRunning(true);
+        setSequenceState({ step: 'countdown', fezinhaIndex: 0, digitIndex: 0 });
+        setStatusText("Preparando Sorteio...");
     };
 
     const onCountdownDone = () => {
-        setSequenceState(prev => ({ ...prev, step: 'drawing' }));
-        // Start spin logic
-        setTimeout(() => {
-            performDraw(sequenceState.index);
-        }, 100);
+        setStatusText("Iniciando Sorteio!");
+        startDigitDraw(sequenceState.fezinhaIndex, 0);
     };
 
-    const performDraw = async (index: number) => {
-        setActiveDrawIndex(index);
+    const startDigitDraw = async (fezinhaIdx: number, digitIdx: number) => {
+        setSequenceState({ step: 'drawing', fezinhaIndex: fezinhaIdx, digitIndex: digitIdx });
+        setStatusText(`Sorteando ${digitIdx + 1}º número...`);
 
-        // Total spin duration = (3 digits * 2.5s) + base duration ~ 10s
-        // We need to wait for the generic "drawing" phase to complete visually
-        // The last digit stops at index 3 * 2.5 = 7.5s delay + transition
-        // Let's set a sufficient wait time before moving to highlight
+        // 1. Spin for a random time (drama)
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s spin per digit
 
-        // Generate result immediately so we can pass it to the component
-        const randomNum = Math.floor(Math.random() * 10000);
-        currentSequenceResults.current[index] = randomNum;
-        setResults([...currentSequenceResults.current]);
+        // 2. Reveal Digit
+        const fullNumber = currentSequenceResults.current[fezinhaIdx];
+        const strNum = fullNumber.toString().padStart(4, '0');
+        const digit = parseInt(strNum[digitIdx]);
 
-        // Wait for animations to finish (4 digits * 2.5s interval + buffer)
-        await new Promise(resolve => setTimeout(resolve, 8000 + 2000));
+        setDisplayValues(prev => {
+            const newVals = [...prev];
+            newVals[fezinhaIdx][digitIdx] = digit;
+            return newVals;
+        });
 
-        // Move to Highlight
-        setActiveDrawIndex(null); // Stop the "active" pulse on grid
-        setHighlightedResult({ number: randomNum, index });
-        setSequenceState(prev => ({ ...prev, step: 'highlighting' }));
+        // 3. Check if done or next digit
+        if (digitIdx < 3) {
+            // Go to next digit
+            setTimeout(() => {
+                startDigitDraw(fezinhaIdx, digitIdx + 1);
+            }, 500); // Short pause between digits
+        } else {
+            // Finished this Fezinha
+            setStatusText("Milhar Sorteada!");
+            setSequenceState(prev => ({ ...prev, step: 'celebrating' })); // Trigger Confetti component
 
-        // Show highlighted result for 3 seconds
-        setTimeout(() => {
-            setHighlightedResult(null);
-            setSequenceState(prev => ({ ...prev, step: 'verifying' }));
-        }, 4000);
+            setTimeout(() => {
+                setSequenceState(prev => ({ ...prev, step: 'highlighting' }));
+            }, 1000);
+
+            setTimeout(() => {
+                setSequenceState(prev => ({ ...prev, step: 'verifying' }));
+                setStatusText("Buscando Ganhadores...");
+            }, 4000); // Show highlight for 3s
+        }
     };
 
     const onVerificationDone = () => {
-        const nextIndex = sequenceState.index + 1;
+        const nextFezinha = sequenceState.fezinhaIndex + 1;
 
-        if (nextIndex < 4) {
-            // Prepare for next
-            setSequenceState(prev => ({ ...prev, step: 'preparing' }));
-            setPreparingNext(true);
+        if (nextFezinha < 4) {
+            setSequenceState({ step: 'preparing', fezinhaIndex: nextFezinha, digitIndex: 0 });
+            setStatusText("Preparando Próxima Fezinha...");
 
             setTimeout(() => {
-                setPreparingNext(false);
-                setSequenceState({ step: 'countdown', index: nextIndex });
-            }, 3000); // Wait 3s saying "Preparing next..."
+                setSequenceState({ step: 'countdown', fezinhaIndex: nextFezinha, digitIndex: 0 });
+            }, 3000);
         } else {
-            // Finish
-            setSequenceState({ step: 'idle', index: 0 });
+            // All done
+            setSequenceState({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
             setIsRunning(false);
-            const finalResults = currentSequenceResults.current.map(r => r ?? 0);
-            setHistory(prev => [finalResults, ...prev].slice(0, 5));
+            setStatusText("Sorteio Finalizado.");
+
+            // Add to history
+            setHistory(prev => [{
+                numbers: [...currentSequenceResults.current],
+                timestamp: new Date()
+            }, ...prev].slice(0, 5));
         }
     };
 
     return (
-        <div className="relative w-full flex flex-col items-center gap-10 py-6 min-h-[600px] overflow-hidden">
+        <div className="relative w-full flex flex-col items-center gap-6 py-6 min-h-[700px] overflow-hidden">
 
-            {/* Overlays */}
+            {/* Animated Status Bar */}
+            <div className="w-full max-w-md bg-card/80 backdrop-blur border rounded-full px-6 py-3 flex items-center justify-center gap-3 shadow-lg z-20">
+                <Megaphone className={`w-5 h-5 text-primary ${sequenceState.step === 'drawing' ? 'animate-bounce' : ''}`} />
+                <span className="font-semibold text-lg animate-in fade-in key={statusText}">
+                    {statusText}
+                </span>
+            </div>
+
+            {/* Grid */}
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full transition-all duration-700 ${['countdown', 'highlighting', 'verifying', 'preparing'].includes(sequenceState.step) ? 'opacity-20 blur-sm scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
+                {displayValues.map((digits, fIndex) => {
+                    const isActiveFezinha = sequenceState.fezinhaIndex === fIndex;
+                    const isDrawing = sequenceState.step === 'drawing' && isActiveFezinha;
+
+                    // Determine spinning index for this specific group
+                    // If active and drawing, the current digit index is spinning
+                    const spinningIdx = isDrawing ? sequenceState.digitIndex : null;
+
+                    return (
+                        <div key={fIndex} className="flex flex-col items-center space-y-3">
+                            <div className="flex items-center gap-2 text-muted-foreground font-medium text-sm uppercase tracking-wider">
+                                <Ticket className={`w-4 h-4 ${isActiveFezinha ? 'text-primary' : ''}`} />
+                                Fezinha {fIndex + 1}
+                            </div>
+
+                            <div className={`relative group transition-all duration-500 ${isActiveFezinha ? 'scale-105 z-10' : 'scale-100'}`}>
+                                {isActiveFezinha && <div className="absolute -inset-4 bg-primary/10 rounded-xl blur-xl animate-pulse" />}
+
+                                <DrawGroup
+                                    digits={digits}
+                                    spinningIndex={spinningIdx}
+                                />
+
+                                {/* Confetti relative to the winner card */}
+                                {sequenceState.step === 'celebrating' && isActiveFezinha && (
+                                    <Confetti />
+                                )}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+
+            {/* Global Overlays */}
             <AnimatePresence>
                 {sequenceState.step === 'countdown' && (
                     <CountdownOverlay
                         isVisible={true}
                         onComplete={onCountdownDone}
-                        seconds={5} // 5s countdown
+                        seconds={5}
                     />
                 )}
 
-                {/* Highlight Overlay */}
-                {sequenceState.step === 'highlighting' && highlightedResult && (
+                {sequenceState.step === 'celebrating' && (
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+                        {/* Full screen confetti */}
+                        <Confetti className="w-full h-full" />
+                    </div>
+                )}
+
+                {sequenceState.step === 'highlighting' && (
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -112,22 +189,24 @@ export function DrawSimulator() {
                         className="absolute inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md"
                     >
                         <div className="flex flex-col items-center gap-6">
-                            <div className="text-2xl font-light text-muted-foreground uppercase tracking-widest">
-                                Resultado Fezinha {highlightedResult.index + 1}
+                            <div className="text-2xl font-light text-muted-foreground uppercase tracking-widest animate-pulse">
+                                Resultado Confirmado
                             </div>
-                            <div className="text-9xl font-black text-primary font-mono drop-shadow-[0_0_50px_rgba(var(--primary-rgb),0.5)]">
-                                {highlightedResult.number.toString().padStart(4, '0')}
+                            <div className="text-9xl font-black text-primary font-mono drop-shadow-[0_0_50px_rgba(var(--primary-rgb),0.8)]">
+                                {currentSequenceResults.current[sequenceState.fezinhaIndex].toString().padStart(4, '0')}
+                            </div>
+                            <div className="flex gap-2">
+                                <Confetti />
                             </div>
                         </div>
                     </motion.div>
                 )}
 
-                {/* Preparing Next Overlay */}
                 {sequenceState.step === 'preparing' && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
                     >
                         <div className="flex flex-col items-center gap-4">
@@ -135,57 +214,31 @@ export function DrawSimulator() {
                             <div className="text-3xl font-bold text-foreground">
                                 Preparando Próximo Sorteio...
                             </div>
-                            <div className="text-muted-foreground">
-                                Fezinha {sequenceState.index + 2} de 4
-                            </div>
                         </div>
                     </motion.div>
                 )}
 
-                {sequenceState.step === 'verifying' && currentSequenceResults.current[sequenceState.index] !== null && (
+                {sequenceState.step === 'verifying' && (
                     <VerificationResult
-                        drawNumber={currentSequenceResults.current[sequenceState.index]!}
+                        drawNumber={currentSequenceResults.current[sequenceState.fezinhaIndex]}
                         onComplete={onVerificationDone}
                     />
                 )}
             </AnimatePresence>
 
-            {/* 4 Cards Grid - Dimmed when overlay is active */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full transition-all duration-700 ${sequenceState.step !== 'drawing' && sequenceState.step !== 'idle' ? 'opacity-10 blur-md scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
-                {results.map((result, index) => {
-                    const isActive = activeDrawIndex === index;
-
-                    return (
-                        <div key={index} className="flex flex-col items-center space-y-3">
-                            <div className="flex items-center gap-2 text-muted-foreground font-medium text-sm uppercase tracking-wider">
-                                <Ticket className={`w-4 h-4 ${isActive ? 'text-primary animate-pulse' : ''}`} />
-                                Fezinha {index + 1}
-                            </div>
-
-                            <div className={`relative group transition-all duration-500 ${isActive ? 'scale-110 z-10' : 'scale-100'}`}>
-                                <DrawGroup
-                                    value={result}
-                                    isSpinning={isActive}
-                                />
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
-
             <div className={`flex flex-col items-center justify-center space-y-6 pt-4 transition-all duration-500 ${isRunning ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100'}`}>
                 <Button
                     size="lg"
                     onClick={startSequence}
-                    className="min-w-[200px] h-12 text-lg font-semibold shadow-lg hover:shadow-primary/25 transition-all active:scale-95"
+                    className="min-w-[200px] h-12 text-lg font-semibold shadow-lg hover:shadow-primary/25 transition-all active:scale-95 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-500 hover:to-primary/90"
                 >
                     <Play className="mr-2 h-5 w-5 fill-current" />
-                    Iniciar Sorteio Completo
+                    Iniciar Sorteio TV Show
                 </Button>
             </div>
 
             {history.length > 0 && (
-                <Card className="bg-muted/10 border-dashed w-full max-w-4xl mt-auto">
+                <Card className="bg-muted/10 border-dashed w-full max-w-4xl mt-auto animate-in slide-in-from-bottom-10">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <Sparkles className="h-4 w-4 text-primary" />
@@ -193,17 +246,24 @@ export function DrawSimulator() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-2">
-                            {history.map((drawSet, i) => (
-                                <div key={i} className="flex flex-wrap gap-2 md:gap-4 items-center justify-between p-3 bg-background/50 rounded-lg border text-sm">
-                                    <span className="font-mono text-muted-foreground w-6">#{i + 1}</span>
+                        <div className="space-y-3">
+                            {history.map((record, i) => (
+                                <div key={i} className="flex flex-wrap gap-2 md:gap-4 items-center justify-between p-4 bg-background/60 backdrop-blur rounded-lg border text-sm shadow-sm">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-mono text-muted-foreground font-bold">#{i + 1}</span>
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            {record.timestamp.toLocaleTimeString()}
+                                        </span>
+                                    </div>
+
                                     <div className="flex flex-1 gap-2 md:gap-8 justify-center">
-                                        {drawSet.map((num, idx) => (
-                                            <div key={idx} className="font-mono font-bold text-lg">
-                                                <span className="text-xs text-muted-foreground mr-1">F{idx + 1}:</span>
-                                                <span className="text-primary">
-                                                    {num?.toString().padStart(4, '0')}
-                                                </span>
+                                        {record.numbers.map((num, idx) => (
+                                            <div key={idx} className="flex flex-col items-center">
+                                                <span className="text-[10px] uppercase text-muted-foreground mb-1">Fezinha {idx + 1}</span>
+                                                <div className="font-mono font-bold text-xl text-primary bg-primary/10 px-3 py-1 rounded">
+                                                    {num.toString().padStart(4, '0')}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
