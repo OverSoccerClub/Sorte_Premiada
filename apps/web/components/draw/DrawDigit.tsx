@@ -78,8 +78,8 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                         <div
                             key={i}
                             className={cn(
-                                "flex items-center justify-center font-mono font-bold text-4xl text-foreground",
-                                "h-20 w-full"
+                                "flex items-center justify-center font-mono font-black text-5xl",
+                                "h-20 w-full text-white drop-shadow-md"
                             )}
                         >
                             {i % 10}
