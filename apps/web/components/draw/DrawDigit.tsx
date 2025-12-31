@@ -64,7 +64,7 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                         type: "spring",
                         stiffness: 60,
                         damping: 15,
-                        delay: delay * 0.2 // Stagger stops
+                        delay: delay // Use exact seconds passed
                     }
                 }}
             >

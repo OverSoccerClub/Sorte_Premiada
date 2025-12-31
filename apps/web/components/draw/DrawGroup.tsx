@@ -20,7 +20,7 @@ export function DrawGroup({ value, isSpinning }: DrawGroupProps) {
                     key={index}
                     value={digit}
                     isSpinning={isSpinning}
-                    delay={index} // Stagger by index
+                    delay={index * 2.5} // 2.5s interval per digit
                 />
             ))}
         </div>
