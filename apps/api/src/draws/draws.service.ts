@@ -28,11 +28,14 @@ export class DrawsService {
                 // Extract HH:mm for timeSlot based on Brazil Time
                 const timeSlot = drawDateBrazil.format('HH:mm');
 
-                // Busca ou cria o contador para este horário
+                const areaId = data.areaId || null; // Support area linking
+
+                // Busca ou cria o contador para este horário E PRAÇA
                 let extractionSeries = await tx.extractionSeries.findUnique({
                     where: {
-                        gameId_time: {
+                        gameId_areaId_time: {
                             gameId,
+                            areaId: areaId,
                             time: timeSlot
                         }
                     }
@@ -42,19 +45,21 @@ export class DrawsService {
                     extractionSeries = await tx.extractionSeries.create({
                         data: {
                             gameId,
+                            areaId: areaId,
                             time: timeSlot,
                             lastSeries: 0
                         }
                     });
                 }
 
-                // Incrementa o contador da serie especifica
+                // Incrementa o contador da serie especifica DA PRAÇA
                 const updatedSeries = await tx.extractionSeries.update({
                     where: { id: extractionSeries.id },
                     data: { lastSeries: { increment: 1 } }
                 });
 
                 // Mantemos o lastSeries global do Game atualizado também (opcional, mas bom p/ compatibilidade)
+                // However, global series implies TOTAL draws.
                 await tx.game.update({
                     where: { id: gameId },
                     data: { lastSeries: { increment: 1 } }

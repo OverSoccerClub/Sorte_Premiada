@@ -28,6 +28,8 @@ const formSchema = z.object({
     areaId: z.string().optional(),
     salesLimit: z.coerce.number().min(0).optional(),
     commissionRate: z.coerce.number().min(0).max(100).optional(),
+    minSalesThreshold: z.coerce.number().min(0).optional(),
+    fixedCommission: z.coerce.number().min(0).optional(),
     accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
     canCancelTickets: z.boolean().default(false),
     isActive: z.boolean().default(true),
@@ -73,6 +75,8 @@ export default function CambistasPage() {
             areaId: undefined,
             salesLimit: 1000,
             commissionRate: 10,
+            minSalesThreshold: 200,
+            fixedCommission: 40,
             accountabilityLimitHours: 24,
             canCancelTickets: false,
             isActive: true,
@@ -131,6 +135,8 @@ export default function CambistasPage() {
                 areaId: cambista.areaId || undefined,
                 salesLimit: cambista.salesLimit ? Number(cambista.salesLimit) : 1000,
                 commissionRate: cambista.commissionRate ? Number(cambista.commissionRate) : 10,
+                minSalesThreshold: cambista.minSalesThreshold ? Number(cambista.minSalesThreshold) : 200,
+                fixedCommission: cambista.fixedCommission ? Number(cambista.fixedCommission) : 40,
                 accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
                 canCancelTickets: cambista.canCancelTickets ?? false,
                 isActive: cambista.isActive ?? true,
@@ -145,6 +151,8 @@ export default function CambistasPage() {
                 areaId: undefined,
                 salesLimit: 1000,
                 commissionRate: 10,
+                minSalesThreshold: 200,
+                fixedCommission: 40,
                 accountabilityLimitHours: 24,
                 canCancelTickets: false,
                 isActive: true,
@@ -449,6 +457,38 @@ export default function CambistasPage() {
                                                         <div className="relative">
                                                             <Percent className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                                             <Input type="number" step="1" placeholder="10" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="minSalesThreshold"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Meta Mínima (R$)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="number" step="0.01" placeholder="200.00" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="fixedCommission"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Comissão Fixa (R$)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                            <Input type="number" step="0.01" placeholder="40.00" className="pl-9 bg-muted/50 border-input" {...field} />
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />

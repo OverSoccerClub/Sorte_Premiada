@@ -96,26 +96,29 @@ export class TicketsService {
         // --- BUSINESS RULE 2: RESTRICTED MODE (Auto-Sequence) ---
         if (rules.restrictedMode && data.numbers && data.numbers.length === 1 && (data.gameType === '2x1000' || data.gameType === '2x500' || data.gameType.includes('MILHAR'))) {
             const firstNum = data.numbers[0];
-            const suffix = firstNum % 1000;
+            const excludedCentenas = new Set<number>();
+            excludedCentenas.add(firstNum % 1000);
 
-            // Generate 3 other numbers
-            const possible: number[] = [];
-            for (let i = 0; i <= 9; i++) {
-                const candidate = i * 1000 + suffix;
-                if (candidate !== firstNum) {
-                    possible.push(candidate);
+            const others: number[] = [];
+
+            // We need 3 more numbers
+            // Constraint: "Totalmente diferentes" and "com terminação diferente"
+            // We ensure all 4 numbers have UNIQUE centenas (last 3 digits).
+            while (others.length < 3) {
+                const candidate = Math.floor(Math.random() * 10000);
+                const candidateCentena = candidate % 1000;
+
+                // Must not be the same number, and must not share a used centenary
+                if (candidate !== firstNum && !excludedCentenas.has(candidateCentena)) {
+                    // One extra check: ensure the number itself isn't already in 'others' (though excludedCentenas handles most collisions)
+                    if (!others.includes(candidate)) {
+                        others.push(candidate);
+                        excludedCentenas.add(candidateCentena);
+                    }
                 }
             }
 
-            const others = possible.sort(() => 0.5 - Math.random()).slice(0, 3);
             data.numbers = [firstNum, ...others].sort((a, b) => a - b);
-
-            // Recalc specifics because numbers changed (count became 4)
-            // But wait, amount is total. If numbers changed from 1 to 4, betPerNumber changes?
-            // Usually Restricted Mode implies buying a "Block" of 4 numbers for the price of... ?
-            // User: "usuario escolhe a 1a milhar... o sistema escolhe as outras 3"
-            // If user input Amount=5.00 for 1 number, and we expanded to 4, is it 5.00 total for 4 numbers (1.25 each)?
-            // YES, assume Amount is Total Ticket Price.
         }
 
         // --- BUSINESS RULE: MAX LIABILITY CHECK (Risk Management) ---

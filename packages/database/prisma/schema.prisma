@@ -38,6 +38,10 @@ model User {
   canCancelTickets Boolean @default(false) // Permissão para o cambista cancelar bilhetes
   commissionRate Decimal? @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
 
+  // New Commission Rules
+  minSalesThreshold Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
+  fixedCommission   Decimal? @default(40.00)  // Ganho fixo se não atingir a meta (R$)
+
   // Corporate Maturity
   auditLogs       AuditLog[] @relation("UserAuditLogs")
   
@@ -56,6 +60,8 @@ model Area {
   state     String
   users     User[]
   configs   AreaConfig[]
+  draws     Draw[]
+  extractionSeries ExtractionSeries[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -100,6 +106,8 @@ model Draw {
   numbers   Int[]
   drawDate  DateTime
   series    Int?     // Número sequencial do sorteio
+  areaId    String?  // Vinculação por praça
+  area      Area?    @relation(fields: [areaId], references: [id])
   createdAt DateTime @default(now())
 }
 
@@ -117,10 +125,12 @@ model ExtractionSeries {
   id        String   @id @default(uuid())
   gameId    String
   game      Game     @relation(fields: [gameId], references: [id])
+  areaId    String?  // Opcional para manter compatibilidade, mas idealmente obrigatório para novas
+  area      Area?    @relation(fields: [areaId], references: [id])
   time      String   // Formato "HH:mm"
   lastSeries Int     @default(0)
 
-  @@unique([gameId, time])
+  @@unique([gameId, areaId, time])
 }
 
 model Ticket {

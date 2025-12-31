@@ -31,7 +31,7 @@ export default function Game2x1000Screen() {
     const [gameId, setGameId] = useState<string | null>(null);
     const [gameName, setGameName] = useState<string>("Jogo 2x1000");
     const [isLoadingGame, setIsLoadingGame] = useState(true);
-    const [gamePrice, setGamePrice] = useState<number>(10.00); // Default fallback
+    const [gamePrice, setGamePrice] = useState<number>(2.00); // Default fallback
     const [soldNumbers, setSoldNumbers] = useState<Set<number>>(new Set());
     const [isLoadingSold, setIsLoadingSold] = useState(false);
     const [drawSeries, setDrawSeries] = useState<number | undefined>(undefined);
@@ -251,32 +251,35 @@ export default function Game2x1000Screen() {
             if (isRestrictedMode) {
                 // In restricted mode, we allow 1 (auto-complete) OR 4 (full manual)
                 if (selectedNumbers.length === 1) {
-                    // +3 Auto Logic: Generating 3 numbers with SAME ENDING (Last 2 digits)
+                    // +3 Auto Logic: "Totalmente Diferentes" (Totally Different)
+                    // Generate 3 random numbers that do NOT share the same centenary (last 3 digits)
+                    // as the user's selection OR each other.
                     const firstNum = selectedNumbers[0];
-                    const suffix = firstNum % 100; // Get last 2 digits (e.g., 4578 -> 78)
+                    const newNumbers = [firstNum];
+                    const excludedCentenas = new Set<number>();
+                    excludedCentenas.add(firstNum % 1000);
+                    const selectedSet = new Set(newNumbers);
 
-                    const available = [];
-                    // Only scan numbers that end with the same suffix
-                    // Optimization: We can jump by 100 starting from suffix
-                    // e.g. if suffix is 78, check 78, 178, 278... 9978
-                    for (let i = suffix; i < 10000; i += 100) {
-                        if (!soldNumbers.has(i) && !selectedNumbers.includes(i)) {
-                            available.push(i);
+                    let attempts = 0;
+                    // Try to complete the set of 4
+                    while (newNumbers.length < 4 && attempts < 100) {
+                        const candidate = Math.floor(Math.random() * 10000);
+                        const candidateCentena = candidate % 1000;
+
+                        if (!soldNumbers.has(candidate) &&
+                            !selectedSet.has(candidate) &&
+                            !excludedCentenas.has(candidateCentena)) {
+
+                            newNumbers.push(candidate);
+                            selectedSet.add(candidate);
+                            excludedCentenas.add(candidateCentena);
                         }
+                        attempts++;
                     }
 
-                    if (available.length < 3) {
-                        showAlert("Esgotado", `Não há números suficientes terminados em ${suffix.toString().padStart(2, '0')} para completar a aposta.`, "error");
+                    if (newNumbers.length < 4) {
+                        showAlert("Indisponível", "Não foi possível encontrar milhares automáticas disponíveis com finais diferentes.", "error");
                         return;
-                    }
-
-                    const newNumbers = [...selectedNumbers];
-                    // Pick 3 random from the filtered list
-                    for (let k = 0; k < 3; k++) {
-                        const randomIndex = Math.floor(Math.random() * available.length);
-                        const num = available[randomIndex];
-                        newNumbers.push(num);
-                        available.splice(randomIndex, 1); // remove to avoid dupe
                     }
 
                     setSelectedNumbers(newNumbers);
@@ -656,7 +659,7 @@ export default function Game2x1000Screen() {
                                     data={{
                                         gameName: gameName,
                                         numbers: selectedNumbers,
-                                        price: "R$ 10,00",
+                                        price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                         series: drawSeries?.toString(),
                                         date: new Date().toLocaleString('pt-BR'),
                                         ticketId: "PREVIEW",
