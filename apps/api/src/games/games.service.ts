@@ -48,8 +48,9 @@ export class GamesService {
                 if (series.time && series.lastSeries !== undefined) {
                     await this.prisma.extractionSeries.upsert({
                         where: {
-                            gameId_time: {
+                            gameId_areaId_time: {
                                 gameId: id,
+                                areaId: series.areaId || null,
                                 time: series.time
                             }
                         },
@@ -58,6 +59,7 @@ export class GamesService {
                         },
                         create: {
                             gameId: id,
+                            areaId: series.areaId || null,
                             time: series.time,
                             lastSeries: Number(series.lastSeries)
                         }
