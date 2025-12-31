@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DrawGroup } from "./DrawGroup";
 import { CountdownOverlay } from "./CountdownOverlay";
 import { VerificationResult } from "./VerificationResult";
 import { Confetti } from "./Confetti";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Play, RotateCw, Ticket, Clock, Megaphone } from "lucide-react";
+import { Sparkles, Play, RotateCw, Ticket, Clock, Megaphone, Volume2, VolumeX } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { narrator } from "@/lib/audio";
 
 export function DrawSimulator() {
     const [isRunning, setIsRunning] = useState(false);
+    const [soundEnabled, setSoundEnabled] = useState(true);
 
     // State for the overarching flow
     const [sequenceState, setSequenceState] = useState<{
@@ -35,6 +37,11 @@ export function DrawSimulator() {
     const [history, setHistory] = useState<{ numbers: number[], timestamp: Date }[]>([]);
     const [statusText, setStatusText] = useState("Aguardando início...");
 
+    // Speak helper
+    const speak = (text: string) => {
+        if (soundEnabled) narrator.speak(text);
+    }
+
     const startSequence = () => {
         // Initialize secret results
         currentSequenceResults.current = Array.from({ length: 4 }).map(() => Math.floor(Math.random() * 10000));
@@ -46,17 +53,24 @@ export function DrawSimulator() {
 
         setIsRunning(true);
         setSequenceState({ step: 'countdown', fezinhaIndex: 0, digitIndex: 0 });
-        setStatusText("Preparando Sorteio...");
+        setStatusText("Sorteio Iniciado!");
+        speak("Iniciando bateria de sorteios! Atenção para a contagem regressiva.");
     };
 
     const onCountdownDone = () => {
-        setStatusText("Iniciando Sorteio!");
-        startDigitDraw(sequenceState.fezinhaIndex, 0);
+        const idx = sequenceState.fezinhaIndex;
+        setStatusText(`Fezinha ${idx + 1}: Iniciando...`);
+        speak(`Atenção para a Fezinha número ${idx + 1}. Boa sorte!`);
+
+        startDigitDraw(idx, 0);
     };
 
     const startDigitDraw = async (fezinhaIdx: number, digitIdx: number) => {
         setSequenceState({ step: 'drawing', fezinhaIndex: fezinhaIdx, digitIndex: digitIdx });
-        setStatusText(`Sorteando ${digitIdx + 1}º número...`);
+
+        const digitOrdinals = ["primeiro", "segundo", "terceiro", "quarto"];
+        setStatusText(`Fezinha ${fezinhaIdx + 1}: Sorteando ${digitIdx + 1}º número...`);
+        // speak(`Sorteando o ${digitOrdinals[digitIdx]} número...`); // Optional, might be too chatty.
 
         // 1. Spin for a random time (drama)
         await new Promise(resolve => setTimeout(resolve, 2000)); // 2s spin per digit
@@ -64,7 +78,8 @@ export function DrawSimulator() {
         // 2. Reveal Digit
         const fullNumber = currentSequenceResults.current[fezinhaIdx];
         const strNum = fullNumber.toString().padStart(4, '0');
-        const digit = parseInt(strNum[digitIdx]);
+        const digitChar = strNum[digitIdx];
+        const digit = parseInt(digitChar);
 
         setDisplayValues(prev => {
             const newVals = [...prev];
@@ -72,25 +87,37 @@ export function DrawSimulator() {
             return newVals;
         });
 
-        // 3. Check if done or next digit
+        // Stop animating this digit specifically by moving index
+        // But we handled that in DrawSimulator render logic (spinningIndex)
+
+        // Speak the digit!
+        speak(digitChar);
+
+        // 3. Pause for user to register the number (IMPORTANT)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 4. Check if done or next digit
         if (digitIdx < 3) {
             // Go to next digit
-            setTimeout(() => {
-                startDigitDraw(fezinhaIdx, digitIdx + 1);
-            }, 500); // Short pause between digits
+            startDigitDraw(fezinhaIdx, digitIdx + 1);
         } else {
             // Finished this Fezinha
-            setStatusText("Milhar Sorteada!");
+            const result = strNum;
+            setStatusText(`Fezinha ${fezinhaIdx + 1}: Milhar ${result}!`);
+            speak(`Milhar sorteada: ${result.split('').join(' ')}!`);
+
             setSequenceState(prev => ({ ...prev, step: 'celebrating' })); // Trigger Confetti component
 
             setTimeout(() => {
                 setSequenceState(prev => ({ ...prev, step: 'highlighting' }));
-            }, 1000);
+                speak("Confira o resultado!");
+            }, 1500);
 
             setTimeout(() => {
                 setSequenceState(prev => ({ ...prev, step: 'verifying' }));
                 setStatusText("Buscando Ganhadores...");
-            }, 4000); // Show highlight for 3s
+                speak("Verificando se temos ganhadores...");
+            }, 5000); // 1.5s celelebrate + 3.5s highlight
         }
     };
 
@@ -99,7 +126,8 @@ export function DrawSimulator() {
 
         if (nextFezinha < 4) {
             setSequenceState({ step: 'preparing', fezinhaIndex: nextFezinha, digitIndex: 0 });
-            setStatusText("Preparando Próxima Fezinha...");
+            setStatusText(`Preparando Fezinha ${nextFezinha + 1}...`);
+            speak("Vamos para o próximo sorteio!");
 
             setTimeout(() => {
                 setSequenceState({ step: 'countdown', fezinhaIndex: nextFezinha, digitIndex: 0 });
@@ -109,6 +137,7 @@ export function DrawSimulator() {
             setSequenceState({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
             setIsRunning(false);
             setStatusText("Sorteio Finalizado.");
+            speak("Sorteio finalizado. Obrigado a todos!");
 
             // Add to history
             setHistory(prev => [{
@@ -121,10 +150,17 @@ export function DrawSimulator() {
     return (
         <div className="relative w-full flex flex-col items-center gap-6 py-6 min-h-[700px] overflow-hidden">
 
+            {/* Controls */}
+            <div className="absolute top-0 right-0 z-50">
+                <Button variant="ghost" size="icon" onClick={() => setSoundEnabled(!soundEnabled)}>
+                    {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                </Button>
+            </div>
+
             {/* Animated Status Bar */}
-            <div className="w-full max-w-md bg-card/80 backdrop-blur border rounded-full px-6 py-3 flex items-center justify-center gap-3 shadow-lg z-20">
-                <Megaphone className={`w-5 h-5 text-primary ${sequenceState.step === 'drawing' ? 'animate-bounce' : ''}`} />
-                <span className="font-semibold text-lg animate-in fade-in key={statusText}">
+            <div className="w-full max-w-xl bg-card/80 backdrop-blur border rounded-full px-8 py-4 flex items-center justify-center gap-4 shadow-xl z-20 transition-all">
+                <Megaphone className={`w-6 h-6 text-primary flex-shrink-0 ${sequenceState.step === 'drawing' ? 'animate-bounce' : ''}`} />
+                <span className="font-bold text-xl animate-in fade-in key={statusText} text-center">
                     {statusText}
                 </span>
             </div>
@@ -146,9 +182,7 @@ export function DrawSimulator() {
                                 Fezinha {fIndex + 1}
                             </div>
 
-                            <div className={`relative group transition-all duration-500 ${isActiveFezinha ? 'scale-105 z-10' : 'scale-100'}`}>
-                                {isActiveFezinha && <div className="absolute -inset-4 bg-primary/10 rounded-xl blur-xl animate-pulse" />}
-
+                            <div className={`relative group transition-all duration-500 ${isActiveFezinha ? 'scale-110 z-10 ring-2 ring-primary/20 rounded-xl' : 'scale-100'}`}>
                                 <DrawGroup
                                     digits={digits}
                                     spinningIndex={spinningIdx}
@@ -190,7 +224,7 @@ export function DrawSimulator() {
                     >
                         <div className="flex flex-col items-center gap-6">
                             <div className="text-2xl font-light text-muted-foreground uppercase tracking-widest animate-pulse">
-                                Resultado Confirmado
+                                Resultado Fezinha {sequenceState.fezinhaIndex + 1}
                             </div>
                             <div className="text-9xl font-black text-primary font-mono drop-shadow-[0_0_50px_rgba(var(--primary-rgb),0.8)]">
                                 {currentSequenceResults.current[sequenceState.fezinhaIndex].toString().padStart(4, '0')}
@@ -212,8 +246,9 @@ export function DrawSimulator() {
                         <div className="flex flex-col items-center gap-4">
                             <RotateCw className="w-16 h-16 text-primary animate-spin" />
                             <div className="text-3xl font-bold text-foreground">
-                                Preparando Próximo Sorteio...
+                                Preparando Fezinha {sequenceState.fezinhaIndex + 1}
                             </div>
+                            <p className="text-muted-foreground">O sistema está reiniciando o motor de sorteio...</p>
                         </div>
                     </motion.div>
                 )}
@@ -233,7 +268,7 @@ export function DrawSimulator() {
                     className="min-w-[200px] h-12 text-lg font-semibold shadow-lg hover:shadow-primary/25 transition-all active:scale-95 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-500 hover:to-primary/90"
                 >
                     <Play className="mr-2 h-5 w-5 fill-current" />
-                    Iniciar Sorteio TV Show
+                    Iniciar Sorteio Narrado
                 </Button>
             </div>
 
