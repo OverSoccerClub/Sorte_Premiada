@@ -52,14 +52,15 @@ export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
                 className="flex flex-col items-center"
                 initial={{ y: 0 }}
                 animate={isSpinning ? {
-                    y: [0, -1000, 0],
+                    y: [0, -800], // Loop exactly one set of 10 digits (10 * 80px)
                     transition: {
                         repeat: Infinity,
-                        duration: 0.5,
+                        duration: 0.25, // Faster spin
                         ease: "linear"
                     }
                 } : {
-                    y: typeof value === 'number' ? -(value * HEIGHT) : 0,
+                    // Land on the second set of numbers (index 10-19) to ensure downward flow
+                    y: typeof value === 'number' ? -((value + 10) * HEIGHT) : 0,
                     transition: {
                         type: "spring",
                         stiffness: 60,
