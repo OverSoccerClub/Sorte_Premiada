@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { DrawGroup } from "./DrawGroup";
 import { CountdownOverlay } from "./CountdownOverlay";
 import { Confetti } from "./Confetti";
+import { VerificationResult } from "./VerificationResult";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Play, RotateCw, Ticket, Clock, Megaphone, Volume2, VolumeX, Trophy, User, XCircle } from "lucide-react";
@@ -54,13 +55,13 @@ export function DrawSimulator() {
         setIsRunning(true);
         setSequenceState({ step: 'countdown', fezinhaIndex: 0, digitIndex: 0 });
         setStatusText("Sorteio Iniciado!");
-        speak("Iniciando sorteio! Preparem seus bilhetes.");
+        speak("Atenção! Iniciando a bateria de sorteios.");
     };
 
     const onCountdownDone = () => {
         const idx = sequenceState.fezinhaIndex;
         setStatusText(`Fezinha ${idx + 1}: Iniciando...`);
-        speak(`Vamos para a Fezinha número ${idx + 1}.`);
+        speak(`Vamos sortear a Fezinha número ${idx + 1}.`);
 
         startDigitDraw(idx, 0);
     };
@@ -69,8 +70,8 @@ export function DrawSimulator() {
         setSequenceState({ step: 'drawing', fezinhaIndex: fezinhaIdx, digitIndex: digitIdx });
         setStatusText(`Fezinha ${fezinhaIdx + 1}: Sorteando ${digitIdx + 1}º número...`);
 
-        // 1. Spin
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // 1. Spin (Slower: 3s)
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // 2. Reveal
         const fullNumber = currentSequenceResults.current[fezinhaIdx];
@@ -85,7 +86,9 @@ export function DrawSimulator() {
         });
 
         speak(digitChar);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Pause for comprehension
+
+        // 3. Pause for comprehension (Slower: 2.5s)
+        await new Promise(resolve => setTimeout(resolve, 2500));
 
         if (digitIdx < 3) {
             startDigitDraw(fezinhaIdx, digitIdx + 1);
@@ -93,41 +96,60 @@ export function DrawSimulator() {
             // Finished Fezinha
             const result = strNum;
             setStatusText(`Fezinha ${fezinhaIdx + 1}: Milhar ${result}!`);
-            speak(`Milhar completa: ${result}!`);
+            speak(`Milhar completa: ${result}! Vamos conferir o resultado.`);
 
             setSequenceState(prev => ({ ...prev, step: 'celebrating' }));
 
-            // Determine winner (Mock logic)
-            const hasWinner = Math.random() > 0.4;
-            const winnerData: WinnerInfo = hasWinner ? {
-                hasWinner: true,
-                ticket: Math.floor(Math.random() * 100000).toString(),
-                cambista: ["João", "Maria", "Carlos", "Ana"][Math.floor(Math.random() * 4)],
-                description: "Bilhete Premiado!"
-            } : {
-                hasWinner: false,
-                description: "Acumulou"
-            };
+            // Wait briefly before verification
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-            setTimeout(() => {
-                setWinners(prev => {
-                    const newW = [...prev];
-                    newW[fezinhaIdx] = winnerData;
-                    return newW;
-                });
-
-                if (hasWinner) {
-                    speak(`Temos ganhador! Bilhete ${winnerData.ticket}, cambista ${winnerData.cambista}. Parabéns!`);
-                } else {
-                    speak("Não houve ganhadores para esta milhar.");
-                }
-            }, 1000);
-
-            setTimeout(() => {
-                // Move to next or finish
-                onFezinhaComplete(fezinhaIdx);
-            }, 6000); // Give time to read winner info
+            // Start Verification UI (Overlay)
+            setSequenceState(prev => ({ ...prev, step: 'verifying' }));
+            setStatusText("Buscando Ganhadores...");
+            // VerificationResult component will handle the "Searching" animation and then trigger onVerificationDone
         }
+    };
+
+    const onVerificationDone = () => {
+        // Logic executed AFTER the full verification overlay animation (Search -> Found/Not Found)
+        // Now we set the inline winner card and move on
+
+        const fezinhaIdx = sequenceState.fezinhaIndex;
+
+        // Determine winner (Mock logic - consistent with what was shown in overlay)
+        // Ideally VerificationResult would pass this back, but we can generate it here or pass it in.
+        // For simplicity, let's regenerate or store consistent mock result.
+        // NOTE: VerificationResult in previous step generated its own mock. We should control it.
+        // WE will rely on Verification component to just show animation, but we need to set the state here to match.
+        // Actually, let's determine winner BEFORE calling verifying, pass it to component.
+
+        const hasWinner = Math.random() > 0.4;
+        const winnerData: WinnerInfo = hasWinner ? {
+            hasWinner: true,
+            ticket: Math.floor(Math.random() * 100000).toString(),
+            cambista: ["João", "Maria", "Carlos", "Ana"][Math.floor(Math.random() * 4)],
+            description: "Bilhete Premiado!"
+        } : {
+            hasWinner: false,
+            description: "Acumulou"
+        };
+
+        setWinners(prev => {
+            const newW = [...prev];
+            newW[fezinhaIdx] = winnerData;
+            return newW;
+        });
+
+        if (hasWinner) {
+            speak(`Confirmado! Temos um ganhador. Bilhete ${winnerData.ticket}.`);
+        } else {
+            speak("Não houve ganhadores.");
+        }
+
+        // Show inline card for a moment
+        setTimeout(() => {
+            onFezinhaComplete(fezinhaIdx);
+        }, 5000); // 5s to read the inline card
     };
 
     const onFezinhaComplete = (currentIdx: number) => {
@@ -136,7 +158,6 @@ export function DrawSimulator() {
         if (nextFezinha < 4) {
             setSequenceState({ step: 'preparing', fezinhaIndex: nextFezinha, digitIndex: 0 });
             setStatusText(`Preparando Fezinha ${nextFezinha + 1}...`);
-            // speak(`Preparando próxima fezinha.`);
 
             setTimeout(() => {
                 setSequenceState({ step: 'countdown', fezinhaIndex: nextFezinha, digitIndex: 0 });
@@ -145,7 +166,7 @@ export function DrawSimulator() {
             setSequenceState({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
             setIsRunning(false);
             setStatusText("Sorteio Finalizado.");
-            speak("Sorteio finalizado. Até a próxima!");
+            speak("Sorteio finalizado. Obrigado e até a próxima!");
 
             setHistory(prev => [{
                 numbers: [...currentSequenceResults.current],
@@ -179,11 +200,7 @@ export function DrawSimulator() {
                     const isDrawing = sequenceState.step === 'drawing' && isActiveFezinha;
                     const winner = winners[fIndex];
 
-                    // Determine spinning index
                     const spinningIdx = isDrawing ? sequenceState.digitIndex : null;
-
-                    // Blur inactive ones if we are focusing deeply, but user wanted to see everything typically
-                    // Let's just highlight the active one
                     const opacityClass = (isRunning && !isActiveFezinha && winner === null) ? 'opacity-50' : 'opacity-100';
 
                     return (
@@ -248,6 +265,17 @@ export function DrawSimulator() {
                         onComplete={onCountdownDone}
                         seconds={5}
                     />
+                )}
+
+                {sequenceState.step === 'verifying' && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                        {/* Pass current draw number to verification which handles its own internal timer */}
+                        {/* We will update VerificationResult to be 'controlled' or trust its internal timer of 2.5s + 4s = 6.5s */}
+                        <VerificationResult
+                            drawNumber={currentSequenceResults.current[sequenceState.fezinhaIndex]}
+                            onComplete={onVerificationDone}
+                        />
+                    </div>
                 )}
 
                 {sequenceState.step === 'preparing' && (
