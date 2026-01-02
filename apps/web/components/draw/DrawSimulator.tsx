@@ -5,9 +5,10 @@ import { DrawGroup } from "./DrawGroup";
 import { CountdownOverlay } from "./CountdownOverlay";
 import { Confetti } from "./Confetti";
 import { VerificationResult } from "./VerificationResult";
+import { VirtualPresenter } from "./VirtualPresenter"; // New component
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Play, RotateCw, Ticket, Clock, Megaphone, Volume2, VolumeX, Trophy, User, XCircle } from "lucide-react";
+import { Sparkles, Play, RotateCw, Ticket, Clock, Volume2, VolumeX, Trophy, User, XCircle, Mic } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { narrator } from "@/lib/audio";
 
@@ -22,11 +23,15 @@ export function DrawSimulator() {
     const [isRunning, setIsRunning] = useState(false);
     const [soundEnabled, setSoundEnabled] = useState(true);
 
+    // Detailed State Machine
     const [sequenceState, setSequenceState] = useState<{
-        step: 'idle' | 'countdown' | 'drawing' | 'celebrating' | 'highlighting' | 'verifying' | 'preparing',
+        step: 'idle' | 'intro' | 'countdown' | 'digit_intro' | 'drawing_digit' | 'reveal_digit' | 'fezinha_complete' | 'verifying' | 'found_winner' | 'outro',
         fezinhaIndex: number,
         digitIndex: number // 0-3
     }>({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
+
+    const [presenterText, setPresenterText] = useState("");
+    const [isPresenterSpeaking, setIsPresenterSpeaking] = useState(false);
 
     const [displayValues, setDisplayValues] = useState<(string | number)[][]>([
         ['?', '?', '?', '?'],
@@ -38,13 +43,19 @@ export function DrawSimulator() {
     const [winners, setWinners] = useState<(WinnerInfo | null)[]>([null, null, null, null]);
     const currentSequenceResults = useRef<number[]>([0, 0, 0, 0]);
     const [history, setHistory] = useState<{ numbers: number[], timestamp: Date }[]>([]);
-    const [statusText, setStatusText] = useState("Aguardando início...");
 
-    const speak = (text: string) => {
+    // Queue to prevent overlapping speech
+    const speak = (text: string, duration?: number) => {
+        setPresenterText(text);
+        setIsPresenterSpeaking(true);
         if (soundEnabled) narrator.speak(text);
+
+        // Auto turn off speaking visuals after estimated duration or default
+        const estimatedDuration = duration || Math.max(2000, text.length * 60);
+        setTimeout(() => setIsPresenterSpeaking(false), estimatedDuration);
     }
 
-    const startSequence = () => {
+    const startSequence = async () => {
         currentSequenceResults.current = Array.from({ length: 4 }).map(() => Math.floor(Math.random() * 10000));
 
         setDisplayValues([
@@ -53,76 +64,83 @@ export function DrawSimulator() {
         setWinners([null, null, null, null]);
 
         setIsRunning(true);
-        setSequenceState({ step: 'countdown', fezinhaIndex: 0, digitIndex: 0 });
-        setStatusText("Sorteio Iniciado!");
-        speak("Atenção! Iniciando a bateria de sorteios.");
+
+        // INTRO
+        setSequenceState({ step: 'intro', fezinhaIndex: 0, digitIndex: 0 });
+        speak("Olá! Bem-vindos ao sorteio 2x1000. Vamos iniciar!", 4000);
+
+        await wait(4000);
+
+        setSequenceState(prev => ({ ...prev, step: 'countdown' }));
     };
 
-    const onCountdownDone = () => {
-        const idx = sequenceState.fezinhaIndex;
-        setStatusText(`Fezinha ${idx + 1}: Iniciando...`);
-        speak(`Vamos sortear a Fezinha número ${idx + 1}.`);
+    const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-        startDigitDraw(idx, 0);
+    const onCountdownDone = async () => {
+        // Start flow for Fezinha 0
+        runFezinhaFlow(0);
     };
 
-    const startDigitDraw = async (fezinhaIdx: number, digitIdx: number) => {
-        setSequenceState({ step: 'drawing', fezinhaIndex: fezinhaIdx, digitIndex: digitIdx });
-        setStatusText(`Fezinha ${fezinhaIdx + 1}: Sorteando ${digitIdx + 1}º número...`);
+    const runFezinhaFlow = async (fIndex: number) => {
+        // Pre-Fezinha announce
+        // speak(`Atenção para a Fezinha 0${fIndex + 1}!`);
+        // await wait(3000);
 
-        // 1. Spin (Slower: 3s)
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // Digits Loop
+        for (let dIndex = 0; dIndex < 4; dIndex++) {
+            await runDigitDraw(fIndex, dIndex);
+        }
 
-        // 2. Reveal
-        const fullNumber = currentSequenceResults.current[fezinhaIdx];
+        // Fezinha Complete
+        setSequenceState(prev => ({ ...prev, step: 'fezinha_complete', fezinhaIndex: fIndex }));
+        const result = currentSequenceResults.current[fIndex].toString().padStart(4, '0');
+
+        speak(`Atenção! A Fezinha 0${fIndex + 1} foi sorteada com sucesso! Milhar: ${result.split('').join(' ')}.`, 5000);
+        await wait(5000);
+
+        // Verify
+        speak("Agora estamos verificando possíveis ganhadores...", 3000);
+        setSequenceState(prev => ({ ...prev, step: 'verifying' }));
+        // The VerificationResult component triggers 'onVerificationDone' after its internal animation
+    };
+
+    const runDigitDraw = async (fIndex: number, dIndex: number) => {
+        const ordinal = ["primeiro", "segundo", "terceiro", "quarto"][dIndex];
+
+        // 1. Explain
+        setSequenceState({ step: 'digit_intro', fezinhaIndex: fIndex, digitIndex: dIndex });
+        speak(`Agora vamos sortear o ${ordinal} dígito da Fezinha 0${fIndex + 1}.`, 3000);
+        await wait(3000);
+
+        // 2. Spin
+        setSequenceState({ step: 'drawing_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
+        // speak("Girando...", 2000); // Create suspense silence or low sound? Let's generic suspense.
+        setPresenterText("🍀 Girando... 🍀");
+        await wait(2000); // 2s spin
+
+        // 3. Reveal
+        const fullNumber = currentSequenceResults.current[fIndex];
         const strNum = fullNumber.toString().padStart(4, '0');
-        const digitChar = strNum[digitIdx];
+        const digitChar = strNum[dIndex];
         const digit = parseInt(digitChar);
 
         setDisplayValues(prev => {
             const newVals = [...prev];
-            newVals[fezinhaIdx][digitIdx] = digit;
+            newVals[fIndex][dIndex] = digit;
             return newVals;
         });
 
-        speak(digitChar);
+        setSequenceState({ step: 'reveal_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
+        speak(`Número ${digitChar}!`, 2000);
 
-        // 3. Pause for comprehension (Slower: 2.5s)
-        await new Promise(resolve => setTimeout(resolve, 2500));
-
-        if (digitIdx < 3) {
-            startDigitDraw(fezinhaIdx, digitIdx + 1);
-        } else {
-            // Finished Fezinha
-            const result = strNum;
-            setStatusText(`Fezinha ${fezinhaIdx + 1}: Milhar ${result}!`);
-            speak(`Milhar completa: ${result}! Vamos conferir o resultado.`);
-
-            setSequenceState(prev => ({ ...prev, step: 'celebrating' }));
-
-            // Wait briefly before verification
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Start Verification UI (Overlay)
-            setSequenceState(prev => ({ ...prev, step: 'verifying' }));
-            setStatusText("Buscando Ganhadores...");
-            // VerificationResult component will handle the "Searching" animation and then trigger onVerificationDone
-        }
+        // 4. Pause Dramatic
+        await wait(2000);
     };
 
-    const onVerificationDone = () => {
-        // Logic executed AFTER the full verification overlay animation (Search -> Found/Not Found)
-        // Now we set the inline winner card and move on
-
+    const onVerificationDone = async () => {
         const fezinhaIdx = sequenceState.fezinhaIndex;
 
-        // Determine winner (Mock logic - consistent with what was shown in overlay)
-        // Ideally VerificationResult would pass this back, but we can generate it here or pass it in.
-        // For simplicity, let's regenerate or store consistent mock result.
-        // NOTE: VerificationResult in previous step generated its own mock. We should control it.
-        // WE will rely on Verification component to just show animation, but we need to set the state here to match.
-        // Actually, let's determine winner BEFORE calling verifying, pass it to component.
-
+        // Determine winner
         const hasWinner = Math.random() > 0.4;
         const winnerData: WinnerInfo = hasWinner ? {
             hasWinner: true,
@@ -140,112 +158,110 @@ export function DrawSimulator() {
             return newW;
         });
 
+        setSequenceState(prev => ({ ...prev, step: 'found_winner' }));
+
         if (hasWinner) {
-            speak(`Confirmado! Temos um ganhador. Bilhete ${winnerData.ticket}.`);
+            speak(`Temos um ganhador! Bilhete ${winnerData.ticket}. Parabéns!`, 4000);
         } else {
-            speak("Não houve ganhadores.");
+            speak("Não houve ganhadores nesta extração.", 3000);
         }
 
-        // Show inline card for a moment
-        setTimeout(() => {
-            onFezinhaComplete(fezinhaIdx);
-        }, 5000); // 5s to read the inline card
+        await wait(4000);
+
+        // Next or Outro
+        const nextFezinha = fezinhaIdx + 1;
+        if (nextFezinha < 4) {
+            runFezinhaFlow(nextFezinha);
+        } else {
+            finishShow();
+        }
     };
 
-    const onFezinhaComplete = (currentIdx: number) => {
-        const nextFezinha = currentIdx + 1;
+    const finishShow = async () => {
+        setSequenceState(prev => ({ ...prev, step: 'outro' }));
+        speak("Sorteio concluído com total transparência. Obrigado a todos e boa sorte na próxima!", 6000);
 
-        if (nextFezinha < 4) {
-            setSequenceState({ step: 'preparing', fezinhaIndex: nextFezinha, digitIndex: 0 });
-            setStatusText(`Preparando Fezinha ${nextFezinha + 1}...`);
+        setHistory(prev => [{
+            numbers: [...currentSequenceResults.current],
+            timestamp: new Date()
+        }, ...prev].slice(0, 5));
 
-            setTimeout(() => {
-                setSequenceState({ step: 'countdown', fezinhaIndex: nextFezinha, digitIndex: 0 });
-            }, 3000);
-        } else {
-            setSequenceState({ step: 'idle', fezinhaIndex: 0, digitIndex: 0 });
-            setIsRunning(false);
-            setStatusText("Sorteio Finalizado.");
-            speak("Sorteio finalizado. Obrigado e até a próxima!");
-
-            setHistory(prev => [{
-                numbers: [...currentSequenceResults.current],
-                timestamp: new Date()
-            }, ...prev].slice(0, 5));
-        }
+        await wait(6000);
+        setIsRunning(false);
+        setPresenterText("Sorteio Finalizado");
     };
 
     return (
-        <div className="relative w-full flex flex-col items-center gap-6 py-6 min-h-[700px] overflow-hidden">
+        <div className="relative w-full flex flex-col items-center gap-4 py-8 min-h-[800px] overflow-hidden">
 
             {/* Controls */}
-            <div className="absolute top-0 right-0 z-50">
-                <Button variant="ghost" size="icon" onClick={() => setSoundEnabled(!soundEnabled)}>
+            <div className="absolute top-4 right-4 z-50">
+                <Button variant="secondary" size="icon" onClick={() => setSoundEnabled(!soundEnabled)}>
                     {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                 </Button>
             </div>
 
-            {/* Animated Status Bar */}
-            <div className="w-full max-w-xl bg-card/80 backdrop-blur border rounded-full px-8 py-4 flex items-center justify-center gap-4 shadow-xl z-20 transition-all">
-                <Megaphone className={`w-6 h-6 text-primary flex-shrink-0 ${sequenceState.step === 'drawing' ? 'animate-bounce' : ''}`} />
-                <span className="font-bold text-xl animate-in fade-in key={statusText} text-center">
-                    {statusText}
-                </span>
+            {/* VIRTUAL PRESENTER AREA */}
+            <div className="w-full bg-gradient-to-b from-transparent to-background/10 z-20 pointer-events-none sticky top-0">
+                <VirtualPresenter text={presenterText} isSpeaking={isPresenterSpeaking} />
             </div>
 
             {/* Grid */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full px-4 mt-8`}>
                 {displayValues.map((digits, fIndex) => {
                     const isActiveFezinha = sequenceState.fezinhaIndex === fIndex;
-                    const isDrawing = sequenceState.step === 'drawing' && isActiveFezinha;
-                    const winner = winners[fIndex];
+                    const isDrawingDigit = sequenceState.step === 'drawing_digit' && isActiveFezinha;
 
-                    const spinningIdx = isDrawing ? sequenceState.digitIndex : null;
-                    const opacityClass = (isRunning && !isActiveFezinha && winner === null) ? 'opacity-50' : 'opacity-100';
+                    // Should this Fezinha be fully visible?
+                    // Only dim if it's NOT active and we are running
+                    const opacityClass = (isRunning && !isActiveFezinha) ? 'opacity-40 scale-95 blur-[1px]' : 'opacity-100 scale-100';
+
+                    // Only spin active digit
+                    const spinningIdx = isDrawingDigit ? sequenceState.digitIndex : null;
 
                     return (
-                        <div key={fIndex} className={`flex flex-col items-center space-y-4 transition-all duration-500 ${opacityClass}`}>
-                            <div className="flex items-center gap-2 text-muted-foreground font-medium text-sm uppercase tracking-wider">
-                                <Ticket className={`w-4 h-4 ${isActiveFezinha ? 'text-primary' : ''}`} />
-                                Fezinha {fIndex + 1}
+                        <div key={fIndex} className={`flex flex-col items-center space-y-6 transition-all duration-700 ${opacityClass}`}>
+                            <div className="flex items-center gap-2 text-primary font-bold text-lg uppercase tracking-widest border-b-2 border-primary/20 pb-1">
+                                <Ticket className="w-5 h-5" />
+                                Fezinha 0{fIndex + 1}
                             </div>
 
-                            <div className={`relative group transition-all duration-500 ${isActiveFezinha ? 'scale-105 z-10' : 'scale-100'}`}>
+                            <div className={`relative group transition-all duration-500`}>
                                 <DrawGroup
                                     digits={digits}
                                     spinningIndex={spinningIdx}
                                 />
-                                {/* Confetti for this card specifically if it just finished */}
-                                {sequenceState.step === 'celebrating' && isActiveFezinha && <Confetti />}
+                                {/* Confetti if completed */}
+                                {sequenceState.step === 'fezinha_complete' && isActiveFezinha && <Confetti />}
                             </div>
 
-                            {/* Inline Winner Display */}
-                            <div className="h-24 w-full flex items-center justify-center">
+                            {/* Winner Display */}
+                            <div className="h-32 w-full flex items-center justify-center">
                                 <AnimatePresence mode="wait">
-                                    {winner && (
+                                    {winners[fIndex] && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
+                                            initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className={`w-full p-3 rounded-lg border flex flex-col items-center shadow-sm ${winner.hasWinner ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-muted/50 border-border'}`}
+                                            className={`w-full p-4 rounded-xl border flex flex-col items-center shadow-lg backdrop-blur-sm ${winners[fIndex]!.hasWinner ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-muted/50 border-border'}`}
                                         >
-                                            {winner.hasWinner ? (
+                                            {winners[fIndex]!.hasWinner ? (
                                                 <>
-                                                    <div className="flex items-center gap-2 text-emerald-500 font-bold mb-1">
-                                                        <Trophy className="w-4 h-4" />
-                                                        <span>{winner.description}</span>
+                                                    <div className="flex items-center gap-2 text-emerald-400 font-black text-lg mb-2 uppercase tracking-wide">
+                                                        <Trophy className="w-5 h-5" />
+                                                        <span>{winners[fIndex]!.description}</span>
                                                     </div>
-                                                    <div className="text-sm font-mono text-foreground mb-0.5">
-                                                        Bilhete: <span className="font-bold">{winner.ticket}</span>
+                                                    <div className="text-base text-foreground mb-1">
+                                                        Bilhete: <span className="font-mono font-black text-xl">{winners[fIndex]!.ticket}</span>
                                                     </div>
-                                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <div className="text-sm text-muted-foreground flex items-center gap-1 bg-background/50 px-3 py-1 rounded-full mt-1">
                                                         <User className="w-3 h-3" />
-                                                        {winner.cambista}
+                                                        {winners[fIndex]!.cambista}
                                                     </div>
                                                 </>
                                             ) : (
                                                 <div className="flex items-center gap-2 text-muted-foreground font-medium">
-                                                    <XCircle className="w-4 h-4" />
-                                                    <span>{winner.description}</span>
+                                                    <XCircle className="w-5 h-5" />
+                                                    <span>{winners[fIndex]!.description}</span>
                                                 </div>
                                             )}
                                         </motion.div>
@@ -269,68 +285,49 @@ export function DrawSimulator() {
 
                 {sequenceState.step === 'verifying' && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-                        {/* Pass current draw number to verification which handles its own internal timer */}
-                        {/* We will update VerificationResult to be 'controlled' or trust its internal timer of 2.5s + 4s = 6.5s */}
                         <VerificationResult
                             drawNumber={currentSequenceResults.current[sequenceState.fezinhaIndex]}
                             onComplete={onVerificationDone}
                         />
                     </div>
                 )}
-
-                {sequenceState.step === 'preparing' && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
-                    >
-                        <div className="flex flex-col items-center gap-4">
-                            <RotateCw className="w-16 h-16 text-primary animate-spin" />
-                            <div className="text-3xl font-bold text-foreground">
-                                Preparando Fezinha {sequenceState.fezinhaIndex + 1}
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
             </AnimatePresence>
 
-            <div className={`flex flex-col items-center justify-center space-y-6 pt-4 transition-all duration-500 ${isRunning ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`flex flex-col items-center justify-center space-y-6 pt-12 transition-all duration-500 ${isRunning ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100'}`}>
                 <Button
                     size="lg"
                     onClick={startSequence}
-                    className="min-w-[200px] h-12 text-lg font-semibold shadow-lg hover:shadow-primary/25 transition-all active:scale-95 bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-500 hover:to-primary/90"
+                    className="min-w-[240px] h-14 text-xl font-bold shadow-2xl hover:shadow-primary/50 transition-all active:scale-95 bg-primary hover:bg-primary/90 rounded-full"
                 >
-                    <Play className="mr-2 h-5 w-5 fill-current" />
-                    Iniciar Sorteio Narrado
+                    <Play className="mr-3 h-6 w-6 fill-current" />
+                    Iniciar Transmissão
                 </Button>
             </div>
 
-            {history.length > 0 && (
-                <Card className="bg-muted/10 border-dashed w-full max-w-4xl mt-auto animate-in slide-in-from-bottom-10">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 text-primary" />
-                            Histórico Recente
+            {history.length > 0 && !isRunning && (
+                <Card className="bg-muted/5 border-none w-full max-w-5xl mt-12 animate-in slide-in-from-bottom-10">
+                    <CardHeader className="pb-4 border-b border-border/10">
+                        <CardTitle className="text-base font-medium text-muted-foreground flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-primary" />
+                            Últimos Sorteios Realizados
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="space-y-3">
+                    <CardContent className="pt-6">
+                        <div className="space-y-4">
                             {history.map((record, i) => (
-                                <div key={i} className="flex flex-wrap gap-2 md:gap-4 items-center justify-between p-4 bg-background/60 backdrop-blur rounded-lg border text-sm shadow-sm">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="font-mono text-muted-foreground font-bold">#{i + 1}</span>
-                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                            <Clock className="w-3 h-3" />
+                                <div key={i} className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-6 bg-background/40 hover:bg-background/60 transition-colors rounded-xl border border-border/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">#{i + 1}</div>
+                                        <span className="text-sm text-muted-foreground">
                                             {record.timestamp.toLocaleTimeString()}
                                         </span>
                                     </div>
 
-                                    <div className="flex flex-1 gap-2 md:gap-8 justify-center">
+                                    <div className="flex flex-1 gap-4 md:gap-12 justify-center flex-wrap">
                                         {record.numbers.map((num, idx) => (
-                                            <div key={idx} className="flex flex-col items-center">
-                                                <span className="text-[10px] uppercase text-muted-foreground mb-1">Fezinha {idx + 1}</span>
-                                                <div className="font-mono font-bold text-xl text-primary bg-primary/10 px-3 py-1 rounded">
+                                            <div key={idx} className="flex flex-col items-center gap-1">
+                                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Fezinha 0{idx + 1}</span>
+                                                <div className="font-mono font-black text-2xl text-foreground tracking-widest">
                                                     {num.toString().padStart(4, '0')}
                                                 </div>
                                             </div>
