@@ -342,7 +342,7 @@ model SecurityLog {
 
 model CompanySettings {
   id            String   @id @default(uuid())
-  companyName   String   @default("Fezinha de Hoje")
+  companyName   String   @default("A Perseverança")
   slogan        String?  @default("Cambista Edition")
   logoUrl       String?  // URL da logo ou base64
   

@@ -1,5 +1,5 @@
 export const AppConfig = {
-    name: 'Fezinha de Hoje',
+    name: 'A Perseverança',
     version: "1.1.51",
     api: {
         baseUrl: "https://pos-jogos-api.uawtgc.easypanel.host",
