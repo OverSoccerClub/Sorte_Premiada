@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Ticket, Save, CashStick, Gamepad2, Dices, PawPrint, Trophy, Star, Diamond, Info } from "lucide-react"
+import { Loader2, Ticket, Save, Banknote, Gamepad2, Dices, PawPrint, Trophy, Star, Diamond, Info } from "lucide-react"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
 
@@ -16,7 +16,7 @@ interface DisplayConfigDialogProps {
 
 // Icon options for picker (Mapped to Lucide components for preview)
 const iconOptions = [
-    { value: "cash-outline", label: "Dinheiro", icon: CashStick },
+    { value: "cash-outline", label: "Dinheiro", icon: Banknote },
     { value: "game-controller-outline", label: "Controle", icon: Gamepad2 },
     { value: "dice-outline", label: "Dados", icon: Dices },
     { value: "paw-outline", label: "Pata (Bicho)", icon: PawPrint },
