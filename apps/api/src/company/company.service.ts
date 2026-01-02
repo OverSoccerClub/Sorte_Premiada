@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Company } from '@prisma/client';
 import type { UpdateCompanySettingsDto, CreateCompanyDto } from './company.dto';
@@ -65,29 +65,46 @@ export class CompanyService {
         const bcrypt = await import('bcrypt');
         const hashedPassword = await bcrypt.hash(data.adminPassword || '123456', 10);
 
-        return this.prisma.$transaction(async (tx) => {
-            const company = await tx.company.create({
-                data: {
-                    slug: data.slug,
-                    companyName: data.companyName,
-                    slogan: data.slogan || 'Slogan Aqui',
-                    primaryColor: data.primaryColor || '#50C878',
-                },
-            });
+        try {
+            return await this.prisma.$transaction(async (tx) => {
+                const company = await tx.company.create({
+                    data: {
+                        slug: data.slug,
+                        companyName: data.companyName,
+                        slogan: data.slogan || 'Slogan Aqui',
+                        primaryColor: data.primaryColor || '#50C878',
+                    },
+                });
 
-            await tx.user.create({
-                data: {
-                    companyId: company.id,
-                    name: data.adminName,
-                    username: data.adminUsername,
-                    email: data.adminEmail,
-                    password: hashedPassword,
-                    role: 'ADMIN',
+                await tx.user.create({
+                    data: {
+                        companyId: company.id,
+                        name: data.adminName,
+                        username: data.adminUsername,
+                        email: data.adminEmail,
+                        password: hashedPassword,
+                        role: 'ADMIN',
+                    }
+                });
+
+                return company;
+            });
+        } catch (error: any) {
+            if (error.code === 'P2002') {
+                const target = error.meta?.target;
+                if (target?.includes('slug')) {
+                    throw new ConflictException('Já existe uma empresa com este Slug.');
                 }
-            });
-
-            return company;
-        });
+                if (target?.includes('username')) {
+                    throw new ConflictException('Este nome de usuário já está em uso.');
+                }
+                if (target?.includes('email')) {
+                    throw new ConflictException('Este email já está em uso.');
+                }
+                throw new ConflictException('Violação de dados únicos (Slug, Usuário ou Email já existem).');
+            }
+            throw error;
+        }
     }
 
     /**
