@@ -157,9 +157,9 @@ export class Narrator {
 
             if (this.voice) utterance.voice = this.voice;
 
-            // Natural speech settings - FASTER and more dynamic
-            utterance.pitch = 1.1;  // Slightly higher for male energy
-            utterance.rate = 1.05;  // Natural speaking pace (was 0.85 - too slow)
+            // Natural speech settings - faster and dynamic
+            utterance.pitch = 1.1;
+            utterance.rate = 1.15;  // Faster speaking pace
             utterance.volume = 1.0;
             utterance.lang = 'pt-BR';
 

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Ticket, Clock, Volume2, VolumeX, Trophy, User, XCircle, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { narrator } from "@/lib/audio";
+import { soundFX } from "@/lib/soundfx";
 
 interface WinnerInfo {
     hasWinner: boolean;
@@ -187,7 +188,12 @@ export function DrawSimulator() {
         // === SPINNING ===
         setSequenceState({ step: 'drawing_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
         setPresenterText("🎰 Girando... 🎰");
+
+        // Start spinning sound
+        if (soundEnabled) soundFX.startSpinSound();
         await wait(TIMING.SPIN_DURATION);
+        // Stop spinning sound
+        soundFX.stopSpinSound();
 
         // === REVELAÇÃO ===
         const fullNumber = currentSequenceResults.current[fIndex];
@@ -204,6 +210,10 @@ export function DrawSimulator() {
         });
 
         setSequenceState({ step: 'reveal_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
+
+        // Play reveal "plim" sound
+        if (soundEnabled) soundFX.playRevealSound();
+
         await speak(`Número: ${digitWord}!`, TIMING.AFTER_REVEAL);
     };
 
@@ -238,6 +248,9 @@ export function DrawSimulator() {
 
         // === ANÚNCIO DO RESULTADO ===
         if (hasWinner) {
+            // Play winner celebration with applause
+            if (soundEnabled) soundFX.playWinnerSound();
+
             await speak("Atenção! Temos ganhador!", TIMING.LONG_PAUSE);
 
             for (let i = 0; i < winnersList.length; i++) {
