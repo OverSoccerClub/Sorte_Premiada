@@ -20,7 +20,7 @@ interface CompanyContextType {
 }
 
 const defaultSettings: CompanySettings = {
-    companyName: "Fezinha de Hoje",
+    companyName: "A Perseverança",
     slogan: "Cambista Edition",
     primaryColor: "#506878",
 }

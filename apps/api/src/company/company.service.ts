@@ -18,7 +18,7 @@ export class CompanyService {
         if (!settings) {
             settings = await this.prisma.companySettings.create({
                 data: {
-                    companyName: 'Fezinha de Hoje',
+                    companyName: 'A Perseverança',
                     slogan: 'Cambista Edition',
                     primaryColor: '#50C878',
                 },

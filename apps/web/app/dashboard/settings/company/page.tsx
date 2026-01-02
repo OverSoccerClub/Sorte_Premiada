@@ -25,7 +25,7 @@ interface CompanySettings {
 }
 
 const defaultSettings: CompanySettings = {
-    companyName: "Fezinha de Hoje",
+    companyName: "A Perseverança",
     slogan: "Cambista Edition",
     logoUrl: "",
     phone: "",
