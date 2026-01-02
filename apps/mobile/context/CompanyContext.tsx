@@ -14,10 +14,10 @@ export interface CompanySettings {
 }
 
 const defaultSettings: CompanySettings = {
-    companyName: 'Sorte Premiada',
+    companyName: 'A Perseverança',
     slogan: 'Cambista Edition',
     primaryColor: '#50C878',
-    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/Sorte_Premiada',
+    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/A_Perseveranca',
 };
 
 const CACHE_KEY = '@company_settings';

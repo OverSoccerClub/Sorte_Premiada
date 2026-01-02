@@ -69,6 +69,15 @@ try {
     cmd /c $prebuildCmd
     if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
 
+    # PATCH: Restore Display Name in strings.xml
+    Write-Step "Restaurando nome de exibição..." -Color "Cyan"
+    $stringsPath = ".\android\app\src\main\res\values\strings.xml"
+    if (Test-Path $stringsPath) {
+        $xmlContent = Get-Content $stringsPath -Raw
+        $xmlContent = $xmlContent -replace '>APerseveranca<', '>A Perseverança<'
+        [System.IO.File]::WriteAllText($stringsPath, $xmlContent, $utf8NoBom)
+    }
+
     # Garantir local.properties APÓS o prebuild
     Write-Step "Configurando SDK Path..." -Color "Gray"
     $sdkPath = "C:/Users/natal/AppData/Local/Android/Sdk"
@@ -83,7 +92,8 @@ try {
     $settingsContent = Get-Content $settingsPath -Raw
     # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
     $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
-    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, [System.Text.Encoding]::UTF8)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, $utf8NoBom)
 
     # 5. Gradle Assembly
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60

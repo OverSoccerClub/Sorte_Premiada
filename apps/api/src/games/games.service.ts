@@ -10,8 +10,25 @@ export class GamesService {
         private auditLog: AuditLogService
     ) { }
 
-    async create(data: Prisma.GameCreateInput) {
-        return this.prisma.game.create({ data });
+    async create(data: any) {
+        const { extractionSeries, ...gameData } = data;
+
+        // Prepare proper Prisma connection/creation syntax
+        const createData: Prisma.GameCreateInput = {
+            ...gameData,
+            rules: gameData.rules || {},
+            extractionSeries: (extractionSeries && Array.isArray(extractionSeries) && extractionSeries.length > 0)
+                ? {
+                    create: extractionSeries.map((series: any) => ({
+                        time: series.time,
+                        lastSeries: Number(series.lastSeries || 0),
+                        areaId: series.areaId || null
+                    }))
+                }
+                : undefined
+        };
+
+        return this.prisma.game.create({ data: createData });
     }
 
     async findAll(options?: { activeOnly?: boolean }) {

@@ -5,7 +5,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts, Roboto_400Regular, Roboto_700Bold, Roboto_900Black } from '@expo-google-fonts/roboto';
 import { RobotoMono_400Regular, RobotoMono_700Bold } from '@expo-google-fonts/roboto-mono';
 import { ActivityIndicator, View } from "react-native";
-// import "../global.css";
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent auto hiding
+SplashScreen.preventAutoHideAsync().catch(() => { });
 
 import { AuthProvider } from "../context/AuthContext";
 import { PrinterProvider } from "../context/PrinterContext";
@@ -136,12 +139,14 @@ export default function RootLayout() {
         RobotoMono_700Bold,
     });
 
+    useEffect(() => {
+        if (fontsLoaded) {
+            SplashScreen.hideAsync().catch(() => { });
+        }
+    }, [fontsLoaded]);
+
     if (!fontsLoaded) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#000" />
-            </View>
-        );
+        return null; // Let splash screen stay distinct
     }
 
     return (
