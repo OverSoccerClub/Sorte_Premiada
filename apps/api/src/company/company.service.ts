@@ -1,14 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Company } from '@prisma/client';
-import type { UpdateCompanySettingsDto } from './company.dto';
-
-export interface CreateCompanyDto {
-    slug: string;
-    companyName: string;
-    slogan?: string;
-    primaryColor?: string;
-}
+import type { UpdateCompanySettingsDto, CreateCompanyDto } from './company.dto';
 
 @Injectable()
 export class CompanyService {
