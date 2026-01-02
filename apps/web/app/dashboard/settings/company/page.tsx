@@ -43,21 +43,102 @@ const defaultSettings: CompanySettings = {
 };
 
 export default function CompanySettingsPage() {
-    const { user } = useAuth(); // Get user role
+    const { user } = useAuth();
     const [settings, setSettings] = useState<CompanySettings>(defaultSettings);
-    // ... (rest of state)
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    // ... (fetchSettings remains same)
+    // Fetch current settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch(`${AppConfig.api.baseUrl}/company/settings`, {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setSettings({
+                        ...defaultSettings,
+                        ...data,
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch company settings:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSettings();
+    }, []);
+
+    // Handle input changes
+    const handleChange = (field: keyof CompanySettings, value: string) => {
+        setSettings((prev) => ({ ...prev, [field]: value }));
+        setSaveSuccess(false);
+    };
+
+    // Save settings
+    const handleSave = async () => {
+        setIsSaving(true);
+        setError(null);
+        setSaveSuccess(false);
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${AppConfig.api.baseUrl}/company/settings`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(settings),
+            });
+
+            if (!response.ok) {
+                throw new Error("Falha ao salvar configurações");
+            }
+
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err: any) {
+            setError(err.message || "Erro ao salvar");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // Handle logo upload (base64)
+    const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                handleChange("logoUrl", reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
-            {/* ... Header ... */}
             <StandardPageHeader
                 title="Configurações da Empresa"
                 description="Personalize as informações e identidade visual do sistema"
                 icon={<Building2 className="w-8 h-8 text-emerald-500" />}
             >
-                {/* ... Button ... */}
                 <Button
                     onClick={handleSave}
                     disabled={isSaving}
@@ -82,7 +163,6 @@ export default function CompanySettingsPage() {
                 </Button>
             </StandardPageHeader>
 
-            {/* ... Error ... */}
             {error && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg">
                     {error}
@@ -139,7 +219,6 @@ export default function CompanySettingsPage() {
                             />
                         </div>
 
-                        {/* ... Logo ... */}
                         <div className="space-y-2">
                             <Label>Logo da Empresa</Label>
                             <div className="flex items-center gap-4">
@@ -178,8 +257,6 @@ export default function CompanySettingsPage() {
                             </div>
                         </div>
 
-
-                        {/* ... Color ... */}
                         <div className="space-y-2">
                             <Label htmlFor="primaryColor">Cor Principal</Label>
                             <div className="flex items-center gap-3">
