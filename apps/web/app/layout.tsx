@@ -12,8 +12,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Fezinha de Hoje",
-  description: "App de Apostas",
+  title: "Sistema de Apostas",
+  description: "Painel Administrativo",
   icons: {
     icon: "/icon.png",
   },

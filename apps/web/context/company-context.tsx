@@ -53,6 +53,12 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
         fetchSettings()
     }, [])
 
+    useEffect(() => {
+        if (settings.companyName) {
+            document.title = settings.companyName
+        }
+    }, [settings.companyName])
+
     return (
         <CompanyContext.Provider value={{ settings, loading, refreshSettings: fetchSettings }}>
             {children}
