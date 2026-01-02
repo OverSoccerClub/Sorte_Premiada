@@ -5,15 +5,19 @@ type VoicePreference = {
     name: string;
     lang: string;
     priority: number;
+    isMale: boolean;
 };
 
-// Brazilian Portuguese voice preferences in priority order
+// Brazilian Portuguese MALE voice preferences in priority order
 const VOICE_PREFERENCES: VoicePreference[] = [
-    { name: 'Google português do Brasil', lang: 'pt-BR', priority: 1 },
-    { name: 'Microsoft Daniel', lang: 'pt-BR', priority: 2 },
-    { name: 'Luciana', lang: 'pt-BR', priority: 3 },
-    { name: 'Daniel', lang: 'pt', priority: 4 },
-    { name: 'Google', lang: 'pt', priority: 5 },
+    // Male voices (highest priority)
+    { name: 'Microsoft Daniel', lang: 'pt-BR', priority: 1, isMale: true },
+    { name: 'Daniel', lang: 'pt-BR', priority: 2, isMale: true },
+    { name: 'Daniel', lang: 'pt', priority: 3, isMale: true },
+    { name: 'Google português do Brasil', lang: 'pt-BR', priority: 4, isMale: false }, // Google is neutral/female
+    // Fallbacks
+    { name: 'Ricardo', lang: 'pt', priority: 5, isMale: true },
+    { name: 'Jorge', lang: 'pt', priority: 6, isMale: true },
 ];
 
 // Number pronunciation map for proper Brazilian Portuguese
@@ -28,31 +32,6 @@ const NUMBER_WORDS: Record<string, string> = {
     '7': 'sete',
     '8': 'oito',
     '9': 'nove',
-};
-
-// Full number pronunciation for complete milhares
-const FULL_NUMBER_PRONUNCIATION: Record<string, string> = {
-    '00': 'zero zero',
-    '01': 'zero um',
-    '02': 'zero dois',
-    '03': 'zero três',
-    '04': 'zero quatro',
-    '05': 'zero cinco',
-    '06': 'zero seis',
-    '07': 'zero sete',
-    '08': 'zero oito',
-    '09': 'zero nove',
-    '10': 'dez',
-    '11': 'onze',
-    '12': 'doze',
-    '13': 'treze',
-    '14': 'quatorze',
-    '15': 'quinze',
-    '16': 'dezesseis',
-    '17': 'dezessete',
-    '18': 'dezoito',
-    '19': 'dezenove',
-    '20': 'vinte',
 };
 
 export class Narrator {
@@ -89,15 +68,26 @@ export class Narrator {
 
         console.log('[Narrator] Available PT voices:', ptVoices.map(v => `${v.name} (${v.lang})`));
 
-        // Try to find voice by preference order
+        // Priority 1: Look for male voices by name
+        const maleNames = ['daniel', 'ricardo', 'jorge', 'paulo', 'carlos', 'antonio', 'pedro'];
+        const maleVoice = ptVoices.find(v =>
+            maleNames.some(name => v.name.toLowerCase().includes(name))
+        );
+
+        if (maleVoice) {
+            this.voice = maleVoice;
+            console.log('[Narrator] Selected MALE voice:', maleVoice.name, maleVoice.lang);
+            return;
+        }
+
+        // Priority 2: Try preference list
         for (const pref of VOICE_PREFERENCES) {
             const match = ptVoices.find(v =>
-                v.name.toLowerCase().includes(pref.name.toLowerCase()) ||
-                (v.lang.includes(pref.lang) && v.name.toLowerCase().includes('google'))
+                v.name.toLowerCase().includes(pref.name.toLowerCase())
             );
             if (match) {
                 this.voice = match;
-                console.log('[Narrator] Selected voice:', match.name, match.lang);
+                console.log('[Narrator] Selected voice from preferences:', match.name, match.lang);
                 return;
             }
         }
@@ -119,24 +109,19 @@ export class Narrator {
 
     /**
      * Convert a 4-digit milhar to spoken form with pauses
-     * e.g., "1234" -> "um... dois... três... quatro"
      */
     pronounceMillhar(milhar: string): string {
         const padded = milhar.padStart(4, '0');
-        return padded.split('').map(d => NUMBER_WORDS[d] || d).join('... ');
+        return padded.split('').map(d => NUMBER_WORDS[d] || d).join(', ');
     }
 
     /**
      * Preprocess text for better pronunciation
-     * - Converts standalone digits to words
-     * - Adds natural pauses for ellipsis
-     * - Fixes common pronunciation issues
      */
     preprocessText(text: string): string {
         let processed = text;
 
-        // Replace digit sequences that should be spoken as individual numbers
-        // Pattern: standalone single digits or digit sequences
+        // Replace standalone single digits
         processed = processed.replace(/\b(\d)\b/g, (_, d) => NUMBER_WORDS[d] || d);
 
         // Replace "Fezinha 01" style patterns
@@ -144,20 +129,16 @@ export class Narrator {
             `Fezinha zero ${NUMBER_WORDS[n] || n}`
         );
 
-        // Replace 4-digit milhars when spoken (e.g., "milhar 1234")
+        // Replace 4-digit milhars
         processed = processed.replace(/milhar[:\s]+(\d{4})/gi, (_, num) =>
             `milhar: ${this.pronounceMillhar(num)}`
         );
-
-        // Natural pauses - convert multiple dots to single pause marker
-        processed = processed.replace(/\.{2,}/g, '...');
 
         return processed;
     }
 
     /**
      * Speaks the text and returns a Promise that resolves when speech is complete.
-     * This ensures proper sequencing without overlap.
      */
     async speakAsync(text: string): Promise<void> {
         await this.voiceReady;
@@ -168,18 +149,17 @@ export class Narrator {
                 return;
             }
 
-            // Cancel any pending speech to avoid pile-up
+            // Cancel any pending speech
             window.speechSynthesis.cancel();
 
-            // Preprocess text for better pronunciation
             const processedText = this.preprocessText(text);
-
             const utterance = new SpeechSynthesisUtterance(processedText);
+
             if (this.voice) utterance.voice = this.voice;
 
-            // Optimized settings for professional TV-style delivery
-            utterance.pitch = 1.0;
-            utterance.rate = 0.85; // Slower for dramatic effect and clarity
+            // Natural speech settings - FASTER and more dynamic
+            utterance.pitch = 1.1;  // Slightly higher for male energy
+            utterance.rate = 1.05;  // Natural speaking pace (was 0.85 - too slow)
             utterance.volume = 1.0;
             utterance.lang = 'pt-BR';
 
@@ -191,7 +171,7 @@ export class Narrator {
             utterance.onerror = (e) => {
                 console.error('[Narrator] Speech error:', e);
                 this.isSpeaking = false;
-                resolve(); // Resolve anyway to not block the flow
+                resolve();
             };
 
             this.isSpeaking = true;
@@ -219,15 +199,12 @@ export class Narrator {
         }
     }
 
-    /**
-     * Utility wait function
-     */
     private wait(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     /**
-     * Legacy sync method - returns estimated duration (less accurate)
+     * Legacy sync method
      */
     speak(text: string): number {
         if (typeof window === 'undefined') return 0;
@@ -237,23 +214,18 @@ export class Narrator {
         const processedText = this.preprocessText(text);
         const utterance = new SpeechSynthesisUtterance(processedText);
         if (this.voice) utterance.voice = this.voice;
-        utterance.pitch = 1.0;
-        utterance.rate = 0.85;
+        utterance.pitch = 1.1;
+        utterance.rate = 1.05;
         utterance.lang = 'pt-BR';
 
         window.speechSynthesis.speak(utterance);
-
-        // Rough estimate: 100ms per character + base (slower rate)
-        return (processedText.length * 100) + 1000;
+        return (processedText.length * 70) + 500;
     }
 
     getIsSpeaking(): boolean {
         return this.isSpeaking;
     }
 
-    /**
-     * Stop any current speech
-     */
     stop(): void {
         if (typeof window !== 'undefined') {
             window.speechSynthesis.cancel();
