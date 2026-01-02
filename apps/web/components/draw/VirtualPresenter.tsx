@@ -28,26 +28,28 @@ export function VirtualPresenter({ text, isSpeaking, videoUrl }: VirtualPresente
                             src={videoUrl}
                             autoPlay
                             loop
-                            muted // Muted because audio comes from browser synthesis for now, or synced separately
+                            muted
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full relative">
-                            {/* Placeholder Image */}
-                            <Image
-                                src="/presenter.png"
-                                alt="Apresentadora Virtual"
-                                fill
-                                className={`object-cover transition-all duration-700 ${isSpeaking ? 'scale-105' : 'scale-100 filter grayscale-[20%]'}`}
-                                priority
-                            />
+                        <div className="w-full h-full relative bg-white/0 flex items-end justify-center overflow-visible">
+                            {/* Placeholder Image with Talking Animation */}
+                            <div className={`relative w-full h-full transition-transform duration-100 origin-bottom ${isSpeaking ? 'animate-talk-bounce' : ''}`}>
+                                <Image
+                                    src="/presenter.png"
+                                    alt="Apresentadora Virtual"
+                                    fill
+                                    className={`object-contain object-bottom mix-blend-multiply`}
+                                    priority
+                                />
+                            </div>
 
-                            {/* Speaking Overlay Effect (Simulate movement) */}
+                            {/* Speaking Overlay Effect (Subtle glow) */}
                             {isSpeaking && (
                                 <motion.div
-                                    className="absolute inset-0 bg-primary/10 mix-blend-overlay"
-                                    animate={{ opacity: [0, 0.2, 0] }}
-                                    transition={{ repeat: Infinity, duration: 0.2 }}
+                                    className="absolute inset-x-0 bottom-0 h-1/3 bg-primary/20 blur-xl rounded-full"
+                                    animate={{ opacity: [0, 0.5, 0], scale: [0.8, 1.2, 0.8] }}
+                                    transition={{ repeat: Infinity, duration: 0.4 }}
                                 />
                             )}
                         </div>

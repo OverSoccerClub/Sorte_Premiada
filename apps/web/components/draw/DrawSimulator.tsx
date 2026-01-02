@@ -45,15 +45,29 @@ export function DrawSimulator() {
     const [history, setHistory] = useState<{ numbers: number[], timestamp: Date }[]>([]);
 
     // Queue to prevent overlapping speech
-    const speak = (text: string, duration?: number) => {
+    // Queue to prevent overlapping speech with strict blocking
+    const speakAndWait = async (text: string, extraPause: number = 0) => {
         setPresenterText(text);
         setIsPresenterSpeaking(true);
-        if (soundEnabled) narrator.speak(text);
 
-        // Auto turn off speaking visuals after estimated duration or default
-        const estimatedDuration = duration || Math.max(2000, text.length * 60);
-        setTimeout(() => setIsPresenterSpeaking(false), estimatedDuration);
-    }
+        let estimatedDuration = 3000;
+        if (soundEnabled) {
+            estimatedDuration = narrator.speak(text);
+        } else {
+            // Fallback calculation if sound off
+            estimatedDuration = (text.length * 90) + 1000;
+        }
+
+        // Wait for speech to finish
+        await wait(estimatedDuration);
+
+        setIsPresenterSpeaking(false);
+
+        // Wait extra pause if requested
+        if (extraPause > 0) {
+            await wait(extraPause);
+        }
+    };
 
     const startSequence = async () => {
         currentSequenceResults.current = Array.from({ length: 4 }).map(() => Math.floor(Math.random() * 10000));
