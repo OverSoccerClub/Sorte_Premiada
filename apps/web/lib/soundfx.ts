@@ -20,9 +20,10 @@ class SoundEffects {
     }
 
     private spinInterval: ReturnType<typeof setInterval> | null = null;
+    private spinTimeout: ReturnType<typeof setTimeout> | null = null;
 
     /**
-     * Start spinning/slot machine tick sound - rapid clicks like a roulette
+     * Start spinning sound - realistic casino roulette wheel with ball bouncing
      */
     startSpinSound(): void {
         try {
@@ -31,32 +32,41 @@ class SoundEffects {
             // Stop any existing spin sound
             this.stopSpinSound();
 
-            // Create rapid clicking sounds like slot machine / roulette wheel
-            let clickCount = 0;
-            const maxClicks = 100;
+            // Roulette wheel sound: ball bouncing on pockets with decreasing interval
+            let interval = 80; // Start fast
+            let volume = 0.12;
 
-            this.spinInterval = setInterval(() => {
-                if (clickCount >= maxClicks) return;
-
+            const playTick = () => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
 
-                // Click sound with slight frequency variation
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800 + Math.random() * 200, ctx.currentTime);
+                // Wooden tick sound
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600 + Math.random() * 100, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05);
 
-                // Very short click
-                gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+                gain.gain.setValueAtTime(volume, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
 
                 osc.connect(gain);
                 gain.connect(ctx.destination);
 
                 osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.03);
+                osc.stop(ctx.currentTime + 0.06);
+            };
 
-                clickCount++;
-            }, 50); // 20 clicks per second
+            // Play ticks with slight speed variation (like ball bouncing)
+            const scheduleTick = () => {
+                playTick();
+
+                // Randomly vary the interval slightly for more realistic feel
+                const variance = interval * 0.1;
+                const nextInterval = interval + (Math.random() * variance - variance / 2);
+
+                this.spinTimeout = setTimeout(scheduleTick, nextInterval);
+            };
+
+            scheduleTick();
 
         } catch (e) {
             console.warn('[SoundFX] Could not start spin sound:', e);
@@ -68,6 +78,10 @@ class SoundEffects {
      */
     stopSpinSound(): void {
         try {
+            if (this.spinTimeout) {
+                clearTimeout(this.spinTimeout);
+                this.spinTimeout = null;
+            }
             if (this.spinInterval) {
                 clearInterval(this.spinInterval);
                 this.spinInterval = null;
