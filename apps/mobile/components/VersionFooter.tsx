@@ -8,9 +8,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { UpdatesService } from "../services/updates.service";
 import { UpdaterService } from "../services/updater.service";
 import { CustomAlert, AlertType } from "./CustomAlert";
+import { useCompany } from "../context/CompanyContext";
 
 export function VersionFooter() {
     const insets = useSafeAreaInsets();
+    const { settings } = useCompany();
     const [isChecking, setIsChecking] = useState(false);
     const [alertConfig, setAlertConfig] = useState<{
         visible: boolean; title: string; message: string; type: AlertType;
@@ -29,7 +31,7 @@ export function VersionFooter() {
 
         try {
             // 1. Check for NATIVE APK update first
-            const nativeUpdate = await UpdaterService.checkForUpdates();
+            const nativeUpdate = await UpdaterService.checkForUpdates(settings.updateUrl);
 
             if (nativeUpdate) {
                 setAlertConfig({
@@ -54,7 +56,7 @@ export function VersionFooter() {
                         });
 
                         try {
-                            await UpdaterService.downloadUpdate(nativeUpdate.apkUrl, (progress) => {
+                            await UpdaterService.downloadUpdate(nativeUpdate.apkUrl, settings.updateUrl, (progress) => {
                                 const percent = Math.round(progress * 100);
                                 setAlertConfig(prev => ({
                                     ...prev,
@@ -154,8 +156,8 @@ export function VersionFooter() {
                 style={[tw`pt-2 items-center justify-center`, { paddingBottom: 15 }]}
             >
                 <View style={tw`flex-row items-center mb-1 opacity-50`}>
-                    <MaterialCommunityIcons name="clover" size={12} color="#50C878" style={tw`mr-1`} />
-                    <Text style={tw`text-gray-400 font-bold text-[10px] tracking-widest`}>Fezinha de Hoje</Text>
+                    <MaterialCommunityIcons name="clover" size={12} color={settings.primaryColor || "#50C878"} style={tw`mr-1`} />
+                    <Text style={tw`text-gray-400 font-bold text-[10px] tracking-widest`}>{settings.companyName}</Text>
                 </View>
 
                 <View style={tw`flex-row items-center gap-2`}>

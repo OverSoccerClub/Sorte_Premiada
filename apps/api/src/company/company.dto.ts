@@ -9,4 +9,5 @@ export interface UpdateCompanySettingsDto {
     city?: string;
     state?: string;
     primaryColor?: string;
+    updateUrl?: string;
 }

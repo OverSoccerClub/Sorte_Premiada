@@ -4,7 +4,7 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import { Alert, Platform, Linking } from 'react-native';
 
 // Fallback update URL - can be overridden by AppConfig if needed
-const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje';
+const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Sorte_Premiada';
 const VERSION_FILE_NAME = 'version.json';
 
 export interface VersionInfo {
@@ -16,16 +16,15 @@ export interface VersionInfo {
 }
 
 export const UpdaterService = {
-    getUpdateUrl(): string {
-        // We could get this from AppConfig if it had a specific update field
-        return DEFAULT_UPDATE_URL;
+    getUpdateUrl(overrideUrl?: string): string {
+        return overrideUrl || DEFAULT_UPDATE_URL;
     },
 
-    async checkForUpdates(): Promise<VersionInfo | null> {
+    async checkForUpdates(updateUrl?: string): Promise<VersionInfo | null> {
         if (Platform.OS !== 'android') return null;
 
         try {
-            const baseUrl = this.getUpdateUrl();
+            const baseUrl = this.getUpdateUrl(updateUrl);
             const checkUrl = `${baseUrl}/${VERSION_FILE_NAME}?t=${Date.now()}`;
 
             console.log('[Updater] Checking for updates at:', checkUrl);
@@ -75,8 +74,8 @@ export const UpdaterService = {
         }
     },
 
-    async downloadUpdate(apkUrl: string, onProgress?: (percentage: number) => void): Promise<void> {
-        const baseUrl = this.getUpdateUrl();
+    async downloadUpdate(apkUrl: string, updateUrl?: string, onProgress?: (percentage: number) => void): Promise<void> {
+        const baseUrl = this.getUpdateUrl(updateUrl);
         const fullUrl = apkUrl.startsWith('http') ? apkUrl : `${baseUrl}/${apkUrl}`;
 
         console.log('[Updater] Starting download from:', fullUrl);

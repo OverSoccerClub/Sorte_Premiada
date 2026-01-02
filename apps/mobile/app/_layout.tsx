@@ -20,6 +20,7 @@ import { UpdaterService, VersionInfo } from "../services/updater.service";
 // Component responsible for Initializations (POS Tracking, Updates, etc)
 function AppInit() {
     usePosTracking();
+    const { settings } = useCompany();
     const { show, hide } = useLoading();
 
     const [alertConfig, setAlertConfig] = useState<{
@@ -50,7 +51,7 @@ function AppInit() {
             show("Verificando atualizações...");
 
             try {
-                const updateInfo = await UpdaterService.checkForUpdates();
+                const updateInfo = await UpdaterService.checkForUpdates(settings.updateUrl);
 
                 if (!isMounted) return;
                 hide();
@@ -76,7 +77,7 @@ function AppInit() {
                             });
 
                             try {
-                                await UpdaterService.downloadUpdate(updateInfo.apkUrl, (progress) => {
+                                await UpdaterService.downloadUpdate(updateInfo.apkUrl, settings.updateUrl, (progress) => {
                                     const percent = Math.round(progress * 100);
                                     setAlertConfig(prev => ({
                                         ...prev,

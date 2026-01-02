@@ -59,6 +59,7 @@ export class CompanyService {
             whatsapp: settings.whatsapp,
             email: settings.email,
             primaryColor: settings.primaryColor,
+            updateUrl: settings.updateUrl,
         };
     }
 }

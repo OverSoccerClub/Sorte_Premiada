@@ -10,12 +10,14 @@ export interface CompanySettings {
     whatsapp?: string;
     email?: string;
     primaryColor: string;
+    updateUrl?: string;
 }
 
 const defaultSettings: CompanySettings = {
-    companyName: 'Fezinha de Hoje',
+    companyName: 'Sorte Premiada',
     slogan: 'Cambista Edition',
     primaryColor: '#50C878',
+    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/Sorte_Premiada',
 };
 
 const CACHE_KEY = '@company_settings';

@@ -358,6 +358,7 @@ model CompanySettings {
   
   // Configurações visuais (futuro)
   primaryColor  String?  @default("#50C878")
+  updateUrl     String?  // URL do repositório para atualizações do App
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

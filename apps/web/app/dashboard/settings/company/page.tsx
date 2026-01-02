@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StandardPageHeader } from "@/components/standard-page-header";
-import { Building2, Save, Upload, Phone, Mail, MapPin, Palette, Loader2, CheckCircle2 } from "lucide-react";
+import { Building2, Save, Upload, Phone, Mail, MapPin, Palette, Loader2, CheckCircle2, RefreshCw } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 
 interface CompanySettings {
@@ -21,6 +21,7 @@ interface CompanySettings {
     city: string;
     state: string;
     primaryColor: string;
+    updateUrl: string;
 }
 
 const defaultSettings: CompanySettings = {
@@ -34,6 +35,7 @@ const defaultSettings: CompanySettings = {
     city: "",
     state: "",
     primaryColor: "#50C878",
+    updateUrl: "",
 };
 
 export default function CompanySettingsPage() {
@@ -341,6 +343,33 @@ export default function CompanySettingsPage() {
                                     />
                                 </div>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Atualização do Aplicativo */}
+                <Card className="bg-card border-border lg:col-span-2">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <RefreshCw className="w-5 h-5 text-emerald-500" />
+                            Atualização do Aplicativo
+                        </CardTitle>
+                        <CardDescription>
+                            Configure o repositório onde o App mobile buscará novas versões
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="updateUrl">URL do Repositório</Label>
+                            <Input
+                                id="updateUrl"
+                                value={settings.updateUrl || ""}
+                                onChange={(e) => handleChange("updateUrl", e.target.value)}
+                                placeholder="Ex: https://meu-repo.com/app"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Esta URL será usada pelo aplicativo para baixar o arquivo <strong>version.json</strong> e o <strong>APK</strong>.
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
