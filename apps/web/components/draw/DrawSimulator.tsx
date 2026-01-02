@@ -67,9 +67,7 @@ export function DrawSimulator() {
 
         // INTRO
         setSequenceState({ step: 'intro', fezinhaIndex: 0, digitIndex: 0 });
-        speak("Olá! Bem-vindos ao sorteio 2x1000. Vamos iniciar!", 4000);
-
-        await wait(4000);
+        await speakAndWait("Olá! Bem-vindos ao sorteio 2 por mil. Vamos começar!", 1000);
 
         setSequenceState(prev => ({ ...prev, step: 'countdown' }));
     };
@@ -77,14 +75,12 @@ export function DrawSimulator() {
     const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     const onCountdownDone = async () => {
-        // Start flow for Fezinha 0
         runFezinhaFlow(0);
     };
 
     const runFezinhaFlow = async (fIndex: number) => {
         // Pre-Fezinha announce
-        // speak(`Atenção para a Fezinha 0${fIndex + 1}!`);
-        // await wait(3000);
+        await speakAndWait(`Iniciando sorteio da Fezinha ${fIndex + 1}.`, 1000);
 
         // Digits Loop
         for (let dIndex = 0; dIndex < 4; dIndex++) {
@@ -95,27 +91,26 @@ export function DrawSimulator() {
         setSequenceState(prev => ({ ...prev, step: 'fezinha_complete', fezinhaIndex: fIndex }));
         const result = currentSequenceResults.current[fIndex].toString().padStart(4, '0');
 
-        speak(`Atenção! A Fezinha 0${fIndex + 1} foi sorteada com sucesso! Milhar: ${result.split('').join(' ')}.`, 5000);
-        await wait(5000);
+        await speakAndWait(`Fezinha ${fIndex + 1} completa!`, 500);
+        await speakAndWait(`Resultado: ${result.split('').join(' ')}.`, 2000);
 
         // Verify
-        speak("Agora estamos verificando possíveis ganhadores...", 3000);
+        speakAndWait("Verificando ganhadores...", 0); // Start speech, then overlay
         setSequenceState(prev => ({ ...prev, step: 'verifying' }));
-        // The VerificationResult component triggers 'onVerificationDone' after its internal animation
     };
 
     const runDigitDraw = async (fIndex: number, dIndex: number) => {
         const ordinal = ["primeiro", "segundo", "terceiro", "quarto"][dIndex];
 
-        // 1. Pre-Announcement (Pause: 3s)
+        // 1. Pre-Announcement
         setSequenceState({ step: 'digit_intro', fezinhaIndex: fIndex, digitIndex: dIndex });
-        speak(`Atenção... vamos sortear agora o ${ordinal} dígito da Fezinha 0${fIndex + 1}.`, 4000);
-        await wait(4000); // Allow text to be read fully
+        await speakAndWait(`Atenção... sorteando o ${ordinal} dígito.`, 1000);
 
-        // 2. Spin Command (Spin: 4s for suspense)
+        // 2. Spin
         setSequenceState({ step: 'drawing_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
         setPresenterText("🍀 Girando... 🍀");
-        await wait(4000);
+        // narrator.speak("Girando..."); // Optional audio hint
+        await wait(3000); // Visual Spin Duration
 
         // 3. Reveal Calculation
         const fullNumber = currentSequenceResults.current[fIndex];
@@ -129,12 +124,9 @@ export function DrawSimulator() {
             return newVals;
         });
 
-        // 4. Reveal & Confirm (Pause: 3s)
+        // 4. Reveal & Confirm
         setSequenceState({ step: 'reveal_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
-        speak(`Número sorteado... ${digitChar}!`, 3000);
-
-        // 5. Post-Reveal Silence/Verification (Pause: 2s)
-        await wait(2000);
+        await speakAndWait(`Número... ${digitChar}!`, 1500);
     };
 
     const onVerificationDone = async () => {
@@ -161,12 +153,10 @@ export function DrawSimulator() {
         setSequenceState(prev => ({ ...prev, step: 'found_winner' }));
 
         if (hasWinner) {
-            speak(`Temos um ganhador! Bilhete ${winnerData.ticket}. Parabéns!`, 4000);
+            await speakAndWait(`Temos um ganhador! Bilhete ${winnerData.ticket}. Parabéns!`, 3000);
         } else {
-            speak("Não houve ganhadores nesta extração.", 3000);
+            await speakAndWait("Não houve ganhadores nesta extração.", 2000);
         }
-
-        await wait(4000);
 
         // Next or Outro
         const nextFezinha = fezinhaIdx + 1;
@@ -179,16 +169,15 @@ export function DrawSimulator() {
 
     const finishShow = async () => {
         setSequenceState(prev => ({ ...prev, step: 'outro' }));
-        speak("Sorteio concluído com total transparência. Obrigado a todos e boa sorte na próxima!", 6000);
+        await speakAndWait("Sorteio finalizado. Obrigado e boa sorte!", 2000);
 
         setHistory(prev => [{
             numbers: [...currentSequenceResults.current],
             timestamp: new Date()
         }, ...prev].slice(0, 5));
 
-        await wait(6000);
         setIsRunning(false);
-        setPresenterText("Sorteio Finalizado");
+        setPresenterText("Fim da Transmissão");
     };
 
     return (
