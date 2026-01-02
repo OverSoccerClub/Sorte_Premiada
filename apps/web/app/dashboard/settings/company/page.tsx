@@ -126,7 +126,7 @@ export default function CompanySettingsPage() {
             <StandardPageHeader
                 title="Configurações da Empresa"
                 description="Personalize as informações e identidade visual do sistema"
-                icon={Building2}
+                icon={<Building2 className="w-8 h-8 text-emerald-500" />}
             >
                 <Button
                     onClick={handleSave}
