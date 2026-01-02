@@ -20,7 +20,7 @@ function Show-Progress {
 
 Clear-Host
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "      GERADOR DE APK - FEZINHA DO DIA v2.0" -ForegroundColor Cyan
+Write-Host "      GERADOR DE APK - A PERSEVERANÇA v2.0" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # 1. Configuration
@@ -29,7 +29,7 @@ $versionJsonPath = ".\version.json"
 $distDir = ".\dist"
 $androidDir = ".\android"
 $apkOutput = "$androidDir\app\build\outputs\apk\release\app-release.apk"
-$finalApkName = "FezinhadeHoje.apk"
+$finalApkName = "A_Perseveranca.apk"
 
 try {
     # 2. Sync Version
@@ -83,7 +83,7 @@ try {
     $settingsContent = Get-Content $settingsPath -Raw
     # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
     $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
-    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, [System.Text.Encoding]::ASCII)
+    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, [System.Text.Encoding]::UTF8)
 
     # 5. Gradle Assembly
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60

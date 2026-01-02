@@ -24,6 +24,7 @@ interface ReceiptModalProps {
 export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false }: ReceiptModalProps) {
     const viewShotRef = useRef<ViewShot>(null);
     const { user } = useAuth();
+    const { settings } = useCompany();
     const [isSharing, setIsSharing] = useState(false);
     const { print, isPrinting } = useTicketPrint();
 
@@ -43,6 +44,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
     const fullTicketData: TicketData = {
         ...ticketData,
         vendorName: ticketData.vendorName || user?.name || user?.username || "Vendedor",
+        companyName: ticketData.companyName || settings.companyName,
     };
 
     const handlePrint = async () => {
@@ -67,7 +69,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                 .map(n => n.toString().padStart(is2x1000 ? 4 : 2, '0'))
                 .join(is2x1000 ? '  ' : ' ');
 
-            const message = `🍀 *Fezinha de Hoje* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 Bilhete: ${ticketData.hash || ticketData.ticketId.slice(0, 8)}\n\n✨ Boa Sorte! ✨`;
+            const message = `🍀 *${settings.companyName}* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 Bilhete: ${ticketData.hash || ticketData.ticketId.slice(0, 8)}\n\n✨ Boa Sorte! ✨`;
 
             await Clipboard.setStringAsync(message);
             await Sharing.shareAsync(uri, {

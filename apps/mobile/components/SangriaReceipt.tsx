@@ -12,6 +12,7 @@ interface SangriaReceiptProps {
     copyName: string; // "Via do Cambista" or "Via do Cobrador"
     signerLabel: string; // "Cobrador" or "Cambista"
     isCapture?: boolean;
+    companyName?: string;
 }
 
 export function SangriaReceipt({
@@ -22,7 +23,8 @@ export function SangriaReceipt({
     id = "TEST-ID",
     copyName,
     signerLabel,
-    isCapture = false
+    isCapture = false,
+    companyName = "Sorte Premiada"
 }: SangriaReceiptProps) {
     // Sames styling logic as TicketPreview
     const containerStyle = isCapture ? {
@@ -40,7 +42,7 @@ export function SangriaReceipt({
             {/* Header */}
             <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2`}>
                 <Ionicons name="wallet-outline" size={isCapture ? 32 : 28} color="#000" style={tw`mb-1`} />
-                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_900Black' }]}>Fezinha de Hoje</Text>
+                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_900Black' }]}>{companyName}</Text>
                 <Text style={[tw`${isCapture ? 'text-xs' : 'text-[10px]'} text-black uppercase tracking-widest text-center`, { fontFamily: 'Roboto_700Bold' }]}>Sangria / Recolhimento</Text>
             </View>
 

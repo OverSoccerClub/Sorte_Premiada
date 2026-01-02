@@ -107,7 +107,7 @@ export const printTicket = async (
           </head>
           <body>
             ${status === 'CANCELLED' ? '<div class="watermark">CANCELADO</div>' : ''}
-            <h1>Fezinha de Hoje</h1>
+            <h1>${data.companyName || 'Sorte Premiada'}</h1>
             <div>COMPROVANTE DE APOSTA</div>
             <div class="dashed"></div>
             
@@ -196,7 +196,7 @@ export const printTicket = async (
     }
 
     receipt += CENTER;
-    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "Fezinha de Hoje" + BOLD_OFF + NORMAL + "\n";
+    receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + (data.companyName || "Sorte Premiada") + BOLD_OFF + NORMAL + "\n";
     receipt += CENTER + "COMPROVANTE DE APOSTA\n";
     receipt += "- - - - - - - - - - - - - - - -\n\n";
 
@@ -260,6 +260,7 @@ export const formatDailyReport = (
     totalDebits: number;
     finalBalance: number;
     transactions: any[];
+    companyName?: string;
   }
 ) => {
   const formatDate = (date: Date) => date.toLocaleString('pt-BR');
@@ -288,7 +289,7 @@ export const formatDailyReport = (
   let receipt = "";
   receipt += INITIALIZE;
   receipt += CENTER;
-  receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "FECHAMENTO" + BOLD_OFF + NORMAL + "\n";
+  receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + (data.companyName?.toUpperCase() || "SORTE PREMIADA") + BOLD_OFF + NORMAL + "\n";
   receipt += "RELATORIO DIARIO\n";
   receipt += dateStr + "\n";
   receipt += "- - - - - - - - - - - - - - - -\n\n";
@@ -328,6 +329,7 @@ export const printDailyReport = async (
     totalDebits: number;
     finalBalance: number;
     transactions: any[];
+    companyName?: string;
   },
   printerType: PrinterType = 'BLE',
   imageUri?: string
@@ -358,7 +360,7 @@ export const printDailyReport = async (
           </head>
           <body>
             <br/>
-            <h1>FECHAMENTO DO CAIXA</h1>
+            <h1>${data.companyName || 'SORTE PREMIADA'}</h1>
             <h3>RELATÓRIO DIÁRIO</h3>
             <div class="center">${data.date.toLocaleString('pt-BR')}</div>
             <div class="dashed"></div>
@@ -444,6 +446,7 @@ export const printSangriaReceipt = async (
     cambistaName: string;
     cobradorName: string;
     transactionId: string;
+    companyName?: string;
   },
   printerType: PrinterType = 'BLE',
   imageUri?: string
@@ -511,7 +514,8 @@ export const printSangriaReceipt = async (
       let r = "";
       r += INITIALIZE;
       r += CENTER;
-      r += DOUBLE_WIDTH_HEIGHT + BOLD_ON + "SANGRIA / RECOLHIMENTO" + BOLD_OFF + NORMAL + "\n";
+      r += DOUBLE_WIDTH_HEIGHT + BOLD_ON + (data.companyName?.toUpperCase() || "SORTE PREMIADA") + BOLD_OFF + NORMAL + "\n";
+      r += "SANGRIA / RECOLHIMENTO\n";
       r += dateStr + "\n";
       r += "- - - - - - - - - - - - - - - -\n\n";
 
@@ -555,10 +559,10 @@ export const printSangriaReceipt = async (
              .cut { border-bottom: 2px dotted black; margin: 20px 0; padding: 10px 0; }
           </style>
         </head>
-        <body>
+          <body>
            ${[1, 2].map(i => `
-              <h2>SANGRIA / RECOLHIMENTO</h2>
-              <div>${dateStr}</div>
+              <h2>${data.companyName || 'SORTE PREMIADA'}</h2>
+              <div>SANGRIA / RECOLHIMENTO</div>
               <div class="dashed"></div>
               <div class="left">
                 <div>VALOR: <b>${formatCurrency(data.amount)}</b></div>

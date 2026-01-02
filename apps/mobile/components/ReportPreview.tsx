@@ -8,9 +8,10 @@ interface ReportPreviewProps {
     data: FinanceSummary;
     date: Date;
     isCapture?: boolean;
+    companyName?: string;
 }
 
-export function ReportPreview({ data, date, isCapture = false }: ReportPreviewProps) {
+export function ReportPreview({ data, date, isCapture = false, companyName = "Sorte Premiada" }: ReportPreviewProps) {
     const formatDate = (date: Date) => date.toLocaleString('pt-BR');
     const formatCurrency = (val: number | string) => {
         const num = typeof val === 'string' ? parseFloat(val) : val;
@@ -34,7 +35,7 @@ export function ReportPreview({ data, date, isCapture = false }: ReportPreviewPr
             {/* Header with Logo */}
             <View style={tw`items-center border-b-[1px] border-dashed border-black pb-2 mb-2 bg-white`}>
                 <Ionicons name="receipt-outline" size={isCapture ? 32 : 28} color="#000" style={tw`mb-1`} />
-                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black text-center uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>Fezinha de Hoje</Text>
+                <Text style={[tw`${isCapture ? 'text-3xl' : 'text-xl'} text-black text-center uppercase tracking-widest`, { fontFamily: 'Roboto_900Black' }]}>{companyName}</Text>
                 <Text style={[tw`${isCapture ? 'text-xs' : 'text-[10px]'} text-black text-center uppercase tracking-widest`, { fontFamily: 'Roboto_700Bold' }]}>Fechamento de Caixa</Text>
             </View>
 

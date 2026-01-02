@@ -49,7 +49,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     const displayTicketId = data.hash || data.ticketId.substring(0, 8);
 
     // Derivar nome da empresa para o ticket
-    const brandName = data.companyName || 'FEZINHA';
+    const brandName = data.companyName || 'Sorte Premiada';
     const brandParts = brandName.toUpperCase().split(' ');
     const brandMain = brandParts.slice(0, -1).join(' ') || brandParts[0];
     const brandSuffix = brandParts.length > 1 ? brandParts[brandParts.length - 1] : '';
@@ -84,7 +84,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     const num = sortedNumbers[idx];
                     return (
                         <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-200 rounded p-1`}>
-                            <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>Fezinha {idx + 1}</Text>
+                            <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
                             {num !== undefined ? (
                                 <View style={tw`flex-row justify-between w-full px-4`}>
                                     {num.toString().padStart(4, '0').split('').map((digit, i) => (
@@ -203,7 +203,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
-                            value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
+                            value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
                             size={240}
                         />
                     </View>

@@ -16,10 +16,12 @@ import { SangriaModal } from "../../components/SangriaModal";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { ScreenLayout } from "../../components/ScreenLayout";
+import { useCompany } from "../../context/CompanyContext";
 
 export default function FinanceScreen() {
     const router = useRouter();
     const { token } = useAuth();
+    const { settings: company } = useCompany();
     const { printerType } = usePrinter();
     const insets = useSafeAreaInsets();
     const BOTTOM_PADDING = 70 + insets.bottom + 50;
@@ -506,6 +508,7 @@ export default function FinanceScreen() {
                                         data={summary}
                                         date={new Date()}
                                         isCapture={true}
+                                        companyName={company.companyName}
                                     />
                                 </ViewShot>
                             )}

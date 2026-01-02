@@ -9,6 +9,7 @@ import { printSangriaReceipt } from '../services/printing.service';
 import ViewShot from 'react-native-view-shot';
 import { SangriaReceipt } from './SangriaReceipt';
 import tw from '../lib/tailwind';
+import { useCompany } from '../context/CompanyContext';
 import { CustomAlert, AlertType } from './CustomAlert';
 
 interface Cobrador {
@@ -25,6 +26,7 @@ interface SangriaModalProps {
 
 export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps) {
     const { token, user } = useAuth();
+    const { settings } = useCompany();
     const { printerType } = usePrinter();
 
     // Steps: 0 = Amount/Cobrador, 1 = PIN
@@ -302,6 +304,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                             copyName="Via do Cambista"
                             signerLabel="Cobrador"
                             isCapture={true}
+                            companyName={settings.companyName}
                         />
                         {/* Cut Line */}
                         <View style={tw`w-full border-b-[2px] border-dashed border-black my-8 h-1`} />
@@ -319,6 +322,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                             copyName="Via do Cobrador"
                             signerLabel="Cambista"
                             isCapture={true}
+                            companyName={settings.companyName}
                         />
                         <View style={tw`h-8`} />
                     </ViewShot>
