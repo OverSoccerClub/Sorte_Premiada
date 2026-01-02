@@ -107,18 +107,17 @@ export function DrawSimulator() {
     const runDigitDraw = async (fIndex: number, dIndex: number) => {
         const ordinal = ["primeiro", "segundo", "terceiro", "quarto"][dIndex];
 
-        // 1. Explain
+        // 1. Pre-Announcement (Pause: 3s)
         setSequenceState({ step: 'digit_intro', fezinhaIndex: fIndex, digitIndex: dIndex });
-        speak(`Agora vamos sortear o ${ordinal} dígito da Fezinha 0${fIndex + 1}.`, 3000);
-        await wait(3000);
+        speak(`Atenção... vamos sortear agora o ${ordinal} dígito da Fezinha 0${fIndex + 1}.`, 4000);
+        await wait(4000); // Allow text to be read fully
 
-        // 2. Spin
+        // 2. Spin Command (Spin: 4s for suspense)
         setSequenceState({ step: 'drawing_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
-        // speak("Girando...", 2000); // Create suspense silence or low sound? Let's generic suspense.
         setPresenterText("🍀 Girando... 🍀");
-        await wait(2000); // 2s spin
+        await wait(4000);
 
-        // 3. Reveal
+        // 3. Reveal Calculation
         const fullNumber = currentSequenceResults.current[fIndex];
         const strNum = fullNumber.toString().padStart(4, '0');
         const digitChar = strNum[dIndex];
@@ -130,10 +129,11 @@ export function DrawSimulator() {
             return newVals;
         });
 
+        // 4. Reveal & Confirm (Pause: 3s)
         setSequenceState({ step: 'reveal_digit', fezinhaIndex: fIndex, digitIndex: dIndex });
-        speak(`Número ${digitChar}!`, 2000);
+        speak(`Número sorteado... ${digitChar}!`, 3000);
 
-        // 4. Pause Dramatic
+        // 5. Post-Reveal Silence/Verification (Pause: 2s)
         await wait(2000);
     };
 

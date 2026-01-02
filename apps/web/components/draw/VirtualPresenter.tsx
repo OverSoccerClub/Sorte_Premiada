@@ -1,58 +1,92 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic2, Sparkles } from "lucide-react";
+import { Mic2, Sparkles, Video, Wifi } from "lucide-react";
+import Image from "next/image";
 
 interface VirtualPresenterProps {
     text: string;
     isSpeaking: boolean;
+    videoUrl?: string; // Optional: If provided, plays video. If not, shows image.
 }
 
-export function VirtualPresenter({ text, isSpeaking }: VirtualPresenterProps) {
+export function VirtualPresenter({ text, isSpeaking, videoUrl }: VirtualPresenterProps) {
     return (
-        <div className="w-full max-w-3xl mx-auto mb-8 flex flex-col items-center z-30">
-            <AnimatePresence mode="wait">
-                {text && (
-                    <motion.div
-                        key={text}
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        className="bg-card/90 backdrop-blur-md border border-primary/20 rounded-2xl p-6 shadow-2xl relative flex items-center gap-6 min-h-[120px] w-full"
-                    >
-                        {/* Avatar / Icon */}
-                        <div className="relative flex-shrink-0">
-                            <div className="w-16 h-16 bg-gradient-to-br from-primary to-emerald-600 rounded-full flex items-center justify-center shadow-lg ring-4 ring-primary/20">
-                                <Mic2 className="w-8 h-8 text-white" />
-                            </div>
+        <div className="w-full max-w-4xl mx-auto mb-8 flex flex-col items-center z-30">
+            <div className="bg-card/95 backdrop-blur-md border border-primary/20 rounded-2xl overflow-hidden shadow-2xl relative w-full flex flex-col md:flex-row min-h-[160px]">
+
+                {/* Presenter Visual Area (Video or Image) */}
+                <div className="relative w-full md:w-[240px] h-[240px] md:h-auto flex-shrink-0 bg-black overflow-hidden border-b md:border-b-0 md:border-r border-primary/10">
+                    {/* Live Indicator */}
+                    <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-wider">
+                        <div className={`w-2 h-2 rounded-full ${isSpeaking ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`} />
+                        {isSpeaking ? 'AO VIVO' : 'EM ESPERA'}
+                    </div>
+
+                    {videoUrl ? (
+                        <video
+                            src={videoUrl}
+                            autoPlay
+                            loop
+                            muted // Muted because audio comes from browser synthesis for now, or synced separately
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full relative">
+                            {/* Placeholder Image */}
+                            <Image
+                                src="/presenter.png"
+                                alt="Apresentadora Virtual"
+                                fill
+                                className={`object-cover transition-all duration-700 ${isSpeaking ? 'scale-105' : 'scale-100 filter grayscale-[20%]'}`}
+                                priority
+                            />
+
+                            {/* Speaking Overlay Effect (Simulate movement) */}
                             {isSpeaking && (
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-background" />
-                            )}
-                            {/* Pulse rings */}
-                            {isSpeaking && (
-                                <>
-                                    <motion.div
-                                        className="absolute inset-0 rounded-full border-4 border-primary/30"
-                                        animate={{ scale: [1, 1.5], opacity: [1, 0] }}
-                                        transition={{ repeat: Infinity, duration: 1.5 }}
-                                    />
-                                </>
+                                <motion.div
+                                    className="absolute inset-0 bg-primary/10 mix-blend-overlay"
+                                    animate={{ opacity: [0, 0.2, 0] }}
+                                    transition={{ repeat: Infinity, duration: 0.2 }}
+                                />
                             )}
                         </div>
+                    )}
+                </div>
 
-                        {/* Dialogue Bubble */}
-                        <div className="flex-1 flex flex-col">
-                            <span className="text-xs uppercase tracking-widest text-primary font-bold mb-1 flex items-center gap-1">
+                {/* Dialogue Bubble Area */}
+                <div className="flex-1 p-6 flex flex-col justify-center relative bg-gradient-to-r from-background to-muted/20">
+                    <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground flex items-center gap-1 opacity-50">
+                        <Wifi className="w-3 h-3" />
+                        Sinal HD
+                    </div>
+
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={text}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="flex flex-col gap-2"
+                        >
+                            <span className="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-1.5">
                                 <Sparkles className="w-3 h-3" />
-                                Apresentador Virtual
+                                Apresentadora Virtual
                             </span>
                             <p className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
                                 "{text}"
                             </p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </div>
+
+            {/* Disclaimer for Video API */}
+            {!videoUrl && (
+                <p className="mt-2 text-[10px] text-muted-foreground opacity-40 text-center w-full">
+                    *Para vídeo real-time (Lip-Sync), integrar API HeyGen/D-ID.
+                </p>
+            )}
         </div>
     );
 }
