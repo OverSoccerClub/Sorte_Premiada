@@ -12,9 +12,12 @@ export class Narrator {
 
     private initVoice() {
         const voices = window.speechSynthesis.getVoices();
-        // Prefer "Google Português do Brasil" or "Microsoft Francisca" or similar female voices for the new character
-        // The user asked for a voice matching the Pixar character (likely female, friendly)
-        this.voice = voices.find(v => v.name.includes("Google Português") || v.name.includes("Francisca") || v.lang === 'pt-BR') || voices[0];
+        // Prefer Male voices for the new character as requested
+        this.voice = voices.find(v =>
+            (v.name.includes("Google Português") && !v.name.includes("Female")) ||
+            v.name.includes("Daniel") ||
+            (v.lang === 'pt-BR' && v.name.includes("Male"))
+        ) || voices.find(v => v.lang === 'pt-BR') || voices[0];
     }
 
     /*
