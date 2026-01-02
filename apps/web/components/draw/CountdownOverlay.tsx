@@ -1,8 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
-import { narrator } from "@/lib/audio";
+import { useEffect, useState, useRef } from "react";
 
 interface CountdownOverlayProps {
     isVisible: boolean;
@@ -13,50 +12,49 @@ interface CountdownOverlayProps {
 export function CountdownOverlay({ isVisible, onComplete, seconds = 5 }: CountdownOverlayProps) {
     const [count, setCount] = useState(seconds);
     const [showGo, setShowGo] = useState(false);
-
-    // Number words for countdown
-    const countWords = ['', 'um', 'dois', 'três', 'quatro', 'cinco'];
-
-    const speakCount = useCallback(async (num: number) => {
-        if (num > 0 && num <= 5) {
-            await narrator.speakAsync(countWords[num]);
-        }
-    }, []);
+    const hasStartedRef = useRef(false);
 
     useEffect(() => {
-        if (isVisible) {
+        // Reset when visibility changes
+        if (!isVisible) {
+            hasStartedRef.current = false;
             setCount(seconds);
             setShowGo(false);
-
-            // Speak the first count
-            speakCount(seconds);
-
-            const interval = setInterval(() => {
-                setCount((prev) => {
-                    const next = prev - 1;
-                    if (next > 0) {
-                        speakCount(next);
-                    }
-                    if (next <= 0) {
-                        clearInterval(interval);
-                        setShowGo(true);
-                        narrator.speakAsync("Valendo!");
-                        return 0;
-                    }
-                    return next;
-                });
-            }, 1000);
-
-            const timeout = setTimeout(() => {
-                onComplete();
-            }, seconds * 1000 + 800); // Extra time for "Valendo!"
-
-            return () => {
-                clearInterval(interval);
-                clearTimeout(timeout);
-            };
+            return;
         }
-    }, [isVisible, seconds, onComplete, speakCount]);
+
+        // Prevent double-start
+        if (hasStartedRef.current) return;
+        hasStartedRef.current = true;
+
+        // Initialize
+        setCount(seconds);
+        setShowGo(false);
+
+        let currentCount = seconds;
+
+        const interval = setInterval(() => {
+            currentCount -= 1;
+
+            if (currentCount > 0) {
+                setCount(currentCount);
+            } else if (currentCount === 0) {
+                setCount(0);
+                setShowGo(true);
+                clearInterval(interval);
+            }
+        }, 1000);
+
+        // Call onComplete after countdown + extra time for "Valendo!"
+        const timeout = setTimeout(() => {
+            onComplete();
+        }, seconds * 1000 + 800);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, [isVisible, seconds, onComplete]);
 
     return (
         <AnimatePresence>

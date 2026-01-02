@@ -19,8 +19,10 @@ class SoundEffects {
         return this.audioContext;
     }
 
+    private spinInterval: ReturnType<typeof setInterval> | null = null;
+
     /**
-     * Start spinning/roulette sound - continuous until stopped
+     * Start spinning/slot machine tick sound - rapid clicks like a roulette
      */
     startSpinSound(): void {
         try {
@@ -29,29 +31,32 @@ class SoundEffects {
             // Stop any existing spin sound
             this.stopSpinSound();
 
-            // Create oscillator for spinning effect
-            this.spinOscillator = ctx.createOscillator();
-            this.spinGain = ctx.createGain();
+            // Create rapid clicking sounds like slot machine / roulette wheel
+            let clickCount = 0;
+            const maxClicks = 100;
 
-            // Use sawtooth wave for mechanical spinning feel
-            this.spinOscillator.type = 'sawtooth';
-            this.spinOscillator.frequency.setValueAtTime(80, ctx.currentTime);
+            this.spinInterval = setInterval(() => {
+                if (clickCount >= maxClicks) return;
 
-            // Modulate frequency for spinning effect
-            const lfo = ctx.createOscillator();
-            const lfoGain = ctx.createGain();
-            lfo.frequency.setValueAtTime(15, ctx.currentTime); // Speed of spinning clicks
-            lfoGain.gain.setValueAtTime(30, ctx.currentTime);
-            lfo.connect(lfoGain);
-            lfoGain.connect(this.spinOscillator.frequency);
-            lfo.start();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
 
-            // Keep volume moderate
-            this.spinGain.gain.setValueAtTime(0.15, ctx.currentTime);
+                // Click sound with slight frequency variation
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800 + Math.random() * 200, ctx.currentTime);
 
-            this.spinOscillator.connect(this.spinGain);
-            this.spinGain.connect(ctx.destination);
-            this.spinOscillator.start();
+                // Very short click
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.03);
+
+                clickCount++;
+            }, 50); // 20 clicks per second
 
         } catch (e) {
             console.warn('[SoundFX] Could not start spin sound:', e);
@@ -63,6 +68,10 @@ class SoundEffects {
      */
     stopSpinSound(): void {
         try {
+            if (this.spinInterval) {
+                clearInterval(this.spinInterval);
+                this.spinInterval = null;
+            }
             if (this.spinOscillator) {
                 this.spinOscillator.stop();
                 this.spinOscillator.disconnect();
