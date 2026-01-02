@@ -34,19 +34,29 @@ export class UsersController {
     @Post()
     @UseGuards(RolesGuard)
     @Roles('ADMIN')
-    async create(@Body() createUserDto: Prisma.UserCreateInput) {
+    async create(@Body() createUserDto: Prisma.UserCreateInput, @Request() req: any) {
         const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        return this.usersService.create({
+
+        // Inject companyId from Admin
+        const companyId = req.user.companyId;
+
+        const data: Prisma.UserCreateInput = {
             ...createUserDto,
             password: hashedPassword,
-        });
+        };
+
+        if (companyId) {
+            data.company = { connect: { id: companyId } };
+        }
+
+        return this.usersService.create(data);
     }
 
     @Get()
     @UseGuards(RolesGuard)
     @Roles('ADMIN', 'COBRADOR')
     async findAll(@Request() req: any, @Query('username') username?: string, @Query('role') role?: string) {
-        const users = await this.usersService.findAll(username, role, req.user.userId);
+        const users = await this.usersService.findAll(username, role, req.user.userId, req.user.companyId);
         return users;
     }
 

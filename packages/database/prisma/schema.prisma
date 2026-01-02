@@ -8,8 +8,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Company {
+  id            String   @id @default(uuid())
+  slug          String   @unique @default("default") // Identificador único para a URL/App
+  companyName   String   @default("A Perseverança")
+  slogan        String?  @default("Cambista Edition")
+  logoUrl       String?  // URL da logo ou base64
+  
+  // Contatos
+  phone         String?
+  whatsapp      String?
+  email         String?
+  
+  // Endereço (opcional)
+  address       String?
+  city          String?
+  state         String?
+  
+  // Configurações visuais
+  primaryColor  String?  @default("#50C878")
+  updateUrl     String?  // URL do repositório para atualizações do App
+  
+  // Multi-Tenancy Relations
+  users           User[]
+  games           Game[]
+  areas           Area[]
+  tickets         Ticket[]
+  transactions    Transaction[]
+  dailyCloses     DailyClose[]
+  posTerminals    PosTerminal[]
+  notificationLogs NotificationLog[]
+  announcements   Announcement[]
+  securityLogs    SecurityLog[]
+  draws           Draw[]
+  extractionSeries ExtractionSeries[]
+  secondChanceDraws SecondChanceDraw[]
+  auditLogs       AuditLog[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("CompanySettings")
+}
+
 model User {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  
   name      String?
   username  String   @unique
   pushToken String?  // Token para notificações push (Expo)
@@ -37,24 +83,29 @@ model User {
   isActive     Boolean  @default(true) // Controla bloqueio manual do cambista
   canCancelTickets Boolean @default(false) // Permissão para o cambista cancelar bilhetes
   commissionRate Decimal? @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
-
+  
   // New Commission Rules
   minSalesThreshold Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
   fixedCommission   Decimal? @default(40.00)  // Ganho fixo se não atingir a meta (R$)
-
+  
   // Corporate Maturity
   auditLogs       AuditLog[] @relation("UserAuditLogs")
   
   // Hardened Security (MFA)
   twoFactorSecret  String?
   twoFactorEnabled Boolean @default(false)
-
+  
   // Announcements targeted to this user
   targetedAnnouncements Announcement[] @relation("UserTargetedAnnouncements")
+
+  @@index([companyId])
 }
 
 model Area {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   name      String
   city      String
   state     String
@@ -64,10 +115,15 @@ model Area {
   extractionSeries ExtractionSeries[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model Game {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   name      String
   
   // Display Configuration (for dynamic mobile rendering)
@@ -104,10 +160,15 @@ model Game {
   prizeDezena   Decimal? @default(60)   // Prêmio para Dezena Seca
 
   configs   AreaConfig[]
+
+  @@index([companyId])
 }
 
 model Draw {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   gameId    String
   game      Game     @relation(fields: [gameId], references: [id])
   numbers   Int[]
@@ -116,20 +177,30 @@ model Draw {
   areaId    String?  // Vinculação por praça
   area      Area?    @relation(fields: [areaId], references: [id])
   createdAt DateTime @default(now())
+
+  @@index([companyId])
 }
 
 model SecondChanceDraw {
   id            String   @id @default(uuid())
+  companyId     String?
+  company       Company? @relation(fields: [companyId], references: [id])
+
   gameId        String
   game          Game     @relation(fields: [gameId], references: [id])
   winningNumber Int
   prizeAmount   Decimal
   drawDate      DateTime // Which Saturday this refers to
   createdAt     DateTime @default(now())
+
+  @@index([companyId])
 }
 
 model ExtractionSeries {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   gameId    String
   game      Game     @relation(fields: [gameId], references: [id])
   areaId    String?  // Opcional para manter compatibilidade, mas idealmente obrigatório para novas
@@ -137,11 +208,19 @@ model ExtractionSeries {
   time      String   // Formato "HH:mm"
   lastSeries Int     @default(0)
 
+  // @@unique([gameId, areaId, time]) removed uniqueness constraint globally to allow same times in different companies?
+  // Actually, if we include companyId in the unique constraint it would be better.
+  // But purely adding companyId makes [gameId, areaId, time] still unique per game/area, 
+  // and game/area are now company-scoped, so it should be fine.
   @@unique([gameId, areaId, time])
+  @@index([companyId])
 }
 
 model Ticket {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   gameType  String   // e.g., "Mega Sena", "Quina"
@@ -173,10 +252,14 @@ model Ticket {
   digitalSignature String? @unique
 
   @@index([drawDate, gameId])
+  @@index([companyId])
 }
 
 model AuditLog {
   id          String   @id @default(uuid())
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+
   userId      String?
   user        User?    @relation("UserAuditLogs", fields: [userId], references: [id])
   action      String   // e.g., "UPDATE_GAME", "CREATE_USER"
@@ -189,9 +272,11 @@ model AuditLog {
 
   @@index([createdAt])
   @@index([entity, entityId])
+  @@index([companyId])
 }
 
 enum Role {
+  MASTER
   ADMIN
   CAMBISTA
   COBRADOR
@@ -209,6 +294,9 @@ enum TicketStatus {
 
 model Transaction {
   id          String          @id @default(uuid())
+  companyId   String?
+  company     Company?        @relation(fields: [companyId], references: [id])
+
   description String
   amount      Decimal
   type        TransactionType
@@ -217,10 +305,15 @@ model Transaction {
   user        User            @relation(fields: [userId], references: [id])
   cobradorId  String?
   cobrador    User?           @relation("TransactionCobrador", fields: [cobradorId], references: [id])
+  
+  @@index([companyId])
 }
 
 model DailyClose {
   id              String   @id @default(uuid())
+  companyId       String?
+  company         Company? @relation(fields: [companyId], references: [id])
+
   date            DateTime @default(now())
   totalSales      Decimal
   totalCredits    Decimal
@@ -239,6 +332,8 @@ model DailyClose {
   verifiedByUserId String?
   verifiedAt      DateTime?
   createdAt       DateTime @default(now())
+
+  @@index([companyId])
 }
 
 enum TransactionType {
@@ -248,6 +343,9 @@ enum TransactionType {
 
 model PosTerminal {
   id            String   @id @default(uuid())
+  companyId     String?
+  company       Company? @relation(fields: [companyId], references: [id])
+
   deviceId      String   @unique
   model         String?
   status        String   @default("OFFLINE") // ONLINE, OFFLINE
@@ -264,6 +362,8 @@ model PosTerminal {
   appVersion    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  @@index([companyId])
 }
 
 enum DailyCloseStatus {
@@ -274,6 +374,9 @@ enum DailyCloseStatus {
 
 model NotificationLog {
   id         String   @id @default(uuid())
+  companyId  String?
+  company    Company? @relation(fields: [companyId], references: [id])
+
   pushToken  String
   title      String
   body       String
@@ -283,6 +386,8 @@ model NotificationLog {
   userId     String?
   user       User?    @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
+  
+  @@index([companyId])
 }
 
 enum NotificationStatus {
@@ -292,6 +397,9 @@ enum NotificationStatus {
 
 model Announcement {
   id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
   title     String
   content   String
   type      String   @default("INFO") // INFO, WARNING, ALERT, SUCCESS
@@ -303,6 +411,8 @@ model Announcement {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  @@index([companyId])
 }
 
 model AreaConfig {
@@ -326,6 +436,9 @@ model AreaConfig {
 
 model SecurityLog {
   id          String   @id @default(uuid())
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+
   type        String   // "SUSPICIOUS_BET", "LATE_BET", "HACK_ATTEMPT"
   severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
   message     String
@@ -338,28 +451,5 @@ model SecurityLog {
   updatedAt   DateTime @updatedAt
 
   @@index([createdAt])
-}
-
-model CompanySettings {
-  id            String   @id @default(uuid())
-  companyName   String   @default("A Perseverança")
-  slogan        String?  @default("Cambista Edition")
-  logoUrl       String?  // URL da logo ou base64
-  
-  // Contatos
-  phone         String?
-  whatsapp      String?
-  email         String?
-  
-  // Endereço (opcional)
-  address       String?
-  city          String?
-  state         String?
-  
-  // Configurações visuais (futuro)
-  primaryColor  String?  @default("#50C878")
-  updateUrl     String?  // URL do repositório para atualizações do App
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  @@index([companyId])
 }

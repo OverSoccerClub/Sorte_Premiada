@@ -237,6 +237,7 @@ export class TicketsService {
                 drawDate: drawDate,
                 hash: this.generateTicketCode(8),
                 gameId: gameId,
+                companyId: data.company?.connect?.id,
                 // New Financials
                 commissionRate: commissionRate,
                 commissionValue: commissionValue,
@@ -470,7 +471,7 @@ export class TicketsService {
         });
     }
 
-    async findAll(filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string; gameId?: string }) {
+    async findAll(filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string; gameId?: string; companyId?: string }) {
         await this.updateExpiredTickets();
 
         const where: Prisma.TicketWhereInput = {};
@@ -478,6 +479,7 @@ export class TicketsService {
             if (filters.status) where.status = filters.status as any;
             if (filters.gameType) where.gameType = filters.gameType;
             if (filters.gameId) where.gameId = filters.gameId;
+            if (filters.companyId) where.companyId = filters.companyId;
             if (filters.startDate || filters.endDate) {
                 where.createdAt = {};
                 if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);

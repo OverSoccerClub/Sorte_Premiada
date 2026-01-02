@@ -49,10 +49,11 @@ export class UsersService {
         });
     }
 
-    async findAll(username?: string, role?: string, requestingUserId?: string): Promise<any[]> {
+    async findAll(username?: string, role?: string, requestingUserId?: string, companyId?: string): Promise<any[]> {
         const where: Prisma.UserWhereInput = {};
         if (username) where.username = username;
         if (role) where.role = role as any;
+        if (companyId) where.companyId = companyId;
 
         if (requestingUserId) {
             const requester = await this.prisma.user.findUnique({

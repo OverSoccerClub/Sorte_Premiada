@@ -52,7 +52,7 @@ export class AuthService {
             }
         }
 
-        const payload = { username: user.username, sub: user.id, role: user.role };
+        const payload = { username: user.username, sub: user.id, role: user.role, companyId: user.companyId };
         return {
             access_token: this.jwtService.sign(payload),
             user: {
@@ -60,6 +60,7 @@ export class AuthService {
                 username: user.username,
                 name: user.name,
                 role: user.role,
+                companyId: user.companyId,
                 twoFactorEnabled: user.twoFactorEnabled
             }
         };

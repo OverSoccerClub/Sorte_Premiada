@@ -12,24 +12,26 @@ export class GamesController {
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
-    async create(@Body() createGameDto: any) {
-        return this.gamesService.create(createGameDto);
+    async create(@Body() createGameDto: any, @Request() req: any) {
+        return this.gamesService.create({
+            ...createGameDto,
+            companyId: req.user.companyId
+        });
     }
 
     @Get()
-    async findAll(@Query('activeOnly') activeOnly?: string) {
+    async findAll(@Query('activeOnly') activeOnly?: string, @Query('slug') slug?: string, @Request() req?: any) {
         try {
+            // How to get user info if endpoint is public but maybe has auth header?
+            // NestJS @Request() might be empty if guard not applied.
+            // But we can check if we want to support token if present.
+            // For now, let's rely on slug for public, and maybe we can add a Guard that is optional?
+            // Or just rely on slug from the App.
+
             const games = await this.gamesService.findAll({
-                activeOnly: activeOnly === 'true'
-            });
-            return games.map(game => ({
-                ...game,
-                price: Number(game.price),
-                prizeMilhar: game.prizeMilhar ? Number(game.prizeMilhar) : null,
-                prizeCentena: game.prizeCentena ? Number(game.prizeCentena) : null,
-                prizeDezena: game.prizeDezena ? Number(game.prizeDezena) : null,
-                maxLiability: Number(game.maxLiability),
-                prizeMultiplier: Number(game.prizeMultiplier),
+                activeOnly: activeOnly === 'true',
+                slug: slug
+                    prizeMultiplier: Number(game.prizeMultiplier),
                 commissionRate: Number(game.commissionRate)
             }));
         } catch (error) {

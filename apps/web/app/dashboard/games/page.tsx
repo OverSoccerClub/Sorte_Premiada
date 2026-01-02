@@ -73,16 +73,20 @@ export default function GamesPage() {
                 onRefresh={fetchGames}
                 refreshing={isLoading}
             >
-                <Link href="/dashboard/games/2x1000">
-                    <Button variant="outline" size="sm">
-                        Relatório 2x1000
-                    </Button>
-                </Link>
-                <Link href="/dashboard/games/jb">
-                    <Button variant="outline" size="sm">
-                        Relatório JB
-                    </Button>
-                </Link>
+                {games.some(g => g.name.includes('2x1000') || g.displayName?.includes('2x1000')) && (
+                    <Link href="/dashboard/games/2x1000">
+                        <Button variant="outline" size="sm">
+                            Relatório 2x1000
+                        </Button>
+                    </Link>
+                )}
+                {games.some(g => g.name.toLowerCase().includes('bicho') || g.displayName?.toLowerCase().includes('jb')) && (
+                    <Link href="/dashboard/games/jb">
+                        <Button variant="outline" size="sm">
+                            Relatório JB
+                        </Button>
+                    </Link>
+                )}
                 <Button onClick={handleCreateClick} className="bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
                     <Plus className="w-4 h-4 mr-2" /> Novo Jogo
                 </Button>

@@ -12,6 +12,7 @@ export class TicketsController {
         return this.ticketsService.create({
             ...createTicketDto,
             user: { connect: { id: req.user.userId } },
+            company: req.user.companyId ? { connect: { id: req.user.companyId } } : undefined,
             // gameId is optional, if provided connect it
             ...(createTicketDto.gameId ? { game: { connect: { id: createTicketDto.gameId } } } : {}),
             gameType: createTicketDto.gameType, // Ensure gameType is passed
@@ -29,7 +30,7 @@ export class TicketsController {
         @Query('gameType') gameType?: string,
         @Query('gameId') gameId?: string
     ) {
-        const filters = { status, startDate, endDate, gameType, gameId };
+        const filters = { status, startDate, endDate, gameType, gameId, companyId: req.user.companyId };
 
         if (req.user.role === 'ADMIN') {
             return this.ticketsService.findAll(filters);

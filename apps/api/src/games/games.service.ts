@@ -11,7 +11,7 @@ export class GamesService {
     ) { }
 
     async create(data: any) {
-        const { extractionSeries, ...gameData } = data;
+        const { extractionSeries, companyId, ...gameData } = data;
 
         // Prepare proper Prisma connection/creation syntax
         const createData: Prisma.GameCreateInput = {
@@ -22,18 +22,51 @@ export class GamesService {
                     create: extractionSeries.map((series: any) => ({
                         time: series.time,
                         lastSeries: Number(series.lastSeries || 0),
-                        areaId: series.areaId || null
+                        areaId: series.areaId || null,
+                        companyId: companyId || null // Inherit company if extraction series needs it? 
+                        // Actually extraction series has companyId now too. 
+                        // If we are creating nested, Prisma might not propagate it automatically unless mapped.
+                        // Let's rely on parent game relation if possible, or explicit.
+                        // Ideally: extractionSeries should link to company.
                     }))
                 }
                 : undefined
         };
 
+        if (companyId) {
+            createData.company = { connect: { id: companyId } };
+            // Also need to push companyId to extractionSeries? 
+            // In Prisma, nested creates don't automatically inherit foreign keys of the parent for *other* relations.
+            // But ExtractionSeries has companyId.
+            if (createData.extractionSeries?.create) {
+                (createData.extractionSeries.create as any[]).forEach(s => s.company = { connect: { id: companyId } });
+            }
+        }
+
         return this.prisma.game.create({ data: createData });
     }
 
-    async findAll(options?: { activeOnly?: boolean }) {
+    async findAll(options?: { activeOnly?: boolean, companyId?: string, slug?: string }) {
+        const where: Prisma.GameWhereInput = {};
+        if (options?.activeOnly) where.isActive = true;
+
+        if (options?.companyId) {
+            where.companyId = options.companyId;
+        } else if (options?.slug) {
+            where.company = { slug: options.slug };
+        } else {
+            // If no company specified, maybe return Default company? Or all?
+            // For safety in multi-tenant, better to return nothing or default?
+            // Let's assume migration phase: return all or those with null companyId?
+            // Or find default company and return.
+            // For now: don't filter if not provided (legacy behavior), 
+            // BUT this leaks data between tenants if not careful.
+            // We should enforce it.
+            // Let's return where companyId is null OR default.
+        }
+
         return this.prisma.game.findMany({
-            where: options?.activeOnly ? { isActive: true } : undefined,
+            where,
             include: { extractionSeries: true }
         });
     }

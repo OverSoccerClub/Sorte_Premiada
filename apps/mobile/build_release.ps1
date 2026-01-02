@@ -22,6 +22,7 @@ Clear-Host
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host "      GERADOR DE APK - A PERSEVERANÇA v2.0" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 # 1. Configuration
 $appJsonPath = ".\app.json"
