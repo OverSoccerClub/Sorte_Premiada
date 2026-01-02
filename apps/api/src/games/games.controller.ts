@@ -31,7 +31,16 @@ export class GamesController {
             const games = await this.gamesService.findAll({
                 activeOnly: activeOnly === 'true',
                 slug: slug
-                    prizeMultiplier: Number(game.prizeMultiplier),
+            });
+
+            return games.map(game => ({
+                ...game,
+                price: Number(game.price),
+                prizeMilhar: game.prizeMilhar ? Number(game.prizeMilhar) : null,
+                prizeCentena: game.prizeCentena ? Number(game.prizeCentena) : null,
+                prizeDezena: game.prizeDezena ? Number(game.prizeDezena) : null,
+                maxLiability: Number(game.maxLiability),
+                prizeMultiplier: Number(game.prizeMultiplier),
                 commissionRate: Number(game.commissionRate)
             }));
         } catch (error) {

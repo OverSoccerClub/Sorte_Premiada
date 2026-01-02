@@ -70,13 +70,10 @@ try {
     cmd /c $prebuildCmd
     if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
 
-    # PATCH: Restore Display Name in strings.xml
+    # PATCH: Restore Display Name in strings.xml using Node for safety
     Write-Step "Restaurando nome de exibição..." -Color "Cyan"
-    $stringsPath = ".\android\app\src\main\res\values\strings.xml"
-    if (Test-Path $stringsPath) {
-        $xmlContent = Get-Content $stringsPath -Raw
-        $xmlContent = $xmlContent -replace '>APerseveranca<', '>A Perseverança<'
-        [System.IO.File]::WriteAllText($stringsPath, $xmlContent, $utf8NoBom)
+    if (Test-Path ".\android\app\src\main\res\values\strings.xml") {
+        node -e "const fs = require('fs'); const path = 'android/app/src/main/res/values/strings.xml'; if (fs.existsSync(path)) { let c = fs.readFileSync(path, 'utf8'); c = c.replace(/>APerseveranca</, '>A Perseverança<'); fs.writeFileSync(path, c, {encoding: 'utf8'}); }"
     }
 
     # Garantir local.properties APÓS o prebuild
