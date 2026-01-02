@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AlertProvider } from "@/context/alert-context";
 import { AuthProvider } from "@/context/auth-context";
+import { CompanyProvider } from "@/context/company-context";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -30,10 +31,12 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <AlertProvider>
-            {children}
-            <Toaster />
-          </AlertProvider>
+          <CompanyProvider>
+            <AlertProvider>
+              {children}
+              <Toaster />
+            </AlertProvider>
+          </CompanyProvider>
         </AuthProvider>
       </body>
     </html>

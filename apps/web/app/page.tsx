@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Lock, User, ArrowRight, Loader2 } from "lucide-react"
+import { Lock, User, ArrowRight, Loader2, ShieldCheck } from "lucide-react"
 import { AppConfig } from "./AppConfig"
 import { useAlert } from "@/context/alert-context"
+import { useCompany } from "@/context/company-context"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { showAlert } = useAlert()
+  const { settings, loading: loadingCompany } = useCompany()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,12 +61,20 @@ export default function LoginPage() {
 
       <Card className="w-[400px] border-slate-700 bg-slate-800/50 backdrop-blur-xl text-slate-100 shadow-2xl relative z-10">
         <CardHeader className="space-y-1 text-center pb-8">
-          <div className="w-12 h-12 bg-emerald-500 rounded-xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <Lock className="w-6 h-6 text-white" />
-          </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">{AppConfig.name}</CardTitle>
+          {settings.logoUrl ? (
+            <div className="w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center overflow-hidden bg-white/10 p-2 border border-white/5">
+              <img src={settings.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+            </div>
+          ) : (
+            <div className="w-12 h-12 bg-emerald-500 rounded-xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <Lock className="w-6 h-6 text-white" />
+            </div>
+          )}
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            {loadingCompany ? "Carregando..." : settings.companyName}
+          </CardTitle>
           <CardDescription className="text-slate-400">
-            Entre com suas credenciais para gerenciar o sistema
+            {settings.slogan || "Entre com suas credenciais para gerenciar o sistema"}
           </CardDescription>
         </CardHeader>
         <CardContent>

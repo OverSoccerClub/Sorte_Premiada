@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
+import { useCompany } from "@/context/company-context";
 
 const sidebarGroups = [
     {
@@ -64,6 +65,7 @@ const sidebarGroups = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const { settings, loading } = useCompany();
 
     // Find current page title for header
     const allItems = sidebarGroups.flatMap(g => g.items);
@@ -77,10 +79,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 {/* Fixed Header */}
                 <div className={`p-6 border-b border-sidebar-border shrink-0 ${isCollapsed ? "flex justify-center px-0" : ""}`}>
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
-                            <Ticket className="w-5 h-5 text-white" />
-                        </div>
-                        {!isCollapsed && <span className="font-bold text-xl tracking-tight">{Config.name}</span>}
+                        {settings.logoUrl ? (
+                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center shrink-0 border border-white/5">
+                                <img src={settings.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                            </div>
+                        ) : (
+                            <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
+                                <Ticket className="w-5 h-5 text-white" />
+                            </div>
+                        )}
+                        {!isCollapsed && <span className="font-bold text-xl tracking-tight">{loading ? "..." : settings.companyName}</span>}
                     </div>
                 </div>
 
