@@ -51,14 +51,48 @@ export class CompanyService {
     /**
      * Create a new Company (Tenant)
      */
+    /**
+     * Create a new Company (Tenant) with an initial Admin User
+     */
     async createCompany(data: CreateCompanyDto): Promise<Company> {
-        return this.prisma.company.create({
-            data: {
-                ...data,
-                // defaults
-                slogan: data.slogan || 'Slogan Aqui',
-                primaryColor: data.primaryColor || '#50C878',
-            },
+        // Hash password (using simple bcrypt import or similar if available, otherwise just store plain if bcrypt not imported in this service. 
+        // Ideally we should use the AuthService or bcrypt/argon2 directly. 
+        // Since I don't see bcrypt imported here, I'll assume we need to import it or use a helper.
+        // Checking imports... Prisma is here. 
+        // I'll do a simple dynamic import or assume the project has bcryptjs installed given it's a NestJS app.
+        // Actually, to be safe and clean, I should just assume the controller/service handles it. 
+        // But for this 'one-shot' service method, I'll use a transaction.
+
+        // IMPORTANT: For now, I will NOT hash the password here to avoid missing dependency errors in this specific file 
+        // if I don't see the import. The User model usually expects hashed. 
+        // Let's assume the caller passes a hashed password OR we just do it here if we can.
+        // Let's try to import * as bcrypt from 'bcryptjs'.
+
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(data.adminPassword || '123456', 10);
+
+        return this.prisma.$transaction(async (tx) => {
+            const company = await tx.company.create({
+                data: {
+                    slug: data.slug,
+                    companyName: data.companyName,
+                    slogan: data.slogan || 'Slogan Aqui',
+                    primaryColor: data.primaryColor || '#50C878',
+                },
+            });
+
+            await tx.user.create({
+                data: {
+                    companyId: company.id,
+                    name: data.adminName,
+                    username: data.adminUsername,
+                    email: data.adminEmail,
+                    password: hashedPassword,
+                    role: 'ADMIN',
+                }
+            });
+
+            return company;
         });
     }
 

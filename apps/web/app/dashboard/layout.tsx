@@ -7,6 +7,7 @@ import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapP
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 import { useCompany } from "@/context/company-context";
+import { useAuth } from "@/context/auth-context";
 
 const sidebarGroups = [
     {
@@ -64,11 +65,67 @@ const sidebarGroups = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const { settings, loading } = useCompany();
+    const { settings, loading: companyLoading } = useCompany(); // Renamed to companyLoading to avoid conflict
+    const { user, loading: authLoading } = useAuth(); // Import auth context
+
+    const sidebarGroups = [
+        {
+            title: "Principal",
+            items: [
+                { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+                ...(user?.role === 'MASTER' ? [{ icon: ShieldCheck, label: "Admin Global", href: "/dashboard/admin" }] : []),
+            ]
+        },
+        {
+            title: "Cadastros",
+            items: [
+                { icon: Users, label: "Cambistas", href: "/dashboard/cambistas" },
+                { icon: Wallet, label: "Cobradores", href: "/dashboard/cobradores" },
+                { icon: User, label: "Usuários (Admin)", href: "/dashboard/users" },
+                { icon: Smartphone, label: "Dispositivos POS", href: "/dashboard/pos" },
+                { icon: MapPin, label: "Praças", href: "/dashboard/areas" },
+            ]
+        },
+        {
+            title: "Vendas & Operação",
+            items: [
+                { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
+                { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
+                { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
+                // { icon: QrCode, label: "Validação", href: "/dashboard/validate" }, // Future
+            ]
+        },
+        {
+            title: "Gestão de Apostas",
+            items: [
+                { icon: XCircle, label: "Cancelamentos", href: "/dashboard/cancellations" },
+                { icon: ShieldAlert, label: "Gestão de Risco", href: "/dashboard/risk" },
+                { icon: Trophy, label: "Segunda Chance", href: "/dashboard/second-chance" },
+            ]
+        },
+        {
+            title: "Relatórios & Financeiro",
+            items: [
+                { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
+                { icon: TrendingUp, label: "Inteligência (BI)", href: "/dashboard/analytics" },
+                { icon: Wallet, label: "Prestação de Contas", href: "/dashboard/prestacao-contas" },
+            ]
+        },
+        {
+            title: "Configurações",
+            items: [
+                { icon: Building2, label: "Empresa", href: "/dashboard/settings/company" },
+                { icon: Megaphone, label: "Avisos Globais", href: "/dashboard/announcements" },
+                { icon: ShieldCheck, label: "Segurança (MFA)", href: "/dashboard/security-mfa" },
+                { icon: History, label: "Logs de Auditoria", href: "/dashboard/audit" },
+            ]
+        },
+    ];
 
     // Find current page title for header
     const allItems = sidebarGroups.flatMap(g => g.items);
     const currentPage = allItems.find(i => i.href === pathname);
+    const loading = companyLoading || authLoading;
 
     return (
         <div className="min-h-screen bg-background flex">
