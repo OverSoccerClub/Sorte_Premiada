@@ -69,6 +69,13 @@ model Area {
 model Game {
   id        String   @id @default(uuid())
   name      String
+  
+  // Display Configuration (for dynamic mobile rendering)
+  isActive    Boolean  @default(true)   // Ativar/desativar exibição do jogo
+  displayName String?                   // Nome amigável para exibição (ex: "2x1500")
+  iconName    String?  @default("game-controller-outline") // Ionicons icon name
+  colorClass  String?  @default("bg-emerald-600")          // Tailwind color class
+  
   rules     Json
   draws     Draw[]
   tickets   Ticket[]
@@ -331,4 +338,27 @@ model SecurityLog {
   updatedAt   DateTime @updatedAt
 
   @@index([createdAt])
+}
+
+model CompanySettings {
+  id            String   @id @default(uuid())
+  companyName   String   @default("Fezinha de Hoje")
+  slogan        String?  @default("Cambista Edition")
+  logoUrl       String?  // URL da logo ou base64
+  
+  // Contatos
+  phone         String?
+  whatsapp      String?
+  email         String?
+  
+  // Endereço (opcional)
+  address       String?
+  city          String?
+  state         String?
+  
+  // Configurações visuais (futuro)
+  primaryColor  String?  @default("#50C878")
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

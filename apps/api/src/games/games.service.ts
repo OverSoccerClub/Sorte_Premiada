@@ -14,8 +14,9 @@ export class GamesService {
         return this.prisma.game.create({ data });
     }
 
-    async findAll() {
+    async findAll(options?: { activeOnly?: boolean }) {
         return this.prisma.game.findMany({
+            where: options?.activeOnly ? { isActive: true } : undefined,
             include: { extractionSeries: true }
         });
     }

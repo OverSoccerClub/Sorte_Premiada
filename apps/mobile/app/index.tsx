@@ -10,12 +10,15 @@ import { VersionFooter } from "../components/VersionFooter";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScreenLayout } from "../components/ScreenLayout";
 import { FormField } from "../components/FormField";
+import { useCompany } from "../context/CompanyContext";
+import { Image } from "react-native";
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
     const { signIn, isLoading } = useAuth();
+    const { settings: company } = useCompany();
     const insets = useSafeAreaInsets();
 
     // Alert State
@@ -67,8 +70,11 @@ export default function LoginScreen() {
             confirmText: "Contatar Suporte",
             useAppIcon: true,
             onConfirm: () => {
-                const message = "Olá, estou precisando recuperar minha senha no app Fezinha de Hoje.";
-                const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
+                const message = `Olá, estou precisando recuperar minha senha no app ${company.companyName}.`;
+                const whatsappNumber = company.whatsapp || '';
+                const url = whatsappNumber
+                    ? `whatsapp://send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`
+                    : `whatsapp://send?text=${encodeURIComponent(message)}`;
 
                 Linking.openURL(url).catch(() => {
                     setAlertConfig(prev => ({
@@ -99,12 +105,22 @@ export default function LoginScreen() {
                 >
                     <View style={tw`w-full max-w-[400px] items-center mb-6`}>
                         <View style={tw`w-20 h-20 bg-surface rounded-2xl justify-center items-center shadow-lg border border-primary mb-3`}>
-                            <MaterialCommunityIcons name="clover" size={40} color="#50C878" />
+                            {company.logoUrl ? (
+                                <Image
+                                    source={{ uri: company.logoUrl }}
+                                    style={tw`w-16 h-16`}
+                                    resizeMode="contain"
+                                />
+                            ) : (
+                                <MaterialCommunityIcons name="clover" size={40} color={company.primaryColor || '#50C878'} />
+                            )}
                         </View>
                         <Text style={tw`text-3xl font-extrabold text-white tracking-tighter`}>
-                            Fezinha <Text style={tw`text-primary`}>de Hoje</Text>
+                            {company.companyName.split(' ').slice(0, -1).join(' ')} <Text style={[tw`text-primary`, { color: company.primaryColor }]}>{company.companyName.split(' ').slice(-1)[0]}</Text>
                         </Text>
-                        <Text style={tw`text-gray-400 text-xs tracking-widest uppercase mt-1`}>Cambista Edition</Text>
+                        {company.slogan && (
+                            <Text style={tw`text-gray-400 text-xs tracking-widest uppercase mt-1`}>{company.slogan}</Text>
+                        )}
                     </View>
 
                     <View style={tw`w-full max-w-[360px] bg-surface p-6 rounded-2xl shadow-2xl border border-gray-800`}>
@@ -166,6 +182,6 @@ export default function LoginScreen() {
                 cancelText={alertConfig.cancelText}
                 useAppIcon={alertConfig.useAppIcon}
             />
-        </ScreenLayout>
+        </ScreenLayout >
     );
 }

@@ -32,6 +32,7 @@ export interface FinanceSummary {
     limitOverrideExpiresAt?: string;
     totalCommission: number;
     netBalance: number;
+    minSalesThreshold: number;
 }
 
 export const FinanceService = {

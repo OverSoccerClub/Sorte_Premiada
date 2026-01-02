@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AppConfig } from "../../AppConfig";
+import { StandardPagination } from "@/components/standard-pagination";
 
 interface PosDevice {
     id: string;
@@ -31,6 +32,8 @@ export default function PosManagementPage() {
     const [devices, setDevices] = useState<PosDevice[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState<number | "all">(10);
 
     const [tick, setTick] = useState(0);
 
@@ -83,6 +86,26 @@ export default function PosManagementPage() {
         d.deviceId.toLowerCase().includes(filter.toLowerCase()) ||
         d.currentUser?.name.toLowerCase().includes(filter.toLowerCase())
     );
+
+    // Pagination logic
+    const totalItems = filteredDevices.length;
+    const effectiveLimit = limit === "all" ? totalItems : limit;
+    const totalPages = limit === "all" ? 1 : Math.ceil(totalItems / effectiveLimit);
+    const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages || 1));
+
+    const paginatedDevices = limit === "all"
+        ? filteredDevices
+        : filteredDevices.slice((validCurrentPage - 1) * effectiveLimit, validCurrentPage * effectiveLimit);
+
+    // Reset to page 1 when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filter]);
+
+    const handleLimitChange = (newLimit: number | "all") => {
+        setLimit(newLimit);
+        setCurrentPage(1);
+    };
 
     const onlineCount = devices.filter(d => isOnline(d.lastSeenAt, d.status)).length;
 
@@ -158,7 +181,7 @@ export default function PosManagementPage() {
                             </tr>
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
-                            {filteredDevices.map((device) => {
+                            {paginatedDevices.map((device) => {
                                 const online = isOnline(device.lastSeenAt, device.status);
                                 return (
                                     <tr key={device.id} className="border-b transition-colors hover:bg-muted/50">
@@ -236,7 +259,7 @@ export default function PosManagementPage() {
                                     </tr>
                                 )
                             })}
-                            {filteredDevices.length === 0 && (
+                            {paginatedDevices.length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="p-4 text-center text-muted-foreground">
                                         Nenhum dispositivo encontrado.
@@ -246,6 +269,14 @@ export default function PosManagementPage() {
                         </tbody>
                     </table>
                 </div>
+                <StandardPagination
+                    currentPage={validCurrentPage}
+                    totalPages={totalPages}
+                    limit={limit}
+                    onPageChange={setCurrentPage}
+                    onLimitChange={handleLimitChange}
+                    totalItems={totalItems}
+                />
             </div>
         </div>
     );

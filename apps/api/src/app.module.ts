@@ -19,6 +19,7 @@ import { SecurityModule } from './security/security.module';
 import { AuditModule } from './audit/audit.module';
 import { RedisModule } from './redis/redis.module';
 import { SecondChanceModule } from './second-chance/second-chance.module';
+import { CompanyModule } from './company/company.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SecondChanceModule } from './second-chance/second-chance.module';
     AuditModule,
     RedisModule,
     SecondChanceModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,6 +10,7 @@ import { ActivityIndicator, View } from "react-native";
 import { AuthProvider } from "../context/AuthContext";
 import { PrinterProvider } from "../context/PrinterContext";
 import { LoadingProvider, useLoading } from "../context/LoadingContext";
+import { CompanyProvider } from "../context/CompanyContext";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { CustomAlert, AlertType } from "../components/CustomAlert";
 
@@ -144,20 +145,22 @@ export default function RootLayout() {
 
     return (
         <LoadingProvider>
-            <AuthProvider>
-                <PrinterProvider>
-                    <SafeAreaProvider>
-                        <AppInit />
-                        <Stack screenOptions={{ headerShown: false }}>
-                            <Stack.Screen name="index" />
-                            <Stack.Screen name="(tabs)" />
-                            <Stack.Screen name="settings/printer" options={{ presentation: 'modal' }} />
-                        </Stack>
-                        <StatusBar style="auto" />
-                        <LoadingOverlay />
-                    </SafeAreaProvider>
-                </PrinterProvider>
-            </AuthProvider>
+            <CompanyProvider>
+                <AuthProvider>
+                    <PrinterProvider>
+                        <SafeAreaProvider>
+                            <AppInit />
+                            <Stack screenOptions={{ headerShown: false }}>
+                                <Stack.Screen name="index" />
+                                <Stack.Screen name="(tabs)" />
+                                <Stack.Screen name="settings/printer" options={{ presentation: 'modal' }} />
+                            </Stack>
+                            <StatusBar style="auto" />
+                            <LoadingOverlay />
+                        </SafeAreaProvider>
+                    </PrinterProvider>
+                </AuthProvider>
+            </CompanyProvider>
         </LoadingProvider>
     );
 }

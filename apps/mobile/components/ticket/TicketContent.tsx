@@ -27,6 +27,9 @@ export interface TicketData {
     };
     status?: string;
     secondChanceStatus?: string;
+    // Company Branding
+    companyName?: string;
+    companyLogoUrl?: string;
 }
 
 interface TicketContentProps {
@@ -45,6 +48,12 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     const displayTicketId = data.hash || data.ticketId.substring(0, 8);
 
+    // Derivar nome da empresa para o ticket
+    const brandName = data.companyName || 'FEZINHA';
+    const brandParts = brandName.toUpperCase().split(' ');
+    const brandMain = brandParts.slice(0, -1).join(' ') || brandParts[0];
+    const brandSuffix = brandParts.length > 1 ? brandParts[brandParts.length - 1] : '';
+
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
             {/* Header */}
@@ -52,11 +61,13 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
                     <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-6`, { transform: [{ translateY: -5 }] }]} />
                     <View style={tw`items-end`}>
-                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>FEZINHA</Text>
-                        <View style={tw`flex-row items-center -mt-2`}>
-                            <Ionicons name="calendar-sharp" size={13} color="#000" style={tw`mr-1`} />
-                            <Text style={tw`text-xs font-black text-black uppercase`}>DE HOJE</Text>
-                        </View>
+                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }]}>{brandMain}</Text>
+                        {brandSuffix && (
+                            <View style={tw`flex-row items-center -mt-2`}>
+                                <Ionicons name="calendar-sharp" size={13} color="#000" style={tw`mr-1`} />
+                                <Text style={tw`text-xs font-black text-black uppercase`}>{brandSuffix}</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
                 <Text style={tw`text-center font-black text-black text-xl mt-2 uppercase`}>

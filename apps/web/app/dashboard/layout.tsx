@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 
@@ -53,6 +53,7 @@ const sidebarGroups = [
         items: [
             { icon: Settings, label: "Jogos / Preços", href: "/dashboard/settings/games" },
             { icon: Calendar, label: "Sorteios", href: "/dashboard/settings/draws" },
+            { icon: Building2, label: "Empresa", href: "/dashboard/settings/company" },
             { icon: Megaphone, label: "Avisos Globais", href: "/dashboard/announcements" },
             { icon: ShieldCheck, label: "Segurança (MFA)", href: "/dashboard/security-mfa" },
             { icon: History, label: "Logs de Auditoria", href: "/dashboard/audit" },

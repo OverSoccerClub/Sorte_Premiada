@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -17,12 +17,20 @@ export class GamesController {
     }
 
     @Get()
-    async findAll() {
+    async findAll(@Query('activeOnly') activeOnly?: string) {
         try {
-            const games = await this.gamesService.findAll();
+            const games = await this.gamesService.findAll({
+                activeOnly: activeOnly === 'true'
+            });
             return games.map(game => ({
                 ...game,
-                price: Number(game.price) // Ensure Decimal is converted to Number
+                price: Number(game.price),
+                prizeMilhar: game.prizeMilhar ? Number(game.prizeMilhar) : null,
+                prizeCentena: game.prizeCentena ? Number(game.prizeCentena) : null,
+                prizeDezena: game.prizeDezena ? Number(game.prizeDezena) : null,
+                maxLiability: Number(game.maxLiability),
+                prizeMultiplier: Number(game.prizeMultiplier),
+                commissionRate: Number(game.commissionRate)
             }));
         } catch (error) {
             console.error("Error fetching games:", error);

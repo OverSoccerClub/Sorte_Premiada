@@ -123,8 +123,15 @@ export class FinanceService {
 
         const isClosed = await this.validateSalesEligibility(userId).then(() => false).catch(() => true);
 
-        // Fetch User Limit
-        const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { salesLimit: true, limitOverrideExpiresAt: true } });
+        // Fetch User Limit and Sales Goal Threshold
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                salesLimit: true,
+                limitOverrideExpiresAt: true,
+                minSalesThreshold: true
+            }
+        });
 
         return {
             date: new Date(),
@@ -137,6 +144,7 @@ export class FinanceService {
             totalDebits,
             finalBalance,
             netBalance, // New field in summary
+            minSalesThreshold: user?.minSalesThreshold ? Number(user.minSalesThreshold) : 200,
             transactions: allTransactions,
             tickets: tickets.map(t => ({
                 id: t.id,

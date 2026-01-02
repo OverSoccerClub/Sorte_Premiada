@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
-import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield, Settings2, Activity } from "lucide-react"
+import { Loader2, Ticket, Save, Check, X, SquarePen, Clock, Plus, Trash2, DollarSign, Shield, Settings2, Activity, Power, Palette, Type } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -34,6 +34,11 @@ export default function GameSettingsPage() {
     // Prize Editing State
     const [prizesModalOpen, setPrizesModalOpen] = useState(false)
     const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
+
+    // Display Config Editing State
+    const [displayModalOpen, setDisplayModalOpen] = useState(false)
+    const [displayValues, setDisplayValues] = useState({ name: "", displayName: "", iconName: "", colorClass: "" })
+    const [togglingActive, setTogglingActive] = useState<string | null>(null)
 
     useEffect(() => {
         fetchGames()
@@ -273,6 +278,105 @@ export default function GameSettingsPage() {
         }
     }
 
+    // Toggle Active Status
+    const toggleActive = async (game: any) => {
+        setTogglingActive(game.id)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/games/${game.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ isActive: !game.isActive })
+            })
+
+            if (res.ok) {
+                toast.success(game.isActive ? "Jogo desativado" : "Jogo ativado")
+                fetchGames()
+            } else {
+                toast.error("Erro ao alterar status")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        } finally {
+            setTogglingActive(null)
+        }
+    }
+
+    // Display Config Functions
+    const openDisplayModal = (game: any) => {
+        setSelectedGame(game)
+        setDisplayValues({
+            name: game.name || "",
+            displayName: game.displayName || "",
+            iconName: game.iconName || "game-controller-outline",
+            colorClass: game.colorClass || "bg-emerald-600"
+        })
+        setDisplayModalOpen(true)
+    }
+
+    const saveDisplayConfig = async () => {
+        if (!selectedGame) return
+        setSaving(true)
+        try {
+            const token = localStorage.getItem("token")
+
+            const payload = {
+                name: displayValues.name,
+                displayName: displayValues.displayName || null,
+                iconName: displayValues.iconName,
+                colorClass: displayValues.colorClass
+            }
+
+            const res = await fetch(`${API_URL}/games/${selectedGame.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            })
+
+            if (res.ok) {
+                toast.success("Configuração atualizada com sucesso")
+                fetchGames()
+                setDisplayModalOpen(false)
+            } else {
+                toast.error("Erro ao salvar configuração")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    // Color options for picker
+    const colorOptions = [
+        { value: "bg-emerald-600", label: "Verde", preview: "bg-emerald-600" },
+        { value: "bg-amber-600", label: "Âmbar", preview: "bg-amber-600" },
+        { value: "bg-blue-600", label: "Azul", preview: "bg-blue-600" },
+        { value: "bg-purple-600", label: "Roxo", preview: "bg-purple-600" },
+        { value: "bg-red-600", label: "Vermelho", preview: "bg-red-600" },
+        { value: "bg-pink-600", label: "Rosa", preview: "bg-pink-600" },
+        { value: "bg-orange-600", label: "Laranja", preview: "bg-orange-600" },
+        { value: "bg-cyan-600", label: "Ciano", preview: "bg-cyan-600" }
+    ]
+
+    // Icon options for picker
+    const iconOptions = [
+        { value: "cash-outline", label: "Dinheiro" },
+        { value: "game-controller-outline", label: "Controle" },
+        { value: "dice-outline", label: "Dados" },
+        { value: "paw-outline", label: "Pata (Bicho)" },
+        { value: "trophy-outline", label: "Troféu" },
+        { value: "star-outline", label: "Estrela" },
+        { value: "diamond-outline", label: "Diamante" },
+        { value: "ticket-outline", label: "Bilhete" }
+    ]
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -299,32 +403,53 @@ export default function GameSettingsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
-                                <TableHead className="pl-6">Nome do Jogo</TableHead>
+                                <TableHead className="pl-6 w-[80px]">Status</TableHead>
+                                <TableHead>Nome do Jogo</TableHead>
                                 <TableHead>Preço Atual</TableHead>
                                 <TableHead>Extrações Diárias</TableHead>
-                                <TableHead className="w-[180px] text-right pr-6">Ações</TableHead>
+                                <TableHead className="w-[220px] text-right pr-6">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">
+                                    <TableCell colSpan={5} className="h-24 text-center">
                                         <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                     </TableCell>
                                 </TableRow>
                             ) : games.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                         Nenhum jogo encontrado.
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 games.map((game) => (
-                                    <TableRow key={game.id} className="hover:bg-muted/50 transition-colors">
-                                        <TableCell className="font-medium pl-6">
+                                    <TableRow key={game.id} className={`hover:bg-muted/50 transition-colors ${!game.isActive ? 'opacity-60' : ''}`}>
+                                        <TableCell className="pl-6">
                                             <div className="flex items-center gap-2">
-                                                <Ticket className="w-4 h-4 text-emerald-500" />
-                                                {game.name}
+                                                {togglingActive === game.id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin text-emerald-500" />
+                                                ) : (
+                                                    <Switch
+                                                        checked={game.isActive !== false}
+                                                        onCheckedChange={() => toggleActive(game)}
+                                                        className="data-[state=checked]:bg-emerald-600"
+                                                    />
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-6 h-6 rounded ${game.colorClass || 'bg-emerald-600'} flex items-center justify-center text-white text-xs`}>
+                                                    <Ticket className="w-3 h-3" />
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold">{game.displayName || game.name}</div>
+                                                    {game.displayName && game.displayName !== game.name && (
+                                                        <div className="text-xs text-muted-foreground">({game.name})</div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -368,6 +493,15 @@ export default function GameSettingsPage() {
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50 border-violet-200"
+                                                        onClick={() => openDisplayModal(game)}
+                                                        title="Nome, Cor e Ícone"
+                                                    >
+                                                        <Palette className="h-4 w-4" />
+                                                    </Button>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
@@ -623,6 +757,89 @@ export default function GameSettingsPage() {
                         <Button onClick={saveRules} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
                             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                             Salvar Regras
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Display Config Modal */}
+            <Dialog open={displayModalOpen} onOpenChange={setDisplayModalOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Configuração de Exibição - {selectedGame?.name}</DialogTitle>
+                        <CardDescription>Configure como o jogo aparece no aplicativo móvel.</CardDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Nome do Jogo (identificador)</Label>
+                            <Input
+                                value={displayValues.name}
+                                onChange={(e) => setDisplayValues({ ...displayValues, name: e.target.value })}
+                                placeholder="Ex: 2x1000"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Nome interno usado no sistema.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Nome de Exibição (opcional)</Label>
+                            <Input
+                                value={displayValues.displayName}
+                                onChange={(e) => setDisplayValues({ ...displayValues, displayName: e.target.value })}
+                                placeholder="Ex: 2x1500"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Nome mostrado ao usuário no app. Se vazio, usa o nome acima.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Ícone</Label>
+                            <div className="grid grid-cols-4 gap-2">
+                                {iconOptions.map(opt => (
+                                    <Button
+                                        key={opt.value}
+                                        type="button"
+                                        variant={displayValues.iconName === opt.value ? "default" : "outline"}
+                                        className={`h-12 flex flex-col gap-1 ${displayValues.iconName === opt.value ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
+                                        onClick={() => setDisplayValues({ ...displayValues, iconName: opt.value })}
+                                    >
+                                        <span className="text-xs">{opt.label}</span>
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Cor</Label>
+                            <div className="grid grid-cols-4 gap-2">
+                                {colorOptions.map(opt => (
+                                    <Button
+                                        key={opt.value}
+                                        type="button"
+                                        variant="outline"
+                                        className={`h-10 ${displayValues.colorClass === opt.value ? 'ring-2 ring-emerald-500 ring-offset-2' : ''}`}
+                                        onClick={() => setDisplayValues({ ...displayValues, colorClass: opt.value })}
+                                    >
+                                        <div className={`w-6 h-6 rounded ${opt.preview}`}></div>
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="mt-4 p-4 bg-muted rounded-lg border border-border">
+                            <Label className="text-xs text-muted-foreground mb-2 block">Pré-visualização</Label>
+                            <div className="flex items-center gap-3">
+                                <div className={`w-12 h-12 rounded-xl ${displayValues.colorClass || 'bg-emerald-600'} flex items-center justify-center text-white shadow-lg`}>
+                                    <Ticket className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-foreground">{displayValues.displayName || displayValues.name || "Nome do Jogo"}</div>
+                                    {displayValues.displayName && displayValues.displayName !== displayValues.name && (
+                                        <div className="text-xs text-muted-foreground">({displayValues.name})</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDisplayModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={saveDisplayConfig} disabled={saving || !displayValues.name} className="bg-emerald-600 hover:bg-emerald-700">
+                            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                            Salvar Configuração
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -211,12 +211,12 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 {/* Evolution Area Chart */}
                 <Card className="col-span-1 md:col-span-4 border-border bg-card shadow-sm h-full">
-                    <CardHeader>
-                        <CardTitle className="text-foreground flex items-center gap-2">
+                    <CardHeader className="bg-muted/30 border-b border-border">
+                        <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-emerald-500" />
                             Tendência de Vendas
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground">Volume de apostas nas últimas 24 horas</CardDescription>
+                        <CardDescription>Volume de apostas nas últimas 24 horas</CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
                         <div className="h-[300px] w-full">
@@ -256,12 +256,12 @@ export default function DashboardPage() {
 
                 {/* Status Breakdown Pie Chart */}
                 <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm h-full">
-                    <CardHeader>
-                        <CardTitle className="text-foreground flex items-center gap-2">
+                    <CardHeader className="bg-muted/30 border-b border-border">
+                        <CardTitle className="flex items-center gap-2">
                             <PieChartIcon className="w-5 h-5 text-emerald-500" />
                             Status dos Bilhetes (Mês)
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground">Distribuição de prêmios e apurações</CardDescription>
+                        <CardDescription>Distribuição de prêmios e apurações</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center pt-0">
                         <div className="h-[240px] w-full">
@@ -319,12 +319,12 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mt-6">
                 {/* Revenue by Game Horizontal Bars */}
                 <Card className="col-span-1 md:col-span-4 border-border bg-card shadow-sm h-full">
-                    <CardHeader>
-                        <CardTitle className="text-foreground flex items-center gap-2">
+                    <CardHeader className="bg-muted/30 border-b border-border">
+                        <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="w-5 h-5 text-emerald-500" />
                             Receita por Jogo (Mês)
                         </CardTitle>
-                        <CardDescription className="text-muted-foreground">Volume financeiro por modalidade</CardDescription>
+                        <CardDescription>Volume financeiro por modalidade</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[300px] w-full">
@@ -358,14 +358,12 @@ export default function DashboardPage() {
 
                 {/* Seller Ranking */}
                 <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm h-full">
-                    <CardHeader>
+                    <CardHeader className="bg-muted/30 border-b border-border">
                         <CardTitle className="flex items-center gap-2">
                             <Trophy className="w-5 h-5 text-yellow-500" />
                             Ranking de Vendedores (Mês Atual)
                         </CardTitle>
-                        <CardDescription>
-                            Cambistas com maior volume de vendas este mês.
-                        </CardDescription>
+                        <CardDescription>Cambistas com maior volume de vendas este mês.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">

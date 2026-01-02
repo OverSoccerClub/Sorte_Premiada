@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,20 +12,25 @@ import { AnnouncementService, Announcement } from "../../services/announcements.
 import { AnnouncementCard } from "../../components/AnnouncementCard";
 import { usePushNotifications } from "../../hooks/usePushNotifications";
 import { UserService } from "../../services/users.service";
+import { GamesService, GameConfig } from "../../services/games.service";
 
 const { height } = Dimensions.get("window");
-
-const games = [
-    { id: "2x1000", name: "2x1000", color: "bg-emerald-600", icon: "cash-outline", borderColor: "border-emerald-500/30" },
-    { id: "jb", name: "Jogo do Bicho", color: "bg-amber-600", icon: "paw-outline", borderColor: "border-amber-500/30" },
-];
 
 export default function Dashboard() {
     const router = useRouter();
     const { user, token } = useAuth();
     const [isDayClosed, setIsDayClosed] = useState(false);
+    const [salesGoalInfo, setSalesGoalInfo] = useState<{
+        minSalesThreshold: number;
+        totalSales: number;
+        remaining: number;
+    } | null>(null);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [dismissedIds, setDismissedIds] = useState<string[]>([]);
+
+    // Dynamic Games State
+    const [games, setGames] = useState<GameConfig[]>([]);
+    const [loadingGames, setLoadingGames] = useState(true);
 
     // Alert State
     const [alertConfig, setAlertConfig] = useState<{
@@ -59,6 +64,7 @@ export default function Dashboard() {
             if (token) {
                 checkStatus();
                 fetchAnnouncements();
+                fetchGames();
             }
         }, [token])
     );
@@ -82,20 +88,48 @@ export default function Dashboard() {
         }
     };
 
+    const fetchGames = async () => {
+        setLoadingGames(true);
+        try {
+            const data = await GamesService.getActiveGames(token!);
+            setGames(data);
+        } catch (error) {
+            console.error("Error fetching games", error);
+            // Fallback to empty array if fetch fails
+            setGames([]);
+        } finally {
+            setLoadingGames(false);
+        }
+    };
+
     const checkStatus = async () => {
         try {
             const summary = await FinanceService.getSummary(token!);
-            if (summary && summary.isClosed) {
-                setIsDayClosed(true);
+            if (summary) {
+                setIsDayClosed(summary.isClosed);
+
+                // Sales Goal Monitoring
+                const threshold = summary.minSalesThreshold || 200;
+                const currentSales = summary.totalSales || 0;
+                if (currentSales < threshold) {
+                    setSalesGoalInfo({
+                        minSalesThreshold: threshold,
+                        totalSales: currentSales,
+                        remaining: threshold - currentSales
+                    });
+                } else {
+                    setSalesGoalInfo(null);
+                }
             } else {
                 setIsDayClosed(false);
+                setSalesGoalInfo(null);
             }
         } catch (error) {
             console.error("Error checking finance status", error);
         }
     };
 
-    const handleGamePress = (gameId: string, gameName: string) => {
+    const handleGamePress = (game: GameConfig) => {
         if (isDayClosed) {
             setAlertConfig({
                 visible: true,
@@ -107,12 +141,15 @@ export default function Dashboard() {
             return;
         }
 
-        if (gameId === "2x1000") {
+        // Dynamic routing based on game name
+        const gameName = game.name.toLowerCase();
+        if (gameName.includes("2x") || gameName.includes("milhar")) {
             router.push("/games/2x1000");
-        } else if (gameId === "jb") {
+        } else if (gameName === "jb" || gameName.includes("bicho")) {
             router.push("/games/jogo-do-bicho");
         } else {
-            router.push({ pathname: "/games/placeholder", params: { title: gameName } });
+            // Future games - use placeholder with game name
+            router.push({ pathname: "/games/placeholder", params: { title: game.displayName || game.name } });
         }
     };
 
@@ -136,7 +173,6 @@ export default function Dashboard() {
                 </TouchableOpacity>
             </View>
 
-            {/* Avisos Ativos */}
             {announcements
                 .filter(a => !dismissedIds.includes(a.id))
                 .map(a => (
@@ -146,6 +182,46 @@ export default function Dashboard() {
                         onClose={(id) => setDismissedIds(prev => [...prev, id])}
                     />
                 ))}
+
+            {/* Sales Goal Monitoring Banner */}
+            {salesGoalInfo && (
+                <View style={tw`w-[90%] mt-4 p-4 bg-emerald-500/10 border border-emerald-500/40 rounded-xl self-center`}>
+                    <View style={tw`flex-row items-center mb-3`}>
+                        <View style={tw`bg-emerald-500/20 p-2 rounded-full mr-3`}>
+                            <Ionicons name="trending-up" size={20} color="#10b981" />
+                        </View>
+                        <View style={tw`flex-1`}>
+                            <Text style={tw`text-emerald-400 font-bold text-base`}>Meta do Dia</Text>
+                            <Text style={tw`text-emerald-300/70 text-xs`}>Atinja a meta para ganhar comissão por %</Text>
+                        </View>
+                    </View>
+
+                    {/* Progress Bar */}
+                    <View style={tw`h-2 bg-gray-700 rounded-full mb-3 overflow-hidden`}>
+                        <View
+                            style={[
+                                tw`h-full bg-emerald-500 rounded-full`,
+                                { width: `${Math.min((salesGoalInfo.totalSales / salesGoalInfo.minSalesThreshold) * 100, 100)}%` }
+                            ]}
+                        />
+                    </View>
+
+                    <View style={tw`flex-row justify-between items-center`}>
+                        <View style={tw`items-center`}>
+                            <Text style={tw`text-gray-400 text-xs`}>Vendas Atuais</Text>
+                            <Text style={tw`text-white font-bold`}>R$ {salesGoalInfo.totalSales.toFixed(2)}</Text>
+                        </View>
+                        <View style={tw`items-center px-3`}>
+                            <Text style={tw`text-emerald-400 text-xs`}>Faltam</Text>
+                            <Text style={tw`text-emerald-400 font-bold text-lg`}>R$ {salesGoalInfo.remaining.toFixed(2)}</Text>
+                        </View>
+                        <View style={tw`items-center`}>
+                            <Text style={tw`text-gray-400 text-xs`}>Meta</Text>
+                            <Text style={tw`text-white font-bold`}>R$ {salesGoalInfo.minSalesThreshold.toFixed(2)}</Text>
+                        </View>
+                    </View>
+                </View>
+            )}
 
             {isDayClosed && (
                 <View style={tw`w-[90%] mt-6 p-4 bg-orange-500/10 border border-orange-500/50 rounded-xl flex-row items-center self-center`}>
@@ -161,20 +237,39 @@ export default function Dashboard() {
                 <Text style={tw`text-lg font-bold text-white uppercase tracking-wider`}>Jogos Disponíveis</Text>
             </View>
 
-            <View style={tw`w-[90%] flex-row justify-center gap-4 mt-2 self-center`}>
-                {games.map((game) => (
-                    <TouchableOpacity
-                        key={game.id}
-                        style={tw`flex-1 bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${game.borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
-                        onPress={() => handleGamePress(game.id, game.name)}
-                        activeOpacity={0.8}
-                    >
-                        <View style={tw`w-16 h-16 ${game.color} rounded-2xl items-center justify-center mb-4 shadow-lg shadow-${game.color.replace('bg-', '')}/50 rotate-3`}>
-                            <Ionicons name={game.icon as any} size={32} color="white" />
-                        </View>
-                        <Text style={tw`font-bold text-lg text-white text-center`}>{game.name}</Text>
-                    </TouchableOpacity>
-                ))}
+            <View style={tw`w-[90%] flex-row flex-wrap justify-center gap-4 mt-2 self-center`}>
+                {loadingGames ? (
+                    <View style={tw`py-8 items-center`}>
+                        <ActivityIndicator size="large" color="#10b981" />
+                        <Text style={tw`text-gray-400 text-sm mt-2`}>Carregando jogos...</Text>
+                    </View>
+                ) : games.length === 0 ? (
+                    <View style={tw`py-8 items-center`}>
+                        <Ionicons name="game-controller-outline" size={48} color="#6b7280" />
+                        <Text style={tw`text-gray-400 text-sm mt-2`}>Nenhum jogo disponível</Text>
+                    </View>
+                ) : (
+                    games.map((game) => {
+                        const color = game.colorClass || "bg-emerald-600";
+                        const icon = (game.iconName || "game-controller-outline") as any;
+                        const borderColor = color.replace("bg-", "border-").replace("-600", "-500/30");
+                        const displayName = game.displayName || game.name;
+
+                        return (
+                            <TouchableOpacity
+                                key={game.id}
+                                style={tw`flex-1 min-w-[140px] max-w-[48%] bg-surface p-4 rounded-3xl mb-4 shadow-lg border ${borderColor} items-center justify-center aspect-square ${isDayClosed ? 'opacity-50' : ''} active:scale-95 transition-transform`}
+                                onPress={() => handleGamePress(game)}
+                                activeOpacity={0.8}
+                            >
+                                <View style={tw`w-16 h-16 ${color} rounded-2xl items-center justify-center mb-4 shadow-lg rotate-3`}>
+                                    <Ionicons name={icon} size={32} color="white" />
+                                </View>
+                                <Text style={tw`font-bold text-lg text-white text-center`}>{displayName}</Text>
+                            </TouchableOpacity>
+                        );
+                    })
+                )}
             </View>
 
             {/* Botão de Validação */}

@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Filter, Loader2, Trash2, Megaphone, SquarePen, Save, Clock, Info, AlertTriangle, AlertCircle, CheckCircle2, Eye, EyeOff, Users, User } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 import { Badge } from "@/components/ui/badge"
+import { StandardPageHeader } from "@/components/standard-page-header"
 
 const formSchema = z.object({
     title: z.string().min(3, { message: "Título deve ter pelo menos 3 caracteres." }),
@@ -226,17 +227,11 @@ export default function AnnouncementsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <Megaphone className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        Gestão de Avisos
-                    </h2>
-                    <p className="text-muted-foreground mt-1 ml-14">Envie comunicados globais ou para cambistas específicos.</p>
-                </div>
-
+            <StandardPageHeader
+                icon={<Megaphone className="w-8 h-8 text-emerald-500" />}
+                title="Gestão de Avisos"
+                description="Envie comunicados globais ou para cambistas específicos."
+            >
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button
@@ -457,7 +452,7 @@ export default function AnnouncementsPage() {
                         </Form>
                     </DialogContent>
                 </Dialog>
-            </div>
+            </StandardPageHeader>
 
             <Card className="border-border shadow-sm bg-card overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b border-border">

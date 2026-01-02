@@ -122,12 +122,13 @@ export default function AnalyticsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Growth Chart */}
-                <Card className="border-border shadow-sm overflow-hidden">
+                <Card className="col-span-1 md:col-span-4 border-border bg-card shadow-sm h-full">
                     <CardHeader className="bg-muted/30 border-b border-border">
-                        <CardTitle className="text-xl flex items-center gap-2">
-                            <TrendingUp className="w-6 h-6 text-blue-500" />
+                        <CardTitle className="flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-blue-500" />
                             Evolução das Vendas (30 dias)
                         </CardTitle>
+                        <CardDescription>Tendência de vendas acumuladas no período.</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="h-[350px]">
@@ -154,12 +155,13 @@ export default function AnalyticsPage() {
                 </Card>
 
                 {/* Regional Heatmap (Table + Chart) */}
-                <Card className="border-border shadow-sm overflow-hidden">
+                <Card className="col-span-1 md:col-span-3 border-border bg-card shadow-sm h-full">
                     <CardHeader className="bg-muted/30 border-b border-border">
-                        <CardTitle className="text-xl flex items-center gap-2">
-                            <MapIcon className="w-6 h-6 text-emerald-500" />
+                        <CardTitle className="flex items-center gap-2">
+                            <MapIcon className="w-5 h-5 text-emerald-500" />
                             Performance por Praça (Heatmap)
                         </CardTitle>
+                        <CardDescription>Distribuição de vendas por região geográfica.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="h-[350px] p-6">
@@ -200,8 +202,8 @@ export default function AnalyticsPage() {
             {/* Efficiency Table */}
             <Card className="border-border shadow-sm overflow-hidden mb-8">
                 <CardHeader className="bg-muted/30 border-b border-border">
-                    <CardTitle className="text-xl flex items-center gap-2">
-                        <Award className="w-6 h-6 text-orange-500" />
+                    <CardTitle className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-orange-500" />
                         Ranking de Eficiência dos Cambistas
                     </CardTitle>
                     <CardDescription>Análise de vendas vs dias ativos no sistema.</CardDescription>
