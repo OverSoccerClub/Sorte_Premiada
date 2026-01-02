@@ -1,17 +1,22 @@
 "use client"
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Plus, Pencil, Ticket, Loader2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Palette, Activity, Check, X, FileText } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { API_URL } from "@/lib/api"
 import { toast } from "sonner"
 import { GameFormDialog } from "@/components/games/game-form-dialog"
 import { StandardPageHeader } from "@/components/standard-page-header"
+import { DisplayConfigDialog } from "@/components/games/display-dialog"
+import { RulesDialog } from "@/components/games/rules-dialog"
+import { PrizesDialog } from "@/components/games/prizes-dialog"
+import { ScheduleDialog } from "@/components/games/schedule-dialog"
+import { Switch } from "@/components/ui/switch"
 
-// Interface para o Jogo vindo da API
 interface Game {
     id: string
     name: string
@@ -21,7 +26,14 @@ interface Game {
     isActive: boolean
     price: number
     rules: any
-    // ... outros campos que vem da API
+    extractionTimes?: string[]
+    // ... other props
+    prizeMilhar?: number
+    prizeCentena?: number
+    prizeDezena?: number
+    maxLiability?: number
+    prizeMultiplier?: number
+    commissionRate?: number
 }
 
 export default function GamesPage() {
@@ -30,10 +42,20 @@ export default function GamesPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingGame, setEditingGame] = useState<Game | null>(null)
 
+    // Config Modals State
+    const [displayModalOpen, setDisplayModalOpen] = useState(false)
+    const [rulesModalOpen, setRulesModalOpen] = useState(false)
+    const [prizesModalOpen, setPrizesModalOpen] = useState(false)
+    const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+    const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+
+    // Inline Price Edit
+    const [editingPriceId, setEditingPriceId] = useState<string | null>(null)
+    const [newPrice, setNewPrice] = useState("")
+
     const fetchGames = async () => {
         setIsLoading(true)
         try {
-            // Fetch all games (active and inactive) for admin
             const response = await fetch(`${API_URL}/games`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`
@@ -59,30 +81,100 @@ export default function GamesPage() {
         setIsDialogOpen(true)
     }
 
-    const handleEditClick = (game: Game) => {
-        setEditingGame(game)
-        setIsDialogOpen(true)
+    // Config Actions
+    const openDisplayConfig = (game: Game) => {
+        setSelectedGame(game)
+        setDisplayModalOpen(true)
+    }
+
+    const openRules = (game: Game) => {
+        setSelectedGame(game)
+        setRulesModalOpen(true)
+    }
+
+    const openPrizes = (game: Game) => {
+        setSelectedGame(game)
+        setPrizesModalOpen(true)
+    }
+
+    const openSchedule = (game: Game) => {
+        setSelectedGame(game)
+        setScheduleModalOpen(true)
+    }
+
+    const toggleActive = async (game: Game) => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/games/${game.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ isActive: !game.isActive })
+            })
+
+            if (res.ok) {
+                toast.success(game.isActive ? "Jogo desativado" : "Jogo ativado")
+                fetchGames()
+            } else {
+                toast.error("Erro ao alterar status")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        }
+    }
+
+    const startPriceEdit = (game: Game) => {
+        setEditingPriceId(game.id)
+        setNewPrice(String(game.price))
+    }
+
+    const savePrice = async (gameId: string) => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/games/${gameId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ price: Number(newPrice) })
+            })
+
+            if (res.ok) {
+                toast.success("Preço atualizado")
+                setEditingPriceId(null)
+                fetchGames()
+            } else {
+                toast.error("Erro ao atualizar")
+            }
+        } catch (e) {
+            toast.error("Erro ao salvar")
+        }
     }
 
     return (
         <div className="space-y-6">
             <StandardPageHeader
                 icon={<Ticket className="w-8 h-8 text-emerald-500" />}
-                title="Gerenciamento de Jogos"
-                description="Configure os jogos disponíveis, preços, prêmios e horários de sorteio."
+                title="Gestão de Jogos"
+                description="Central de controle dos jogos: Preços, Regras, Prêmios e Horários."
                 onRefresh={fetchGames}
                 refreshing={isLoading}
             >
                 {games.some(g => g.name.includes('2x1000') || g.displayName?.includes('2x1000')) && (
                     <Link href="/dashboard/games/2x1000">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="hidden sm:flex">
+                            <FileText className="w-4 h-4 mr-2" />
                             Relatório 2x1000
                         </Button>
                     </Link>
                 )}
                 {games.some(g => g.name.toLowerCase().includes('bicho') || g.displayName?.toLowerCase().includes('jb')) && (
                     <Link href="/dashboard/games/jb">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="hidden sm:flex">
+                            <FileText className="w-4 h-4 mr-2" />
                             Relatório JB
                         </Button>
                     </Link>
@@ -97,51 +189,105 @@ export default function GamesPage() {
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
                 </div>
             ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {games.map((game) => (
-                        <Card key={game.id} className={`hover:shadow-lg transition-all duration-200 border-muted group relative ${!game.isActive ? 'opacity-75 grayscale' : ''}`}>
-                            <div className="absolute top-4 right-4 z-10 w-auto">
-                                <Button
-                                    variant="secondary"
-                                    size="icon"
-                                    className="h-8 w-8 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        handleEditClick(game)
-                                    }}
-                                >
-                                    <Pencil className="w-4 h-4" />
-                                </Button>
-                            </div>
-
-                            <CardHeader className="space-y-1">
-                                <div className="flex items-center justify-between mr-8">
+                        <Card key={game.id} className={`flex flex-col hover:shadow-lg transition-all duration-200 border-muted group relative ${!game.isActive ? 'opacity-90 grayscale-[0.5]' : ''}`}>
+                            <CardHeader className="space-y-1 pb-3">
+                                <div className="flex items-center justify-between">
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${game.colorClass || 'bg-emerald-600'} text-white shadow-lg`}>
                                         <Ticket className="w-6 h-6" />
                                     </div>
-                                    <Badge variant={game.isActive ? "default" : "destructive"}>
-                                        {game.isActive ? "Ativo" : "Inativo"}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                        <Switch
+                                            checked={game.isActive}
+                                            onCheckedChange={() => toggleActive(game)}
+                                            className="data-[state=checked]:bg-emerald-600"
+                                            title={game.isActive ? "Desativar Jogo" : "Ativar Jogo"}
+                                        />
+                                    </div>
                                 </div>
-                                <CardTitle className="text-xl pt-4 group-hover:text-emerald-500 transition-colors">
-                                    {game.displayName || game.name}
-                                </CardTitle>
+                                <div className="pt-4">
+                                    <CardTitle className="text-xl group-hover:text-emerald-500 transition-colors flex items-center justify-between">
+                                        {game.displayName || game.name}
+                                        {editingPriceId === game.id ? (
+                                            <div className="flex items-center gap-1">
+                                                <Input
+                                                    type="number"
+                                                    value={newPrice}
+                                                    onChange={e => setNewPrice(e.target.value)}
+                                                    className="h-7 w-20 text-right px-1"
+                                                    autoFocus
+                                                />
+                                                <Button size="icon" className="h-7 w-7 bg-emerald-600" onClick={() => savePrice(game.id)}>
+                                                    <Check className="w-3 h-3" />
+                                                </Button>
+                                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingPriceId(null)}>
+                                                    <X className="w-3 h-3" />
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="text-sm font-semibold bg-emerald-50 text-emerald-700 px-2 py-1 rounded cursor-pointer hover:bg-emerald-100 border border-emerald-100"
+                                                onClick={() => startPriceEdit(game)}
+                                                title="Clique para editar preço"
+                                            >
+                                                R$ {Number(game.price).toFixed(2)}
+                                            </div>
+                                        )}
+
+                                    </CardTitle>
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                        {game.extractionTimes && game.extractionTimes.length > 0
+                                            ? `${game.extractionTimes.length} extrações diárias`
+                                            : "Sem horários definidos"
+                                        }
+                                    </div>
+                                </div>
                             </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2 text-sm text-muted-foreground">
-                                    <div className="flex justify-between">
-                                        <span>Preço do Bilhete:</span>
-                                        <span className="font-semibold text-foreground">R$ {game.price ? Number(game.price).toFixed(2) : '0.00'}</span>
+                            <CardContent className="flex-1 pb-2">
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="flex flex-col bg-muted/30 p-2 rounded">
+                                        <span className="text-muted-foreground">Risco Máx</span>
+                                        <span className="font-medium text-foreground">R$ {game.maxLiability || 0}</span>
+                                    </div>
+                                    <div className="flex flex-col bg-muted/30 p-2 rounded">
+                                        <span className="text-muted-foreground">Mult. Prêmios</span>
+                                        <span className="font-medium text-foreground">{game.prizeMultiplier || 0}x</span>
+                                    </div>
+                                    <div className="flex flex-col bg-muted/30 p-2 rounded">
+                                        <span className="text-muted-foreground">Comissão</span>
+                                        <span className="font-medium text-foreground">{game.commissionRate || 0}%</span>
+                                    </div>
+                                    <div className="flex flex-col bg-muted/30 p-2 rounded">
+                                        <span className="text-muted-foreground">Prêmio Milhar</span>
+                                        <span className="font-medium text-foreground">R$ {game.prizeMilhar || 0}</span>
                                     </div>
                                 </div>
                             </CardContent>
+                            <CardFooter className="pt-2 border-t border-border grid grid-cols-4 gap-1 p-2">
+                                <Button variant="ghost" size="sm" className="flex flex-col h-14 gap-1 text-[10px] items-center justify-center text-muted-foreground hover:bg-violet-50 hover:text-violet-600" onClick={() => openDisplayConfig(game)}>
+                                    <Palette className="w-5 h-5" />
+                                    Visual
+                                </Button>
+                                <Button variant="ghost" size="sm" className="flex flex-col h-14 gap-1 text-[10px] items-center justify-center text-muted-foreground hover:bg-blue-50 hover:text-blue-600" onClick={() => openRules(game)}>
+                                    <Shield className="w-5 h-5" />
+                                    Regras
+                                </Button>
+                                <Button variant="ghost" size="sm" className="flex flex-col h-14 gap-1 text-[10px] items-center justify-center text-muted-foreground hover:bg-amber-50 hover:text-amber-600" onClick={() => openPrizes(game)}>
+                                    <DollarSign className="w-5 h-5" />
+                                    Prêmios
+                                </Button>
+                                <Button variant="ghost" size="sm" className="flex flex-col h-14 gap-1 text-[10px] items-center justify-center text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600" onClick={() => openSchedule(game)}>
+                                    <Clock className="w-5 h-5" />
+                                    Horários
+                                </Button>
+                            </CardFooter>
                         </Card>
                     ))}
 
                     {games.length === 0 && (
-                        <div className="col-span-full text-center py-10 text-muted-foreground">
-                            Nenhum jogo cadastrado. Clique em "Novo Jogo" para começar.
+                        <div className="col-span-full text-center py-20 text-muted-foreground">
+                            Nenhum jogo encontrado.
                         </div>
                     )}
                 </div>
@@ -151,6 +297,34 @@ export default function GamesPage() {
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
                 gameToEdit={editingGame}
+                onSuccess={fetchGames}
+            />
+
+            <DisplayConfigDialog
+                open={displayModalOpen}
+                onOpenChange={setDisplayModalOpen}
+                game={selectedGame}
+                onSuccess={fetchGames}
+            />
+
+            <RulesDialog
+                open={rulesModalOpen}
+                onOpenChange={setRulesModalOpen}
+                game={selectedGame}
+                onSuccess={fetchGames}
+            />
+
+            <PrizesDialog
+                open={prizesModalOpen}
+                onOpenChange={setPrizesModalOpen}
+                game={selectedGame}
+                onSuccess={fetchGames}
+            />
+
+            <ScheduleDialog
+                open={scheduleModalOpen}
+                onOpenChange={setScheduleModalOpen}
+                game={selectedGame}
                 onSuccess={fetchGames}
             />
         </div>

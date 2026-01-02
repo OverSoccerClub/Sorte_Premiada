@@ -28,7 +28,8 @@ const sidebarGroups = [
     {
         title: "Vendas & Operação",
         items: [
-            { icon: Ticket, label: "Jogos / Vendas", href: "/dashboard/games" },
+            { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
+            { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
             { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
             // { icon: QrCode, label: "Validação", href: "/dashboard/validate" }, // Future
         ]
@@ -46,14 +47,12 @@ const sidebarGroups = [
         items: [
             { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
             { icon: TrendingUp, label: "Inteligência (BI)", href: "/dashboard/analytics" },
-            { icon: Wallet, label: "Prestação de Contas", href: "/dashboard/prestacao-contas" }, // Assuming path based on task
+            { icon: Wallet, label: "Prestação de Contas", href: "/dashboard/prestacao-contas" },
         ]
     },
     {
         title: "Configurações",
         items: [
-            { icon: Settings, label: "Jogos / Preços", href: "/dashboard/settings/games" },
-            { icon: Calendar, label: "Sorteios", href: "/dashboard/settings/draws" },
             { icon: Building2, label: "Empresa", href: "/dashboard/settings/company" },
             { icon: Megaphone, label: "Avisos Globais", href: "/dashboard/announcements" },
             { icon: ShieldCheck, label: "Segurança (MFA)", href: "/dashboard/security-mfa" },

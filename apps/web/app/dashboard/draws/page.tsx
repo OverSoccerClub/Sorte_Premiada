@@ -79,7 +79,14 @@ export default function DrawsSettingsPage() {
             const res = await fetch(`${API_URL}/games`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
-            if (res.ok) setGames(await res.json())
+            if (res.ok) {
+                const data = await res.json()
+                setGames(data)
+                // Select first game by default if none selected
+                if (data.length > 0 && !selectedGameId) {
+                    setSelectedGameId(data[0].id)
+                }
+            }
         } catch (e) { toast.error("Erro ao carregar jogos") }
     }
 
@@ -171,7 +178,7 @@ export default function DrawsSettingsPage() {
             <StandardPageHeader
                 icon={<Calendar className="w-8 h-8 text-emerald-500" />}
                 title="Gestão de Sorteios"
-                description="Agende e gerencie os resultados dos sorteios."
+                description="Agende, acompanhe e informe os resultados dos sorteios."
                 onRefresh={() => selectedGameId && fetchDraws(selectedGameId)}
                 refreshing={loading}
             >
@@ -234,7 +241,7 @@ export default function DrawsSettingsPage() {
                                     if (totalItems === 0) return (
                                         <TableRow>
                                             <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                                Nenhum sorteio encontrado.
+                                                Nenhum sorteio encontrado. Agende um novo sorteio.
                                             </TableCell>
                                         </TableRow>
                                     );
