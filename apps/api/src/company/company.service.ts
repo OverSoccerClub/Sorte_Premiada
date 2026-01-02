@@ -61,7 +61,8 @@ export class CompanyService {
         // Let's assume the caller passes a hashed password OR we just do it here if we can.
         // Let's try to import * as bcrypt from 'bcryptjs'.
 
-        const bcrypt = require('bcryptjs');
+        // Hash password using the project's existing 'bcrypt' dependency
+        const bcrypt = await import('bcrypt');
         const hashedPassword = await bcrypt.hash(data.adminPassword || '123456', 10);
 
         return this.prisma.$transaction(async (tx) => {
