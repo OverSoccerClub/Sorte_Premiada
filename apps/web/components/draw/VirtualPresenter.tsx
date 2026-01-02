@@ -1,94 +1,76 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic2, Sparkles, Video, Wifi } from "lucide-react";
+import { Sparkles, Wifi, Radio } from "lucide-react";
 import Image from "next/image";
 
 interface VirtualPresenterProps {
     text: string;
     isSpeaking: boolean;
-    videoUrl?: string; // Optional: If provided, plays video. If not, shows image.
 }
 
-export function VirtualPresenter({ text, isSpeaking, videoUrl }: VirtualPresenterProps) {
+export function VirtualPresenter({ text, isSpeaking }: VirtualPresenterProps) {
     return (
-        <div className="w-full max-w-4xl mx-auto mb-8 flex flex-col items-center z-30">
-            <div className="bg-card/95 backdrop-blur-md border border-primary/20 rounded-2xl overflow-hidden shadow-2xl relative w-full flex flex-col md:flex-row min-h-[160px]">
+        <div className="w-full max-w-4xl mx-auto mb-8 flex flex-col items-center z-30 pointer-events-auto">
+            <div className="bg-card border border-primary/30 rounded-2xl overflow-hidden shadow-2xl relative w-full flex flex-col md:flex-row min-h-[180px]">
 
-                {/* Presenter Visual Area (Video or Image) */}
-                <div className="relative w-full md:w-[240px] h-[240px] md:h-auto flex-shrink-0 bg-black overflow-hidden border-b md:border-b-0 md:border-r border-primary/10">
+                {/* Presenter Visual Area */}
+                <div className="relative w-full md:w-[220px] h-[220px] md:h-auto flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/5 overflow-hidden border-b md:border-b-0 md:border-r border-primary/20">
                     {/* Live Indicator */}
-                    <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-wider">
+                    <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-wider">
                         <div className={`w-2 h-2 rounded-full ${isSpeaking ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`} />
                         {isSpeaking ? 'AO VIVO' : 'EM ESPERA'}
                     </div>
 
-                    {videoUrl ? (
-                        <video
-                            src={videoUrl}
-                            autoPlay
-                            loop
-                            muted
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full relative bg-white/0 flex items-end justify-center overflow-visible">
-                            {/* Placeholder Image with Talking Animation */}
-                            <div className={`relative w-full h-full transition-transform duration-100 origin-bottom ${isSpeaking ? 'animate-talk-bounce' : ''}`}>
-                                <Image
-                                    src="/presenter.png"
-                                    alt="Apresentadora Virtual"
-                                    fill
-                                    className={`object-contain object-bottom mix-blend-multiply`}
-                                    priority
-                                />
-                            </div>
-
-                            {/* Speaking Overlay Effect (Subtle glow) */}
-                            {isSpeaking && (
-                                <motion.div
-                                    className="absolute inset-x-0 bottom-0 h-1/3 bg-primary/20 blur-xl rounded-full"
-                                    animate={{ opacity: [0, 0.5, 0], scale: [0.8, 1.2, 0.8] }}
-                                    transition={{ repeat: Infinity, duration: 0.4 }}
-                                />
-                            )}
+                    {/* Presenter Image */}
+                    <div className="w-full h-full relative flex items-center justify-center p-4">
+                        <div className={`relative w-full h-full transition-transform duration-150 ${isSpeaking ? 'scale-[1.02]' : 'scale-100'}`}>
+                            <Image
+                                src="/presenter.png"
+                                alt="Apresentador Virtual"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
-                    )}
+
+                        {/* Speaking Glow Effect */}
+                        {isSpeaking && (
+                            <motion.div
+                                className="absolute inset-0 bg-primary/10 rounded-full blur-3xl"
+                                animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.1, 0.9] }}
+                                transition={{ repeat: Infinity, duration: 0.8 }}
+                            />
+                        )}
+                    </div>
                 </div>
 
-                {/* Dialogue Bubble Area */}
-                <div className="flex-1 p-6 flex flex-col justify-center relative bg-gradient-to-r from-background to-muted/20">
-                    <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground flex items-center gap-1 opacity-50">
-                        <Wifi className="w-3 h-3" />
-                        Sinal HD
+                {/* Dialogue Area */}
+                <div className="flex-1 p-6 flex flex-col justify-center relative">
+                    <div className="absolute top-4 right-4 text-xs font-mono text-muted-foreground flex items-center gap-1 opacity-60">
+                        <Radio className="w-3 h-3" />
+                        HD
                     </div>
 
+                    <span className="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-1.5 mb-3">
+                        <Sparkles className="w-3 h-3" />
+                        Apresentador Virtual
+                    </span>
+
                     <AnimatePresence mode="wait">
-                        <motion.div
+                        <motion.p
                             key={text}
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            className="flex flex-col gap-2"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="text-xl md:text-2xl font-medium text-foreground leading-relaxed"
                         >
-                            <span className="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-1.5">
-                                <Sparkles className="w-3 h-3" />
-                                Apresentadora Virtual
-                            </span>
-                            <p className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
-                                "{text}"
-                            </p>
-                        </motion.div>
+                            {text ? `"${text}"` : "..."}
+                        </motion.p>
                     </AnimatePresence>
                 </div>
             </div>
-
-            {/* Disclaimer for Video API */}
-            {!videoUrl && (
-                <p className="mt-2 text-[10px] text-muted-foreground opacity-40 text-center w-full">
-                    *Para vídeo real-time (Lip-Sync), integrar API HeyGen/D-ID.
-                </p>
-            )}
         </div>
     );
 }

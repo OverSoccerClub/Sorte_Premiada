@@ -1,11 +1,9 @@
 "use client";
 
-import { motion, useSpring, useTransform } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // Repeated for smooth looping look
-const HEIGHT = 80; // Height of each number container
+const HEIGHT = 80;
 
 interface DrawDigitProps {
     value: number | string;
@@ -14,87 +12,65 @@ interface DrawDigitProps {
 }
 
 export function DrawDigit({ value, isSpinning, delay = 0 }: DrawDigitProps) {
-    const [targetY, setTargetY] = useState(0);
-
-    // Spring physics for smooth deceleration
-    const springY = useSpring(0, {
-        stiffness: 50,
-        damping: 15,
-        mass: 1,
-    });
-
-    useEffect(() => {
-        if (isSpinning) {
-            // Spinning state is handled by the animate prop directly
-        } else {
-            if (typeof value === 'number') {
-                // Calculate position to land on 'value'
-                // We want to land on the second set of numbers to ensure we scrolled past the first
-                const index = value + 10;
-                const newY = -(index * HEIGHT);
-                setTargetY(newY);
-            } else {
-                // Reset to 0 or specific position for placeholder
-                setTargetY(0);
-            }
-        }
-    }, [value, isSpinning, delay]);
-
-    // If we want a constant spin, we can use a separate animation control.
-    // But for now, let's try a simpler approach where we just animate to a very low negative number then snap back?
-    // Actually, standard slot machines just spin until they stop.
-
-    // Let's implement a continuous spin style:
+    // Calculate the target position based on the value
+    const getTargetY = () => {
+        if (typeof value !== 'number') return 0;
+        // Land on position 10 + value to ensure we scrolled past first set
+        return -((10 + value) * HEIGHT);
+    };
 
     return (
         <div
-            className="relative overflow-hidden w-16 bg-muted rounded-md border border-border flex justify-center items-center shadow-inner"
+            className="relative overflow-hidden w-16 bg-gradient-to-b from-slate-800 to-slate-900 rounded-lg border border-slate-700 flex justify-center items-center shadow-lg"
             style={{ height: HEIGHT }}
         >
-            <motion.div
-                className="flex flex-col items-center"
-                initial={{ y: 0 }}
-                animate={isSpinning ? {
-                    y: [0, -800], // Loop exactly one set of 10 digits (10 * 80px)
-                    transition: {
-                        repeat: Infinity,
-                        duration: 0.25, // Faster spin
-                        ease: "linear"
-                    }
-                } : {
-                    // Land on the second set of numbers (index 10-19) to ensure downward flow
-                    y: typeof value === 'number' ? -((value + 10) * HEIGHT) : 0,
-                    transition: {
-                        type: "spring",
-                        stiffness: 60,
-                        damping: 15,
-                        delay: delay // Use exact seconds passed
-                    }
-                }}
-            >
-                {value === '?' ? (
-                    <div className="flex items-center justify-center font-mono font-bold text-4xl text-foreground/50 h-20 w-full">
-                        ?
-                    </div>
-                ) : (
-                    /* Render a long strip of numbers */
-                    Array.from({ length: 30 }).map((_, i) => (
+            {value === '?' ? (
+                // Placeholder state
+                <div className="flex items-center justify-center font-mono font-bold text-5xl text-slate-500 w-full h-full">
+                    ?
+                </div>
+            ) : (
+                <motion.div
+                    className="flex flex-col items-center"
+                    initial={{ y: 0 }}
+                    animate={isSpinning ? {
+                        y: [0, -800],
+                        transition: {
+                            repeat: Infinity,
+                            duration: 0.3,
+                            ease: "linear"
+                        }
+                    } : {
+                        y: getTargetY(),
+                        transition: {
+                            type: "spring",
+                            stiffness: 80,
+                            damping: 12,
+                            delay: delay
+                        }
+                    }}
+                >
+                    {/* Render 30 digits for smooth scrolling */}
+                    {Array.from({ length: 30 }).map((_, i) => (
                         <div
                             key={i}
                             className={cn(
                                 "flex items-center justify-center font-mono font-black text-5xl",
-                                "w-full text-white drop-shadow-md"
+                                "w-full text-white"
                             )}
-                            style={{ height: HEIGHT, minHeight: HEIGHT }} // Force exact pixel height
+                            style={{ height: HEIGHT, minHeight: HEIGHT }}
                         >
                             {i % 10}
                         </div>
-                    ))
-                )}
-            </motion.div>
+                    ))}
+                </motion.div>
+            )}
 
-            {/* Overlay gradient for depth */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none" />
+            {/* Glass overlay effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/30 pointer-events-none" />
+
+            {/* Shine line */}
+            <div className="absolute inset-x-0 top-0 h-px bg-white/20" />
         </div>
     );
 }
