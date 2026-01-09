@@ -5,7 +5,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { Role } from '@prisma/client';
 import { User } from '../auth/user.decorator';
 import { SkipLicenseCheck } from '../licensing/skip-license-check.decorator';
 
@@ -74,8 +73,10 @@ export class CompanyController {
                     return this.companyService.getPublicSettings(undefined, device.companyId);
                 }
             } catch (error) {
-                // Device token invalid, continue to other auth methods
-                console.warn('Invalid device token, falling back to other auth methods');
+                // Device token invalid - if it was provided, we MUST return error
+                // so the app can clear activation state.
+                console.warn(`[CompanyController] Invalid device token: ${error.message}`);
+                throw error; // Rethrow to return 401/403
             }
         }
 
@@ -118,7 +119,7 @@ export class CompanyController {
      */
     @Put('settings')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, 'MASTER')
+    @Roles('ADMIN', 'MASTER')
     async updateSettings(
         @Body() data: UpdateCompanySettingsDto,
         @User() user: any,
