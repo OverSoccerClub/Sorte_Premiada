@@ -59,19 +59,19 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
         <View style={tw`bg-white w-[384px] p-1`}>
             {/* Header */}
             <View style={tw`items-center mb-1 w-full px-1`}>
-                <View style={tw`border-[3px] border-black rounded-xl p-2 w-full flex-row items-center justify-center`}>
+                <View style={tw`border-[3px] border-black rounded-xl p-3 w-full flex-row items-center justify-between`}>
                     {data.companyLogoUrl ? (
                         <Image
                             source={{ uri: data.companyLogoUrl }}
-                            style={{ width: 60, height: 60, resizeMode: 'contain', marginRight: 10 }}
+                            style={{ width: 60, height: 60, resizeMode: 'contain' }}
                         />
                     ) : (
-                        <MaterialCommunityIcons name="clover" size={35} color="#000" style={[tw`mr-6`, { transform: [{ translateY: -5 }] }]} />
+                        <MaterialCommunityIcons name="clover" size={40} color="#000" />
                     )}
-                    <View style={tw`items-end flex-1`}>
-                        <Text style={[tw`text-4xl font-black text-black leading-tight`, { transform: [{ scaleX: 1.25 }] }, { fontSize: brandMain.length > 15 ? 24 : 36 }]}>{brandMain}</Text>
+                    <View style={tw`items-center flex-1 ml-3`}>
+                        <Text style={[tw`text-4xl font-black text-black leading-tight text-center`, { transform: [{ scaleX: 1.25 }] }, { fontSize: brandMain.length > 15 ? 24 : 36 }]}>{brandMain}</Text>
                         {brandSuffix && (
-                            <View style={tw`flex-row items-center -mt-2`}>
+                            <View style={tw`flex-row items-center -mt-1`}>
                                 <Ionicons name="calendar-sharp" size={13} color="#000" style={tw`mr-1`} />
                                 <Text style={tw`text-xs font-black text-black uppercase`}>{brandSuffix}</Text>
                             </View>
