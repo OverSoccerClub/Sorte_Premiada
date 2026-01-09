@@ -23,7 +23,7 @@ import { UpdaterService, VersionInfo } from "../services/updater.service";
 // Component responsible for Initializations (POS Tracking, Updates, etc)
 function AppInit() {
     usePosTracking();
-    const { settings } = useCompany();
+    const { settings, isActivated } = useCompany();
     const { show, hide } = useLoading();
 
     const [alertConfig, setAlertConfig] = useState<{
@@ -113,7 +113,8 @@ function AppInit() {
         checkUpdates();
 
         return () => { isMounted = false; };
-    }, []);
+    }, [isActivated, settings.updateUrl]);
+
 
     return (
         <CustomAlert

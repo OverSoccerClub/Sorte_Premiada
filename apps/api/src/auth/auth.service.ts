@@ -98,7 +98,8 @@ export class AuthService {
                 name: user.name,
                 role: user.role,
                 companyId: user.companyId,
-                twoFactorEnabled: user.twoFactorEnabled
+                twoFactorEnabled: user.twoFactorEnabled,
+                canResetActivation: user.canResetActivation
             }
         };
     }

@@ -32,6 +32,7 @@ const formSchema = z.object({
     fixedCommission: z.coerce.number().min(0).optional(),
     accountabilityLimitHours: z.coerce.number().min(1, { message: "Mínimo 1 hora." }).optional(),
     canCancelTickets: z.boolean().default(false),
+    canResetActivation: z.boolean().default(false),
     isActive: z.boolean().default(true),
     // New fields
     address: z.string().optional(),
@@ -124,6 +125,7 @@ export default function CambistasPage() {
             fixedCommission: 40,
             accountabilityLimitHours: 24,
             canCancelTickets: false,
+            canResetActivation: false,
             isActive: true,
         },
     })
@@ -225,6 +227,7 @@ export default function CambistasPage() {
                 fixedCommission: cambista.fixedCommission ? Number(cambista.fixedCommission) : 40,
                 accountabilityLimitHours: cambista.accountabilityLimitHours ?? 24,
                 canCancelTickets: cambista.canCancelTickets ?? false,
+                canResetActivation: cambista.canResetActivation ?? false,
                 isActive: cambista.isActive ?? true,
                 // New fields
                 address: cambista.address || "",
@@ -251,6 +254,7 @@ export default function CambistasPage() {
                 fixedCommission: 40,
                 accountabilityLimitHours: 24,
                 canCancelTickets: false,
+                canResetActivation: false,
                 isActive: true,
                 // New fields
                 address: "",
@@ -875,6 +879,28 @@ export default function CambistasPage() {
                                                             <div className="space-y-0.5">
                                                                 <FormLabel className="text-xs font-medium text-foreground">
                                                                     Permitir Cancelar Bilhetes
+                                                                </FormLabel>
+                                                            </div>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div className="md:col-span-12 flex justify-end">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="canResetActivation"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-lg border p-2 bg-muted/30">
+                                                            <FormControl>
+                                                                <Switch
+                                                                    checked={field.value}
+                                                                    onCheckedChange={field.onChange}
+                                                                />
+                                                            </FormControl>
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel className="text-xs font-medium text-foreground">
+                                                                    Permitir Resetar Ativação do Dispositivo
                                                                 </FormLabel>
                                                             </div>
                                                         </FormItem>

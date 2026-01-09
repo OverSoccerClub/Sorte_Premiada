@@ -15,6 +15,7 @@ interface User {
     email: string;
     role: string;
     companyId?: string; // Multi-tenant: ID da empresa do usuário
+    canResetActivation?: boolean;
 }
 
 interface AuthContextType {

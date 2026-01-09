@@ -18,7 +18,7 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
     const router = useRouter();
     const { signIn, isLoading } = useAuth();
-    const { settings: company, isActivated, isLoading: companyLoading } = useCompany();
+    const { settings: company, isActivated, isLoading: companyLoading, activationCode, verificationStatus, clearActivation } = useCompany();
     const insets = useSafeAreaInsets();
 
     // Redirecionar para ativação se dispositivo não estiver ativado
@@ -170,12 +170,29 @@ export default function LoginScreen() {
                             </Text>
                         </TouchableOpacity>
                     </View>
+
+                    {/* Footer Content inside ScrollView to avoid overlap */}
+                    <View style={tw`mt-8 items-center w-full max-w-[360px]`}>
+                        <View style={tw`mb-4 w-full px-4 py-3 bg-gray-900/50 rounded-xl border border-gray-800/50 items-center`}>
+                            <Text style={tw`text-gray-500 text-[10px] font-mono mb-1.5 uppercase tracking-widest`}>Dispositivo</Text>
+                            <View style={tw`flex-row items-center`}>
+                                <View style={tw`w-2 h-2 rounded-full ${isActivated
+                                    ? (verificationStatus === 'verified' ? 'bg-green-400' : 'bg-yellow-400')
+                                    : 'bg-red-400'
+                                    } mr-2`} />
+                                <Text style={tw`text-gray-300 text-xs font-bold uppercase`}>
+                                    {isActivated
+                                        ? (verificationStatus === 'verified' ? 'Validado' : 'Offline (Cache)')
+                                        : 'Não Ativado'
+                                    }
+                                    {isActivated && activationCode ? ` • ${activationCode}` : ''}
+                                </Text>
+                            </View>
+                        </View>
+                        <VersionFooter />
+                    </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-
-            <View style={tw`pb-4`}>
-                <VersionFooter />
-            </View>
 
             <CustomAlert
                 visible={alertConfig.visible}

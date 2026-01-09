@@ -130,6 +130,7 @@ model User {
   area                     Area?             @relation(fields: [areaId], references: [id])
   isActive                 Boolean           @default(true) // Controla bloqueio manual do cambista
   canCancelTickets         Boolean           @default(false) // Permissão para o cambista cancelar bilhetes
+  canResetActivation       Boolean           @default(false) // Permissão para o cambista resetar a ativação do dispositivo
   commissionRate           Decimal?          @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
 
   // Dados Cadastrais Completos

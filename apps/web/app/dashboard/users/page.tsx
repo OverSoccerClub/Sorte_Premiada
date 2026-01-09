@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, ShieldAlert, ShieldCheck, Ban, CheckCircle2, Shield } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
+import { Switch } from "@/components/ui/switch"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
@@ -27,6 +28,7 @@ const formSchema = z.object({
     role: z.enum(["ADMIN", "SUPERVISOR", "GERENTE", "MASTER"], {
         required_error: "Selecione um nível de acesso.",
     }),
+    canResetActivation: z.boolean().default(false),
     isActive: z.boolean().default(true),
 })
 
@@ -50,6 +52,7 @@ export default function UsersPage() {
             password: "",
             email: "",
             role: "SUPERVISOR",
+            canResetActivation: false,
             isActive: true,
         },
     })
@@ -96,6 +99,7 @@ export default function UsersPage() {
                 email: user.email || "",
                 password: "", // Password is optional on edit
                 role: user.role,
+                canResetActivation: user.canResetActivation ?? false,
                 isActive: user.isActive ?? true,
             })
         } else {
@@ -106,6 +110,7 @@ export default function UsersPage() {
                 email: "",
                 password: "",
                 role: "SUPERVISOR",
+                canResetActivation: false,
                 isActive: true,
             })
         }
@@ -352,6 +357,27 @@ export default function UsersPage() {
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="canResetActivation"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-3 shadow-sm bg-muted/20">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel className="text-foreground text-xs font-bold flex items-center gap-1.5 uppercase">
+                                                            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                                            Resetar Ativação
+                                                        </FormLabel>
+                                                        <p className="text-[10px] text-muted-foreground">O usuário poderá remover a ativação do app.</p>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
                                                 </FormItem>
                                             )}
                                         />

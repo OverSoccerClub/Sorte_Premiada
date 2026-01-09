@@ -10,10 +10,12 @@ import { VersionFooter } from "../components/VersionFooter";
 import { ScreenLayout } from "../components/ScreenLayout";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { FormField } from "../components/FormField";
+import { useCompany } from "../context/CompanyContext";
 
 export default function ProfileScreen() {
     const router = useRouter();
     const { user, updateUser, signOut, token } = useAuth();
+    const { clearActivation } = useCompany();
     const insets = useSafeAreaInsets();
     const BOTTOM_PADDING = 70 + insets.bottom + 50;
 
@@ -179,6 +181,38 @@ export default function ProfileScreen() {
                     >
                         <Text style={tw`text-red-500 font-bold text-lg uppercase tracking-wide`}>Sair do App</Text>
                     </TouchableOpacity>
+
+                    {/* Administrativo: Reset de Ativação */}
+                    {user?.canResetActivation && (
+                        <View style={tw`mt-8 pt-6 border-t border-gray-800`}>
+                            <Text style={tw`text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-center`}>Opções Administrativas</Text>
+                            <TouchableOpacity
+                                style={tw`w-full bg-gray-900/50 p-4 rounded-xl items-center border border-red-500/20 active:bg-red-500/10`}
+                                onPress={() => {
+                                    setAlertConfig({
+                                        visible: true,
+                                        title: "Resetar Ativação",
+                                        message: "Tem certeza que deseja remover a ativação deste dispositivo? Esta ação desconectará o app da empresa atual.",
+                                        type: "warning",
+                                    });
+                                    // Sobrescrever onConfirm temporariamente para o Reset
+                                    setAlertConfig(prev => ({
+                                        ...prev,
+                                        onConfirm: async () => {
+                                            await clearActivation();
+                                            signOut(); // Forçar logout ao resetar
+                                            hideAlert();
+                                        }
+                                    }));
+                                }}
+                            >
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="refresh-circle-outline" size={20} color="#f87171" style={tw`mr-2`} />
+                                    <Text style={tw`text-red-400 font-bold text-base uppercase`}>Resetar Ativação do POS</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </View>
 

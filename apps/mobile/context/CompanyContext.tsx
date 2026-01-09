@@ -18,12 +18,13 @@ const defaultSettings: CompanySettings = {
     companyName: 'A Perseverança',
     slogan: 'Cambista Edition',
     primaryColor: '#50C878',
-    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/A_Perseveranca',
+    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/InnoBet',
 };
 
 const CACHE_KEY = '@company_settings';
 const DEVICE_TOKEN_KEY = '@device_token';
 const COMPANY_ID_KEY = '@company_id';
+const ACTIVATION_CODE_KEY = '@activation_code';
 const CACHE_EXPIRY_MS = 1000 * 60 * 60; // 1 hour
 
 interface CompanyContextType {
@@ -32,6 +33,8 @@ interface CompanyContextType {
     isActivated: boolean;
     deviceToken: string | null;
     companyId: string | null;
+    activationCode: string | null;
+    verificationStatus: 'verified' | 'offline' | 'failed' | 'checking';
     refresh: () => Promise<void>;
     activateDevice: (activationCode: string) => Promise<void>;
     clearActivation: () => Promise<void>;
@@ -43,6 +46,8 @@ const CompanyContext = createContext<CompanyContextType>({
     isActivated: false,
     deviceToken: null,
     companyId: null,
+    activationCode: null,
+    verificationStatus: 'checking',
     refresh: async () => { },
     activateDevice: async () => { },
     clearActivation: async () => { },
@@ -55,20 +60,24 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
     const [isLoading, setIsLoading] = useState(true);
     const [deviceToken, setDeviceToken] = useState<string | null>(null);
     const [companyId, setCompanyId] = useState<string | null>(null);
+    const [activationCode, setActivationCode] = useState<string | null>(null);
+    const [verificationStatus, setVerificationStatus] = useState<'verified' | 'offline' | 'failed' | 'checking'>('checking');
     const [isActivated, setIsActivated] = useState(false);
 
     // Carrega token e settings salvos
     const loadStoredData = useCallback(async () => {
         try {
-            const [storedToken, storedCompanyId, cached] = await Promise.all([
+            const [storedToken, storedCompanyId, storedActivationCode, cached] = await Promise.all([
                 AsyncStorage.getItem(DEVICE_TOKEN_KEY),
                 AsyncStorage.getItem(COMPANY_ID_KEY),
+                AsyncStorage.getItem(ACTIVATION_CODE_KEY),
                 AsyncStorage.getItem(CACHE_KEY),
             ]);
 
             // Only update state if changed to prevent effects loop
             setDeviceToken(prev => (prev !== storedToken ? storedToken : prev));
             setCompanyId(prev => (prev !== storedCompanyId ? storedCompanyId : prev));
+            setActivationCode(prev => (prev !== storedActivationCode ? storedActivationCode : prev));
 
             const hasToken = !!storedToken;
             setIsActivated(prev => (prev !== hasToken ? hasToken : prev));
@@ -100,6 +109,8 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
+            setVerificationStatus('checking');
+
             const response = await fetch(`${AppConfig.api.baseUrl}/company/settings`, {
                 method: 'GET',
                 headers: {
@@ -110,13 +121,15 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             });
             clearTimeout(timeoutId);
 
-            if (response.status === 401 || response.status === 403) {
-                console.warn('Device token invalid or expired. clearing activation.');
+            if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404) {
+                console.warn(`Device token invalid or expired (Status: ${response.status}). clearing activation.`);
+                setVerificationStatus('failed');
                 await clearActivation();
                 return;
             }
 
             if (response.ok) {
+                setVerificationStatus('verified');
                 const data = await response.json();
                 const newSettings = { ...defaultSettings, ...data };
                 setSettings(newSettings);
@@ -129,6 +142,12 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             }
         } catch (error) {
             console.warn('Failed to fetch company settings, using defaults:', error);
+            // If we have a token but fetch failed, we are efficiently "Offline" but Activated
+            if (deviceToken) {
+                setVerificationStatus('offline');
+            } else {
+                setVerificationStatus('failed');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -159,6 +178,7 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             await Promise.all([
                 AsyncStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken),
                 AsyncStorage.setItem(COMPANY_ID_KEY, data.companyId),
+                AsyncStorage.setItem(ACTIVATION_CODE_KEY, activationCode),
                 AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
                     data: data.companySettings,
                     timestamp: Date.now(),
@@ -168,8 +188,10 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             // Atualizar estado
             setDeviceToken(data.deviceToken);
             setCompanyId(data.companyId);
+            setActivationCode(activationCode);
             setSettings({ ...defaultSettings, ...data.companySettings });
             setIsActivated(true);
+            setVerificationStatus('verified');
         } catch (error) {
             console.error('Erro ao ativar dispositivo:', error);
             throw error;
@@ -180,12 +202,15 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
         await Promise.all([
             AsyncStorage.removeItem(DEVICE_TOKEN_KEY),
             AsyncStorage.removeItem(COMPANY_ID_KEY),
+            AsyncStorage.removeItem(ACTIVATION_CODE_KEY),
             AsyncStorage.removeItem(CACHE_KEY),
         ]);
         setDeviceToken(null);
         setCompanyId(null);
+        setActivationCode(null);
         setSettings(defaultSettings);
         setIsActivated(false);
+        setVerificationStatus('failed'); // or checking/idle
     }, []);
 
     const refresh = useCallback(async () => {
@@ -209,6 +234,8 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             isActivated,
             deviceToken,
             companyId,
+            activationCode,
+            verificationStatus,
             refresh,
             activateDevice,
             clearActivation,
