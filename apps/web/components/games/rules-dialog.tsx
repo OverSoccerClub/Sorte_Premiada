@@ -103,12 +103,12 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Regras de Negócio - {game?.name}</DialogTitle>
                     <DialogDescription>Configure as restrições e regras automáticas deste jogo.</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                <div className="space-y-4 py-4 overflow-y-auto flex-1 pr-2">
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
                         <div className="space-y-0.5">
                             <Label className="text-base font-semibold">Bloqueio Global</Label>
