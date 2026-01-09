@@ -77,6 +77,7 @@ interface BugReport {
     createdAt: string;
     updatedAt: string;
     _count: { comments: number };
+    comments?: BugComment[];
 }
 
 interface BugComment {
@@ -337,9 +338,25 @@ export default function BugsPage() {
                             <Card
                                 key={bug.id}
                                 className="group p-5 hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-transparent hover:border-l-emerald-500 bg-card border-border"
-                                onClick={() => {
+                                onClick={async () => {
+                                    // Set initial data immediately
                                     setSelectedBug(bug);
                                     setShowDetailDialog(true);
+
+                                    // Fetch full details including comments
+                                    try {
+                                        const token = localStorage.getItem('token');
+                                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bugs/${bug.id}`, {
+                                            headers: { Authorization: `Bearer ${token}` },
+                                        });
+                                        if (response.ok) {
+                                            const fullBug = await response.json();
+                                            setSelectedBug(fullBug);
+                                        }
+                                    } catch (error) {
+                                        console.error('Erro ao carregar detalhes do bug', error);
+                                        toast.error('Erro ao carregar comentários');
+                                    }
                                 }}
                             >
                                 <div className="flex flex-col md:flex-row gap-4 justify-between md:items-start">
