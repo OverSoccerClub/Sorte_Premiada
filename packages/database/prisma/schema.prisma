@@ -219,6 +219,7 @@ model Game {
   secondChanceRangeEnd   Int? // e.g. 125500
   secondChanceWeekday    Int?    @default(6) // 0=Dom, 6=Sáb
   secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
+  secondChancePrize      Decimal? @default(1000) // Prêmio do sorteio de Segunda Chance
   lastSecondChanceSeries Int     @default(0)
 
   // Custom Prize Configuration (Printed on Ticket)
