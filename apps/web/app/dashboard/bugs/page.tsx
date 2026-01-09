@@ -688,62 +688,137 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Coluna Esquerda: Detalhes */}
-            <div className="lg:col-span-3 space-y-8">
-
-                <div className="space-y-4">
-                    <div>
-                        <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider">Descrição</Label>
-                        <div className="mt-1 text-foreground whitespace-pre-wrap leading-relaxed">{bug.description}</div>
-                    </div>
-
-                    {bug.stepsToReproduce && (
-                        <div className="bg-muted p-4 rounded-lg border border-border">
-                            <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider mb-2 block">Passos para Reproduzir</Label>
-                            <div className="text-foreground whitespace-pre-wrap font-mono text-sm">{bug.stepsToReproduce}</div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Coluna Esquerda: Detalhes e Comentários (2/3) */}
+            <div className="lg:col-span-2 space-y-6">
+                {/* Seção de Descrição */}
+                <Card className="p-6 border-border shadow-sm bg-card">
+                    <div className="space-y-4">
+                        <div>
+                            <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider flex items-center gap-2 mb-2">
+                                <Bug className="w-3.5 h-3.5" />
+                                Descrição do Problema
+                            </Label>
+                            <div className="text-foreground whitespace-pre-wrap leading-relaxed text-sm bg-muted/30 p-4 rounded-lg border border-border/50">
+                                {bug.description}
+                            </div>
                         </div>
-                    )}
 
-                    <div className="grid grid-cols-2 gap-4">
-                        {bug.location && (
-                            <div>
-                                <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider">Local / URL</Label>
-                                <div className="mt-1 text-sm font-medium text-foreground">{bug.location}</div>
-                            </div>
-                        )}
-                        {bug.environment && (
-                            <div>
-                                <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider">Ambiente</Label>
-                                <div className="mt-1 text-sm font-medium text-foreground">{bug.environment}</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="border-t border-border pt-6">
-                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-foreground">
-                        <MessageSquare className="w-5 h-5 text-muted-foreground" />
-                        Histórico e Comentários
-                    </h3>
-
-                    <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
-                        {comments.map((c: BugComment) => (
-                            <div key={c.id} className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 text-xs font-bold shrink-0 ring-1 ring-emerald-500/20">
-                                    {c.user.name?.substring(0, 2) || 'US'}
+                        {bug.stepsToReproduce && (
+                            <div className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+                                <Label className="text-blue-700 dark:text-blue-400 uppercase text-xs font-bold tracking-wider mb-3 flex items-center gap-2">
+                                    <Activity className="w-3.5 h-3.5" />
+                                    Passos para Reproduzir
+                                </Label>
+                                <div className="text-foreground whitespace-pre-wrap font-mono text-xs leading-relaxed bg-background/50 p-3 rounded border border-blue-500/10">
+                                    {bug.stepsToReproduce}
                                 </div>
-                                <div className="flex-1 space-y-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-medium text-sm text-foreground">{c.user.name || c.user.username}</span>
-                                        <span className="text-xs text-muted-foreground">{format(new Date(c.createdAt), "dd/MM/yyyy HH:mm")}</span>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            {bug.location && (
+                                <div className="bg-muted/50 p-3 rounded-lg border border-border/50">
+                                    <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider flex items-center gap-1.5 mb-1.5">
+                                        <Search className="w-3 h-3" />
+                                        Local / URL
+                                    </Label>
+                                    <div className="text-sm font-medium text-foreground truncate" title={bug.location}>
+                                        {bug.location}
                                     </div>
-                                    <div className="bg-muted p-3 rounded-tr-lg rounded-br-lg rounded-bl-lg text-sm text-foreground">
+                                </div>
+                            )}
+                            {bug.environment && (
+                                <div className="bg-muted/50 p-3 rounded-lg border border-border/50">
+                                    <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider flex items-center gap-1.5 mb-1.5">
+                                        <Activity className="w-3 h-3" />
+                                        Ambiente
+                                    </Label>
+                                    <div className="text-sm font-medium text-foreground">
+                                        {bug.environment}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Seção de Correção (se existir) */}
+                {bug.fixDescription && (
+                    <Card className="p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 shadow-sm">
+                        <Label className="text-emerald-700 dark:text-emerald-400 uppercase text-xs font-bold tracking-wider mb-3 flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Descrição da Correção
+                        </Label>
+                        <div className="text-foreground whitespace-pre-wrap leading-relaxed text-sm bg-background/50 p-4 rounded-lg border border-emerald-500/20">
+                            {bug.fixDescription}
+                        </div>
+                        {bug.fixedByUser && (
+                            <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                                <UserIcon className="w-3 h-3" />
+                                <span>Corrigido por <strong className="text-foreground">{bug.fixedByUser.name || bug.fixedByUser.username}</strong></span>
+                            </div>
+                        )}
+                    </Card>
+                )}
+
+                {/* Validação (se existir) */}
+                {bug.validatedByUser && (
+                    <Card className="p-4 border-green-500/30 bg-gradient-to-br from-green-500/5 to-green-500/10 shadow-sm">
+                        <div className="flex items-center gap-2 text-sm">
+                            <div className="p-2 rounded-lg bg-green-500/10">
+                                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div>
+                                <div className="font-semibold text-green-700 dark:text-green-400">Validado</div>
+                                <div className="text-xs text-muted-foreground">
+                                    por <strong className="text-foreground">{bug.validatedByUser.name || bug.validatedByUser.username}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                )}
+
+                {/* Histórico e Comentários */}
+                <Card className="p-6 border-border shadow-sm bg-card">
+                    <div className="flex items-center justify-between mb-5">
+                        <h3 className="font-semibold text-lg flex items-center gap-2 text-foreground">
+                            <MessageSquare className="w-5 h-5 text-emerald-600" />
+                            Histórico e Comentários
+                        </h3>
+                        <Badge variant="outline" className="text-xs">
+                            {comments.length} {comments.length === 1 ? 'comentário' : 'comentários'}
+                        </Badge>
+                    </div>
+
+                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+                        {comments.map((c: BugComment) => (
+                            <div key={c.id} className="flex gap-3 group">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold shrink-0 ring-2 ring-emerald-500/30 group-hover:ring-emerald-500/50 transition-all">
+                                    {c.user.name?.substring(0, 2).toUpperCase() || 'US'}
+                                </div>
+                                <div className="flex-1 space-y-1.5">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="font-semibold text-sm text-foreground">{c.user.name || c.user.username}</span>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                            {format(new Date(c.createdAt), "dd/MM/yyyy 'às' HH:mm")}
+                                        </span>
+                                    </div>
+                                    <div className="bg-muted/70 p-3.5 rounded-lg rounded-tl-none text-sm text-foreground leading-relaxed border border-border/50 group-hover:border-emerald-500/30 transition-colors">
                                         {c.comment}
                                         {c.statusChange && (
-                                            <div className="mt-2 text-xs flex items-center gap-2 text-muted-foreground bg-background p-1 rounded border border-border w-fit">
-                                                <Activity className="w-3 h-3" />
-                                                Mudou status de <span className="font-bold text-foreground">{c.previousStatus}</span> para <span className="font-bold text-foreground">{c.newStatus}</span>
+                                            <div className="mt-3 pt-3 border-t border-border/50">
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground bg-background/80 px-2.5 py-1.5 rounded-md border border-border/50 w-fit">
+                                                    <Activity className="w-3.5 h-3.5 text-blue-500" />
+                                                    <span>Status alterado de</span>
+                                                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
+                                                        {c.previousStatus}
+                                                    </Badge>
+                                                    <span>para</span>
+                                                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
+                                                        {c.newStatus}
+                                                    </Badge>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -752,72 +827,88 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                         ))}
 
                         {comments.length === 0 && (
-                            <div className="text-center py-8 text-muted-foreground text-sm">Nenhum comentário ainda.</div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Coluna Direita: Ações e Metadados */}
-            <div className="space-y-5">
-                <Card className="p-5 bg-gradient-to-br from-muted/50 to-muted border border-border/50 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="p-2 rounded-lg bg-emerald-500/10">
-                            <Activity className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <h4 className="font-semibold text-sm text-foreground uppercase tracking-wide">Informações do Bug</h4>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <Calendar className="w-3.5 h-3.5" />
-                                <span>Reportado em</span>
-                            </div>
-                            <span className="font-semibold text-foreground">{format(new Date(bug.createdAt), "dd/MMM/yyyy", { locale: ptBR })}</span>
-                        </div>
-                        <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <UserIcon className="w-3.5 h-3.5" />
-                                <span>Reportado por</span>
-                            </div>
-                            <span className="font-semibold text-foreground">{bug.reportedByUser.name || bug.reportedByUser.username}</span>
-                        </div>
-                        <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <UserIcon className="w-3.5 h-3.5" />
-                                <span>Atribuído a</span>
-                            </div>
-                            <span className="font-semibold text-foreground">{bug.assignedToUser ? (bug.assignedToUser.name || bug.assignedToUser.username) : '-'}</span>
-                        </div>
-                        {bug.fixedByUser && (
-                            <div className="flex items-center justify-between py-2.5">
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    <span>Corrigido por</span>
-                                </div>
-                                <span className="font-semibold text-foreground">{bug.fixedByUser.name || bug.fixedByUser.username}</span>
+                            <div className="text-center py-12 text-muted-foreground">
+                                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                                <p className="text-sm font-medium">Nenhum comentário ainda</p>
+                                <p className="text-xs mt-1">Seja o primeiro a comentar sobre este bug</p>
                             </div>
                         )}
                     </div>
                 </Card>
+            </div>
 
+            {/* Coluna Direita: Metadados e Ações (1/3) */}
+            <div className="space-y-5">
+                {/* Informações do Bug */}
+                <Card className="p-5 bg-gradient-to-br from-muted/50 to-muted/30 border border-border shadow-sm">
+                    <div className="flex items-center gap-2 mb-5">
+                        <div className="p-2 rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20">
+                            <Activity className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <h4 className="font-bold text-sm text-foreground uppercase tracking-wide">Informações</h4>
+                    </div>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex items-start justify-between py-2.5 border-b border-border/50">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                                <span className="text-xs">Reportado em</span>
+                            </div>
+                            <span className="font-semibold text-foreground text-right text-xs">
+                                {format(new Date(bug.createdAt), "dd/MMM/yyyy", { locale: ptBR })}
+                            </span>
+                        </div>
+                        <div className="flex items-start justify-between py-2.5 border-b border-border/50">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <UserIcon className="w-3.5 h-3.5 shrink-0" />
+                                <span className="text-xs">Reportado por</span>
+                            </div>
+                            <span className="font-semibold text-foreground text-right text-xs max-w-[120px] truncate" title={bug.reportedByUser.name || bug.reportedByUser.username}>
+                                {bug.reportedByUser.name || bug.reportedByUser.username}
+                            </span>
+                        </div>
+                        <div className="flex items-start justify-between py-2.5 border-b border-border/50">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <UserIcon className="w-3.5 h-3.5 shrink-0" />
+                                <span className="text-xs">Atribuído a</span>
+                            </div>
+                            <span className="font-semibold text-foreground text-right text-xs max-w-[120px] truncate" title={bug.assignedToUser ? (bug.assignedToUser.name || bug.assignedToUser.username) : 'Não atribuído'}>
+                                {bug.assignedToUser ? (bug.assignedToUser.name || bug.assignedToUser.username) : (
+                                    <span className="text-muted-foreground italic">Não atribuído</span>
+                                )}
+                            </span>
+                        </div>
+                        <div className="flex items-start justify-between py-2.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock className="w-3.5 h-3.5 shrink-0" />
+                                <span className="text-xs">Última atualização</span>
+                            </div>
+                            <span className="font-semibold text-foreground text-right text-xs">
+                                {format(new Date(bug.updatedAt), "dd/MMM/yyyy", { locale: ptBR })}
+                            </span>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Atualizar Status */}
                 <Card className="p-5 border-border shadow-sm bg-card">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="p-2 rounded-lg bg-blue-500/10">
+                        <div className="p-2 rounded-lg bg-blue-500/10 ring-1 ring-blue-500/20">
                             <Activity className="w-4 h-4 text-blue-600" />
                         </div>
-                        <h4 className="font-semibold text-foreground">Atualizar Status</h4>
+                        <h4 className="font-bold text-sm text-foreground">Atualizar Status</h4>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <Label className="text-xs mb-2 block text-muted-foreground font-medium">Alterar Status para:</Label>
-                            <Select onValueChange={(v) => setNewStatus(v as BugStatus)}>
-                                <SelectTrigger className="bg-background border-input text-foreground">
-                                    <SelectValue placeholder="Manter atual" />
+                            <Label className="text-xs mb-2 block text-muted-foreground font-semibold uppercase tracking-wider">
+                                Novo Status
+                            </Label>
+                            <Select onValueChange={(v) => setNewStatus(v as BugStatus)} value={newStatus}>
+                                <SelectTrigger className="bg-background border-input text-foreground hover:border-emerald-500/50 transition-colors">
+                                    <SelectValue placeholder="Selecione um status..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="OPEN">🔴 Aberto</SelectItem>
-                                    <SelectItem value="IN_PROGRESS">🔵 Em Progresso (Assumir)</SelectItem>
+                                    <SelectItem value="IN_PROGRESS">🔵 Em Progresso</SelectItem>
                                     <SelectItem value="FIXED">🟡 Corrigido</SelectItem>
                                     <SelectItem value="VALIDATED">🟢 Validado</SelectItem>
                                     <SelectItem value="CLOSED">⚫ Fechado</SelectItem>
@@ -827,11 +918,13 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                         </div>
 
                         {shouldShowFixDescription && (
-                            <div>
-                                <Label className="text-xs mb-2 block text-muted-foreground font-medium">Descrição da Correção (Opcional)</Label>
+                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                <Label className="text-xs mb-2 block text-muted-foreground font-semibold uppercase tracking-wider">
+                                    Descrição da Correção
+                                </Label>
                                 <Textarea
                                     placeholder="Descreva tecnicamente o que foi corrigido..."
-                                    className="h-20 text-sm bg-background border-input text-foreground resize-none"
+                                    className="h-24 text-sm bg-background border-input text-foreground resize-none focus:border-emerald-500/50 transition-colors"
                                     value={fixDescription}
                                     onChange={(e) => setFixDescription(e.target.value)}
                                 />
@@ -839,17 +932,19 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                         )}
 
                         <div>
-                            <Label className="text-xs mb-2 block text-muted-foreground font-medium">Comentário</Label>
+                            <Label className="text-xs mb-2 block text-muted-foreground font-semibold uppercase tracking-wider">
+                                Comentário
+                            </Label>
                             <Textarea
                                 placeholder="Adicione um comentário sobre esta atualização..."
-                                className="h-24 bg-background border-input text-foreground resize-none"
+                                className="h-28 bg-background border-input text-foreground resize-none focus:border-emerald-500/50 transition-colors"
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                             />
                         </div>
 
                         <Button
-                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm"
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
                             onClick={handleUpdate}
                             disabled={loading || (!comment && !newStatus)}
                         >
@@ -868,21 +963,22 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                     </div>
                 </Card>
 
+                {/* Zona de Perigo */}
                 <Card className="p-5 border-red-500/30 bg-gradient-to-br from-red-500/5 to-red-500/10 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
-                        <div className="p-2 rounded-lg bg-red-500/10">
+                        <div className="p-2 rounded-lg bg-red-500/10 ring-1 ring-red-500/20">
                             <AlertCircle className="w-4 h-4 text-red-600" />
                         </div>
-                        <h4 className="font-semibold text-red-600 flex items-center gap-2">
+                        <h4 className="font-bold text-sm text-red-600 uppercase tracking-wide">
                             Zona de Perigo
                         </h4>
                     </div>
                     <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                        Esta ação é <strong className="text-red-600">irreversível</strong> e removerá permanentemente todos os dados deste bug, incluindo comentários e histórico.
+                        Esta ação é <strong className="text-red-600">irreversível</strong> e removerá permanentemente todos os dados deste bug.
                     </p>
                     <Button
                         variant="destructive"
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-sm"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
                         onClick={() => setShowDeleteDialog(true)}
                         disabled={deleteLoading}
                     >
@@ -894,7 +990,7 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                         ) : (
                             <>
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                Excluir Bug Permanentemente
+                                Excluir Permanentemente
                             </>
                         )}
                     </Button>
@@ -908,7 +1004,7 @@ function BugDetailView({ bug, onUpdate, onClose }: any) {
                                 </AlertDialogTitle>
                                 <AlertDialogDescription className="text-foreground space-y-2">
                                     <p className="font-medium">
-                                        Tem certeza que deseja excluir o bug <span className="text-red-600">#{bug.id.split('-')[0]}</span>?
+                                        Tem certeza que deseja excluir o bug <span className="text-red-600 font-bold">#{bug.id.split('-')[0]}</span>?
                                     </p>
                                     <p className="text-sm text-muted-foreground">
                                         Esta ação é irreversível e removerá o histórico e configurações deste bug.
