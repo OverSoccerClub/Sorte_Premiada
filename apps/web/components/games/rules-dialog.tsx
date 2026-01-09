@@ -86,7 +86,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Regras de Negócio - {game?.name}</DialogTitle>
                     <DialogDescription>Configure as restrições e regras automáticas deste jogo.</DialogDescription>

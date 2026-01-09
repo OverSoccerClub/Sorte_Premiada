@@ -110,6 +110,12 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             });
             clearTimeout(timeoutId);
 
+            if (response.status === 401 || response.status === 403) {
+                console.warn('Device token invalid or expired. clearing activation.');
+                await clearActivation();
+                return;
+            }
+
             if (response.ok) {
                 const data = await response.json();
                 const newSettings = { ...defaultSettings, ...data };
