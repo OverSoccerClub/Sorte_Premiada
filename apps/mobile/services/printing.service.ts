@@ -22,7 +22,7 @@ export const printTicket = async (
   printerType: PrinterType = 'BLE',
   imageUri?: string
 ) => {
-  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, terminalId } = data;
+  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId } = data;
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
@@ -142,7 +142,7 @@ export const printTicket = async (
             <div class="dashed"></div>
             
             <div class="footer">
-              <div>Série: ${series || '----'} | Terminal: ${terminalId || '----'}</div>
+              <div>Série: ${series || '----'} | Bilhete: ${ticketNumber?.toString().padStart(4, '0') || '----'} | Terminal: ${terminalId || '----'}</div>
               <div>ID: ${ticketId}</div>
               ${secondChanceStatus === 'WON' ? '<div style="color: green; font-weight: bold; border: 1px solid green; padding: 2px; margin-top: 5px;">GANHADOR SEGUNDA CHANCE</div>' : ''}
               <br/>
@@ -251,7 +251,7 @@ export const printTicket = async (
 
     receipt += CENTER + "\n";
     receipt += "|| ||| || |||| ||| || ||||| ||||\n";
-    receipt += FONT_B + `SERIE: ${series || '----'} | TERM: ${terminalId || '----'}\n`;
+    receipt += FONT_B + `SERIE: ${series || '----'} | BILHETE: ${ticketNumber?.toString().padStart(4, '0') || '----'} | TERM: ${terminalId || '----'}\n`;
     receipt += FONT_B + `ID: ${ticketId}\n`;
     receipt += "\nEste bilhete não possui valor fiscal.\nBoa Sorte!\n" + FONT_A + "\n";
 

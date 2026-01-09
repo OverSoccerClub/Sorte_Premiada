@@ -376,6 +376,7 @@ export default function Game2x1000Screen() {
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
                 series: drawSeries?.toString(),
+                ticketNumber: ticketData.ticketNumber,
                 terminalId: Device.deviceName || Device.modelName || "Terminal",
                 vendorName: user?.name || user?.username || "Vendedor",
                 possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,

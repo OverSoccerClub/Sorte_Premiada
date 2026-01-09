@@ -54,6 +54,22 @@ export class TicketsController {
         return this.ticketsService.getAvailability(gameId);
     }
 
+    @Get('series-stats/:gameId')
+    @UseGuards(JwtAuthGuard)
+    async getSeriesStats(
+        @Request() req: any,
+        @Param('gameId') gameId: string,
+        @Query('drawDate') drawDate?: string
+    ) {
+        if (!req.user.companyId) {
+            throw new BadRequestException('Company ID required');
+        }
+
+        const parsedDate = drawDate ? new Date(drawDate) : undefined;
+        return this.ticketsService.getSeriesStats(gameId, req.user.companyId, parsedDate);
+    }
+
+
     @Get('validate/:id')
     @UseGuards(JwtAuthGuard)
     async validate(@Request() req: any, @Param('id') id: string) {

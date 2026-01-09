@@ -174,6 +174,7 @@ export class TicketsService {
         // 2x1000 Special Logic
         if (data.gameType === '2x1000') {
             const NUMBERS_PER_TICKET = 4;
+            const MAX_TICKETS_PER_SERIES = 2500;
             const isAutoPick = !data.numbers || data.numbers.length === 0;
 
             if (isAutoPick) {
@@ -186,6 +187,11 @@ export class TicketsService {
                     await this.validateNumbersAvailability(gameId, data.numbers, drawDate!);
                 }
             }
+
+            // Generate random ticket number for this series
+            const ticketNumber = await this.generateRandomTicketNumber(gameId, drawDate!, MAX_TICKETS_PER_SERIES);
+            // Store it temporarily to add to createData later
+            (data as any)._ticketNumber = ticketNumber;
         }
         // Jogo do Bicho Logic
         else if (data.gameType.startsWith('JB-')) {
@@ -242,7 +248,9 @@ export class TicketsService {
                 commissionRate: commissionRate,
                 commissionValue: commissionValue,
                 netValue: netValue,
-                possiblePrize: possiblePrize
+                possiblePrize: possiblePrize,
+                // Ticket Number (for 2x1000)
+                ...((data as any)._ticketNumber ? { ticketNumber: (data as any)._ticketNumber } : {})
             };
 
             // Second Chance ...
@@ -407,6 +415,50 @@ export class TicketsService {
         return selected;
     }
 
+    private async generateRandomTicketNumber(
+        gameId: string,
+        drawDate: Date,
+        maxTickets: number
+    ): Promise<number> {
+        // Fetch already used ticket numbers for this series (game + drawDate)
+        const usedTickets = await this.prisma.ticket.findMany({
+            where: {
+                gameId: gameId,
+                drawDate: drawDate,
+                status: { not: 'CANCELLED' },
+                ticketNumber: { not: null }
+            },
+            select: { ticketNumber: true }
+        });
+
+        const usedSet = new Set(usedTickets.map(t => t.ticketNumber!));
+
+        // Check if series is full
+        if (usedSet.size >= maxTickets) {
+            throw new BadRequestException(`Todos os ${maxTickets} bilhetes desta série já foram vendidos.`);
+        }
+
+        // Try to generate a random available number (up to 100 attempts)
+        const MAX_ATTEMPTS = 100;
+        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+            const randomNumber = Math.floor(Math.random() * maxTickets) + 1; // 1 to maxTickets
+
+            if (!usedSet.has(randomNumber)) {
+                return randomNumber;
+            }
+        }
+
+        // Fallback: Find first available number (rare case when series is almost full)
+        for (let i = 1; i <= maxTickets; i++) {
+            if (!usedSet.has(i)) {
+                return i;
+            }
+        }
+
+        throw new BadRequestException('Não foi possível gerar número de bilhete.');
+    }
+
+
     private async getSoldNumbers(gameId: string, drawDate: Date): Promise<Set<number>> {
         const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}`;
         let cached: string | null = null;
@@ -455,6 +507,71 @@ export class TicketsService {
         const soldSet = await this.getSoldNumbers(gameId, nextDraw);
         return Array.from(soldSet);
     }
+
+    async getSeriesStats(gameId: string, companyId: string, drawDate?: Date) {
+        const MAX_TICKETS_PER_SERIES = 2500;
+
+        // Fetch game
+        const game = await this.prisma.game.findUnique({
+            where: { id: gameId },
+            select: { name: true }
+        });
+
+        if (!game) throw new BadRequestException('Jogo não encontrado');
+
+        // Fetch draws for this game
+        const drawsQuery: any = {
+            gameId: gameId,
+            companyId: companyId
+        };
+
+        if (drawDate) {
+            drawsQuery.drawDate = drawDate;
+        }
+
+        const draws = await this.prisma.draw.findMany({
+            where: drawsQuery,
+            orderBy: { drawDate: 'asc' }
+        });
+
+        // For each draw, count tickets sold
+        const seriesStats = await Promise.all(
+            draws.map(async (draw) => {
+                const ticketCount = await this.prisma.ticket.count({
+                    where: {
+                        gameId: gameId,
+                        drawDate: draw.drawDate,
+                        status: { not: 'CANCELLED' },
+                        ticketNumber: { not: null }
+                    }
+                });
+
+                const ticketsRemaining = MAX_TICKETS_PER_SERIES - ticketCount;
+                const percentageFilled = (ticketCount / MAX_TICKETS_PER_SERIES) * 100;
+
+                let status = 'ACTIVE';
+                if (ticketCount >= MAX_TICKETS_PER_SERIES) status = 'FULL';
+                else if (new Date() > new Date(draw.drawDate)) status = 'CLOSED';
+
+                return {
+                    seriesNumber: draw.series,
+                    drawDate: draw.drawDate,
+                    ticketsSold: ticketCount,
+                    ticketsRemaining: ticketsRemaining,
+                    percentageFilled: Math.round(percentageFilled * 10) / 10, // 1 decimal
+                    status: status
+                };
+            })
+        );
+
+        return {
+            gameId: gameId,
+            gameName: game.name,
+            maxTicketsPerSeries: MAX_TICKETS_PER_SERIES,
+            series: seriesStats
+        };
+    }
+
 
     private async updateExpiredTickets() {
         // Update tickets that are PENDING and have a drawDate in the past

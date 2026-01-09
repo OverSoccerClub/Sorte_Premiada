@@ -77,6 +77,31 @@ try {
         node -e "const fs = require('fs'); const path = 'android/app/src/main/res/values/strings.xml'; if (fs.existsSync(path)) { let c = fs.readFileSync(path, 'utf8'); c = c.replace(/>APerseveranca</, '>A Perseverança<'); fs.writeFileSync(path, c, {encoding: 'utf8'}); }"
     }
 
+    # JAVA_HOME Detection
+    Write-Step "Configurando JAVA_HOME..." -Color "Gray"
+    $possibleJavaPaths = @(
+        "C:\Program Files\Android\Android Studio\jbr",
+        "C:\Program Files\Android\Android Studio\jre"
+    )
+
+    if (-not $env:JAVA_HOME -or -not (Test-Path $env:JAVA_HOME)) {
+        foreach ($jPath in $possibleJavaPaths) {
+            if (Test-Path $jPath) {
+                $env:JAVA_HOME = $jPath
+                $env:Path = "$jPath\bin;" + $env:Path
+                Write-Host "   -> JAVA_HOME definido: $jPath" -ForegroundColor Green
+                break
+            }
+        }
+    }
+    else {
+        Write-Host "   -> JAVA_HOME já definido: $env:JAVA_HOME" -ForegroundColor Gray
+    }
+
+    if (-not $env:JAVA_HOME) {
+        Write-Warning "JAVA_HOME não encontrado. O build pode falhar."
+    }
+
     # Garantir local.properties APÓS o prebuild
     # Garantir local.properties APÓS o prebuild
     Write-Step "Configurando SDK Path..." -Color "Gray"
@@ -110,9 +135,9 @@ try {
     if (Test-Path $ndkBase) {
         $ndkVersions = Get-ChildItem $ndkBase | Sort-Object Name -Descending
         if ($ndkVersions.Count -gt 0) {
-           $ndkPath = $ndkVersions[0].FullName
-           $env:ANDROID_NDK_HOME = $ndkPath
-           Write-Host "   -> NDK Encontrado: $ndkPath" -ForegroundColor Gray
+            $ndkPath = $ndkVersions[0].FullName
+            $env:ANDROID_NDK_HOME = $ndkPath
+            Write-Host "   -> NDK Encontrado: $ndkPath" -ForegroundColor Gray
         }
     }
     
@@ -125,20 +150,20 @@ try {
     [System.IO.File]::WriteAllText("$absAndroidDir\local.properties", $localPropsContent, [System.Text.Encoding]::ASCII)
 
     # PATCH: Corrigir settings.gradle para apontar para o autolinking correto no monorepo
-    Write-Step "Aplicando patch no settings.gradle..." -Color "Cyan"
-    $settingsPath = "$absAndroidDir\settings.gradle"
-    $settingsContent = Get-Content $settingsPath -Raw
-    # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
-    $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($settingsPath, $settingsContent, $utf8NoBom)
+    # Write-Step "Aplicando patch no settings.gradle..." -Color "Cyan"
+    # $settingsPath = "$absAndroidDir\settings.gradle"
+    # $settingsContent = Get-Content $settingsPath -Raw
+    # # Substituir a lógica dinâmica (ou patch anterior incorreto) pelo caminho correto
+    # $settingsContent = $settingsContent -replace 'apply from: .*?autolinking\.gradle.*?;', 'apply from: "../../../node_modules/expo/scripts/autolinking.gradle";'
+    # $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    # [System.IO.File]::WriteAllText($settingsPath, $settingsContent, $utf8NoBom)
 
     # 5. Gradle Assembly
     Show-Progress -Activity "Gerando APK" -Status "Compilando com Gradle (Isso pode demorar)..." -PercentComplete 60
     Write-Step "4/5 Compilando APK (Gradle)..." -Color "Yellow"
     
     Set-Location $absAndroidDir
-    $gradleArgs = "assembleRelease"
+    $gradleArgs = "assembleRelease -Pandroid.kotlinVersion=1.9.24 -PkotlinCompilerExtensionVersion=1.5.14 -PsuppressKotlinVersionCompatibilityCheck=true"
     
     # Otimização de Memória e Envs
     $env:GRADLE_OPTS = "-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"

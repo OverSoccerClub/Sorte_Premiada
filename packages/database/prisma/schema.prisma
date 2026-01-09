@@ -300,6 +300,8 @@ model Ticket {
   secondChanceNumber   Int? // Número da Sorte / Segunda Chance
   secondChanceDrawDate DateTime?
   secondChanceStatus   TicketStatus @default(PENDING) // Status específico para a Segunda Chance
+  ticketNumber         Int? // Número sequencial do bilhete na série (0001-2500 para 2x1000)
+
 
   // Financial Snapshot
   commissionRate  Decimal @default(0) // Taxa aplicada no momento da venda
@@ -318,6 +320,7 @@ model Ticket {
   digitalSignature String? @unique
 
   @@index([drawDate, gameId])
+  @@index([drawDate, gameId, ticketNumber])
   @@index([companyId])
 }
 
