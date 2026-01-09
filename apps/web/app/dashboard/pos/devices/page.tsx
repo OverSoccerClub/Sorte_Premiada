@@ -300,7 +300,7 @@ export default function DeviceManagementPage() {
 
             {/* Modal de Código Gerado */}
             <Dialog open={showCodeModal} onOpenChange={setShowCodeModal}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Código de Ativação Gerado</DialogTitle>
                         <DialogDescription>

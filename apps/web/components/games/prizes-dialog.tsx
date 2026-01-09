@@ -65,7 +65,7 @@ export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDial
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Premiação - {game?.name}</DialogTitle>
                     <DialogDescription>Defina os valores de premiação para cada acerto.</DialogDescription>

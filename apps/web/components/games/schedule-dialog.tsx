@@ -103,7 +103,7 @@ export function ScheduleDialog({ open, onOpenChange, game, onSuccess }: Schedule
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Horários de Extração - {game?.name}</DialogTitle>
                     <DialogDescription>Adicione ou remova os horários de sorteio diários.</DialogDescription>
