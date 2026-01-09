@@ -247,12 +247,29 @@ export class DevicesService {
     // ========================================
 
     /**
-     * Gera um código de ativação único automaticamente
-     * Formato: SIGLA-ANO-CÓDIGO (ex: AP-2024-XYZ123)
+     * Extrai as iniciais de um nome de empresa
+     * Exemplo: "A Perseverança" -> "AP"
+     * Exemplo: "Sorte Premiada" -> "SP"
      */
-    private async generateUniqueActivationCode(companySlug: string): Promise<string> {
+    private extractInitials(companyName: string): string {
+        return companyName
+            .split(' ')
+            .filter(word => word.length > 0)
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 3); // Máximo 3 letras
+    }
+
+    /**
+     * Gera um código de ativação único automaticamente
+     * Formato: SIGLA-ANO-CÓDIGO (ex: AP-2026-XYZ123)
+     */
+    private async generateUniqueActivationCode(company: { initials?: string; companyName: string }): Promise<string> {
         const year = new Date().getFullYear();
-        const prefix = companySlug.substring(0, 2).toUpperCase(); // Primeiras 2 letras da sigla
+
+        // Usar initials se disponível, senão extrair do nome
+        const prefix = company.initials || this.extractInitials(company.companyName);
 
         let code: string;
         let isUnique = false;
@@ -295,7 +312,10 @@ export class DevicesService {
         }
 
         // Gerar código único
-        const activationCode = await this.generateUniqueActivationCode(company.slug);
+        const activationCode = await this.generateUniqueActivationCode({
+            initials: company.initials,
+            companyName: company.companyName
+        });
 
         // Criar registro de dispositivo pendente de ativação
         const device = await this.prisma.posTerminal.create({

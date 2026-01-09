@@ -28,6 +28,7 @@ model Company {
   // Configurações visuais
   primaryColor String? @default("#50C878")
   updateUrl    String? // URL do repositório para atualizações do App
+  initials     String? // Iniciais da empresa para códigos de ativação (ex: "AP" para "A Perseverança")
   
   // === CONFIGURAÇÕES DE EXIBIÇÃO ===
   showPlanTotalValue Boolean @default(true) // Exibir valor total calculado nos planos

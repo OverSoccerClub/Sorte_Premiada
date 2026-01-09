@@ -53,6 +53,7 @@ async function main() {
             slug: 'perseveranca',
             companyName: 'A Perseverança',
             slogan: 'Cambista Edition',
+            initials: 'AP', // Iniciais para códigos de ativação
             isActive: true,
             subscriptionPlan: 'BASIC',
         },
