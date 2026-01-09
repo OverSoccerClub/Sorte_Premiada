@@ -23,7 +23,12 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
         maxLiability: "5000",
         prizeMultiplier: "1000",
         ticketNumberingMode: "RANDOM",
-        maxTicketsPerSeries: "2500"
+        maxTicketsPerSeries: "2500",
+        secondChanceEnabled: false,
+        secondChanceRangeStart: "",
+        secondChanceRangeEnd: "",
+        secondChanceWeekday: "6",
+        secondChanceDrawTime: "19:00"
     })
     const [saving, setSaving] = useState(false)
 
@@ -36,7 +41,12 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 maxLiability: game.maxLiability ? String(game.maxLiability) : "5000",
                 prizeMultiplier: game.prizeMultiplier ? String(game.prizeMultiplier) : "1000",
                 ticketNumberingMode: game.ticketNumberingMode || "RANDOM",
-                maxTicketsPerSeries: game.maxTicketsPerSeries ? String(game.maxTicketsPerSeries) : "2500"
+                maxTicketsPerSeries: game.maxTicketsPerSeries ? String(game.maxTicketsPerSeries) : "2500",
+                secondChanceEnabled: !!(game.secondChanceRangeStart && game.secondChanceRangeEnd),
+                secondChanceRangeStart: game.secondChanceRangeStart ? String(game.secondChanceRangeStart) : "",
+                secondChanceRangeEnd: game.secondChanceRangeEnd ? String(game.secondChanceRangeEnd) : "",
+                secondChanceWeekday: game.secondChanceWeekday !== null && game.secondChanceWeekday !== undefined ? String(game.secondChanceWeekday) : "6",
+                secondChanceDrawTime: game.secondChanceDrawTime || "19:00"
             })
         }
     }, [open, game])
@@ -58,7 +68,11 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 maxLiability: Number(rulesValues.maxLiability),
                 prizeMultiplier: Number(rulesValues.prizeMultiplier),
                 ticketNumberingMode: rulesValues.ticketNumberingMode,
-                maxTicketsPerSeries: Number(rulesValues.maxTicketsPerSeries)
+                maxTicketsPerSeries: Number(rulesValues.maxTicketsPerSeries),
+                secondChanceRangeStart: rulesValues.secondChanceEnabled && rulesValues.secondChanceRangeStart ? Number(rulesValues.secondChanceRangeStart) : null,
+                secondChanceRangeEnd: rulesValues.secondChanceEnabled && rulesValues.secondChanceRangeEnd ? Number(rulesValues.secondChanceRangeEnd) : null,
+                secondChanceWeekday: rulesValues.secondChanceEnabled ? Number(rulesValues.secondChanceWeekday) : null,
+                secondChanceDrawTime: rulesValues.secondChanceEnabled ? rulesValues.secondChanceDrawTime : null
             }
 
             const res = await fetch(`${API_URL}/games/${game.id}`, {
@@ -207,6 +221,85 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                                 Quantidade máxima de bilhetes que podem ser vendidos por série.
                             </p>
                         </div>
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-border">
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm bg-gradient-to-r from-purple-50 to-pink-50">
+                            <div className="space-y-0.5">
+                                <Label className="text-base font-semibold flex items-center gap-2">
+                                    <Ticket className="w-4 h-4 text-purple-500" />
+                                    Segunda Chance
+                                </Label>
+                                <p className="text-sm text-muted-foreground max-w-[300px]">
+                                    Habilita sorteio extra semanal para bilhetes não premiados.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={rulesValues.secondChanceEnabled}
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, secondChanceEnabled: checked })}
+                                className="data-[state=checked]:bg-purple-600"
+                            />
+                        </div>
+
+                        {rulesValues.secondChanceEnabled && (
+                            <div className="space-y-4 pl-4 border-l-2 border-purple-200">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Faixa Inicial</Label>
+                                        <Input
+                                            type="number"
+                                            value={rulesValues.secondChanceRangeStart}
+                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeStart: e.target.value })}
+                                            placeholder="Ex: 122300"
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Número inicial da faixa de Segunda Chance.</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Faixa Final</Label>
+                                        <Input
+                                            type="number"
+                                            value={rulesValues.secondChanceRangeEnd}
+                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeEnd: e.target.value })}
+                                            placeholder="Ex: 125500"
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Número final da faixa de Segunda Chance.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Dia do Sorteio</Label>
+                                        <Select
+                                            value={rulesValues.secondChanceWeekday}
+                                            onValueChange={(value) => setRulesValues({ ...rulesValues, secondChanceWeekday: value })}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="0">Domingo</SelectItem>
+                                                <SelectItem value="1">Segunda-feira</SelectItem>
+                                                <SelectItem value="2">Terça-feira</SelectItem>
+                                                <SelectItem value="3">Quarta-feira</SelectItem>
+                                                <SelectItem value="4">Quinta-feira</SelectItem>
+                                                <SelectItem value="5">Sexta-feira</SelectItem>
+                                                <SelectItem value="6">Sábado</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <p className="text-[10px] text-muted-foreground">Dia da semana do sorteio extra.</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Horário do Sorteio</Label>
+                                        <Input
+                                            type="time"
+                                            value={rulesValues.secondChanceDrawTime}
+                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceDrawTime: e.target.value })}
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Horário do sorteio extra (HH:mm).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <DialogFooter>
