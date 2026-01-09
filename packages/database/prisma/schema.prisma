@@ -225,6 +225,11 @@ model Game {
   prizeCentena Decimal? @default(600) // Prêmio para Centena Seca
   prizeDezena  Decimal? @default(60) // Prêmio para Dezena Seca
 
+  // Ticket Numbering Configuration
+  ticketNumberingMode String? @default("RANDOM") // "RANDOM" ou "SEQUENTIAL"
+  maxTicketsPerSeries Int?    @default(2500)     // Limite de bilhetes por série
+
+
   configs AreaConfig[]
 
   @@index([companyId])

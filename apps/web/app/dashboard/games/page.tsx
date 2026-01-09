@@ -35,6 +35,8 @@ interface Game {
     maxLiability?: number
     prizeMultiplier?: number
     commissionRate?: number
+    ticketNumberingMode?: string
+    maxTicketsPerSeries?: number
 }
 
 export default function GamesPage() {
