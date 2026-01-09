@@ -134,6 +134,18 @@ export const printTicket = async (
             <div class="dashed"></div>
             ` : ''}
             
+            ${data.secondChanceNumber ? `
+            <div class="bold" style="background: black; color: white; padding: 5px; border-radius: 10px; margin: 10px 0;">
+              <div style="font-size: 14px;">SEGUNDA CHANCE</div>
+              <div style="font-size: 10px;">SORTEIO EXTRA - ${data.secondChanceDrawDate || 'SÁBADO'}</div>
+            </div>
+            <div class="bold big" style="font-size: 28px; letter-spacing: 8px;">
+              ${data.secondChanceNumber.toString().split('').join(' ')}
+            </div>
+            <div style="font-size: 9px; margin-bottom: 10px;">ACERTANDO TODOS OS NÚMEROS NA ORDEM</div>
+            <div class="dashed"></div>
+            ` : ''}
+            
             <div class="flex">
               <span class="bold">TOTAL A PAGAR</span>
               <span>${amountStr}</span>
@@ -244,6 +256,15 @@ export const printTicket = async (
       receipt += "- - - - - - - - - - - - - - - -\n";
       receipt += BOLD_ON + "PREMIO MAXIMO" + BOLD_OFF + "\n";
       receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + possiblePrize + BOLD_OFF + NORMAL + "\n";
+    }
+
+    // Segunda Chance Section
+    if (data.secondChanceNumber) {
+      receipt += "- - - - - - - - - - - - - - - -\n";
+      receipt += CENTER + BOLD_ON + "SEGUNDA CHANCE" + BOLD_OFF + "\n";
+      receipt += "SORTEIO EXTRA - " + (data.secondChanceDrawDate || "SABADO") + "\n";
+      receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + data.secondChanceNumber.toString().split('').join(' ') + BOLD_OFF + NORMAL + "\n";
+      receipt += "ACERTANDO TODOS OS NUMEROS NA ORDEM\n";
     }
 
     receipt += "- - - - - - - - - - - - - - - -\n";
