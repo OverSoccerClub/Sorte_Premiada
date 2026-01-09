@@ -77,7 +77,15 @@ export class AuthService {
             console.log(`[AuthService] Device Company: ${device.companyId} (${device.company?.companyName})`);
             console.log(`[AuthService] User Company: ${user.companyId}`);
 
-            if (device.companyId && user.companyId !== device.companyId) {
+            // CRITICAL SECURITY: Block if device has no company OR if companies don't match
+            if (!device.companyId) {
+                console.warn(`[AuthService] BLOCKED: Device ${deviceId} has no companyId assigned`);
+                throw new UnauthorizedException(
+                    'Este dispositivo não está vinculado a nenhuma empresa. Entre em contato com o suporte.'
+                );
+            }
+
+            if (user.companyId !== device.companyId) {
                 console.warn(`[AuthService] BLOCKED: User ${user.username} (Company ${user.companyId}) tried to access Device (Company ${device.companyId})`);
                 throw new UnauthorizedException(
                     `Acesso Negado: Este dispositivo pertence à empresa "${device.company?.companyName}". ` +
