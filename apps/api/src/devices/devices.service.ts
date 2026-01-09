@@ -313,7 +313,7 @@ export class DevicesService {
 
         // Gerar código único
         const activationCode = await this.generateUniqueActivationCode({
-            initials: company.initials,
+            initials: company.initials ?? undefined,
             companyName: company.companyName
         });
 
