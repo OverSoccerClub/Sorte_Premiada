@@ -258,7 +258,7 @@ export class DevicesService {
             .map(word => word[0])
             .join('')
             .toUpperCase()
-            .substring(0, 3); // Máximo 3 letras
+            .substring(0, 2); // Máximo 2 letras
     }
 
     /**
@@ -279,7 +279,12 @@ export class DevicesService {
         while (!isUnique && attempts < maxAttempts) {
             // Gera código aleatório de 6 caracteres (letras maiúsculas e números)
             const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            code = `${prefix}-${year}-${randomCode}`;
+
+            // Garantir que o prefixo tenha exatamente 2 chars (preencher com X se necessário)
+            const formattedPrefix = prefix.substring(0, 2).padEnd(2, 'X').toUpperCase();
+
+            // Formato: XX-XXXX-XXXXXX
+            code = `${formattedPrefix}-${year}-${randomCode}`;
 
             // Verifica se já existe
             const existing = await this.prisma.posTerminal.findUnique({

@@ -41,7 +41,7 @@ export default function ActivationScreen() {
         // Formato esperado: XX-YYYY-XXXXXX (ex: AP-2026-ABC123)
         const regex = /^[A-Z]{2}-\d{4}-[A-Z0-9]{6}$/i;
         return regex.test(code);
-    };
+    }
 
     const handleActivate = async () => {
         const code = activationCode.trim().toUpperCase();
