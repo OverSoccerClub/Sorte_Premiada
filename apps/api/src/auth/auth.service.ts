@@ -53,45 +53,40 @@ export class AuthService {
         }
 
         // === DEVICE LICENSE PROTECTION ===
-        if (deviceId) {
-            console.log(`[AuthService] Login attempt with deviceId: ${deviceId}`);
-            // Restriction: Only CAMBISTA can access via Mobile App (which sends deviceId)
-            // MASTER access allowed for debugging/support if needed, but per requirement "UNIQUE type is CAMBISTA"
-            if (user.role !== 'CAMBISTA' && user.role !== 'MASTER') {
-                throw new UnauthorizedException('Apenas usuários do tipo CAMBISTA podem acessar o aplicativo.');
+        if (user.role === 'CAMBISTA') {
+            if (!deviceId) {
+                console.warn(`[AuthService] BLOCKED: Cambista ${user.username} login attempt without deviceId`);
+                throw new UnauthorizedException('Este usuário só pode acessar via aplicativo mobile em um dispositivo ativado.');
             }
 
             const device = await this.prisma.posTerminal.findUnique({
-                where: { deviceId }, // deviceId físico ou UUID? Normalmente mobile envia deviceId (físico/interno)
+                where: { deviceId },
                 include: { company: true }
             });
 
-            console.log(`[AuthService] Device found: ${!!device}`);
-            if (device) {
-                console.log(`[AuthService] Device Company: ${device.companyId} (${device.company?.companyName})`);
-                console.log(`[AuthService] User Company: ${user.companyId}`);
-                console.log(`[AuthService] User Role: ${user.role}`);
-
-                // Se o dispositivo tem empresa, o usuário deve ser da mesma empresa
-                // NOVA LÓGICA: Se device.companyId existe, o user.companyId DEVE ser igual.
-                if (device.companyId && user.companyId !== device.companyId) {
-
-                    // Exceção: MASTER pode logar em qualquer lugar?
-                    // "o cambista de uma determinada empresa nao pode acessar via pos de outra empresa"
-                    // Role based check:
-                    if (user.role !== 'MASTER') {
-                        console.warn(`[AuthService] BLOCKED: User ${user.username} (Company ${user.companyId}) tried to access Device (Company ${device.companyId})`);
-                        throw new UnauthorizedException(
-                            `Acesso Negado: Este dispositivo pertence à empresa "${device.company?.companyName}". ` +
-                            `Seu usuário é da empresa "${user.company?.companyName || 'Outra'}".`
-                        );
-                    } else {
-                        console.log(`[AuthService] ALLOWED: MASTER user accessing device of company ${device.companyId}`);
-                    }
-                }
-            } else {
-                console.warn(`[AuthService] Device ID ${deviceId} not found in database.`);
+            if (!device) {
+                console.warn(`[AuthService] BLOCKED: Device ID ${deviceId} not found for Cambista ${user.username}`);
+                throw new UnauthorizedException('Dispositivo não ativado. Por favor, ative este dispositivo antes de logar.');
             }
+
+            if (!device.isActive) {
+                console.warn(`[AuthService] BLOCKED: Device ${deviceId} is inactive`);
+                throw new UnauthorizedException('Este dispositivo foi desativado pelo administrador.');
+            }
+
+            console.log(`[AuthService] Device Company: ${device.companyId} (${device.company?.companyName})`);
+            console.log(`[AuthService] User Company: ${user.companyId}`);
+
+            if (device.companyId && user.companyId !== device.companyId) {
+                console.warn(`[AuthService] BLOCKED: User ${user.username} (Company ${user.companyId}) tried to access Device (Company ${device.companyId})`);
+                throw new UnauthorizedException(
+                    `Acesso Negado: Este dispositivo pertence à empresa "${device.company?.companyName}". ` +
+                    `Seu usuário é da empresa "${user.company?.companyName || 'Outra'}".`
+                );
+            }
+        } else if (deviceId && user.role === 'MASTER') {
+            // Log for Master users just for tracking, but allow everything
+            console.log(`[AuthService] MASTER user ${user.username} accessing via device ${deviceId}`);
         }
 
         const payload = { username: user.username, sub: user.id, role: user.role, companyId: user.companyId };
