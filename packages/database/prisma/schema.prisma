@@ -1,0 +1,762 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id          String  @id @default(uuid())
+  slug        String  @unique @default("default") // Identificador único para a URL/App
+  companyName String  @default("A Perseverança")
+  slogan      String? @default("Cambista Edition")
+  logoUrl     String? // URL da logo ou base64
+
+  // Contatos
+  phone    String?
+  whatsapp String?
+  email    String?
+
+  // Endereço (opcional)
+  address String?
+  city    String?
+  state   String?
+
+  // Configurações visuais
+  primaryColor String? @default("#50C878")
+  updateUrl    String? // URL do repositório para atualizações do App
+  
+  // === CONFIGURAÇÕES DE EXIBIÇÃO ===
+  showPlanTotalValue Boolean @default(true) // Exibir valor total calculado nos planos
+
+  // === LICENCIAMENTO ===
+  licenseStatus    LicenseStatus @default(TRIAL)
+  licenseStartDate DateTime      @default(now())
+  licenseExpiresAt DateTime?
+  trialEndsAt      DateTime? // 30 dias após criação
+
+  // === LIMITES DE USO ===
+  maxUsers           Int @default(10)
+  maxTicketsPerMonth Int @default(1000)
+  maxGames           Int @default(5)
+  maxActiveDevices   Int @default(5) // Limite de dispositivos POS ativos simultaneamente
+
+  // === PLANO DE ASSINATURA (Dinâmico) ===
+  planId String?
+  plan   Plan?   @relation(fields: [planId], references: [id])
+  
+  // Mantemos o Enum e campos manuais como snapshot/fallback
+  subscriptionPlan SubscriptionPlan @default(BASIC)
+  monthlyPrice     Decimal          @default(0)
+  currency         String           @default("BRL")
+
+  // === CONTROLE DE PAGAMENTO ===
+  lastPaymentDate DateTime?
+  nextBillingDate DateTime?
+  paymentMethod   String? // "PIX", "BOLETO", "CARTAO"
+
+  // === CONTROLE DE ACESSO ===
+  isActive         Boolean   @default(true)
+  suspendedAt      DateTime?
+  suspensionReason String?
+
+  // === AUDITORIA ===
+  createdBy      String? // ID do MASTER que criou
+  lastModifiedBy String?
+  lastModifiedAt DateTime @default(now()) @updatedAt
+
+  // Multi-Tenancy Relations
+  users             User[]
+  games             Game[]
+  areas             Area[]
+  tickets           Ticket[]
+  transactions      Transaction[]
+  dailyCloses       DailyClose[]
+  posTerminals      PosTerminal[]
+  notificationLogs  NotificationLog[]
+  announcements     Announcement[]
+  securityLogs      SecurityLog[]
+  draws             Draw[]
+  extractionSeries  ExtractionSeries[]
+  secondChanceDraws SecondChanceDraw[]
+  auditLogs         AuditLog[]
+
+  // Bug Tracking
+  bugReports BugReport[]
+
+  // Licensing Relations
+  payments       Payment[]
+  usageStats     UsageStats[]
+  licenseHistory LicenseHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("CompanySettings")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  name                     String?
+  username                 String            @unique
+  pushToken                String? // Token para notificações push (Expo)
+  email                    String?           @unique
+  password                 String
+  securityPin              String? // 4-digit PIN for Cobradores
+  usernameExpiresAt        DateTime?
+  securityPinExpiresAt     DateTime?
+  role                     Role              @default(CAMBISTA)
+  salesLimit               Decimal?          @default(1000.00) // Limite diário de vendas (padrão 1000 se não definido)
+  limitOverrideExpiresAt   DateTime? // Data até quando o limite é ignorado ou estendido
+  accountabilityLimitHours Int?              @default(24) // Tempo limite (em horas) para prestar contas após o início das vendas
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  tickets                  Ticket[]
+  cancelledTickets         Ticket[]          @relation("TicketCancelledBy") // New relation
+  transactions             Transaction[]
+  transactionsCollected    Transaction[]     @relation("TransactionCobrador")
+  dailyCloses              DailyClose[]
+  notificationLogs         NotificationLog[]
+  posTerminalsAsCurrent    PosTerminal[]     @relation("PosCurrentUser")
+  posTerminalsAsLast       PosTerminal[]     @relation("PosLastUser")
+  areaId                   String?
+  area                     Area?             @relation(fields: [areaId], references: [id])
+  isActive                 Boolean           @default(true) // Controla bloqueio manual do cambista
+  canCancelTickets         Boolean           @default(false) // Permissão para o cambista cancelar bilhetes
+  commissionRate           Decimal?          @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
+
+  // Dados Cadastrais Completos
+  address      String?
+  city         String?
+  state        String?
+  zipCode      String?
+  phone        String?
+  neighborhood String?
+  number       String?
+  complement   String?
+  cpf          String?
+
+  // New Commission Rules
+  minSalesThreshold Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
+  fixedCommission   Decimal? @default(40.00) // Ganho fixo se não atingir a meta (R$)
+
+  // Corporate Maturity
+  auditLogs AuditLog[] @relation("UserAuditLogs")
+
+  // Hardened Security (MFA)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean @default(false)
+
+  // Announcements targeted to this user
+  targetedAnnouncements Announcement[] @relation("UserTargetedAnnouncements")
+
+  // Bug Tracking Relations
+  bugsReported   BugReport[] @relation("BugReportedBy")
+  bugsAssigned   BugReport[] @relation("BugAssignedTo")
+  bugsFixed      BugReport[] @relation("BugFixedBy")
+  bugsValidated  BugReport[] @relation("BugValidatedBy")
+  bugComments    BugComment[] @relation("BugCommentUser")
+
+  @@index([companyId])
+}
+
+model Area {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  name             String
+  city             String
+  state            String
+  users            User[]
+  configs          AreaConfig[]
+  draws            Draw[]
+  extractionSeries ExtractionSeries[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([companyId])
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  name String
+
+  // Display Configuration (for dynamic mobile rendering)
+  isActive    Boolean @default(true) // Ativar/desativar exibição do jogo
+  displayName String? // Nome amigável para exibição (ex: "2x1500")
+  iconName    String? @default("game-controller-outline") // Ionicons icon name
+  colorClass  String? @default("bg-emerald-600") // Tailwind color class
+
+  rules             Json
+  draws             Draw[]
+  tickets           Ticket[]
+  price             Decimal            @default(5.00)
+  extractionTimes   String[]           @default([])
+  lastSeries        Int                @default(0)
+  extractionSeries  ExtractionSeries[]
+  secondChanceDraws SecondChanceDraw[]
+
+  // Risk and Financial Config
+  prizeMultiplier Decimal @default(1000.0) // Multiplicador de Prêmio (ex: 1000x)
+  maxLiability    Decimal @default(5000.0) // Limite máximo de prêmio acumulado por milhar
+  commissionRate  Decimal @default(10.0) // Comissão padrão do jogo (ex: 10%)
+
+  // Configuração Segunda Chance (Sorteio Semanal/Sábado)
+  secondChanceEnabled    Boolean @default(false)
+  secondChanceRangeStart Int? // e.g. 122300
+  secondChanceRangeEnd   Int? // e.g. 125500
+  secondChanceWeekday    Int?    @default(6) // 0=Dom, 6=Sáb
+  secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
+  lastSecondChanceSeries Int     @default(0)
+
+  // Custom Prize Configuration (Printed on Ticket)
+  prizeMilhar  Decimal? @default(5000) // Prêmio para Milhar Seca
+  prizeCentena Decimal? @default(600) // Prêmio para Centena Seca
+  prizeDezena  Decimal? @default(60) // Prêmio para Dezena Seca
+
+  configs AreaConfig[]
+
+  @@index([companyId])
+}
+
+model Draw {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  numbers   Int[]
+  drawDate  DateTime
+  series    Int? // Número sequencial do sorteio
+  areaId    String? // Vinculação por praça
+  area      Area?    @relation(fields: [areaId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+}
+
+model SecondChanceDraw {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  gameId        String
+  game          Game     @relation(fields: [gameId], references: [id])
+  winningNumber Int
+  prizeAmount   Decimal
+  drawDate      DateTime // Which Saturday this refers to
+  createdAt     DateTime @default(now())
+
+  @@index([companyId])
+}
+
+model ExtractionSeries {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  gameId     String
+  game       Game    @relation(fields: [gameId], references: [id])
+  areaId     String? // Opcional para manter compatibilidade, mas idealmente obrigatório para novas
+  area       Area?   @relation(fields: [areaId], references: [id])
+  time       String // Formato "HH:mm"
+  lastSeries Int     @default(0)
+
+  // @@unique([gameId, areaId, time]) removed uniqueness constraint globally to allow same times in different companies?
+  // Actually, if we include companyId in the unique constraint it would be better.
+  // But purely adding companyId makes [gameId, areaId, time] still unique per game/area, 
+  // and game/area are now company-scoped, so it should be fine.
+  @@unique([gameId, areaId, time])
+  @@index([companyId])
+}
+
+model Ticket {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  userId               String
+  user                 User         @relation(fields: [userId], references: [id])
+  gameType             String // e.g., "Mega Sena", "Quina"
+  gameId               String?
+  game                 Game?        @relation(fields: [gameId], references: [id])
+  numbers              Int[]
+  amount               Decimal
+  status               TicketStatus @default(PENDING)
+  drawDate             DateTime? // For 2x500: Scheduled Draw Time
+  hash                 String? // Unique hash for barcode/validation
+  secondChanceNumber   Int? // Número da Sorte / Segunda Chance
+  secondChanceDrawDate DateTime?
+  secondChanceStatus   TicketStatus @default(PENDING) // Status específico para a Segunda Chance
+
+  // Financial Snapshot
+  commissionRate  Decimal @default(0) // Taxa aplicada no momento da venda
+  commissionValue Decimal @default(0) // Valor monetário da comissão
+  netValue        Decimal @default(0) // Valor líquido (Amount - Commission)
+  possiblePrize   Decimal @default(0) // Prêmio estimado se ganhar
+
+  // Cancellation Audit
+  cancellationReason String?
+  cancelledByUserId  String?
+  cancelledByUser    User?   @relation("TicketCancelledBy", fields: [cancelledByUserId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  // Anti-Fraud
+  digitalSignature String? @unique
+
+  @@index([drawDate, gameId])
+  @@index([companyId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  userId    String?
+  user      User?    @relation("UserAuditLogs", fields: [userId], references: [id])
+  action    String // e.g., "UPDATE_GAME", "CREATE_USER"
+  entity    String // e.g., "Game", "User"
+  entityId  String?
+  oldValue  Json?
+  newValue  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@index([companyId])
+}
+
+enum Role {
+  MASTER
+  ADMIN
+  CAMBISTA
+  COBRADOR
+}
+
+// ============================================
+// LICENSING SYSTEM ENUMS
+// ============================================
+
+enum LicenseStatus {
+  TRIAL // Período de teste (30 dias)
+  ACTIVE // Licença ativa e paga
+  SUSPENDED // Suspensa manualmente (MASTER)
+  EXPIRED // Licença expirada (não renovada)
+  CANCELLED // Cancelada pelo cliente
+  BLOCKED // Bloqueada por violação de termos
+}
+
+enum SubscriptionPlan {
+  BASIC // Plano básico
+  PRO // Plano profissional
+  ENTERPRISE // Plano empresarial
+  CUSTOM // Plano customizado
+}
+
+enum PaymentStatus {
+  PENDING // Aguardando pagamento
+  PAID // Pago
+  OVERDUE // Atrasado
+  CANCELLED // Cancelado
+  REFUNDED // Reembolsado
+}
+
+// ============================================
+// LICENSING SYSTEM MODELS
+// ============================================
+
+model Payment {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  amount   Decimal
+  currency String        @default("BRL")
+  status   PaymentStatus @default(PENDING)
+  method   String? // "PIX", "BOLETO", "CARTAO"
+
+  referenceMonth DateTime // Mês de referência
+  dueDate        DateTime
+  paidAt         DateTime?
+
+  transactionId String? // ID da transação no gateway
+  receiptUrl    String? // URL do comprovante
+  notes         String? // Observações
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([referenceMonth])
+}
+
+model UsageStats {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  month DateTime // Mês de referência (primeiro dia do mês)
+
+  totalUsers   Int     @default(0)
+  totalTickets Int     @default(0)
+  totalGames   Int     @default(0)
+  totalRevenue Decimal @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, month])
+  @@index([companyId])
+  @@index([month])
+}
+
+model LicenseHistory {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  action         String // "CREATED", "ACTIVATED", "SUSPENDED", "EXPIRED", "RENEWED", "PLAN_CHANGED"
+  previousStatus LicenseStatus?
+  newStatus      LicenseStatus
+
+  previousPlan SubscriptionPlan?
+  newPlan      SubscriptionPlan?
+
+  reason          String?
+  performedBy     String // ID do usuário que executou (MASTER)
+  performedByName String? // Nome do usuário para histórico
+
+  metadata Json? // Dados adicionais (limites alterados, etc)
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+enum TicketStatus {
+  PENDING
+  PAID
+  CANCELLED
+  CANCEL_REQUESTED // New
+  WON
+  LOST
+  EXPIRED
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  description String
+  amount      Decimal
+  type        TransactionType
+  createdAt   DateTime        @default(now())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  cobradorId  String?
+  cobrador    User?           @relation("TransactionCobrador", fields: [cobradorId], references: [id])
+
+  @@index([companyId])
+}
+
+model DailyClose {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  date            DateTime @default(now())
+  totalSales      Decimal
+  totalCredits    Decimal
+  totalDebits     Decimal
+  finalBalance    Decimal
+  totalCommission Decimal  @default(0)
+  netBalance      Decimal  @default(0)
+
+  // Audit Fields
+  physicalCashReported Decimal?
+  variance             Decimal?
+
+  closedByUserId   String
+  closedByUser     User             @relation(fields: [closedByUserId], references: [id])
+  status           DailyCloseStatus @default(PENDING)
+  verifiedByUserId String?
+  verifiedAt       DateTime?
+  createdAt        DateTime         @default(now())
+
+  @@index([companyId])
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+model PosTerminal {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  deviceId   String   @unique
+  model      String?
+  status     String   @default("OFFLINE") // ONLINE, OFFLINE
+  lastSeenAt DateTime @default(now())
+  latitude   Float?
+  longitude  Float?
+
+  currentUserId String?
+  currentUser   User?   @relation("PosCurrentUser", fields: [currentUserId], references: [id])
+
+  lastUserId String?
+  lastUser   User?   @relation("PosLastUser", fields: [lastUserId], references: [id])
+
+  appVersion String?
+  
+  // === SISTEMA DE ATIVAÇÃO ===
+  name           String? // Nome do dispositivo (ex: "POS Loja Centro")
+  description    String? // Descrição opcional
+  activationCode String?   @unique // Código de ativação (ex: "AP-2024-ABC123")
+  deviceToken    String?   @unique // JWT para autenticação do dispositivo
+  activatedAt    DateTime? // Data/hora de ativação
+  isActive       Boolean   @default(true) // Controle de ativação/desativação remota
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([activationCode])
+  @@index([deviceToken])
+}
+
+enum DailyCloseStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model NotificationLog {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  pushToken String
+  title     String
+  body      String
+  data      Json?
+  status    NotificationStatus @default(SENT)
+  response  Json?
+  userId    String?
+  user      User?              @relation(fields: [userId], references: [id])
+  createdAt DateTime           @default(now())
+
+  @@index([companyId])
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  title     String
+  content   String
+  type      String    @default("INFO") // INFO, WARNING, ALERT, SUCCESS
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+
+  targetUserId String?
+  targetUser   User?   @relation("UserTargetedAnnouncements", fields: [targetUserId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model AreaConfig {
+  id     String @id @default(uuid())
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id])
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id])
+
+  // Overrides
+  commissionRate  Decimal?
+  prizeMultiplier Decimal?
+  maxLiability    Decimal?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([areaId, gameId])
+}
+
+model SecurityLog {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  type       String // "SUSPICIOUS_BET", "LATE_BET", "HACK_ATTEMPT"
+  severity   String // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  message    String
+  metadata   Json? // Store ticketId, userId, etc.
+  areaId     String?
+  userId     String?
+  isResolved Boolean  @default(false)
+  resolvedBy String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([companyId])
+}
+
+// === CONFIGURAÇÃO DE PLANOS ===
+model Plan {
+  id          String   @id @default(uuid())
+  name        String   @unique // ex: "Basic", "Pro", "Enterprise"
+  description String?
+  
+  // Preços e Limites Padrão
+  price              Decimal  @default(0)
+  maxUsers           Int      @default(10)
+  maxTicketsPerMonth Int      @default(1000)
+  maxGames           Int      @default(5)
+  maxActiveDevices   Int      @default(5) // Limite de dispositivos POS ativos simultaneamente
+  
+  features    String[] // Lista de features habilitadas (ex: ["API", "Support"])
+  
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companies   Company[]
+}
+
+// ============================================
+// BUG TRACKING SYSTEM ENUMS
+// ============================================
+
+enum BugStatus {
+  OPEN          // Bug reportado, aguardando análise
+  IN_PROGRESS   // Em desenvolvimento/correção
+  FIXED         // Corrigido, aguardando validação
+  VALIDATED     // Validado pela equipe de testes
+  CLOSED        // Fechado/resolvido
+  REOPENED      // Reaberto após validação
+}
+
+enum BugSeverity {
+  CRITICAL      // Sistema quebrado/indisponível
+  HIGH          // Funcionalidade importante quebrada
+  MEDIUM        // Bug que afeta funcionalidade secundária
+  LOW           // Bug cosmético ou menor
+}
+
+enum BugPriority {
+  URGENT        // Precisa ser corrigido imediatamente
+  HIGH          // Alta prioridade
+  MEDIUM        // Prioridade média
+  LOW           // Pode esperar
+}
+
+// ============================================
+// BUG TRACKING SYSTEM MODELS
+// ============================================
+
+model BugReport {
+  id        String   @id @default(uuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  // Informações Básicas
+  title       String
+  description String   @db.Text // Descrição detalhada do bug
+  
+  // Classificação
+  status      BugStatus    @default(OPEN)
+  severity    BugSeverity
+  priority    BugPriority
+  
+  // Localização e Reprodução
+  location         String?  // Página/módulo onde ocorreu (ex: "/dashboard/games")
+  stepsToReproduce String?  @db.Text // Passos detalhados para reproduzir
+  environment      String?  // Informações do ambiente (browser, versão, etc.)
+  
+  // Atribuição e Responsabilidade
+  reportedByUserId String
+  reportedByUser   User     @relation("BugReportedBy", fields: [reportedByUserId], references: [id])
+  
+  assignedToUserId String?
+  assignedToUser   User?    @relation("BugAssignedTo", fields: [assignedToUserId], references: [id])
+  
+  // Correção e Validação
+  fixDescription    String?  @db.Text // Descrição da correção aplicada
+  fixedAt           DateTime?
+  fixedByUserId     String?
+  fixedByUser       User?    @relation("BugFixedBy", fields: [fixedByUserId], references: [id])
+  
+  validatedAt       DateTime?
+  validatedByUserId String?
+  validatedByUser   User?    @relation("BugValidatedBy", fields: [validatedByUserId], references: [id])
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Histórico de Comentários
+  comments BugComment[]
+  
+  @@index([companyId])
+  @@index([status])
+  @@index([severity])
+  @@index([priority])
+  @@index([reportedByUserId])
+  @@index([assignedToUserId])
+}
+
+model BugComment {
+  id          String    @id @default(uuid())
+  bugReportId String
+  bugReport   BugReport @relation(fields: [bugReportId], references: [id], onDelete: Cascade)
+  
+  userId  String
+  user    User   @relation("BugCommentUser", fields: [userId], references: [id])
+  
+  comment String @db.Text
+  
+  // Rastreamento de mudanças de status
+  statusChange     Boolean?    // Se este comentário representa uma mudança de status
+  previousStatus   BugStatus?
+  newStatus        BugStatus?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([bugReportId])
+  @@index([userId])
+}

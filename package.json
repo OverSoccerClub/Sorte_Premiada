@@ -1,0 +1,40 @@
+{
+  "name": "MegaSena",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "test": "npm run test:api && npm run test:e2e && npm run test:report",
+    "test:api": "cd apps/api && npm run test",
+    "test:e2e": "cd apps/web && npm run test:e2e",
+    "test:report": "node scripts/generate-report.js",
+    "test:watch": "cd apps/api && npm run test:watch",
+    "test:prod": "cd apps/web && npm run test:e2e:prod && cd ../.. && npm run test:report"
+  },
+  "devDependencies": {
+    "expo-modules-autolinking": "2.0.8",
+    "prettier": "^3.6.2",
+    "turbo": "^2.6.1",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "version": "1.0.0",
+  "dependencies": {
+    "ajv": "8.17.1"
+  },
+  "overrides": {
+    "expo-modules-core": "~1.12.11"
+  }
+}

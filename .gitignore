@@ -1,0 +1,59 @@
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage/
+test-reports/
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/.playwright/
+
+# Turbo
+.turbo/
+
+# Vercel
+.vercel/
+
+# Build Outputs
+.next/
+out/
+build/
+dist/
+**/build/
+**/dist/
+
+# Mobile
+.expo/
+*.jks
+*.p12
+*.key
+*.apk
+*.aab
+
+# Backups
+Backup/
+*.rar
+*.zip
+*.sql
+!packages/database/prisma/migrations/**/*.sql
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug_log*.txt
+error_output*.txt
+
+# Misc
+.DS_Store
+*.pem
