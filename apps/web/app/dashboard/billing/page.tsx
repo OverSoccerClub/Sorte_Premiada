@@ -2,38 +2,47 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import {
+    BarChart3,
+    TrendingUp,
+    AlertTriangle,
+    CreditCard,
+    DollarSign,
+    Download,
+    Loader2,
+    Calendar,
+    ArrowUpRight,
+    ArrowDownRight,
+    Wallet
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { StandardPageHeader } from "@/components/standard-page-header";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Loader2, CheckCircle, Clock, XCircle, AlertTriangle, Crown } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
-import { useActiveCompanyId } from "@/context/use-active-company";
-
-interface Payment {
-    id: string;
-    company: {
-        companyName: string;
-    };
-    amount: number;
-    currency: string;
-    status: string;
-    method: string | null;
-    referenceMonth: string;
-    dueDate: string;
-    paidAt: string | null;
-    createdAt: string;
-}
+import { toast } from "sonner";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    TooltipProps
+} from "recharts";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export default function BillingPage() {
-    const activeCompanyId = useActiveCompanyId();
+    const { user } = useAuth();
     const router = useRouter();
-    const { user, token } = useAuth();
-    const [payments, setPayments] = useState<Payment[]>([]);
+
+    // States
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<string>("all");
+    const [metrics, setMetrics] = useState<any>(null);
+    const [revenueData, setRevenueData] = useState<any[]>([]);
+    const [inadimplentes, setInadimplentes] = useState<any[]>([]);
 
     useEffect(() => {
         if (user?.role !== "MASTER") {
@@ -41,83 +50,61 @@ export default function BillingPage() {
             return;
         }
 
-        fetchPayments();
-    }, [user, filter, activeCompanyId]);
+        fetchDashboardData();
+    }, [user]);
 
-    const fetchPayments = async () => {
-        setLoading(true);
+    const fetchDashboardData = async () => {
         try {
-            const url =
-                filter === "all"
-                    ? `${AppConfig.api.baseUrl}/billing/payments?limit=100`
-                    : `${AppConfig.api.baseUrl}/billing/payments?status=${filter}&limit=100`;
+            setLoading(true);
+            const token = localStorage.getItem("token");
+            const headers = { Authorization: `Bearer ${token}` };
 
-            const finalUrl = activeCompanyId ? `${url}&targetCompanyId=${activeCompanyId}` : url;
+            const [metricsRes, revenueRes, inadimRes] = await Promise.all([
+                fetch(`${AppConfig.api.baseUrl}/reports/financial/metrics`, { headers }),
+                fetch(`${AppConfig.api.baseUrl}/reports/financial/revenue-chart`, { headers }),
+                fetch(`${AppConfig.api.baseUrl}/reports/financial/inadimplencia`, { headers })
+            ]);
 
-            const response = await fetch(finalUrl, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setPayments(data.payments || []);
+            if (metricsRes.ok && revenueRes.ok && inadimRes.ok) {
+                setMetrics(await metricsRes.json());
+                setRevenueData(await revenueRes.json());
+                setInadimplentes(await inadimRes.json());
+            } else {
+                toast.error("Erro ao carregar dados financeiros");
             }
         } catch (error) {
-            console.error("Erro ao buscar pagamentos:", error);
+            console.error(error);
+            toast.error("Erro de conexão");
         } finally {
             setLoading(false);
         }
     };
 
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, { color: string; icon: any; label: string }> = {
-            PENDING: { color: "bg-blue-500/10 text-blue-600 border-blue-500/30", icon: Clock, label: "Pendente" },
-            PAID: { color: "bg-green-500/10 text-green-600 border-green-500/30", icon: CheckCircle, label: "Pago" },
-            OVERDUE: { color: "bg-red-500/10 text-red-600 border-red-500/30", icon: AlertTriangle, label: "Atrasado" },
-            CANCELLED: { color: "bg-gray-500/10 text-gray-600 border-gray-500/30", icon: XCircle, label: "Cancelado" },
-            REFUNDED: { color: "bg-orange-500/10 text-orange-600 border-orange-500/30", icon: XCircle, label: "Reembolsado" },
-        };
-
-        const variant = variants[status] || variants.PENDING;
-        const Icon = variant.icon;
-
-        return (
-            <Badge variant="outline" className={variant.color}>
-                <Icon className="w-3 h-3 mr-1" />
-                {variant.label}
-            </Badge>
-        );
-    };
-
-    const formatCurrency = (amount: number, currency: string) => {
+    const formatCurrency = (value: number) => {
         return new Intl.NumberFormat("pt-BR", {
             style: "currency",
-            currency: currency || "BRL",
-        }).format(amount);
+            currency: "BRL",
+        }).format(value);
     };
 
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString("pt-BR");
+    const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-background border rounded p-2 shadow-md">
+                    <p className="font-medium text-sm">{label}</p>
+                    <p className="text-primary font-bold text-sm">
+                        {formatCurrency(payload[0].value as number)}
+                    </p>
+                </div>
+            );
+        }
+        return null;
     };
-
-    const totalPaid = payments
-        .filter((p) => p.status === "PAID")
-        .reduce((sum, p) => sum + Number(p.amount), 0);
-
-    const totalPending = payments
-        .filter((p) => p.status === "PENDING")
-        .reduce((sum, p) => sum + Number(p.amount), 0);
-
-    const totalOverdue = payments
-        .filter((p) => p.status === "OVERDUE")
-        .reduce((sum, p) => sum + Number(p.amount), 0);
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -125,154 +112,160 @@ export default function BillingPage() {
     return (
         <div className="space-y-6">
             <StandardPageHeader
-                title="Gerenciamento de Billing"
-                description="Visualize e gerencie todos os pagamentos do sistema"
-                icon={<DollarSign className="w-8 h-8 text-emerald-500" />}
-            >
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-                    <Crown className="w-3 h-3 mr-1" />
-                    MASTER
-                </Badge>
-            </StandardPageHeader>
+                title="Financeiro Global"
+                description="Visão geral de receitas, inadimplência e projeções"
+                icon={Wallet}
+            />
 
-            {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Métricas Principais */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Total Pago</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Receita Total (Mês)</CardTitle>
+                        <DollarSign className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-600">
-                            {formatCurrency(totalPaid, "BRL")}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                            {payments.filter((p) => p.status === "PAID").length} pagamentos
-                        </div>
+                        <div className="text-2xl font-bold">{formatCurrency(metrics?.monthlyRevenue || 0)}</div>
+                        <p className="text-xs text-muted-foreground mt-1 flex items-center">
+                            Recebido este mês
+                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Total Pendente</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Pendente (Futuro)</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-blue-600">
-                            {formatCurrency(totalPending, "BRL")}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                            {payments.filter((p) => p.status === "PENDING").length} pagamentos
-                        </div>
+                        <div className="text-2xl font-bold">{formatCurrency(metrics?.pendingAmount || 0)}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            A receber (vencimento futuro)
+                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Total Atrasado</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Inadimplência</CardTitle>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-600">
-                            {formatCurrency(totalOverdue, "BRL")}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                            {payments.filter((p) => p.status === "OVERDUE").length} pagamentos
-                        </div>
+                        <div className="text-2xl font-bold text-red-600">{formatCurrency(metrics?.overdueAmount || 0)}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {metrics?.overdueCount} pagamentos atrasados
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
+                        <Wallet className="h-4 w-4 text-green-600" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-green-700">{formatCurrency(metrics?.totalRevenue || 0)}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            Acumulado histórico
+                        </p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Filtros */}
-            <div className="flex gap-2 flex-wrap">
-                <Button
-                    variant={filter === "all" ? "default" : "outline"}
-                    onClick={() => setFilter("all")}
-                    size="sm"
-                >
-                    Todos ({payments.length})
-                </Button>
-                <Button
-                    variant={filter === "PAID" ? "default" : "outline"}
-                    onClick={() => setFilter("PAID")}
-                    size="sm"
-                >
-                    Pagos
-                </Button>
-                <Button
-                    variant={filter === "PENDING" ? "default" : "outline"}
-                    onClick={() => setFilter("PENDING")}
-                    size="sm"
-                >
-                    Pendentes
-                </Button>
-                <Button
-                    variant={filter === "OVERDUE" ? "default" : "outline"}
-                    onClick={() => setFilter("OVERDUE")}
-                    size="sm"
-                >
-                    Atrasados
-                </Button>
-            </div>
-
-            {/* Tabela de Pagamentos */}
-            <Card className="bg-card border-border">
-                <CardHeader>
-                    <CardTitle>Pagamentos ({payments.length})</CardTitle>
-                    <CardDescription>Histórico completo de pagamentos</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Empresa</TableHead>
-                                <TableHead>Valor</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Mês Ref.</TableHead>
-                                <TableHead>Vencimento</TableHead>
-                                <TableHead>Pago em</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {payments.map((payment) => (
-                                <TableRow key={payment.id}>
-                                    <TableCell>
-                                        <div className="font-medium">{payment.company.companyName}</div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="font-semibold">
-                                            {formatCurrency(Number(payment.amount), payment.currency)}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                                    <TableCell>{formatDate(payment.referenceMonth)}</TableCell>
-                                    <TableCell>
-                                        <div
-                                            className={
-                                                new Date(payment.dueDate) < new Date() && payment.status === "PENDING"
-                                                    ? "text-red-500 font-semibold"
-                                                    : ""
-                                            }
-                                        >
-                                            {formatDate(payment.dueDate)}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        {payment.paidAt ? (
-                                            <div className="text-green-600">{formatDate(payment.paidAt)}</div>
-                                        ) : (
-                                            <span className="text-muted-foreground">-</span>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-
-                    {payments.length === 0 && (
-                        <div className="text-center py-12 text-muted-foreground">
-                            Nenhum pagamento encontrado
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+                {/* Gráfico de Receita */}
+                <Card className="md:col-span-4">
+                    <CardHeader>
+                        <CardTitle>Receita Mensal</CardTitle>
+                        <CardDescription>
+                            Evolução dos pagamentos confirmados no ano atual
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pl-2">
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={revenueData}>
+                                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                    <XAxis
+                                        dataKey="name"
+                                        stroke="#888888"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <YAxis
+                                        stroke="#888888"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickFormatter={(value) => `R$${value}`}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                                    <Bar
+                                        dataKey="total"
+                                        fill="currentColor"
+                                        radius={[4, 4, 0, 0]}
+                                        className="fill-primary"
+                                        barSize={40}
+                                    />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
-                    )}
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+
+                {/* Lista de Inadimplência */}
+                <Card className="md:col-span-3">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle className="text-red-600 flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5" />
+                                Inadimplência
+                            </CardTitle>
+                            <CardDescription>
+                                Empresas com pagamentos em atraso
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="max-h-[350px] overflow-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Empresa</TableHead>
+                                        <TableHead>Vencimento</TableHead>
+                                        <TableHead className="text-right">Valor</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {inadimplentes.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={3} className="text-center text-muted-foreground">
+                                                Nenhum atraso registrado 🎉
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        inadimplentes.map(item => (
+                                            <TableRow key={item.id}>
+                                                <TableCell className="font-medium">
+                                                    {item.company.companyName}
+                                                    <div className="text-xs text-muted-foreground">{item.company.phone}</div>
+                                                </TableCell>
+                                                <TableCell className="text-red-600 font-medium text-xs">
+                                                    {new Date(item.dueDate).toLocaleDateString("pt-BR")}
+                                                </TableCell>
+                                                <TableCell className="text-right font-bold">
+                                                    {formatCurrency(Number(item.amount))}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
