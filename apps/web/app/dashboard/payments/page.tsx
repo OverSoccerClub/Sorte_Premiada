@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit } from "lucide-react";
+import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit, Save } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
@@ -57,6 +57,14 @@ export default function PaymentsPage() {
     const [paymentMethod, setPaymentMethod] = useState("");
     const [transactionId, setTransactionId] = useState("");
     const [processing, setProcessing] = useState(false);
+    const [editPaymentDialog, setEditPaymentDialog] = useState(false);
+    const [editForm, setEditForm] = useState({
+        amount: 0,
+        dueDate: "",
+        notes: "",
+        status: "",
+        method: "",
+    });
 
     useEffect(() => {
         if (user?.role !== "MASTER") {
@@ -179,6 +187,56 @@ export default function PaymentsPage() {
             }
         } catch (error) {
             toast.error("Erro ao processar");
+        }
+    };
+
+    const handleEditClick = (payment: Payment) => {
+        setSelectedPayment(payment);
+        setEditForm({
+            amount: Number(payment.amount),
+            dueDate: new Date(payment.dueDate).toISOString().split('T')[0],
+            notes: payment.notes || "",
+            status: payment.status,
+            method: payment.method || "",
+        });
+        setEditPaymentDialog(true);
+    };
+
+    const handleUpdatePayment = async () => {
+        if (!selectedPayment) return;
+        setProcessing(true);
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(
+                `${AppConfig.api.baseUrl}/payments/${selectedPayment.id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        amount: editForm.amount,
+                        dueDate: new Date(editForm.dueDate).toISOString(),
+                        notes: editForm.notes,
+                        status: editForm.status,
+                        method: editForm.method || null,
+                    }),
+                }
+            );
+
+            if (response.ok) {
+                toast.success("Pagamento atualizado!");
+                setEditPaymentDialog(false);
+                fetchPayments();
+            } else {
+                toast.error("Erro ao atualizar pagamento");
+            }
+        } catch (error) {
+            toast.error("Erro ao processar");
+        } finally {
+            setProcessing(false);
         }
     };
 
@@ -306,6 +364,13 @@ export default function PaymentsPage() {
                                     <TableCell>{payment.method || "-"}</TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleEditClick(payment)}
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
                                             {payment.status === "PENDING" || payment.status === "OVERDUE" ? (
                                                 <>
                                                     <Button
@@ -408,6 +473,95 @@ export default function PaymentsPage() {
                                 <>
                                     <CheckCircle className="w-4 h-4 mr-2" />
                                     Confirmar Pagamento
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Dialog: Editar Pagamento */}
+            <Dialog open={editPaymentDialog} onOpenChange={setEditPaymentDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Editar Pagamento</DialogTitle>
+                        <DialogDescription>
+                            Alterar detalhes do pagamento
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label>Valor</Label>
+                                <Input
+                                    type="number"
+                                    value={editForm.amount}
+                                    onChange={(e) => setEditForm({ ...editForm, amount: Number(e.target.value) })}
+                                />
+                            </div>
+                            <div>
+                                <Label>Vencimento</Label>
+                                <Input
+                                    type="date"
+                                    value={editForm.dueDate}
+                                    onChange={(e) => setEditForm({ ...editForm, dueDate: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <Label>Status</Label>
+                            <Select value={editForm.status} onValueChange={(value) => setEditForm({ ...editForm, status: value })}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PENDING">Pendente</SelectItem>
+                                    <SelectItem value="PAID">Pago</SelectItem>
+                                    <SelectItem value="OVERDUE">Atrasado</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelado</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Label>Método</Label>
+                            <Select value={editForm.method} onValueChange={(value) => setEditForm({ ...editForm, method: value })}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PIX">PIX</SelectItem>
+                                    <SelectItem value="BOLETO">Boleto</SelectItem>
+                                    <SelectItem value="CARTAO">Cartão</SelectItem>
+                                    <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
+                                    <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Label>Observações</Label>
+                            <Input
+                                value={editForm.notes}
+                                onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditPaymentDialog(false)}>
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleUpdatePayment}
+                            disabled={processing}
+                        >
+                            {processing ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Salvando...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    Salvar Alterações
                                 </>
                             )}
                         </Button>

@@ -115,6 +115,47 @@ export class PaymentsService {
     }
 
     /**
+     * Atualizar detalhes do pagamento
+     */
+    async updatePayment(paymentId: string, data: {
+        amount?: number;
+        dueDate?: Date;
+        notes?: string;
+        method?: string;
+        status?: PaymentStatus;
+    }) {
+        this.logger.log(`Updating payment ${paymentId}`);
+
+        const payment = await this.prisma.payment.findUnique({
+            where: { id: paymentId }
+        });
+
+        if (!payment) {
+            throw new NotFoundException('Pagamento não encontrado');
+        }
+
+        // Se estiver alterando o status para PAID, atualizar data de pagamento se não existir
+        let paidAt = payment.paidAt;
+        if (data.status === PaymentStatus.PAID && !payment.paidAt) {
+            paidAt = new Date();
+        } else if (data.status && data.status !== PaymentStatus.PAID) {
+            paidAt = null;
+        }
+
+        return this.prisma.payment.update({
+            where: { id: paymentId },
+            data: {
+                amount: data.amount,
+                dueDate: data.dueDate,
+                notes: data.notes,
+                method: data.method,
+                status: data.status,
+                paidAt: paidAt,
+            }
+        });
+    }
+
+    /**
      * Listar todos os pagamentos
      */
     async findAll(filters?: {

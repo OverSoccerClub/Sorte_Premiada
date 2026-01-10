@@ -89,6 +89,26 @@ export class PaymentsController {
     }
 
     /**
+     * Atualizar pagamento
+     * PUT /payments/:id
+     */
+    @Put(':id')
+    @Roles('MASTER')
+    async update(
+        @Param('id') id: string,
+        @Body() data: {
+            amount?: number;
+            dueDate?: Date;
+            notes?: string;
+            method?: string;
+            status?: PaymentStatus;
+        }
+    ) {
+        this.logger.log(`PUT /payments/${id}`);
+        return this.paymentsService.updatePayment(id, data);
+    }
+
+    /**
      * Verificar e processar pagamentos vencidos (manual trigger)
      * POST /payments/check-overdue
      */
