@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import tw from '../../lib/tailwind';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -45,6 +45,7 @@ const numberToText = (num: number): string => {
 };
 
 export const TicketContent = ({ data, isCapture = false }: TicketContentProps) => {
+    const [logoError, setLogoError] = useState(false);
     const sortedNumbers = [...data.numbers].sort((a, b) => a - b);
     const scDigits = data.secondChanceNumber ? data.secondChanceNumber.toString().split('').map(Number) : [];
 
@@ -56,25 +57,43 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     const brandMain = brandParts.slice(0, -1).join(' ') || brandParts[0];
     const brandSuffix = brandParts.length > 1 ? brandParts[brandParts.length - 1] : '';
 
+    // Determinar se deve mostrar logo ou ícone
+    const shouldShowLogo = data.companyLogoUrl && !logoError;
+
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
             {/* Header */}
             <View style={tw`items-center mb-1 w-full px-1`}>
                 <View style={tw`border-[3px] border-black rounded-xl p-3 w-full flex-row items-center justify-between`}>
-                    {data.companyLogoUrl ? (
+                    {/* Logo ou Ícone */}
+                    {shouldShowLogo ? (
                         <Image
                             source={{ uri: data.companyLogoUrl }}
                             style={{ width: 60, height: 60, resizeMode: 'contain' }}
+                            onError={() => {
+                                console.warn('[TicketContent] Failed to load company logo, using fallback icon');
+                                setLogoError(true);
+                            }}
                         />
                     ) : (
                         <MaterialCommunityIcons name="clover" size={40} color="#000" />
                     )}
+
+                    {/* Nome da Empresa */}
                     <View style={tw`items-center flex-1 ml-3`}>
-                        <Text style={[tw`text-4xl font-black text-black leading-tight text-center`, { transform: [{ scaleX: 1.25 }] }, { fontSize: brandMain.length > 15 ? 24 : 36 }]}>{brandMain}</Text>
+                        <Text style={[
+                            tw`text-4xl font-black text-black leading-tight text-center`,
+                            { transform: [{ scaleX: 1.25 }] },
+                            { fontSize: brandMain.length > 15 ? 24 : 36 }
+                        ]}>
+                            {brandMain}
+                        </Text>
                         {brandSuffix && (
                             <View style={tw`flex-row items-center -mt-1`}>
                                 <Ionicons name="calendar-sharp" size={13} color="#000" style={tw`mr-1`} />
-                                <Text style={tw`text-xs font-black text-black uppercase`}>{brandSuffix}</Text>
+                                <Text style={tw`text-xs font-black text-black uppercase`}>
+                                    {brandSuffix}
+                                </Text>
                             </View>
                         )}
                     </View>
