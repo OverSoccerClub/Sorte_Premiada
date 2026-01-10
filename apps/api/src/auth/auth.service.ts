@@ -79,13 +79,21 @@ export class AuthService {
 
             // CRITICAL SECURITY: Block if device has no company OR if companies don't match
             if (!device.companyId) {
-                console.warn(`[AuthService] BLOCKED: Device ${deviceId} has no companyId assigned`);
-                throw new UnauthorizedException(
-                    'Este dispositivo não está vinculado a nenhuma empresa. Entre em contato com o suporte.'
-                );
-            }
+                // LEGACY DEVICE SUPPORT: Allow devices without companyId for backward compatibility
+                // but assign the user's company to the device for future logins
+                console.warn(`[AuthService] LEGACY DEVICE DETECTED: Device ${deviceId} has no companyId. Assigning user's company: ${user.companyId}`);
 
-            if (user.companyId !== device.companyId) {
+                try {
+                    await this.prisma.posTerminal.update({
+                        where: { deviceId },
+                        data: { companyId: user.companyId }
+                    });
+                    console.log(`[AuthService] Successfully assigned companyId ${user.companyId} to device ${deviceId}`);
+                } catch (updateError) {
+                    console.error(`[AuthService] Failed to update device companyId:`, updateError);
+                    // Continue anyway for backward compatibility
+                }
+            } else if (user.companyId !== device.companyId) {
                 console.warn(`[AuthService] BLOCKED: User ${user.username} (Company ${user.companyId}) tried to access Device (Company ${device.companyId})`);
                 throw new UnauthorizedException(
                     `Acesso Negado: Este dispositivo pertence à empresa "${device.company?.companyName}". ` +
