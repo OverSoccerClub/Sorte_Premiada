@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy, Building2, FileCheck, Receipt, Layers, Bug } from "lucide-react";
+import { LayoutDashboard, Users, User, BarChart3, Settings, LogOut, Ticket, MapPin, Smartphone, Calendar, Wallet, Menu, Search, ShieldAlert, XCircle, Megaphone, History, TrendingUp, ShieldCheck, Trophy, Building2, FileCheck, Receipt, Layers, Bug, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppConfig as Config } from "../AppConfig";
 import { useCompany } from "@/context/company-context";
@@ -114,6 +114,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 { icon: ShieldCheck, label: "Admin Global", href: "/dashboard/admin" },
                 { icon: Layers, label: "Configurar Planos", href: "/dashboard/admin/plans" },
                 { icon: FileCheck, label: "Gestão de Licenças", href: "/dashboard/licenses" },
+                { icon: DollarSign, label: "Pagamentos", href: "/dashboard/payments" },
                 { icon: Receipt, label: "Financeiro Global", href: "/dashboard/billing" },
             ]
         }] : []),
