@@ -201,6 +201,11 @@ export class PlansService {
                 throw new NotFoundException('Plano não encontrado');
             }
 
+            // Calcular data de expiração (1 mês a partir de agora)
+            const now = new Date();
+            const licenseExpiresAt = new Date(now);
+            licenseExpiresAt.setMonth(licenseExpiresAt.getMonth() + 1);
+
             const company = await this.prisma.company.update({
                 where: { id: companyId },
                 data: {
@@ -211,6 +216,10 @@ export class PlansService {
                     maxGames: planRaw.maxGames,
                     maxActiveDevices: planRaw.maxActiveDevices,
                     monthlyPrice: planRaw.price,
+                    // Define status como ACTIVE e data de expiração
+                    licenseStatus: 'ACTIVE',
+                    licenseExpiresAt: licenseExpiresAt,
+                    isActive: true,
                 }
             });
 
