@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Shield, Loader2, CheckCircle, XCircle, AlertTriangle, ArrowLeft, Save, RefreshCw, Users, Ticket, Gamepad2, Smartphone, Calendar, TrendingUp } from "lucide-react";
+import { Shield, Loader2, CheckCircle, XCircle, AlertTriangle, ArrowLeft, Save, RefreshCw, Users, Ticket, Gamepad2, Smartphone, Calendar, TrendingUp, DollarSign, Clock } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,10 +37,12 @@ export default function LicenseDetailsPage() {
         maxGames: 5,
         maxActiveDevices: 5,
     });
+    const [payments, setPayments] = useState<any[]>([]);
 
     useEffect(() => {
         fetchLicenseDetails();
         fetchPlans();
+        fetchPayments();
     }, [companyId]);
 
     const fetchLicenseDetails = async () => {
@@ -85,6 +87,24 @@ export default function LicenseDetailsPage() {
             }
         } catch (error) {
             console.error("Erro ao buscar planos:", error);
+        }
+    };
+
+    const fetchPayments = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${AppConfig.api.baseUrl}/payments/company/${companyId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setPayments(data);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar pagamentos:", error);
         }
     };
 
@@ -658,6 +678,110 @@ export default function LicenseDetailsPage() {
                         <Save className="w-4 h-4 mr-2" />
                         Salvar Limites Personalizados
                     </Button>
+                </CardContent>
+            </Card>
+
+            {/* Histórico de Pagamentos */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <DollarSign className="w-5 h-5" />
+                        Histórico de Pagamentos
+                    </CardTitle>
+                    <CardDescription>
+                        Registro de pagamentos e renovações desta empresa
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="rounded-md border">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b bg-muted/50">
+                                    <th className="p-3 text-left font-medium">Vencimento</th>
+                                    <th className="p-3 text-left font-medium">Valor</th>
+                                    <th className="p-3 text-left font-medium">Referência</th>
+                                    <th className="p-3 text-left font-medium">Status</th>
+                                    <th className="p-3 text-left font-medium">Detalhes</th>
+                                    <th className="p-3 text-left font-medium">Auditoria</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {payments.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="p-4 text-center text-muted-foreground">
+                                            Nenhum pagamento registrado
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    payments.map((payment) => (
+                                        <tr key={payment.id} className="border-b last:border-0 hover:bg-muted/50">
+                                            <td className="p-3">
+                                                <div className="font-medium">
+                                                    {new Date(payment.dueDate).toLocaleDateString('pt-BR')}
+                                                </div>
+                                                {new Date(payment.dueDate) < new Date() && payment.status === 'PENDING' && (
+                                                    <span className="text-xs text-red-600 font-semibold flex items-center gap-1">
+                                                        <AlertTriangle className="w-3 h-3" /> Vencido
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-3 font-semibold">
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(payment.amount))}
+                                            </td>
+                                            <td className="p-3 capitalize">
+                                                {new Date(payment.referenceMonth).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                                            </td>
+                                            <td className="p-3">
+                                                <Badge
+                                                    variant={
+                                                        payment.status === 'PAID' ? 'default' :
+                                                            payment.status === 'PENDING' ? 'outline' :
+                                                                payment.status === 'OVERDUE' ? 'destructive' :
+                                                                    'secondary'
+                                                    }
+                                                    className="gap-1"
+                                                >
+                                                    {payment.status === 'PAID' && <CheckCircle className="w-3 h-3" />}
+                                                    {payment.status === 'PENDING' && <Clock className="w-3 h-3" />}
+                                                    {payment.status === 'OVERDUE' && <AlertTriangle className="w-3 h-3" />}
+                                                    {payment.status === 'CANCELLED' && <XCircle className="w-3 h-3" />}
+                                                    {payment.status === 'PAID' ? 'Pago' :
+                                                        payment.status === 'PENDING' ? 'Pendente' :
+                                                            payment.status === 'OVERDUE' ? 'Atrasado' :
+                                                                payment.status === 'CANCELLED' ? 'Cancelado' : payment.status}
+                                                </Badge>
+                                                {payment.paidAt && (
+                                                    <div className="text-xs text-muted-foreground mt-1">
+                                                        Em: {new Date(payment.paidAt).toLocaleDateString('pt-BR')}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="p-3">
+                                                <div className="text-xs">
+                                                    {payment.planName && <div className="font-medium text-foreground">{payment.planName}</div>}
+                                                    <div className="text-muted-foreground truncate max-w-[200px]" title={payment.notes || ''}>
+                                                        {payment.notes || '-'}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-3 text-xs text-muted-foreground">
+                                                {payment.createdByName && (
+                                                    <div title={`Criado por ${payment.createdByName} em ${new Date(payment.createdAt).toLocaleString()}`}>
+                                                        Criado por: <span className="text-foreground">{payment.createdByName}</span>
+                                                    </div>
+                                                )}
+                                                {payment.cancelledByName && (
+                                                    <div className="text-red-600 mt-1" title={`Cancelado por ${payment.cancelledByName} em ${new Date(payment.cancelledAt).toLocaleString()}`}>
+                                                        Cancelado por: <span className="font-medium">{payment.cancelledByName}</span>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </CardContent>
             </Card>
         </div>
