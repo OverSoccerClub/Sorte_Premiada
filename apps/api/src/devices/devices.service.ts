@@ -263,11 +263,9 @@ export class DevicesService {
 
     /**
      * Gera um código de ativação único automaticamente
-     * Formato: SIGLA-ANO-CÓDIGO (ex: AP-2026-XYZ123)
+     * Formato: XX-XXXX-XXXXXX (ex: AP-A3B9-X7K2M5)
      */
     private async generateUniqueActivationCode(company: { initials?: string; companyName: string }): Promise<string> {
-        const year = new Date().getFullYear();
-
         // Usar initials se disponível, senão extrair do nome
         const prefix = company.initials || this.extractInitials(company.companyName);
 
@@ -277,14 +275,17 @@ export class DevicesService {
         const maxAttempts = 10;
 
         while (!isUnique && attempts < maxAttempts) {
+            // Gera 4 caracteres aleatórios para o meio (letras maiúsculas e números)
+            const randomMiddle = Math.random().toString(36).substring(2, 6).toUpperCase();
+
             // Gera código aleatório de 6 caracteres (letras maiúsculas e números)
             const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
             // Garantir que o prefixo tenha exatamente 2 chars (preencher com X se necessário)
             const formattedPrefix = prefix.substring(0, 2).padEnd(2, 'X').toUpperCase();
 
-            // Formato: XX-XXXX-XXXXXX
-            code = `${formattedPrefix}-${year}-${randomCode}`;
+            // Formato: XX-XXXX-XXXXXX (Ex: AP-A3B9-X7K2M5)
+            code = `${formattedPrefix}-${randomMiddle}-${randomCode}`;
 
             // Verifica se já existe
             const existing = await this.prisma.posTerminal.findUnique({
