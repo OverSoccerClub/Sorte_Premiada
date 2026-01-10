@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAreaDto } from './dto/create-area.dto';
+import { UpdateAreaDto } from './dto/update-area.dto';
 
 @Injectable()
 export class AreasService {
@@ -37,6 +38,13 @@ export class AreasService {
             include: {
                 users: true,
             },
+        });
+    }
+
+    async update(id: string, updateAreaDto: UpdateAreaDto) {
+        return this.prisma.area.update({
+            where: { id },
+            data: updateAreaDto,
         });
     }
 

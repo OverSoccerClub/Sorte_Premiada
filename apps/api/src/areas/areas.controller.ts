@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch, UseGuards, Query, Request } from '@nestjs/common';
 import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
+import { UpdateAreaDto } from './dto/update-area.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -48,6 +49,12 @@ export class AreasController {
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.areasService.findOne(id);
+    }
+
+    @Patch(':id')
+    @Roles('ADMIN', 'MASTER')
+    update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
+        return this.areasService.update(id, updateAreaDto);
     }
 
     @Delete(':id')
