@@ -265,12 +265,31 @@ export class PlansService {
                     const dueDate = new Date();
                     dueDate.setDate(dueDate.getDate() + 7);
 
+                    // Buscar nome do usuário MASTER
+                    const masterUser = await this.prisma.user.findUnique({
+                        where: { id: masterUserId },
+                        select: { name: true, username: true }
+                    });
+
                     await this.paymentsService.createPayment({
                         companyId: companyId,
                         amount: totalAmount,
                         referenceMonth: new Date(), // Mês atual
                         dueDate: dueDate,
                         notes: `Ativação Plano ${planRaw.name} (${planRaw.maxUsers} usuários)`,
+                        // Auditoria completa
+                        createdBy: masterUserId,
+                        createdByName: masterUser?.name || masterUser?.username || 'MASTER',
+                        planId: planRaw.id,
+                        planName: planRaw.name,
+                        planDetails: {
+                            maxUsers: planRaw.maxUsers,
+                            maxTicketsPerMonth: planRaw.maxTicketsPerMonth,
+                            maxGames: planRaw.maxGames,
+                            maxActiveDevices: planRaw.maxActiveDevices,
+                            price: Number(planRaw.price),
+                            totalAmount: totalAmount,
+                        },
                     });
 
                     this.logger.log(`Payment created for plan application: R$ ${totalAmount.toFixed(2)} - Due: ${dueDate.toLocaleDateString()}`);

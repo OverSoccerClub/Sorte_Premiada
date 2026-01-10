@@ -17,6 +17,11 @@ export class PaymentsService {
         referenceMonth: Date;
         dueDate: Date;
         notes?: string;
+        createdBy?: string;
+        createdByName?: string;
+        planId?: string;
+        planName?: string;
+        planDetails?: any;
     }) {
         this.logger.log(`Creating payment for company ${data.companyId}: R$ ${data.amount}`);
 
@@ -28,6 +33,12 @@ export class PaymentsService {
                 referenceMonth: data.referenceMonth,
                 dueDate: data.dueDate,
                 notes: data.notes,
+                // Auditoria
+                createdBy: data.createdBy,
+                createdByName: data.createdByName,
+                planId: data.planId,
+                planName: data.planName,
+                planDetails: data.planDetails,
             },
             include: {
                 company: {

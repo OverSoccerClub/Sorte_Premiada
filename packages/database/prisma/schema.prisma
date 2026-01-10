@@ -414,6 +414,18 @@ model Payment {
   receiptUrl    String? // URL do comprovante
   notes         String? // Observações
 
+  // Auditoria e Rastreabilidade
+  createdBy     String? // ID do usuário MASTER que criou
+  createdByName String? // Nome do usuário para histórico
+  planId        String? // ID do plano aplicado
+  planName      String? // Nome do plano (snapshot)
+  planDetails   Json? // Detalhes completos do plano (maxUsers, etc)
+  
+  cancelledBy     String? // ID de quem cancelou
+  cancelledByName String? // Nome de quem cancelou
+  cancelledAt     DateTime? // Quando foi cancelado
+  cancelReason    String? // Motivo do cancelamento
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -421,6 +433,7 @@ model Payment {
   @@index([status])
   @@index([dueDate])
   @@index([referenceMonth])
+  @@index([createdBy])
 }
 
 model UsageStats {
