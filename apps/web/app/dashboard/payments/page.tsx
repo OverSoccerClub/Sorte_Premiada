@@ -295,7 +295,7 @@ export default function PaymentsPage() {
             <StandardPageHeader
                 title="Gestão de Pagamentos"
                 description="Controle de pagamentos de mensalidades das empresas"
-                icon={DollarSign}
+                icon={<DollarSign className="w-8 h-8 text-emerald-500" />}
             />
 
             {/* Filtros */}
