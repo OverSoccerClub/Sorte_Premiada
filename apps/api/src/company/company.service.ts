@@ -125,10 +125,13 @@ export class CompanyService {
      * Update company settings
      */
     async updateSettings(id: string, data: UpdateCompanySettingsDto): Promise<Company> {
+        // Remove plan field as it's a relation and can't be updated directly
+        const { plan, ...updateData } = data as any;
+
         return this.prisma.company.update({
             where: { id },
             data: {
-                ...data,
+                ...updateData,
                 updatedAt: new Date(),
             },
         });
