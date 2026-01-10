@@ -310,6 +310,7 @@ model Ticket {
   secondChanceDrawDate DateTime?
   secondChanceStatus   TicketStatus @default(PENDING) // Status específico para a Segunda Chance
   ticketNumber         Int? // Número sequencial do bilhete na série (0001-2500 para 2x1000)
+  series               Int? // Número da série da área/praça (ex: 1, 2, 3)
 
 
   // Financial Snapshot

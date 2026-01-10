@@ -13,6 +13,9 @@ export class TicketsController {
             throw new BadRequestException("Usuário sem empresa vinculada. Contate o suporte.");
         }
 
+        // Extract deviceId from headers (sent by mobile app)
+        const deviceId = req.headers['x-device-id'] || req.headers['x-device-token'];
+
         return this.ticketsService.create({
             ...createTicketDto,
             user: { connect: { id: req.user.userId } },
@@ -21,6 +24,7 @@ export class TicketsController {
             ...(createTicketDto.gameId ? { game: { connect: { id: createTicketDto.gameId } } } : {}),
             gameType: createTicketDto.gameType, // Ensure gameType is passed
             status: 'PENDING',
+            _deviceId: deviceId, // Pass deviceId to service
         });
     }
 

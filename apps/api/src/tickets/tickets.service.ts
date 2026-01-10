@@ -42,6 +42,26 @@ export class TicketsService {
         if (!game) throw new Error("Game not found");
         const rules = (game.rules as any) || {};
 
+        // Fetch Terminal and Area for Series Number
+        let seriesNumber: number | null = null;
+        const deviceId = (data as any)._deviceId;
+
+        if (deviceId) {
+            try {
+                const terminal = await this.prisma.posTerminal.findUnique({
+                    where: { deviceId },
+                    include: { area: true }
+                });
+
+                if (terminal?.area?.seriesNumber) {
+                    seriesNumber = terminal.area.seriesNumber;
+                    console.log(`[TicketsService] Using series ${seriesNumber} from area: ${terminal.area.name}`);
+                }
+            } catch (error) {
+                console.warn(`[TicketsService] Could not fetch terminal area:`, error);
+            }
+        }
+
         // Fetch User with Area for Commission Rate
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -253,7 +273,9 @@ export class TicketsService {
                 netValue: netValue,
                 possiblePrize: possiblePrize,
                 // Ticket Number (for 2x1000)
-                ...((data as any)._ticketNumber ? { ticketNumber: (data as any)._ticketNumber } : {})
+                ...((data as any)._ticketNumber ? { ticketNumber: (data as any)._ticketNumber } : {}),
+                // Series from Area
+                ...(seriesNumber !== null ? { series: seriesNumber } : {})
             };
 
             // Second Chance ...
