@@ -4,6 +4,7 @@ import { CreatePlanDto, UpdatePlanDto } from './dto/plans.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { User } from '../auth/user.decorator';
 
 @Controller('plans')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -50,8 +51,8 @@ export class PlansController {
 
     @Post(':id/apply/:companyId')
     @Roles('MASTER')
-    applyToCompany(@Param('id') id: string, @Param('companyId') companyId: string) {
-        this.logger.log(`POST /plans/${id}/apply/${companyId}`);
-        return this.plansService.applyPlanToCompany(companyId, id);
+    applyToCompany(@Param('id') id: string, @Param('companyId') companyId: string, @User() user: any) {
+        this.logger.log(`POST /plans/${id}/apply/${companyId} - User: ${user?.userId}`);
+        return this.plansService.applyPlanToCompany(companyId, id, user?.userId);
     }
 }

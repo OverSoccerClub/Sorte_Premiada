@@ -1,13 +1,17 @@
 import { Injectable, NotFoundException, ConflictException, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plans.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, TransactionType } from '@prisma/client';
+import { FinanceService } from '../finance/finance.service';
 
 @Injectable()
 export class PlansService {
     private readonly logger = new Logger(PlansService.name);
 
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private financeService: FinanceService,
+    ) { }
 
     private serializePlan(plan: any) {
         return {
@@ -191,7 +195,7 @@ export class PlansService {
         }
     }
 
-    async applyPlanToCompany(companyId: string, planId: string) {
+    async applyPlanToCompany(companyId: string, planId: string, masterUserId?: string) {
         this.logger.log(`Applying plan ${planId} to company ${companyId}`);
 
         try {
@@ -222,6 +226,25 @@ export class PlansService {
                     isActive: true,
                 }
             });
+
+            // Criar registro financeiro
+            if (masterUserId) {
+                try {
+                    await this.financeService.createTransaction(
+                        masterUserId,
+                        companyId,
+                        {
+                            description: `Ativação Plano ${planRaw.name} - Empresa: ${company.companyName}`,
+                            amount: Number(planRaw.price),
+                            type: TransactionType.CREDIT,
+                        }
+                    );
+                    this.logger.log(`Financial transaction created for plan application`);
+                } catch (error) {
+                    this.logger.error(`Failed to create financial transaction: ${error.message}`);
+                    // Não falhar a aplicação do plano se a transação falhar
+                }
+            }
 
             this.logger.log(`Plan applied successfully to company ${companyId}`);
             return company;
