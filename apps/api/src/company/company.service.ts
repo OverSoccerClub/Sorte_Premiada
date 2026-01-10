@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { DevicesService } from '../devices/devices.service';
-import { Company } from '@prisma/client';
+import { Company, LicenseStatus } from '@prisma/client';
 import type { UpdateCompanySettingsDto, CreateCompanyDto } from './company.dto';
+
+const DEFAULT_TRIAL_DAYS = 30;
 
 @Injectable()
 export class CompanyService {
@@ -78,6 +80,8 @@ export class CompanyService {
                         companyName: data.companyName,
                         slogan: data.slogan || 'Slogan Aqui',
                         primaryColor: data.primaryColor || '#50C878',
+                        licenseStatus: LicenseStatus.TRIAL,
+                        trialEndsAt: new Date(Date.now() + DEFAULT_TRIAL_DAYS * 24 * 60 * 60 * 1000),
                     },
                 });
 

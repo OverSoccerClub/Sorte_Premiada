@@ -165,14 +165,14 @@ export class LicenseController {
     ) {
         this.logger.log(`PUT /license/${companyId}/activate - User: ${JSON.stringify(user)}`);
 
-        if (!user || !user.id) {
-            this.logger.error('User or user.id is missing from @User() decorator');
+        if (!user || !user.userId) {
+            this.logger.error('User or user.userId is missing from @User() decorator');
             throw new BadRequestException('Usuário não autenticado corretamente');
         }
 
         const company = await this.licenseService.activateCompany(
             companyId,
-            user.id,
+            user.userId,
             user.name || user.username,
         );
 
@@ -205,14 +205,14 @@ export class LicenseController {
             throw new BadRequestException('Motivo da suspensão é obrigatório');
         }
 
-        if (!user || !user.id) {
+        if (!user || !user.userId) {
             throw new BadRequestException('Usuário não autenticado corretamente');
         }
 
         const company = await this.licenseService.suspendCompany(
             companyId,
             reason,
-            user.id,
+            user.userId,
             user.name || user.username,
         );
 
@@ -247,14 +247,14 @@ export class LicenseController {
             throw new BadRequestException('Número de meses inválido (mínimo 1)');
         }
 
-        if (!user || !user.id) {
+        if (!user || !user.userId) {
             throw new BadRequestException('Usuário não autenticado corretamente');
         }
 
         const company = await this.licenseService.renewLicense(
             companyId,
             months,
-            user.id,
+            user.userId,
             user.name || user.username,
         );
 
@@ -292,14 +292,14 @@ export class LicenseController {
             throw new BadRequestException('Pelo menos um limite deve ser fornecido');
         }
 
-        if (!user || !user.id) {
+        if (!user || !user.userId) {
             throw new BadRequestException('Usuário não autenticado corretamente');
         }
 
         const company = await this.licenseService.updateLimits(
             companyId,
             limits,
-            user.id,
+            user.userId,
             user.name || user.username,
         );
 
