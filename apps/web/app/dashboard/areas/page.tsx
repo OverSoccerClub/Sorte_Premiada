@@ -198,8 +198,6 @@ export default function AreasPage() {
             const url = editingId ? `${API_URL}/areas/${editingId}` : `${API_URL}/areas`
             const method = editingId ? "PATCH" : "POST"
 
-            const seriesNum = values.seriesNumber ? parseInt(values.seriesNumber) : null
-
             const res = await fetch(url, {
                 method: method,
                 headers: {
@@ -210,7 +208,7 @@ export default function AreasPage() {
                     name: values.name,
                     city: values.city,
                     state: values.state,
-                    seriesNumber: seriesNum,
+                    seriesNumber: values.seriesNumber || null,
                     companyId: activeCompanyId
                 }),
             })
