@@ -11,6 +11,7 @@ export class AreasService {
         return this.prisma.area.create({
             data: {
                 ...createAreaDto,
+                currentSeries: createAreaDto.seriesNumber, // Inicializar série atual
                 ...(companyId ? { companyId } : {})
             },
         });

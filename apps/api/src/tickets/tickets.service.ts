@@ -57,11 +57,39 @@ export class TicketsService {
             }
         });
 
-        // Get Series Number from User's Area
+        // === AUTOMATIC SERIES CONTROL ===
+        // Fetch area with series control fields
         let seriesNumber: string | null = null;
-        if (user?.area?.seriesNumber) {
-            seriesNumber = user.area.seriesNumber;
-            console.log(`[TicketsService] Using series ${seriesNumber} from user's area: ${user.area.name}`);
+        let areaToUpdate: { id: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number } | null = null;
+
+        if (user?.areaId) {
+            areaToUpdate = await this.prisma.area.findUnique({
+                where: { id: user.areaId },
+                select: {
+                    id: true,
+                    name: true,
+                    currentSeries: true,
+                    ticketsInSeries: true,
+                    maxTicketsPerSeries: true
+                }
+            });
+
+            if (areaToUpdate) {
+                // Check if we need to increment series
+                if (areaToUpdate.ticketsInSeries >= areaToUpdate.maxTicketsPerSeries) {
+                    // Increment series
+                    const currentSeriesNum = parseInt(areaToUpdate.currentSeries);
+                    const newSeries = (currentSeriesNum + 1).toString().padStart(4, '0');
+
+                    console.log(`[Series Auto-Increment] Area ${user.areaId} reached ${areaToUpdate.ticketsInSeries} tickets. Incrementing series: ${areaToUpdate.currentSeries} → ${newSeries}`);
+
+                    areaToUpdate.currentSeries = newSeries;
+                    areaToUpdate.ticketsInSeries = 0;
+                }
+
+                seriesNumber = areaToUpdate.currentSeries;
+                console.log(`[TicketsService] Using series ${seriesNumber} from area (${areaToUpdate.ticketsInSeries + 1}/${areaToUpdate.maxTicketsPerSeries})`);
+            }
         }
 
         // Fetch Area Override
@@ -248,8 +276,41 @@ export class TicketsService {
             }
         }
 
+
         if (!drawDate) {
             try { drawDate = await this.getNextDrawDate(gameId); } catch { }
+        }
+
+        // Fetch Device Name from POS Terminal (if deviceId/token provided)
+        let deviceName: string | null = null;
+        if (data._deviceId) {
+            try {
+                // Try to find device by token first (x-device-token)
+                const deviceByToken = await this.prisma.posTerminal.findFirst({
+                    where: { deviceToken: data._deviceId },
+                    select: { name: true, activationCode: true }
+                });
+
+                if (deviceByToken) {
+                    deviceName = deviceByToken.name || deviceByToken.activationCode || null;
+                } else {
+                    // Fallback: try to find by deviceId (x-device-id)
+                    const deviceById = await this.prisma.posTerminal.findFirst({
+                        where: { deviceId: data._deviceId },
+                        select: { name: true, activationCode: true }
+                    });
+
+                    if (deviceById) {
+                        deviceName = deviceById.name || deviceById.activationCode || null;
+                    }
+                }
+
+                if (deviceName) {
+                    console.log(`[TicketsService] Using device name: ${deviceName}`);
+                }
+            } catch (e) {
+                console.warn(`[TicketsService] Failed to fetch device name:`, e);
+            }
         }
 
         try {
@@ -327,6 +388,18 @@ export class TicketsService {
                 data: createData
             });
 
+            // Update area series counter
+            if (areaToUpdate) {
+                await this.prisma.area.update({
+                    where: { id: areaToUpdate.id },
+                    data: {
+                        currentSeries: areaToUpdate.currentSeries,
+                        ticketsInSeries: areaToUpdate.ticketsInSeries + 1
+                    }
+                });
+                console.log(`[Series Counter] Area ${areaToUpdate.id} updated: series=${areaToUpdate.currentSeries}, count=${areaToUpdate.ticketsInSeries + 1}`);
+            }
+
             // Invalidate Redis Caches for this game and draw date
             try {
                 const cacheKey = `sold_numbers:${ticket.gameId}:${ticket.drawDate?.toISOString()}`;
@@ -337,11 +410,16 @@ export class TicketsService {
                 console.error("Redis invalidation failed", e);
             }
 
-            return ticket;
+            // Return ticket with additional device info
+            return {
+                ...ticket,
+                deviceName: deviceName
+            };
         } catch (error) {
             console.error("Error creating ticket:", error);
             throw error;
         }
+
     }
 
     private generateTicketCode(length: number = 8): string {

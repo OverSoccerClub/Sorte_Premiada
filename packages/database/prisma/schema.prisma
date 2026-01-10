@@ -173,17 +173,20 @@ model Area {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  name             String
-  city             String
-  state            String
-  seriesNumber     String? // Número da série desta área formatado (ex: "0001", "0002", "0003")
-  users            User[]
-  configs          AreaConfig[]
-  posTerminals     PosTerminal[]
-  draws            Draw[]
-  extractionSeries ExtractionSeries[]
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  name                String
+  city                String
+  state               String
+  seriesNumber        String // Série base inicial (obrigatório) - ex: "0001"
+  currentSeries       String // Série atual em uso (incrementa automaticamente)
+  ticketsInSeries     Int    @default(0) // Contador de bilhetes na série atual
+  maxTicketsPerSeries Int    @default(2500) // Máximo de bilhetes por série
+  users               User[]
+  configs             AreaConfig[]
+  posTerminals        PosTerminal[]
+  draws               Draw[]
+  extractionSeries    ExtractionSeries[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   @@index([companyId])
 }
