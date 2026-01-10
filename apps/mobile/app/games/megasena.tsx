@@ -4,6 +4,7 @@ import ViewShot from "react-native-view-shot";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Device from "expo-device";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
 import { useLoading } from "../../context/LoadingContext";
@@ -204,7 +205,8 @@ export default function MegaSenaScreen() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'x-device-id': Device.modelName || 'unknown'
                 },
                 body: JSON.stringify({
                     gameType: "Mega Sena",

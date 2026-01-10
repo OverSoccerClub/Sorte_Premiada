@@ -344,7 +344,8 @@ export default function Game2x1000Screen() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'x-device-id': Device.modelName || 'unknown'
                 },
                 body: JSON.stringify(payload),
                 signal: controller.signal
