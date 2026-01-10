@@ -217,4 +217,26 @@ export class PaymentsService {
             }))
         };
     }
+
+    /**
+     * Excluir pagamento
+     */
+    async deletePayment(paymentId: string) {
+        this.logger.log(`Deleting payment ${paymentId}`);
+
+        const payment = await this.prisma.payment.findUnique({
+            where: { id: paymentId }
+        });
+
+        if (!payment) {
+            throw new NotFoundException('Pagamento não encontrado');
+        }
+
+        await this.prisma.payment.delete({
+            where: { id: paymentId }
+        });
+
+        this.logger.log(`Payment ${paymentId} deleted successfully`);
+        return { message: 'Pagamento excluído com sucesso' };
+    }
 }

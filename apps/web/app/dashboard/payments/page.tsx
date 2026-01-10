@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter } from "lucide-react";
+import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
@@ -127,6 +127,58 @@ export default function PaymentsPage() {
             toast.error("Erro ao processar");
         } finally {
             setProcessing(false);
+        }
+    };
+
+    const handleCancelPayment = async (paymentId: string) => {
+        if (!confirm("Tem certeza que deseja cancelar este pagamento?")) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(
+                `${AppConfig.api.baseUrl}/payments/${paymentId}/mark-overdue`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                toast.success("Pagamento cancelado!");
+                fetchPayments();
+            } else {
+                toast.error("Erro ao cancelar pagamento");
+            }
+        } catch (error) {
+            toast.error("Erro ao processar");
+        }
+    };
+
+    const handleDeletePayment = async (paymentId: string) => {
+        if (!confirm("Tem certeza que deseja EXCLUIR este pagamento? Esta ação não pode ser desfeita!")) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(
+                `${AppConfig.api.baseUrl}/payments/${paymentId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                toast.success("Pagamento excluído!");
+                fetchPayments();
+            } else {
+                toast.error("Erro ao excluir pagamento");
+            }
+        } catch (error) {
+            toast.error("Erro ao processar");
         }
     };
 
@@ -253,20 +305,41 @@ export default function PaymentsPage() {
                                     </TableCell>
                                     <TableCell>{payment.method || "-"}</TableCell>
                                     <TableCell>
-                                        {payment.status === "PENDING" || payment.status === "OVERDUE" ? (
-                                            <Button
-                                                size="sm"
-                                                onClick={() => {
-                                                    setSelectedPayment(payment);
-                                                    setMarkPaidDialog(true);
-                                                }}
-                                            >
-                                                <CheckCircle className="w-4 h-4 mr-1" />
-                                                Marcar Pago
-                                            </Button>
-                                        ) : (
-                                            <span className="text-muted-foreground text-sm">-</span>
-                                        )}
+                                        <div className="flex gap-2">
+                                            {payment.status === "PENDING" || payment.status === "OVERDUE" ? (
+                                                <>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setSelectedPayment(payment);
+                                                            setMarkPaidDialog(true);
+                                                        }}
+                                                    >
+                                                        <CheckCircle className="w-4 h-4 mr-1" />
+                                                        Marcar Pago
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() => handleCancelPayment(payment.id)}
+                                                    >
+                                                        <XCircle className="w-4 h-4 mr-1" />
+                                                        Cancelar
+                                                    </Button>
+                                                </>
+                                            ) : payment.status === "PAID" ? (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => handleDeletePayment(payment.id)}
+                                                >
+                                                    <Trash2 className="w-4 h-4 mr-1" />
+                                                    Excluir
+                                                </Button>
+                                            ) : (
+                                                <span className="text-muted-foreground text-sm">-</span>
+                                            )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

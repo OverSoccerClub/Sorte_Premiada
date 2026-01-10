@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, Logger } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -97,5 +97,16 @@ export class PaymentsController {
     async checkOverdue() {
         this.logger.log('POST /payments/check-overdue - Manual trigger');
         return this.paymentsService.checkAndUpdateOverduePayments();
+    }
+
+    /**
+     * Excluir pagamento
+     * DELETE /payments/:id
+     */
+    @Delete(':id')
+    @Roles('MASTER')
+    async deletePayment(@Param('id') id: string) {
+        this.logger.log(`DELETE /payments/${id}`);
+        return this.paymentsService.deletePayment(id);
     }
 }
