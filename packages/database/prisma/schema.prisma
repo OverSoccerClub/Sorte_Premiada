@@ -551,12 +551,17 @@ model PosTerminal {
   activatedAt    DateTime? // Data/hora de ativação
   isActive       Boolean   @default(true) // Controle de ativação/desativação remota
   
+  // Vínculo com Área/Praça
+  areaId String?
+  area   Area?   @relation(fields: [areaId], references: [id])
+  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@index([companyId])
   @@index([activationCode])
   @@index([deviceToken])
+  @@index([areaId])
 }
 
 enum DailyCloseStatus {
