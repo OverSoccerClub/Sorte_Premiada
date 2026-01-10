@@ -176,8 +176,10 @@ model Area {
   name             String
   city             String
   state            String
+  seriesNumber     Int? // Número da série desta área (ex: 1, 2, 3)
   users            User[]
   configs          AreaConfig[]
+  posTerminals     PosTerminal[]
   draws            Draw[]
   extractionSeries ExtractionSeries[]
   createdAt        DateTime           @default(now())
