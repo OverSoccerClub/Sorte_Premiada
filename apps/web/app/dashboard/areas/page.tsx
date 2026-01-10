@@ -22,7 +22,7 @@ const formSchema = z.object({
     name: z.string().min(1, "Nome é obrigatório"),
     city: z.string().min(1, "Cidade é obrigatória"),
     state: z.string().min(1, "Estado é obrigatório").length(2, { message: "Estado deve ser a sigla (ex: SP)." }).toUpperCase(),
-    seriesNumber: z.string().optional(),
+    seriesNumber: z.string().min(4, "Série é obrigatória (ex: 0001)"),
 })
 
 interface Area {

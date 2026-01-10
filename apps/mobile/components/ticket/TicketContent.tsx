@@ -16,6 +16,7 @@ export interface TicketData {
     ticketNumber?: number;
     drawDate?: string;
     terminalId?: string;
+    deviceName?: string;
     vendorName?: string;
     possiblePrize?: string;
     secondChanceNumber?: number;
