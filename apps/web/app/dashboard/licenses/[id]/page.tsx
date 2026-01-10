@@ -29,6 +29,7 @@ export default function LicenseDetailsPage() {
     const [plans, setPlans] = useState<any[]>([]);
     const [selectedPlanId, setSelectedPlanId] = useState<string>("");
     const [renewMonths, setRenewMonths] = useState(1);
+    const [trialDays, setTrialDays] = useState(30);
     const [suspendReason, setSuspendReason] = useState("");
     const [limits, setLimits] = useState({
         maxUsers: 10,
@@ -199,6 +200,38 @@ export default function LicenseDetailsPage() {
             }
         } catch (error) {
             toast.error("Erro ao atualizar limites");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSetTrial = async () => {
+        if (trialDays < 1) {
+            toast.error("Número de dias inválido");
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${AppConfig.api.baseUrl}/license/${companyId}/trial`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ trialDays }),
+            });
+
+            if (response.ok) {
+                toast.success(`Período de teste configurado para ${trialDays} dia(s)!`);
+                fetchLicenseDetails();
+            } else {
+                const error = await response.json();
+                toast.error(error.message || "Erro ao configurar período de teste");
+            }
+        } catch (error) {
+            toast.error("Erro ao configurar período de teste");
         } finally {
             setSaving(false);
         }
@@ -412,6 +445,33 @@ export default function LicenseDetailsPage() {
                                     Renovar
                                 </Button>
                             </div>
+                        </div>
+
+                        <Separator />
+
+                        {/* Configurar Período de Teste */}
+                        <div className="space-y-3">
+                            <Label className="text-base font-semibold">Configurar Período de Teste</Label>
+                            <div className="flex gap-3">
+                                <div className="flex-1 flex items-center gap-2">
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        max="365"
+                                        value={trialDays}
+                                        onChange={(e) => setTrialDays(parseInt(e.target.value) || 1)}
+                                        className="w-24"
+                                    />
+                                    <span className="text-sm text-muted-foreground">dia(s)</span>
+                                </div>
+                                <Button onClick={handleSetTrial} disabled={saving} className="bg-purple-600 hover:bg-purple-700">
+                                    <Calendar className="w-4 h-4 mr-2" />
+                                    Aplicar Trial
+                                </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Define o período de teste e muda o status para TRIAL
+                            </p>
                         </div>
 
                         <Separator />

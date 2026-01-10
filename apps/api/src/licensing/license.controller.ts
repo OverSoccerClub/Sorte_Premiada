@@ -317,6 +317,46 @@ export class LicenseController {
     }
 
     /**
+     * Configurar período de teste de uma empresa
+     * PUT /license/:companyId/trial
+     * Body: { trialDays: number }
+     */
+    @Put(':companyId/trial')
+    @HttpCode(HttpStatus.OK)
+    async setTrialPeriod(
+        @Param('companyId') companyId: string,
+        @Body('trialDays') trialDays: number,
+        @User() user: any,
+    ) {
+        this.logger.log(`PUT /license/${companyId}/trial - User: ${user?.userId}, Days: ${trialDays}`);
+
+        if (!trialDays || trialDays < 1) {
+            throw new BadRequestException('Número de dias inválido (mínimo 1)');
+        }
+
+        if (!user || !user.userId) {
+            throw new BadRequestException('Usuário não autenticado corretamente');
+        }
+
+        const company = await this.licenseService.setTrialPeriod(
+            companyId,
+            trialDays,
+            user.userId,
+            user.name || user.username,
+        );
+
+        return {
+            message: `Período de teste configurado para ${trialDays} dia(s)`,
+            company: {
+                id: company.id,
+                companyName: company.companyName,
+                licenseStatus: company.licenseStatus,
+                trialEndsAt: company.trialEndsAt,
+            },
+        };
+    }
+
+    /**
      * Ver histórico de mudanças de uma licença
      * GET /license/:companyId/history?limit=50
      */

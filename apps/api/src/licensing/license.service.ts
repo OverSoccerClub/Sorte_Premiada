@@ -459,6 +459,57 @@ export class LicenseService {
     }
 
     /**
+     * Configurar período de teste de uma empresa (MASTER only)
+     * @param companyId ID da empresa
+     * @param trialDays Número de dias de teste
+     * @param performedBy ID do usuário MASTER
+     * @returns Empresa atualizada
+     */
+    async setTrialPeriod(
+        companyId: string,
+        trialDays: number,
+        performedBy: string,
+        performedByName?: string,
+    ) {
+        const company = await this.prisma.company.findUnique({
+            where: { id: companyId },
+        });
+
+        if (!company) {
+            throw new Error('Empresa não encontrada');
+        }
+
+        const now = new Date();
+        const trialEndsAt = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+
+        const updated = await this.prisma.company.update({
+            where: { id: companyId },
+            data: {
+                trialEndsAt,
+                licenseStatus: LicenseStatus.TRIAL,
+                lastModifiedBy: performedBy,
+                lastModifiedAt: now,
+            },
+        });
+
+        // Registrar no histórico
+        await this.recordLicenseHistory({
+            companyId,
+            action: 'TRIAL_CONFIGURED',
+            previousStatus: company.licenseStatus,
+            newStatus: LicenseStatus.TRIAL,
+            reason: `Período de teste configurado para ${trialDays} dia(s)`,
+            performedBy,
+            performedByName,
+            metadata: { trialDays, trialEndsAt },
+        });
+
+        this.logger.log(`Período de teste configurado: ${company.companyName} - ${trialDays} dias`);
+
+        return updated;
+    }
+
+    /**
      * Registra uma mudança no histórico de licenças
      */
     async recordLicenseHistory(data: {
