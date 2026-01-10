@@ -332,7 +332,7 @@ export class TicketsService {
                 // Ticket Number (for 2x1000)
                 ...((data as any)._ticketNumber ? { ticketNumber: (data as any)._ticketNumber } : {}),
                 // Series from Area
-                ...(seriesNumber !== null ? { series: seriesNumber } : {})
+                ...(seriesNumber !== null ? { series: Number(seriesNumber) } : {})
             };
 
             // Second Chance ...

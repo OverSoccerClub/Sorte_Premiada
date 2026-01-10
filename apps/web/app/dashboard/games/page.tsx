@@ -17,6 +17,7 @@ import { PrizesDialog } from "@/components/games/prizes-dialog"
 import { ScheduleDialog } from "@/components/games/schedule-dialog"
 import { Switch } from "@/components/ui/switch"
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { useAuth } from "@/context/auth-context"
 
 interface Game {
     id: string
@@ -40,6 +41,7 @@ interface Game {
 }
 
 export default function GamesPage() {
+    const { user } = useAuth()
     const activeCompanyId = useActiveCompanyId()
     const [games, setGames] = useState<Game[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -194,9 +196,11 @@ export default function GamesPage() {
                         Estatísticas de Séries
                     </Button>
                 </Link>
-                <Button onClick={handleCreateClick} className="bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
-                    <Plus className="w-4 h-4 mr-2" /> Novo Jogo
-                </Button>
+                {user?.role === 'MASTER' && (
+                    <Button onClick={handleCreateClick} className="bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
+                        <Plus className="w-4 h-4 mr-2" /> Novo Jogo
+                    </Button>
+                )}
             </StandardPageHeader>
 
             {isLoading ? (
