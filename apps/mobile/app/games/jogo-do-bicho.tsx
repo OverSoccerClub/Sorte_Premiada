@@ -16,6 +16,7 @@ import { useTicketPrint } from "../../hooks/useTicketPrint";
 import { TicketData } from "../../components/ticket/TicketContent";
 import { ReceiptModal } from "../../components/ReceiptModal";
 import { AppConfig } from "../../constants/AppConfig";
+import { useCompany } from "../../context/CompanyContext";
 
 
 // Animal Data
@@ -54,6 +55,7 @@ export default function JogoDoBichoScreen() {
     const { token } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
+    const { settings } = useCompany();
     const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
@@ -224,6 +226,8 @@ export default function JogoDoBichoScreen() {
                     centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                     dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                 } : undefined,
+                companyName: settings.companyName,
+                companyLogoUrl: settings.logoUrl
             };
             setLastTicket(ticketObj);
 
@@ -397,7 +401,9 @@ export default function JogoDoBichoScreen() {
                                         milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                                         centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                                         dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
-                                    } : undefined
+                                    } : undefined,
+                                    companyName: settings.companyName,
+                                    companyLogoUrl: settings.logoUrl
                                 }}
                                 mode="preview"
                             />

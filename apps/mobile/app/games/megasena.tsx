@@ -17,6 +17,7 @@ import { TicketDisplay } from "../../components/ticket/TicketDisplay";
 import { useTicketPrint } from "../../hooks/useTicketPrint";
 import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
+import { useCompany } from "../../context/CompanyContext";
 
 
 // --- Number Ball Component ---
@@ -77,6 +78,7 @@ export default function MegaSenaScreen() {
     const { token } = useAuth(); // Get token
     const { show, hide } = useLoading(); // Global loading
     const { printerType } = usePrinter();
+    const { settings } = useCompany();
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
     const viewShotRef = useRef(null);
@@ -233,7 +235,9 @@ export default function MegaSenaScreen() {
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                 secondChanceLabel: "SEGUNDA CHANCE",
-                status: ticketData.status
+                status: ticketData.status,
+                companyName: settings.companyName,
+                companyLogoUrl: settings.logoUrl
             };
 
             setLastTicket(fullTicket);
@@ -382,7 +386,9 @@ export default function MegaSenaScreen() {
                                             numbers: selectedNumbers,
                                             price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                             date: new Date().toLocaleString('pt-BR'),
-                                            ticketId: "PREVIEW"
+                                            ticketId: "PREVIEW",
+                                            companyName: settings.companyName,
+                                            companyLogoUrl: settings.logoUrl
                                         }}
                                         mode="preview"
                                     />
