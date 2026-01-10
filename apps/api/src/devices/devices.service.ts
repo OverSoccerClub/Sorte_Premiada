@@ -10,18 +10,25 @@ export class DevicesService {
     ) { }
 
     async register(data: { deviceId: string; model?: string; appVersion?: string }) {
-        return this.prisma.posTerminal.upsert({
+        // Only update if device already exists (activated)
+        // Do NOT create new devices here - they should be created via activation code
+        const existing = await this.prisma.posTerminal.findUnique({
+            where: { deviceId: data.deviceId }
+        });
+
+        if (!existing) {
+            // Device not activated yet - do nothing
+            console.log(`[DeviceService] Device ${data.deviceId} not activated yet, skipping registration`);
+            return null;
+        }
+
+        // Update existing device
+        return this.prisma.posTerminal.update({
             where: { deviceId: data.deviceId },
-            update: {
+            data: {
                 model: data.model,
                 appVersion: data.appVersion,
                 lastSeenAt: new Date(),
-                status: 'ONLINE',
-            },
-            create: {
-                deviceId: data.deviceId,
-                model: data.model,
-                appVersion: data.appVersion,
                 status: 'ONLINE',
             },
         });
