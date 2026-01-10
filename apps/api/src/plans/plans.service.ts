@@ -205,6 +205,34 @@ export class PlansService {
                 throw new NotFoundException('Plano não encontrado');
             }
 
+            // Verificar se já existe pagamento PENDING ou OVERDUE para esta empresa
+            const existingPendingPayments = await this.prisma.payment.findMany({
+                where: {
+                    companyId: companyId,
+                    status: {
+                        in: ['PENDING', 'OVERDUE']
+                    }
+                }
+            });
+
+            // Cancelar pagamentos pendentes/atrasados anteriores
+            if (existingPendingPayments.length > 0) {
+                this.logger.warn(`Found ${existingPendingPayments.length} pending/overdue payments for company ${companyId}. Cancelling them...`);
+
+                for (const payment of existingPendingPayments) {
+                    await this.prisma.payment.update({
+                        where: { id: payment.id },
+                        data: {
+                            status: 'CANCELLED',
+                            notes: payment.notes
+                                ? `${payment.notes} - CANCELADO: Novo plano aplicado`
+                                : 'CANCELADO: Novo plano aplicado'
+                        }
+                    });
+                    this.logger.log(`Payment ${payment.id} cancelled (R$ ${payment.amount})`);
+                }
+            }
+
             // Calcular data de expiração (1 mês a partir de agora)
             const now = new Date();
             const licenseExpiresAt = new Date(now);
