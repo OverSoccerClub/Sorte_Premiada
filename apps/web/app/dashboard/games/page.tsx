@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Palette, Activity, Check, X, FileText } from "lucide-react"
+import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Palette, Activity, Check, X, FileText, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { API_URL } from "@/lib/api"
@@ -188,6 +188,12 @@ export default function GamesPage() {
                         </Button>
                     </Link>
                 )}
+                <Link href="/dashboard/games/series-stats">
+                    <Button variant="outline" size="sm" className="hidden sm:flex">
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        Estatísticas de Séries
+                    </Button>
+                </Link>
                 <Button onClick={handleCreateClick} className="bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
                     <Plus className="w-4 h-4 mr-2" /> Novo Jogo
                 </Button>
