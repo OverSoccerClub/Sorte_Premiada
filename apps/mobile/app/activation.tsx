@@ -39,7 +39,7 @@ export default function ActivationScreen() {
 
     const validateCodeFormat = (code: string): boolean => {
         // Formato esperado: XX-XXXX-XXXXXX (ex: AP-A3B9-K7M2N5)
-        const regex = /^[A-Z]{2}-\d{4}-[A-Z0-9]{6}$/i;
+        const regex = /^[A-Z0-9]{2}-[A-Z0-9]{4}-[A-Z0-9]{6}$/i;
         return regex.test(code);
     }
 
@@ -54,7 +54,7 @@ export default function ActivationScreen() {
         if (!validateCodeFormat(code)) {
             showAlert(
                 "Código Inválido",
-                "O código deve estar no formato: XX-YYYY-XXXXXX\nExemplo: AP-2026-ABC123",
+                "O código deve estar no formato: XX-XXXX-XXXXXX\nExemplo: AP-A3B9-K7M2N5",
                 "warning"
             );
             return;
