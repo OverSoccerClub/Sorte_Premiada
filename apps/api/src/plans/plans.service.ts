@@ -230,16 +230,19 @@ export class PlansService {
             // Criar registro financeiro
             if (masterUserId) {
                 try {
+                    // Calcular valor total: Preço do plano × Máximo de usuários
+                    const totalAmount = Number(planRaw.price) * planRaw.maxUsers;
+
                     await this.financeService.createTransaction(
                         masterUserId,
                         companyId,
                         {
-                            description: `Ativação Plano ${planRaw.name} - Empresa: ${company.companyName}`,
-                            amount: Number(planRaw.price),
+                            description: `Ativação Plano ${planRaw.name} - Empresa: ${company.companyName} (${planRaw.maxUsers} usuários)`,
+                            amount: totalAmount,
                             type: TransactionType.CREDIT,
                         }
                     );
-                    this.logger.log(`Financial transaction created for plan application`);
+                    this.logger.log(`Financial transaction created for plan application: R$ ${totalAmount.toFixed(2)}`);
                 } catch (error) {
                     this.logger.error(`Failed to create financial transaction: ${error.message}`);
                     // Não falhar a aplicação do plano se a transação falhar
