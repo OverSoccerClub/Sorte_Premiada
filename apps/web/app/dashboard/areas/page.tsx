@@ -363,21 +363,25 @@ export default function AreasPage() {
                                                     <Input
                                                         type="text"
                                                         maxLength={4}
-                                                        placeholder="Ex: 0001, 0002, 0003..."
+                                                        placeholder="Ex: 1, 2, 3..."
                                                         className="bg-muted/50 border-input font-mono"
                                                         value={field.value || ''}
                                                         onChange={(e) => {
-                                                            const value = e.target.value.replace(/\D/g, ''); // Apenas números
+                                                            // Permite apenas números
+                                                            const value = e.target.value.replace(/\D/g, '');
+                                                            field.onChange(value);
+                                                        }}
+                                                        onBlur={(e) => {
+                                                            // Formata com 4 dígitos apenas quando sai do campo
+                                                            const value = e.target.value.replace(/\D/g, '');
                                                             if (value) {
-                                                                field.onChange(value.padStart(4, '0')); // Formata com 4 dígitos
-                                                            } else {
-                                                                field.onChange('');
+                                                                field.onChange(value.padStart(4, '0'));
                                                             }
                                                         }}
                                                     />
                                                 </FormControl>
                                                 <p className="text-xs text-muted-foreground">
-                                                    Série única para identificar bilhetes desta área (ex: Centro = 0001, Ceasa = 0002)
+                                                    Série única para identificar bilhetes desta área (ex: Centro = 1, Ceasa = 2)
                                                 </p>
                                                 <FormMessage />
                                             </FormItem>
