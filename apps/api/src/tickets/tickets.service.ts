@@ -58,7 +58,7 @@ export class TicketsService {
         });
 
         // Get Series Number from User's Area
-        let seriesNumber: number | null = null;
+        let seriesNumber: string | null = null;
         if (user?.area?.seriesNumber) {
             seriesNumber = user.area.seriesNumber;
             console.log(`[TicketsService] Using series ${seriesNumber} from user's area: ${user.area.name}`);
