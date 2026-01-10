@@ -42,31 +42,27 @@ export class TicketsService {
         if (!game) throw new Error("Game not found");
         const rules = (game.rules as any) || {};
 
-        // Fetch Terminal and Area for Series Number
-        let seriesNumber: number | null = null;
-        const deviceId = (data as any)._deviceId;
-
-        if (deviceId) {
-            try {
-                const terminal = await this.prisma.posTerminal.findUnique({
-                    where: { deviceId },
-                    include: { area: true }
-                });
-
-                if (terminal?.area?.seriesNumber) {
-                    seriesNumber = terminal.area.seriesNumber;
-                    console.log(`[TicketsService] Using series ${seriesNumber} from area: ${terminal.area.name}`);
-                }
-            } catch (error) {
-                console.warn(`[TicketsService] Could not fetch terminal area:`, error);
-            }
-        }
-
-        // Fetch User with Area for Commission Rate
+        // Fetch User with Area for Commission Rate AND Series Number
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: { commissionRate: true, areaId: true }
+            select: {
+                commissionRate: true,
+                areaId: true,
+                area: {
+                    select: {
+                        seriesNumber: true,
+                        name: true
+                    }
+                }
+            }
         });
+
+        // Get Series Number from User's Area
+        let seriesNumber: number | null = null;
+        if (user?.area?.seriesNumber) {
+            seriesNumber = user.area.seriesNumber;
+            console.log(`[TicketsService] Using series ${seriesNumber} from user's area: ${user.area.name}`);
+        }
 
         // Fetch Area Override
         const areaConfig = (user?.areaId && gameId) ? await this.prisma.areaConfig.findUnique({
