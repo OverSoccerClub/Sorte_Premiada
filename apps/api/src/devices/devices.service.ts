@@ -10,25 +10,18 @@ export class DevicesService {
     ) { }
 
     async register(data: { deviceId: string; model?: string; appVersion?: string }) {
-        // Only update if device already exists (activated)
-        // Do NOT create new devices here - they should be created via activation code
-        const existing = await this.prisma.posTerminal.findUnique({
-            where: { deviceId: data.deviceId }
-        });
-
-        if (!existing) {
-            // Device not activated yet - do nothing
-            console.log(`[DeviceService] Device ${data.deviceId} not activated yet, skipping registration`);
-            return null;
-        }
-
-        // Update existing device
-        return this.prisma.posTerminal.update({
+        return this.prisma.posTerminal.upsert({
             where: { deviceId: data.deviceId },
-            data: {
+            update: {
                 model: data.model,
                 appVersion: data.appVersion,
                 lastSeenAt: new Date(),
+                status: 'ONLINE',
+            },
+            create: {
+                deviceId: data.deviceId,
+                model: data.model,
+                appVersion: data.appVersion,
                 status: 'ONLINE',
             },
         });
@@ -399,18 +392,14 @@ export class DevicesService {
 
         // === CONFLICT RESOLUTION ===
         // Verificar se já existe um dispositivo registrado com este deviceId físico
-        // Isso acontece se o app for reinstalado ou dados limpos no mesmo aparelho
+        // Isso pode acontecer se register() foi chamado antes da ativação
         const existingDevice = await this.prisma.posTerminal.findUnique({
             where: { deviceId }
         });
 
         if (existingDevice && existingDevice.id !== device.id) {
-            // Verificar se pertence a OUTRA empresa
-            // O dispositivo registrado (existingDevice) pode não ter companyId carregado aqui se não fizermos include.
-            // O findUnique acima { where: { deviceId } } não tinha include. Mas o model tem companyId.
-            // Vamos assumir que existingDevice.companyId está disponível.
-
-            // Buscar informações completas do dispositivo existente para verificar empresa e nome
+            // Existe outro registro com este deviceId físico
+            // Buscar informações completas
             const conflictDevice = await this.prisma.posTerminal.findUnique({
                 where: { id: existingDevice.id },
                 include: { company: true }
@@ -424,19 +413,11 @@ export class DevicesService {
                 );
             }
 
-            console.warn(`[Device Activation] Re-install detected within same company. Archiving old device record ${existingDevice.id} to release deviceId ${deviceId}`);
-
-            // Se for a MESMA empresa, permite (Reinstalação/Limpeza de Cache)
-            // Arquivar o registro antigo para liberar o deviceId
-            await this.prisma.posTerminal.update({
-                where: { id: existingDevice.id },
-                data: {
-                    // Renomeia para liberar a constraint unique
-                    deviceId: `archived_${Date.now()}_${deviceId.substring(0, 50)}`,
-                    isActive: false,
-                    status: 'OFFLINE',
-                    deviceToken: null // Invalida o token antigo
-                }
+            // Mesma empresa: deletar o registro criado por register() 
+            // e manter o registro do código de ativação
+            console.log(`[Device Activation] Deleting duplicate device created by register(): ${existingDevice.id}`);
+            await this.prisma.posTerminal.delete({
+                where: { id: existingDevice.id }
             });
         }
 
