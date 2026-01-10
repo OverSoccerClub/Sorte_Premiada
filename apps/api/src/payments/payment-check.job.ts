@@ -27,6 +27,11 @@ export class PaymentCheckJob {
                     this.logger.warn(`  - ${p.companyName}: R$ ${p.amount} (Due: ${p.dueDate})`);
                 });
             }
+
+            // 2. Generate new recurring payments
+            const generationResult = await this.paymentsService.generateRecurringPayments();
+            this.logger.log(`Recurring payment generation completed: ${generationResult.processed} payments generated`);
+
         } catch (error) {
             this.logger.error(`Error checking overdue payments: ${error.message}`, error.stack);
         }

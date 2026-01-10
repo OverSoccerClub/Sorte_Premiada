@@ -11,7 +11,7 @@ export class GamesService {
     ) { }
 
     async create(data: any) {
-        const { extractionSeries, companyId, ...gameData } = data;
+        const { extractionSeries, companyId, targetCompanyId, ...gameData } = data;
 
         // Prepare proper Prisma connection/creation syntax
         const createData: Prisma.GameCreateInput = {

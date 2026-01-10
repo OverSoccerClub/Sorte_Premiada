@@ -1,12 +1,17 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Role } from '@prisma/client';
+
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PaymentsService {
     private readonly logger = new Logger(PaymentsService.name);
 
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private notificationsService: NotificationsService
+    ) { }
 
     /**
      * Criar um novo pagamento
@@ -96,6 +101,12 @@ export class PaymentsService {
             });
             this.logger.log(`Company ${payment.company.companyName} reactivated after payment`);
         }
+
+        this.notifyCompany(
+            payment.companyId,
+            'Pagamento Confirmado',
+            `O pagamento referente a ${payment.referenceMonth} foi confirmado com sucesso. Obrigado!`
+        );
 
         return updated;
     }
@@ -247,6 +258,12 @@ export class PaymentsService {
                     }
                 });
                 this.logger.warn(`Company ${payment.company.companyName} suspended due to overdue payment`);
+
+                this.notifyCompany(
+                    payment.companyId,
+                    'Aviso de Cobrança',
+                    `Seu pagamento venceu em ${payment.dueDate.toLocaleDateString()}. Sua conta foi suspensa temporariamente. Regularize para continuar.`
+                );
             }
         }
 
@@ -281,5 +298,109 @@ export class PaymentsService {
 
         this.logger.log(`Payment ${paymentId} deleted successfully`);
         return { message: 'Pagamento excluído com sucesso' };
+    }
+
+    /**
+     * Gerar pagamentos recorrentes
+     * Chamado pelo Job diário
+     */
+    async generateRecurringPayments() {
+        this.logger.log('Checking for recurring payments generation...');
+        const today = new Date();
+
+        // 1. Find companies that need billing
+        const companiesToBill = await this.prisma.company.findMany({
+            where: {
+                licenseStatus: 'ACTIVE',
+                nextBillingDate: {
+                    lte: today
+                },
+                monthlyPrice: {
+                    gt: 0 // Only bill if price > 0
+                }
+            }
+        });
+
+        this.logger.log(`Found ${companiesToBill.length} companies to bill.`);
+
+        let processed = 0;
+
+        for (const company of companiesToBill) {
+            try {
+                // Check if already has PENDING payment for this period/month 
+                // (Simple check: pending payment with same amount created recently? 
+                // Or jus trust nextBillingDate if we update it correctly)
+
+                const dueDate = new Date(company.nextBillingDate!);
+                // Set due date to 5 days from billing date or keep billing date? 
+                // Usually billing date IS the due date or generation date.
+                // Let's assume nextBillingDate is the DUE DATE.
+
+                const referenceMonth = dueDate.toISOString().slice(0, 7); // YYYY-MM
+
+                // Create Payment
+                await this.prisma.payment.create({
+                    data: {
+                        companyId: company.id,
+                        amount: company.monthlyPrice,
+                        dueDate: dueDate,
+                        status: PaymentStatus.PENDING,
+                        referenceMonth: referenceMonth,
+                        notes: 'Renovação Automática de Plano',
+                        createdBy: 'SYSTEM',
+                        createdByName: 'Sistema Automático'
+                    }
+                });
+
+                // Update Next Billing Date (Add 1 month)
+                const nextDate = new Date(dueDate);
+                nextDate.setMonth(nextDate.getMonth() + 1);
+
+                await this.prisma.company.update({
+                    where: { id: company.id },
+                    data: {
+                        nextBillingDate: nextDate
+                    }
+                });
+
+                // Notify Company
+                this.notifyCompany(
+                    company.id,
+                    'Nova Fatura Gerada',
+                    `Sua fatura de renovação do plano referente a ${referenceMonth} já está disponível. Vencimento: ${dueDate.toLocaleDateString('pt-BR')}`
+                );
+
+                processed++;
+            } catch (error) {
+                this.logger.error(`Error generating payment for company ${company.id}: ${error.message}`);
+            }
+        }
+
+        return { processed };
+    }
+
+    /**
+     * Enviar notificação para donos da empresa
+     */
+    private async notifyCompany(companyId: string, title: string, body: string, data?: any) {
+        try {
+            // Find owners of the company
+            const owners = await this.prisma.user.findMany({
+                where: {
+                    companyId,
+                    role: Role.ADMIN,
+                    pushToken: { not: null }
+                },
+                select: { pushToken: true }
+            });
+
+            const tokens = owners.map(u => u.pushToken).filter(t => t !== null) as string[];
+
+            if (tokens.length > 0) {
+                await this.notificationsService.sendPushNotification(tokens, title, body, data, companyId);
+            }
+        } catch (error) {
+            this.logger.warn(`Failed to notify company ${companyId}: ${error.message}`);
+        }
     }
 }
