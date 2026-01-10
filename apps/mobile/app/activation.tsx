@@ -38,7 +38,7 @@ export default function ActivationScreen() {
     };
 
     const validateCodeFormat = (code: string): boolean => {
-        // Formato esperado: XX-YYYY-XXXXXX (ex: AP-2026-ABC123)
+        // Formato esperado: XX-XXXX-XXXXXX (ex: AP-A3B9-K7M2N5)
         const regex = /^[A-Z]{2}-\d{4}-[A-Z0-9]{6}$/i;
         return regex.test(code);
     }
@@ -98,7 +98,7 @@ export default function ActivationScreen() {
             cleaned = cleaned.slice(0, 7) + '-' + cleaned.slice(7);
         }
 
-        // Limita ao tamanho máximo (XX-YYYY-XXXXXX = 14 caracteres com hífens)
+        // Limita ao tamanho máximo (XX-XXXX-XXXXXX = 14 caracteres com hífens)
         return cleaned.slice(0, 14);
     };
 
@@ -135,7 +135,7 @@ export default function ActivationScreen() {
                             value={activationCode}
                             onChangeText={(text) => setActivationCode(formatCodeInput(text))}
                             autoCapitalize="characters"
-                            placeholder="XX-YYYY-XXXXXX"
+                            placeholder="XX-XXXX-XXXXXX"
                             containerStyle={tw`mb-6`}
                             style={tw`h-14 text-lg font-mono text-center tracking-widest`}
                             maxLength={14}
@@ -148,7 +148,7 @@ export default function ActivationScreen() {
                             </Text>
                             <Text style={tw`text-blue-200 text-xs leading-5`}>
                                 1. Solicite o código ao administrador{'\n'}
-                                2. Digite o código no formato: XX-YYYY-XXXXXX{'\n'}
+                                2. Digite o código no formato: XX-XXXX-XXXXXX{'\n'}
                                 3. Aguarde a validação{'\n'}
                                 4. Após ativação, faça login normalmente
                             </Text>
@@ -178,7 +178,7 @@ export default function ActivationScreen() {
                         {/* Exemplo de Código */}
                         <View style={tw`mt-4 items-center`}>
                             <Text style={tw`text-gray-500 text-xs`}>
-                                Exemplo: <Text style={tw`font-mono text-gray-400`}>AP-2026-ABC123</Text>
+                                Exemplo: <Text style={tw`font-mono text-gray-400`}>AP-A3B9-K7M2N5</Text>
                             </Text>
                         </View>
                     </View>
