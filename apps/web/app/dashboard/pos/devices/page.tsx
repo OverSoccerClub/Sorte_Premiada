@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Smartphone, Plus, Copy, Check, Power, PowerOff, Calendar, Tag } from "lucide-react";
+import { Smartphone, Plus, Copy, Check, Power, PowerOff, Calendar, Tag, User, MapPin, Clock, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,8 +23,22 @@ interface PosDevice {
     isActive: boolean;
     status: string;
     lastSeenAt: string;
+    model?: string;
+    appVersion?: string;
+    latitude?: number;
+    longitude?: number;
     company?: {
         companyName: string;
+    };
+    currentUser?: {
+        id: string;
+        name: string;
+        username: string;
+        role: string;
+    };
+    lastUser?: {
+        name: string;
+        username: string;
     };
 }
 
@@ -171,6 +185,26 @@ export default function DeviceManagementPage() {
         return new Date(dateStr).toLocaleString("pt-BR");
     };
 
+    const getRelativeTime = (dateStr?: string) => {
+        if (!dateStr) return "Nunca";
+        const now = new Date();
+        const date = new Date(dateStr);
+        const diff = now.getTime() - date.getTime();
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return "agora";
+        if (minutes < 60) return `há ${minutes}min`;
+        if (hours < 24) return `há ${hours}h`;
+        return `há ${days}d`;
+    };
+
+    const formatLocation = (lat?: number, lon?: number) => {
+        if (!lat || !lon) return "Não disponível";
+        return `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    };
+
     if (loading) {
         return (
             <div className="p-8">
@@ -241,31 +275,60 @@ export default function DeviceManagementPage() {
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
+                                            <div className="flex items-center gap-3 mb-3">
                                                 <h4 className="font-semibold text-lg">{device.name}</h4>
                                                 {getStatusBadge(device)}
                                             </div>
                                             {device.description && (
-                                                <p className="text-sm text-gray-600 mb-2">{device.description}</p>
+                                                <p className="text-sm text-gray-600 mb-3">{device.description}</p>
                                             )}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
+
+                                            {/* Grid de Informações */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                                                {/* Empresa */}
+                                                {device.company && (
+                                                    <div className="flex items-center gap-2 text-gray-700">
+                                                        <Smartphone className="h-4 w-4 text-blue-500" />
+                                                        <span className="font-medium">{device.company.companyName}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Modelo/Versão */}
+                                                {(device.model || device.appVersion) && (
+                                                    <div className="flex items-center gap-2 text-gray-700">
+                                                        <Monitor className="h-4 w-4 text-purple-500" />
+                                                        <span>{device.model || 'Genérico'} {device.appVersion ? `v${device.appVersion}` : ''}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Usuário Atual */}
+                                                <div className="flex items-center gap-2 text-gray-700">
+                                                    <User className="h-4 w-4 text-green-500" />
+                                                    <span className={device.currentUser ? "font-medium text-green-700" : "text-gray-500"}>
+                                                        {device.currentUser ? device.currentUser.name : "Nenhum"}
+                                                    </span>
+                                                </div>
+
+                                                {/* Localização */}
+                                                <div className="flex items-center gap-2 text-gray-700">
+                                                    <MapPin className="h-4 w-4 text-red-500" />
+                                                    <span className="text-xs">{formatLocation(device.latitude, device.longitude)}</span>
+                                                </div>
+
+                                                {/* Código de Ativação */}
                                                 {device.activationCode && (
                                                     <div className="flex items-center gap-2">
-                                                        <Tag className="h-4 w-4" />
+                                                        <Tag className="h-4 w-4 text-blue-500" />
                                                         <span className="font-mono font-semibold text-blue-600">
                                                             {device.activationCode}
                                                         </span>
                                                     </div>
                                                 )}
-                                                {device.activatedAt && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Calendar className="h-4 w-4" />
-                                                        Ativado: {formatDate(device.activatedAt)}
-                                                    </div>
-                                                )}
-                                                <div className="flex items-center gap-2">
-                                                    <Smartphone className="h-4 w-4" />
-                                                    ID: {device.deviceId.substring(0, 12)}...
+
+                                                {/* Último Visto */}
+                                                <div className="flex items-center gap-2 text-gray-700">
+                                                    <Clock className="h-4 w-4 text-orange-500" />
+                                                    <span>{getRelativeTime(device.lastSeenAt)}</span>
                                                 </div>
                                             </div>
                                         </div>
