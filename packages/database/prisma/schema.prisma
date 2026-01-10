@@ -176,7 +176,7 @@ model Area {
   name             String
   city             String
   state            String
-  seriesNumber     Int? // Número da série desta área (ex: 1, 2, 3)
+  seriesNumber     String? // Número da série desta área formatado (ex: "0001", "0002", "0003")
   users            User[]
   configs          AreaConfig[]
   posTerminals     PosTerminal[]

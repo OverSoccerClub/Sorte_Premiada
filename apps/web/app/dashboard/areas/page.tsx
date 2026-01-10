@@ -19,9 +19,9 @@ import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
 const formSchema = z.object({
-    name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
-    city: z.string().min(2, { message: "Cidade deve ter pelo menos 2 caracteres." }),
-    state: z.string().length(2, { message: "Estado deve ser a sigla (ex: SP)." }).toUpperCase(),
+    name: z.string().min(1, "Nome é obrigatório"),
+    city: z.string().min(1, "Cidade é obrigatória"),
+    state: z.string().min(1, "Estado é obrigatório").length(2, { message: "Estado deve ser a sigla (ex: SP)." }).toUpperCase(),
     seriesNumber: z.string().optional(),
 })
 
@@ -30,7 +30,7 @@ interface Area {
     name: string
     city: string
     state: string
-    seriesNumber?: number | null
+    seriesNumber?: string
     _count?: {
         users: number
     }
@@ -363,15 +363,23 @@ export default function AreasPage() {
                                                 <FormLabel className="text-foreground">Número da Série (Opcional)</FormLabel>
                                                 <FormControl>
                                                     <Input
-                                                        type="number"
-                                                        min="1"
-                                                        placeholder="Ex: 1, 2, 3..."
-                                                        className="bg-muted/50 border-input"
-                                                        {...field}
+                                                        type="text"
+                                                        maxLength={4}
+                                                        placeholder="Ex: 0001, 0002, 0003..."
+                                                        className="bg-muted/50 border-input font-mono"
+                                                        value={field.value || ''}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.replace(/\D/g, ''); // Apenas números
+                                                            if (value) {
+                                                                field.onChange(value.padStart(4, '0')); // Formata com 4 dígitos
+                                                            } else {
+                                                                field.onChange('');
+                                                            }
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <p className="text-xs text-muted-foreground">
-                                                    Série única para identificar bilhetes desta área (ex: Centro = 1, Ceasa = 2)
+                                                    Série única para identificar bilhetes desta área (ex: Centro = 0001, Ceasa = 0002)
                                                 </p>
                                                 <FormMessage />
                                             </FormItem>
