@@ -22,6 +22,7 @@ const formSchema = z.object({
     name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
     city: z.string().min(2, { message: "Cidade deve ter pelo menos 2 caracteres." }),
     state: z.string().length(2, { message: "Estado deve ser a sigla (ex: SP)." }).toUpperCase(),
+    seriesNumber: z.string().optional(),
 })
 
 interface Area {
@@ -29,6 +30,7 @@ interface Area {
     name: string
     city: string
     state: string
+    seriesNumber?: number | null
     _count?: {
         users: number
     }
@@ -123,6 +125,7 @@ export default function AreasPage() {
             name: area.name,
             city: area.city,
             state: area.state,
+            seriesNumber: area.seriesNumber?.toString() || "",
         })
         setIsDialogOpen(true)
     }
@@ -195,13 +198,21 @@ export default function AreasPage() {
             const url = editingId ? `${API_URL}/areas/${editingId}` : `${API_URL}/areas`
             const method = editingId ? "PATCH" : "POST"
 
+            const seriesNum = values.seriesNumber ? parseInt(values.seriesNumber) : null
+
             const res = await fetch(url, {
                 method: method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(values),
+                body: JSON.stringify({
+                    name: values.name,
+                    city: values.city,
+                    state: values.state,
+                    seriesNumber: seriesNum,
+                    companyId: activeCompanyId
+                }),
             })
 
             if (res.ok) {
@@ -340,6 +351,28 @@ export default function AreasPage() {
                                                         <Input placeholder="Ex: Centro, Zona Norte..." className="pl-9 bg-muted/50 border-input" {...field} />
                                                     </div>
                                                 </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="seriesNumber"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-foreground">Número da Série (Opcional)</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        placeholder="Ex: 1, 2, 3..."
+                                                        className="bg-muted/50 border-input"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Série única para identificar bilhetes desta área (ex: Centro = 1, Ceasa = 2)
+                                                </p>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
