@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit, Save } from "lucide-react";
+import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit, Save, ExternalLink } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ interface Payment {
     dueDate: string;
     paidAt: string | null;
     notes: string | null;
+    receiptUrl: string | null;
     company: {
         id: string;
         companyName: string;
@@ -64,6 +65,7 @@ export default function PaymentsPage() {
         notes: "",
         status: "",
         method: "",
+        receiptUrl: "",
     });
 
     useEffect(() => {
@@ -198,6 +200,7 @@ export default function PaymentsPage() {
             notes: payment.notes || "",
             status: payment.status,
             method: payment.method || "",
+            receiptUrl: payment.receiptUrl || "",
         });
         setEditPaymentDialog(true);
     };
@@ -222,6 +225,7 @@ export default function PaymentsPage() {
                         notes: editForm.notes,
                         status: editForm.status,
                         method: editForm.method || null,
+                        receiptUrl: editForm.receiptUrl || undefined,
                     }),
                 }
             );
@@ -371,6 +375,16 @@ export default function PaymentsPage() {
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </Button>
+                                            {payment.receiptUrl && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => window.open(payment.receiptUrl!, '_blank')}
+                                                    title="Ver Comprovante"
+                                                >
+                                                    <ExternalLink className="w-4 h-4" />
+                                                </Button>
+                                            )}
                                             {payment.status === "PENDING" || payment.status === "OVERDUE" ? (
                                                 <>
                                                     <Button
@@ -536,6 +550,14 @@ export default function PaymentsPage() {
                                     <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div>
+                            <Label>Link do Comprovante (URL)</Label>
+                            <Input
+                                value={editForm.receiptUrl}
+                                onChange={(e) => setEditForm({ ...editForm, receiptUrl: e.target.value })}
+                                placeholder="https://..."
+                            />
                         </div>
                         <div>
                             <Label>Observações</Label>

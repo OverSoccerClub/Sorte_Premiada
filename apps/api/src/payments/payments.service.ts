@@ -123,6 +123,7 @@ export class PaymentsService {
         notes?: string;
         method?: string;
         status?: PaymentStatus;
+        receiptUrl?: string;
     }) {
         this.logger.log(`Updating payment ${paymentId}`);
 
@@ -151,6 +152,7 @@ export class PaymentsService {
                 method: data.method,
                 status: data.status,
                 paidAt: paidAt,
+                receiptUrl: data.receiptUrl,
             }
         });
     }

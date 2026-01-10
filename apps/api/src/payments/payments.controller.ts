@@ -102,6 +102,7 @@ export class PaymentsController {
             notes?: string;
             method?: string;
             status?: PaymentStatus;
+            receiptUrl?: string;
         }
     ) {
         this.logger.log(`PUT /payments/${id}`);
