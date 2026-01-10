@@ -18,6 +18,7 @@ import { TicketDisplay } from "../../components/ticket/TicketDisplay";
 import { useTicketPrint } from "../../hooks/useTicketPrint";
 import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
+import { useCompany } from "../../context/CompanyContext";
 
 
 export default function Game2x1000Screen() {
@@ -25,6 +26,7 @@ export default function Game2x1000Screen() {
     const { token, user } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
+    const { settings } = useCompany();
     const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
@@ -384,7 +386,9 @@ export default function Game2x1000Screen() {
                 status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
-                secondChanceLabel: "SEGUNDA CHANCE"
+                secondChanceLabel: "SEGUNDA CHANCE",
+                companyName: settings.companyName,
+                companyLogoUrl: settings.logoUrl
             };
 
             setLastTicket(fullTicket);
@@ -664,7 +668,9 @@ export default function Game2x1000Screen() {
                                         series: drawSeries?.toString(),
                                         date: new Date().toLocaleString('pt-BR'),
                                         ticketId: "PREVIEW",
-                                        prizes: gamePrizes || undefined
+                                        prizes: gamePrizes || undefined,
+                                        companyName: settings.companyName,
+                                        companyLogoUrl: settings.logoUrl
                                     }}
                                     mode="preview"
                                 />
