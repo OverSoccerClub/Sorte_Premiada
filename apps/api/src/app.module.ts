@@ -25,6 +25,7 @@ import { CommonModule } from './common/common.module';
 import { TenantInterceptor } from './common/tenant.interceptor';
 import { LicensingModule } from './licensing/licensing.module';
 import { PlansModule } from './plans/plans.module';
+import { PaymentsModule } from './payments/payments.module';
 
 import { BugsModule } from './bugs/bugs.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -42,6 +43,7 @@ import { LicenseGuard } from './licensing/license.guard';
     UsersModule,
     CompanyModule,
     PlansModule, // Novo modulo de planos
+    PaymentsModule, // Sistema de pagamentos
     LicensingModule, // Sistema de licenciamento
     GamesModule,
     TicketsModule,

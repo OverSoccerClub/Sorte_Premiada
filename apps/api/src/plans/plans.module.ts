@@ -3,9 +3,10 @@ import { PlansService } from './plans.service';
 import { PlansController } from './plans.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { FinanceModule } from '../finance/finance.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
-    imports: [PrismaModule, FinanceModule],
+    imports: [PrismaModule, FinanceModule, PaymentsModule],
     controllers: [PlansController],
     providers: [PlansService],
     exports: [PlansService],

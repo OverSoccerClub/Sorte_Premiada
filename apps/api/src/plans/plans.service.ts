@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ConflictException, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plans.dto';
-import { Prisma, TransactionType } from '@prisma/client';
-import { FinanceService } from '../finance/finance.service';
+import { Prisma } from '@prisma/client';
+import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class PlansService {
@@ -10,7 +10,7 @@ export class PlansService {
 
     constructor(
         private prisma: PrismaService,
-        private financeService: FinanceService,
+        private paymentsService: PaymentsService,
     ) { }
 
     private serializePlan(plan: any) {
@@ -227,25 +227,28 @@ export class PlansService {
                 }
             });
 
-            // Criar registro financeiro
+            // Criar pagamento da mensalidade
             if (masterUserId) {
                 try {
                     // Calcular valor total: Preço do plano × Máximo de usuários
                     const totalAmount = Number(planRaw.price) * planRaw.maxUsers;
 
-                    await this.financeService.createTransaction(
-                        masterUserId,
-                        companyId,
-                        {
-                            description: `Ativação Plano ${planRaw.name} - Empresa: ${company.companyName} (${planRaw.maxUsers} usuários)`,
-                            amount: totalAmount,
-                            type: TransactionType.CREDIT,
-                        }
-                    );
-                    this.logger.log(`Financial transaction created for plan application: R$ ${totalAmount.toFixed(2)}`);
+                    // Definir data de vencimento (7 dias a partir de hoje)
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + 7);
+
+                    await this.paymentsService.createPayment({
+                        companyId: companyId,
+                        amount: totalAmount,
+                        referenceMonth: new Date(), // Mês atual
+                        dueDate: dueDate,
+                        notes: `Ativação Plano ${planRaw.name} (${planRaw.maxUsers} usuários)`,
+                    });
+
+                    this.logger.log(`Payment created for plan application: R$ ${totalAmount.toFixed(2)} - Due: ${dueDate.toLocaleDateString()}`);
                 } catch (error) {
-                    this.logger.error(`Failed to create financial transaction: ${error.message}`);
-                    // Não falhar a aplicação do plano se a transação falhar
+                    this.logger.error(`Failed to create payment: ${error.message}`);
+                    // Não falhar a aplicação do plano se o pagamento falhar
                 }
             }
 
