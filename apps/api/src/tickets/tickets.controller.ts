@@ -55,6 +55,7 @@ export class TicketsController {
     @Get('availability/:gameId')
     @UseGuards(JwtAuthGuard)
     async getAvailability(@Request() req: any, @Param('gameId') gameId: string) {
+        console.log(`[TicketsController] getAvailability request user:`, JSON.stringify(req.user)); // DEBUG
         return this.ticketsService.getAvailability(gameId, req.user?.userId);
     }
 

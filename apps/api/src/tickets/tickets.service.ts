@@ -617,7 +617,8 @@ export class TicketsService {
 
     private async getSoldNumbers(gameId: string, drawDate: Date, series?: number): Promise<Set<number>> {
         const seriesKey = series !== undefined ? `:${series}` : ':global';
-        const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}${seriesKey}`;
+        // Prefix V2 to force cache invalidation
+        const cacheKey = `sold_numbers_v2:${gameId}:${drawDate.toISOString()}${seriesKey}`;
         let cached: string | null = null;
 
         try {
@@ -666,21 +667,32 @@ export class TicketsService {
         const nextDraw = await this.getNextDrawDate(gameId);
         let series: number | undefined;
 
+        console.log(`[getAvailability] Start for Game ${gameId}, User: ${userId}`);
+
         if (userId) {
             const user = await this.prisma.user.findUnique({
                 where: { id: userId },
                 select: {
                     area: {
-                        select: { currentSeries: true }
+                        select: { id: true, name: true, currentSeries: true }
                     }
                 }
             });
+
+            console.log(`[getAvailability] User Area Config:`, JSON.stringify(user?.area));
+
             if (user?.area?.currentSeries) {
                 series = Number(user.area.currentSeries);
+                console.log(`[getAvailability] Detected Series: ${series} for Area: ${user.area.name}`);
+            } else {
+                console.log(`[getAvailability] No series configured for user area (or no area). Fallback to global?`);
             }
+        } else {
+            console.log(`[getAvailability] No userId provided. Using global scope.`);
         }
 
         const soldSet = await this.getSoldNumbers(gameId, nextDraw, series);
+        console.log(`[getAvailability] Found ${soldSet.size} sold numbers. Series Filter: ${series}`);
         return Array.from(soldSet);
     }
 
