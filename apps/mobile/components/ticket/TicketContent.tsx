@@ -194,8 +194,11 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     INFORMAÇÕES DO BILHETE
                 </Text>
                 <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {displayTicketId}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {data.series || '----'} | Nº {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Identificador: {displayTicketId}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
+                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                </View>
+                <View style={tw`flex-row justify-between mb-1`}>
                     <Text style={tw`text-[12px] text-black font-bold`}>Preço: {data.price}</Text>
                 </View>
                 <View style={tw`flex-row justify-between mb-1`}>
