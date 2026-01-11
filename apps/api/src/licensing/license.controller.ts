@@ -67,6 +67,11 @@ export class LicenseController {
                         games: true,
                     },
                 },
+                plan: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
             orderBy: {
                 companyName: 'asc',
@@ -127,6 +132,7 @@ export class LicenseController {
                     tickets: monthlyTickets,
                     devices: activeDevices,
                 },
+                subscriptionPlan: (company as any).plan?.name || company.subscriptionPlan,
             };
         });
 

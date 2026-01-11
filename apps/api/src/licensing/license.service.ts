@@ -50,7 +50,7 @@ export class LicenseService {
             companyId: company.id,
             companyName: company.companyName,
             status: company.licenseStatus,
-            plan: company.subscriptionPlan,
+            plan: company.plan?.name || company.subscriptionPlan,
             planDetails: company.plan,
             isActive: company.isActive,
             isValid,
