@@ -29,6 +29,8 @@ interface DashboardStats {
             name: string | null;
         };
         cambistaDailyTotal: number;
+        ticketNumber: number | null;
+        secondChanceNumber: number | null;
     }[];
     ranking: {
         userId: string;
@@ -451,10 +453,13 @@ export default function DashboardPage() {
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
                                 <tr>
+                                    <th className="px-6 py-4 font-semibold">ID</th>
                                     <th className="px-6 py-4 font-semibold">Data/Hora</th>
                                     <th className="px-6 py-4 font-semibold">Cambista</th>
                                     <th className="px-6 py-4 font-semibold">Jogo</th>
+                                    <th className="px-6 py-4 font-semibold">Bilhete</th>
                                     <th className="px-6 py-4 font-semibold">Números</th>
+                                    <th className="px-6 py-4 font-semibold">Chance Extra</th>
                                     <th className="px-10 py-4 font-semibold text-center">Valor</th>
                                     <th className="px-6 py-4 font-semibold text-right">Total Cambista (Hoje)</th>
                                 </tr>
@@ -469,6 +474,11 @@ export default function DashboardPage() {
 
                                     return paginated.map((sale) => (
                                         <tr key={sale.id} className="hover:bg-muted/20 transition-colors group">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="font-mono text-[10px] text-muted-foreground bg-muted p-1 rounded">
+                                                    {sale.id.split('-')[0]}
+                                                </span>
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col">
                                                     <span className="text-foreground font-medium">
@@ -493,6 +503,11 @@ export default function DashboardPage() {
                                                 </Badge>
                                             </td>
                                             <td className="px-6 py-4">
+                                                <span className="font-mono text-xs font-bold bg-slate-100 px-2 py-1 rounded text-slate-700">
+                                                    {sale.ticketNumber ? sale.ticketNumber.toString().padStart(4, '0') : '-'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
                                                 <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
                                                     <Ticket className="w-3 h-3" />
                                                     {sale.numbers
@@ -502,6 +517,11 @@ export default function DashboardPage() {
                                                         .join(' - ')
                                                     }
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="font-mono text-xs text-muted-foreground">
+                                                    {sale.secondChanceNumber || '-'}
+                                                </span>
                                             </td>
                                             <td className="px-10 py-4 text-center">
                                                 <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full font-bold">

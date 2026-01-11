@@ -74,63 +74,60 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
-            {/* Header */}
-            <View style={tw`items-center mb-1 w-full px-1`}>
-                <View style={tw`border-[3px] border-black rounded-xl p-3 w-full flex-row items-center justify-between`}>
-                    {/* Logo ou Ícone */}
-                    {shouldShowLogo ? (
-                        <Image
-                            source={{ uri: data.companyLogoUrl }}
-                            style={{ width: 60, height: 60, resizeMode: 'contain' }}
-                            onError={() => {
-                                console.warn('[TicketContent] Failed to load company logo, using fallback icon');
-                                setLogoError(true);
-                            }}
-                        />
-                    ) : (
-                        <MaterialCommunityIcons name="clover" size={40} color="#000" />
-                    )}
+            {/* Header Clean & Professional */}
+            <View style={tw`items-center mb-4 w-full pt-4 pb-2 border-b-2 border-dashed border-black mx-2`}>
+                {/* Logo Centralizado e Maior */}
+                {shouldShowLogo ? (
+                    <Image
+                        source={{ uri: data.companyLogoUrl }}
+                        style={{ width: 120, height: 80, resizeMode: 'contain', marginBottom: 6 }}
+                        onError={() => {
+                            console.warn('[TicketContent] Failed to load company logo, using fallback icon');
+                            setLogoError(true);
+                        }}
+                    />
+                ) : (
+                    <MaterialCommunityIcons name="clover" size={60} color="#000" style={tw`mb-2`} />
+                )}
 
-                    {/* Nome da Empresa */}
-                    <View style={tw`items-center flex-1 ml-3`}>
-                        <Text style={[
-                            tw`text-4xl font-black text-black leading-tight text-center`,
-                            { transform: [{ scaleX: 1.25 }] },
-                            { fontSize: brandMain.length > 15 ? 24 : 36 }
-                        ]}>
-                            {brandMain}
-                        </Text>
-                        {brandSuffix && (
-                            <View style={tw`flex-row items-center -mt-1`}>
-                                <Ionicons name="calendar-sharp" size={13} color="#000" style={tw`mr-1`} />
-                                <Text style={tw`text-xs font-black text-black uppercase`}>
-                                    {brandSuffix}
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                </View>
-                <Text style={tw`text-center font-black text-black text-xl mt-2 uppercase`}>
-                    {data.gameName}
+                {/* Nome da Empresa */}
+                <Text style={[
+                    tw`text-2xl font-black text-black text-center uppercase mb-1`,
+                    { letterSpacing: 1 }
+                ]}>
+                    {brandMain}
                 </Text>
-                <Text style={tw`text-center font-black text-black text-[12px] mt-1 uppercase`}>
-                    SORTEIO {data.drawDate || data.date.split(' ')[0]} - 19H
+
+                {brandSuffix && (
+                    <Text style={tw`text-sm font-bold text-black uppercase mb-3`}>
+                        {brandSuffix}
+                    </Text>
+                )}
+
+                {/* Nome do Jogo e Data */}
+                <View style={tw`w-full items-center mt-2 bg-black py-1`}>
+                    <Text style={tw`text-white font-black text-lg uppercase`}>
+                        {data.gameName}
+                    </Text>
+                </View>
+                <Text style={tw`text-center font-bold text-black text-[10px] mt-1`}>
+                    SORTEIO: <Text style={tw`font-black text-[12px]`}>{data.drawDate || data.date.split(' ')[0]} - 19H</Text>
                 </Text>
             </View>
 
             {/* Numbers Grid */}
-            <View style={tw`flex-row flex-wrap justify-between mb-1 px-1`}>
+            <View style={tw`flex-row flex-wrap justify-between mb-2 px-1`}>
                 {Array.from({ length: 4 }).map((_, idx) => {
                     const num = sortedNumbers[idx];
                     return (
-                        <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-200 rounded p-1`}>
-                            <Text style={tw`font-bold text-[12px] text-black self-start mb-0 ml-1`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
+                        <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-300 rounded-lg p-2 bg-gray-50`}>
+                            <Text style={tw`font-bold text-[10px] text-gray-500 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
                             {num !== undefined ? (
-                                <View style={tw`flex-row justify-between w-full px-4`}>
+                                <View style={tw`flex-row justify-between w-full px-2 mt-1`}>
                                     {num.toString().padStart(4, '0').split('').map((digit, i) => (
                                         <View key={i} style={tw`items-center`}>
-                                            <Text style={[tw`text-4xl text-black font-bold mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
-                                            <Text style={[tw`text-[8px] text-black text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
+                                            <Text style={[tw`text-4xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
+                                            <Text style={[tw`text-[7px] text-gray-600 text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
                                                 {numberToText(parseInt(digit))}
                                             </Text>
                                         </View>
@@ -146,100 +143,109 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 })}
             </View>
 
-            <View style={tw`border-b-2 border-dashed border-black mb-2 mx-2`} />
+            <View style={tw`border-b-2 border-dashed border-black mb-3 mx-2`} />
 
-            <Text style={tw`text-center font-bold text-[11px] text-black mb-1 uppercase`}>
-                {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
-            </Text>
+            {/* Prompt Message (Incentivo) */}
+            <View style={tw`mb-3 px-4`}>
+                <Text style={tw`text-center font-black text-[12px] text-black uppercase leading-tight`}>
+                    {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
+                </Text>
+            </View>
 
             {data.prizes ? (
-                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2`}>
-                    <View style={tw`flex-row justify-between mb-1`}>
+                <View style={tw`mb-4 border-2 border-black rounded p-2 mx-2 bg-gray-100`}>
+                    <View style={tw`flex-row justify-between mb-1 border-b border-gray-300 pb-1`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>MILHAR:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.milhar || 'R$ 0,00'}</Text>
+                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.milhar || 'R$ 0,00'}</Text>
                     </View>
-                    <View style={tw`flex-row justify-between mb-1`}>
+                    <View style={tw`flex-row justify-between mb-1 border-b border-gray-300 pb-1`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>CENTENA:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.centena || 'R$ 0,00'}</Text>
+                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.centena || 'R$ 0,00'}</Text>
                     </View>
                     <View style={tw`flex-row justify-between`}>
                         <Text style={tw`font-bold text-[11px] text-black`}>DEZENA:</Text>
-                        <Text style={tw`font-black text-[12px] text-black`}>{data.prizes.dezena || 'R$ 0,00'}</Text>
+                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.dezena || 'R$ 0,00'}</Text>
                     </View>
                 </View>
             ) : data.possiblePrize ? (
-                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2 items-center`}>
-                    <Text style={tw`text-center font-black text-lg text-black uppercase`}>PRÊMIO MÁXIMO</Text>
-                    <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
+                <View style={tw`mb-4 border-2 border-black rounded p-2 mx-2 bg-gray-100 items-center`}>
+                    <Text style={tw`text-center font-bold text-xs text-black uppercase mb-1`}>PRÊMIO MÁXIMO</Text>
+                    <Text style={tw`text-center font-black text-3xl text-black`}>{data.possiblePrize}</Text>
                 </View>
-            ) : (
-                <View style={tw`mb-3 border-b-2 border-black pb-1 mx-2`} />
-            )}
+            ) : null}
+
+            {/* Main Match Message (Moved OUTSIDE logic blocks) */}
+            <View style={tw`mb-4 px-2`}>
+                <Text style={[tw`text-center font-bold text-[10px] text-black uppercase bg-black text-white py-1 rounded`, { letterSpacing: 0.5 }]}>
+                    {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                </Text>
+            </View>
 
             {/* Second Chance */}
             {data.secondChanceNumber !== undefined && data.secondChanceNumber !== null && (
-                <View style={tw`items-center mb-2`}>
-                    <View style={tw`bg-black rounded-full py-1 px-10 mb-1 items-center w-full`}>
-                        <Text style={tw`text-white text-center font-black text-xl uppercase`}>{data.secondChanceLabel || 'SEGUNDA CHANCE'}</Text>
-                        <Text style={tw`text-white text-center text-[9px] font-bold uppercase`}>SORTEIO EXTRA - {data.secondChanceDrawDate || 'SÁBADO'}</Text>
+                <View style={tw`items-center mb-4 mx-1 pt-2 border-t-2 border-black border-dashed`}>
+                    <View style={tw`bg-black rounded-lg py-1 px-4 mb-2 items-center w-full shadow-sm`}>
+                        <View style={tw`flex-row items-center`}>
+                            <MaterialCommunityIcons name="ticket-percent" size={16} color="white" style={tw`mr-2`} />
+                            <Text style={tw`text-white text-center font-black text-lg uppercase`}>
+                                {data.secondChanceLabel || 'SEGUNDA CHANCE'}
+                            </Text>
+                        </View>
+                        <Text style={tw`text-gray-300 text-center text-[9px] font-bold uppercase mt-0.5`}>
+                            SORTEIO EXTRA - {data.secondChanceDrawDate || 'SÁBADO'}
+                        </Text>
                     </View>
 
                     {data.secondChanceStatus === 'WON' && (
-                        <View style={[tw`border-2 border-emerald-500 px-3 py-1 rounded absolute -right-4 -top-2 bg-emerald-50`, { transform: [{ rotate: '15deg' }] }]}>
-                            <Text style={tw`text-emerald-600 font-black text-xs uppercase`}>PREMIADO!</Text>
+                        <View style={[tw`border-4 border-emerald-500 px-4 py-2 rounded-xl absolute -right-2 -top-4 bg-white shadow-lg`, { transform: [{ rotate: '15deg' }] }]}>
+                            <Text style={tw`text-emerald-600 font-black text-sm uppercase`}>PREMIADO!</Text>
                         </View>
                     )}
-                    <View style={tw`item-center mb-1`}>
-                        <View style={tw`flex-row gap-5`}>
+
+                    <View style={tw`item-center my-1 border-2 border-black rounded-lg p-2 w-full items-center bg-gray-50`}>
+                        <View style={tw`flex-row gap-4`}>
                             {scDigits.map((n, i) => (
                                 <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
                             ))}
                         </View>
                     </View>
-                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
-                        {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
-                    </Text>
                 </View>
             )}
 
-            {/* Info Footer */}
-            <View style={tw`mb-2 px-1`}>
-                <Text style={tw`text-center font-black text-[12px] text-black mb-1 mt-1 uppercase border-t-2 border-dashed border-black pt-1`}>
-                    INFORMAÇÕES DO BILHETE
-                </Text>
-                {/* Row 1: ID, Série, Bilhete */}
-                <View style={tw`flex-row justify-between mb-1`}>
-                    <View style={tw`w-[32%]`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>ID: {displayTicketId}</Text>
-                    </View>
-                    <View style={tw`w-[30%] items-center`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
-                    </View>
-                    <View style={tw`w-[38%] items-end`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
-                    </View>
-                </View>
+            {/* Info Footer title removed (cleaner) */}
 
-                {/* Row 2: Preço, Terminal, Vendedor */}
-                <View style={tw`flex-row justify-between mb-1`}>
-                    <View style={tw`w-[32%]`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
-                    </View>
-                    <View style={tw`w-[30%] items-center`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>
-                            Term: {getPosName()}
-                        </Text>
-                    </View>
-                    <View style={tw`w-[38%] items-end`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>
-                            Vend: {data.vendorName?.substring(0, 10) || "Cambista"}
-                        </Text>
-                    </View>
+            {/* Row 1: ID, Série, Bilhete */}
+            <View style={tw`flex-row justify-between mb-1`}>
+                <View style={tw`w-[32%]`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>ID: {displayTicketId}</Text>
                 </View>
-                <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Data: {data.date}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Ext: {data.drawDate || "Hoje 19H"}</Text>
+                <View style={tw`w-[30%] items-center`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
+                <View style={tw`w-[38%] items-end`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                </View>
+            </View>
+
+            {/* Row 2: Preço, Terminal, Vendedor */}
+            <View style={tw`flex-row justify-between mb-1`}>
+                <View style={tw`w-[32%]`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                </View>
+                <View style={tw`w-[30%] items-center`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>
+                        Term: {getPosName()}
+                    </Text>
+                </View>
+                <View style={tw`w-[38%] items-end`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>
+                        Vend: {data.vendorName?.substring(0, 10) || "Cambista"}
+                    </Text>
+                </View>
+            </View>
+            <View style={tw`flex-row justify-between mb-1`}>
+                <Text style={tw`text-[12px] text-black font-bold`}>Data: {data.date}</Text>
+                <Text style={tw`text-[12px] text-black font-bold`}>Ext: {data.drawDate || "Hoje 19H"}</Text>
             </View>
 
             {/* Barcode and QR */}
@@ -273,38 +279,40 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             </View>
 
             {/* OVERLAY WATERMARK (Rendered last to be on top) */}
-            {data.status === 'CANCELLED' && (
-                <View
-                    pointerEvents="none"
-                    style={[
-                        tw`absolute items-center justify-center`,
-                        {
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            zIndex: 100,
-                            overflow: 'hidden'
-                        }
-                    ]}
-                >
-                    <View style={{
-                        transform: [{ rotate: '-45deg' }],
-                        borderWidth: 10,
-                        borderColor: 'rgba(180, 0, 0, 0.7)', // Darker and more opaque
-                        padding: 15,
-                        borderRadius: 20,
-                    }}>
-                        <Text style={[
-                            tw`text-red-800 font-black`,
+            {
+                data.status === 'CANCELLED' && (
+                    <View
+                        pointerEvents="none"
+                        style={[
+                            tw`absolute items-center justify-center`,
                             {
-                                fontSize: 80,
-                                textAlign: 'center',
-                                opacity: 0.8, // Much higher opacity for capture
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                zIndex: 100,
+                                overflow: 'hidden'
                             }
-                        ]}>
-                            CANCELADO
-                        </Text>
+                        ]}
+                    >
+                        <View style={{
+                            transform: [{ rotate: '-45deg' }],
+                            borderWidth: 10,
+                            borderColor: 'rgba(180, 0, 0, 0.7)', // Darker and more opaque
+                            padding: 15,
+                            borderRadius: 20,
+                        }}>
+                            <Text style={[
+                                tw`text-red-800 font-black`,
+                                {
+                                    fontSize: 80,
+                                    textAlign: 'center',
+                                    opacity: 0.8, // Much higher opacity for capture
+                                }
+                            ]}>
+                                CANCELADO
+                            </Text>
+                        </View>
                     </View>
-                </View>
-            )}
-        </View>
+                )
+            }
+        </View >
     );
 };
