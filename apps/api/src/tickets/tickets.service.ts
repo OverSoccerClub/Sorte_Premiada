@@ -40,6 +40,15 @@ export class TicketsService {
         });
 
         if (!game) throw new Error("Game not found");
+
+        // DEBUG: Log Segunda Chance configuration
+        console.log(`[DEBUG] Game ${game.id} Segunda Chance Config:`, {
+            secondChanceEnabled: game.secondChanceEnabled,
+            secondChanceRangeStart: game.secondChanceRangeStart,
+            secondChanceRangeEnd: game.secondChanceRangeEnd,
+            secondChanceLabel: (game as any).secondChanceLabel
+        });
+
         const rules = (game.rules as any) || {};
 
         // Fetch User with Area for Commission Rate AND Series Number
