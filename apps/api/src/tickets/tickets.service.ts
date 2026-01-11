@@ -637,7 +637,7 @@ export class TicketsService {
     }
 
     async getSeriesStats(gameId: string, companyId: string, drawDate?: Date) {
-        // Fetch game with configuration
+        // Get game info
         const game = await this.prisma.game.findUnique({
             where: { id: gameId },
             select: {
@@ -646,60 +646,64 @@ export class TicketsService {
             }
         });
 
-        if (!game) throw new BadRequestException('Jogo não encontrado');
-
-        const MAX_TICKETS_PER_SERIES = game.maxTicketsPerSeries || 2500;
-
-        // Fetch draws for this game
-        const drawsQuery: any = {
-            gameId: gameId,
-            companyId: companyId
-        };
-
-        if (drawDate) {
-            drawsQuery.drawDate = drawDate;
+        if (!game) {
+            throw new Error("Game not found");
         }
 
-        const draws = await this.prisma.draw.findMany({
-            where: drawsQuery,
-            orderBy: { drawDate: 'asc' }
+        const maxTicketsPerSeries = game.maxTicketsPerSeries || 2500;
+
+        // Get all tickets for this game and company
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                gameId,
+                companyId,
+                status: { not: 'CANCELLED' },
+                ...(drawDate ? { drawDate } : {})
+            },
+            select: {
+                series: true,
+                drawDate: true
+            }
         });
 
-        // For each draw, count tickets sold
-        const seriesStats = await Promise.all(
-            draws.map(async (draw: any) => {
-                const ticketCount = await this.prisma.ticket.count({
-                    where: {
-                        gameId: gameId,
-                        drawDate: draw.drawDate,
-                        status: { not: 'CANCELLED' },
-                        ticketNumber: { not: null }
-                    }
+        // Group by series and drawDate
+        const seriesMap = new Map<string, { seriesNumber: number; drawDate: Date; count: number }>();
+
+        for (const ticket of tickets) {
+            if (ticket.series === null) continue;
+
+            const key = `${ticket.series}-${ticket.drawDate?.toISOString()}`;
+            const existing = seriesMap.get(key);
+
+            if (existing) {
+                existing.count++;
+            } else {
+                seriesMap.set(key, {
+                    seriesNumber: ticket.series,
+                    drawDate: ticket.drawDate!,
+                    count: 1
                 });
+            }
+        }
 
-                const ticketsRemaining = MAX_TICKETS_PER_SERIES - ticketCount;
-                const percentageFilled = (ticketCount / MAX_TICKETS_PER_SERIES) * 100;
+        // Convert to array and calculate stats
+        const series = Array.from(seriesMap.values()).map(s => ({
+            seriesNumber: s.seriesNumber,
+            drawDate: s.drawDate.toISOString(),
+            ticketsSold: s.count,
+            ticketsRemaining: maxTicketsPerSeries - s.count,
+            percentageFilled: Math.round((s.count / maxTicketsPerSeries) * 100),
+            status: s.count >= maxTicketsPerSeries ? 'FULL' : 'ACTIVE'
+        }));
 
-                let status = 'ACTIVE';
-                if (ticketCount >= MAX_TICKETS_PER_SERIES) status = 'FULL';
-                else if (new Date() > new Date(draw.drawDate)) status = 'CLOSED';
-
-                return {
-                    seriesNumber: draw.series,
-                    drawDate: draw.drawDate,
-                    ticketsSold: ticketCount,
-                    ticketsRemaining: ticketsRemaining,
-                    percentageFilled: Math.round(percentageFilled * 10) / 10, // 1 decimal
-                    status: status
-                };
-            })
-        );
+        // Sort by series number
+        series.sort((a, b) => a.seriesNumber - b.seriesNumber);
 
         return {
-            gameId: gameId,
+            gameId,
             gameName: game.name,
-            maxTicketsPerSeries: MAX_TICKETS_PER_SERIES,
-            series: seriesStats
+            maxTicketsPerSeries,
+            series
         };
     }
 

@@ -199,11 +199,9 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
                 <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Preço: {data.price}</Text>
-                </View>
-                <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Terminal: {data.terminalId || "----------"}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Vendedor: {data.vendorName || "Cambista"}</Text>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Term: {data.terminalId || "----"}</Text>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Vend: {data.vendorName?.substring(0, 10) || "Cambista"}</Text>
                 </View>
                 <View style={tw`flex-row justify-between mb-1`}>
                     <Text style={tw`text-[12px] text-black font-bold`}>Data: {data.date}</Text>
@@ -227,7 +225,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <View style={[
                     tw`items-center justify-center w-full mt-2`,
                     isCapture && {
-                        transform: [{ scaleY: 0.35 }],
+                        transform: [{ scaleY: 0.45 }],
                         marginTop: -90,
                         marginBottom: -90
                     }
