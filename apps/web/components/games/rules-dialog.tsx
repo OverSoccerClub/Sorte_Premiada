@@ -30,7 +30,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
         secondChanceWeekday: "6",
         secondChanceDrawTime: "19:00",
         secondChancePrize: "1000",
-        secondChancePrize: "1000",
+
         secondChanceLabel: "",
         promptMessage: "",
         mainMatchMessage: ""
@@ -53,8 +53,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceWeekday: game.secondChanceWeekday !== null && game.secondChanceWeekday !== undefined ? String(game.secondChanceWeekday) : "6",
                 secondChanceDrawTime: game.secondChanceDrawTime || "19:00",
                 secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000",
-                secondChanceDrawTime: game.secondChanceDrawTime || "19:00",
-                secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000",
+
                 secondChanceLabel: game.secondChanceLabel || "",
                 promptMessage: game.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS",
                 mainMatchMessage: game.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"
@@ -86,7 +85,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceWeekday: rulesValues.secondChanceEnabled ? Number(rulesValues.secondChanceWeekday) : null,
                 secondChanceDrawTime: rulesValues.secondChanceEnabled ? rulesValues.secondChanceDrawTime : null,
                 secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null,
-                secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null,
+
                 secondChanceLabel: rulesValues.secondChanceEnabled && rulesValues.secondChanceLabel ? rulesValues.secondChanceLabel : null,
                 promptMessage: rulesValues.promptMessage,
                 mainMatchMessage: rulesValues.mainMatchMessage
@@ -117,265 +116,234 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+                <DialogHeader className="px-6 py-4 border-b border-border bg-muted/10">
                     <DialogTitle>Regras de Negócio - {game?.name}</DialogTitle>
                     <DialogDescription>Configure as restrições e regras automáticas deste jogo.</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4 overflow-y-auto flex-1 pr-2">
-                    <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                        <div className="space-y-0.5">
-                            <Label className="text-base font-semibold">Bloqueio Global</Label>
-                            <p className="text-sm text-muted-foreground max-w-[300px]">
-                                Impede que o mesmo número seja vendido mais de uma vez para o mesmo sorteio, por qualquer cambista.
-                            </p>
-                        </div>
-                        <Switch
-                            checked={rulesValues.globalCheck}
-                            onCheckedChange={(checked) => setRulesValues({ ...rulesValues, globalCheck: checked })}
-                            className="data-[state=checked]:bg-emerald-600"
-                        />
-                    </div>
 
-                    <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                        <div className="space-y-0.5">
-                            <Label className="text-base font-semibold">Modo Restrito</Label>
-                            <p className="text-sm text-muted-foreground max-w-[300px]">
-                                Gera automaticamente as outras 3 milhares relacionadas ao escolher apenas 1 milhar.
-                            </p>
-                        </div>
-                        <Switch
-                            checked={rulesValues.restrictedMode}
-                            onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
-                            className="data-[state=checked]:bg-emerald-600"
-                        />
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t border-border">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Ticket className="w-4 h-4 text-blue-500" />
-                            <Label className="text-base font-semibold">Mensagens do Bilhete</Label>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Mensagem de Incentivo</Label>
-                                <Input
-                                    value={rulesValues.promptMessage}
-                                    onChange={(e) => setRulesValues({ ...rulesValues, promptMessage: e.target.value })}
-                                    placeholder="Ex: VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS"
-                                />
-                                <p className="text-[10px] text-muted-foreground">Exibida acima dos números apostados.</p>
+                <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+                    {/* Top Section: Toggles */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-card">
+                            <div className="space-y-0.5">
+                                <Label className="text-sm font-semibold">Bloqueio Global</Label>
+                                <p className="text-[10px] text-muted-foreground leading-tight">
+                                    Impede repetição de número por sorteio.
+                                </p>
                             </div>
-                            <div className="space-y-2">
-                                <Label>Mensagem de Acerto Principal</Label>
-                                <Input
-                                    value={rulesValues.mainMatchMessage}
-                                    onChange={(e) => setRulesValues({ ...rulesValues, mainMatchMessage: e.target.value })}
-                                    placeholder="Ex: ACERTANDO TODOS OS NÚMEROS NA ORDEM"
-                                />
-                                <p className="text-[10px] text-muted-foreground">Exibida perto do prêmio principal.</p>
+                            <Switch
+                                checked={rulesValues.globalCheck}
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, globalCheck: checked })}
+                                className="scale-90 data-[state=checked]:bg-emerald-600"
+                            />
+                        </div>
+
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-card">
+                            <div className="space-y-0.5">
+                                <Label className="text-sm font-semibold">Modo Restrito</Label>
+                                <p className="text-[10px] text-muted-foreground leading-tight">
+                                    Gera milhares relacionadas automaticamente.
+                                </p>
                             </div>
+                            <Switch
+                                checked={rulesValues.restrictedMode}
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
+                                className="scale-90 data-[state=checked]:bg-emerald-600"
+                            />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                        <div className="space-y-2">
-                            <Label className="flex items-center gap-2">
-                                <Activity className="w-4 h-4 text-red-500" />
-                                Limite de Risco (R$)
+                    {/* Middle Section: Configuration Grid */}
+                    <div className="grid grid-cols-4 gap-4">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-medium flex items-center gap-1.5">
+                                <Activity className="w-3.5 h-3.5 text-red-500" /> Limite Risco
                             </Label>
                             <Input
                                 type="number"
+                                className="h-9"
                                 value={rulesValues.maxLiability}
                                 onChange={(e) => setRulesValues({ ...rulesValues, maxLiability: e.target.value })}
-                                placeholder="Ex: 5000"
+                                placeholder="5000"
                             />
-                            <p className="text-[10px] text-muted-foreground whitespace-nowrap">Máximo de prêmios por número/sorteio.</p>
                         </div>
-                        <div className="space-y-2">
-                            <Label className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-emerald-500" />
-                                Multiplicador
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-medium flex items-center gap-1.5">
+                                <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Multiplicador
                             </Label>
                             <Input
                                 type="number"
+                                className="h-9"
                                 value={rulesValues.prizeMultiplier}
                                 onChange={(e) => setRulesValues({ ...rulesValues, prizeMultiplier: e.target.value })}
-                                placeholder="Ex: 1000"
+                                placeholder="1000"
                             />
-                            <p className="text-[10px] text-muted-foreground whitespace-nowrap text-wrap">Multiplica o valor da aposta no prêmio.</p>
                         </div>
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t border-border">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Ticket className="w-4 h-4 text-purple-500" />
-                            <Label className="text-base font-semibold">Configuração de Bilhetes</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-medium flex items-center gap-1.5">
+                                <Hash className="w-3.5 h-3.5 text-purple-500" /> Max Bilhetes
+                            </Label>
+                            <Input
+                                type="number"
+                                className="h-9"
+                                value={rulesValues.maxTicketsPerSeries}
+                                onChange={(e) => setRulesValues({ ...rulesValues, maxTicketsPerSeries: e.target.value })}
+                                placeholder="2500"
+                            />
                         </div>
-
-                        <div className="space-y-2">
-                            <Label>Modo de Numeração</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-medium flex items-center gap-1.5">
+                                <Ticket className="w-3.5 h-3.5 text-blue-500" /> Mod. Numeração
+                            </Label>
                             <Select
                                 value={rulesValues.ticketNumberingMode}
                                 onValueChange={(value) => setRulesValues({ ...rulesValues, ticketNumberingMode: value })}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="h-9">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="RANDOM">
-                                        <div className="flex flex-col py-1">
-                                            <span className="font-semibold">Aleatório</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                Números atribuídos aleatoriamente (ex: 1523, 0047, 2341...)
-                                            </span>
-                                        </div>
-                                    </SelectItem>
-                                    <SelectItem value="SEQUENTIAL">
-                                        <div className="flex flex-col py-1">
-                                            <span className="font-semibold">Sequencial</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                Números atribuídos em ordem (ex: 0001, 0002, 0003...)
-                                            </span>
-                                        </div>
-                                    </SelectItem>
+                                    <SelectItem value="RANDOM">Aleatório</SelectItem>
+                                    <SelectItem value="SEQUENTIAL">Sequencial</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <p className="text-[10px] text-muted-foreground">
-                                {rulesValues.ticketNumberingMode === "RANDOM"
-                                    ? "Modo aleatório dificulta fraude e torna a distribuição imprevisível."
-                                    : "Modo sequencial facilita auditoria e rastreamento de vendas."}
-                            </p>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="flex items-center gap-2">
-                                <Hash className="w-4 h-4 text-purple-500" />
-                                Máximo de Bilhetes por Série
-                            </Label>
-                            <Input
-                                type="number"
-                                value={rulesValues.maxTicketsPerSeries}
-                                onChange={(e) => setRulesValues({ ...rulesValues, maxTicketsPerSeries: e.target.value })}
-                                placeholder="Ex: 2500"
-                                min="1"
-                                max="10000"
-                            />
-                            <p className="text-[10px] text-muted-foreground">
-                                Quantidade máxima de bilhetes que podem ser vendidos por série.
-                            </p>
                         </div>
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-border">
-                        <div className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm bg-gradient-to-r from-purple-50 to-pink-50">
-                            <div className="space-y-0.5">
-                                <Label className="text-base font-semibold flex items-center gap-2">
-                                    <Ticket className="w-4 h-4 text-purple-500" />
-                                    Segunda Chance
-                                </Label>
-                                <p className="text-sm text-muted-foreground max-w-[300px]">
-                                    Habilita sorteio extra semanal para bilhetes não premiados.
-                                </p>
+                    {/* Second Chance Compact */}
+                    <div className="rounded-lg border shadow-sm overflow-hidden">
+                        <div className="bg-muted/30 p-3 flex items-center justify-between border-b border-border">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1 rounded bg-purple-100">
+                                    <Ticket className="w-3.5 h-3.5 text-purple-600" />
+                                </div>
+                                <div>
+                                    <Label className="text-sm font-semibold block">Segunda Chance</Label>
+                                    <span className="text-[10px] text-muted-foreground">Sorteio extra semanal</span>
+                                </div>
                             </div>
                             <Switch
                                 checked={rulesValues.secondChanceEnabled}
                                 onCheckedChange={(checked) => setRulesValues({ ...rulesValues, secondChanceEnabled: checked })}
-                                className="data-[state=checked]:bg-purple-600"
+                                className="scale-90 data-[state=checked]:bg-purple-600"
                             />
                         </div>
 
                         {rulesValues.secondChanceEnabled && (
-                            <div className="space-y-4 pl-4 border-l-2 border-purple-200">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Faixa Inicial</Label>
-                                        <Input
-                                            type="number"
-                                            value={rulesValues.secondChanceRangeStart}
-                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeStart: e.target.value })}
-                                            placeholder="Ex: 122300"
-                                        />
-                                        <p className="text-[10px] text-muted-foreground">Número inicial da faixa de Segunda Chance.</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Faixa Final</Label>
-                                        <Input
-                                            type="number"
-                                            value={rulesValues.secondChanceRangeEnd}
-                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeEnd: e.target.value })}
-                                            placeholder="Ex: 125500"
-                                        />
-                                        <p className="text-[10px] text-muted-foreground">Número final da faixa de Segunda Chance.</p>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Dia do Sorteio</Label>
-                                        <Select
-                                            value={rulesValues.secondChanceWeekday}
-                                            onValueChange={(value) => setRulesValues({ ...rulesValues, secondChanceWeekday: value })}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="0">Domingo</SelectItem>
-                                                <SelectItem value="1">Segunda-feira</SelectItem>
-                                                <SelectItem value="2">Terça-feira</SelectItem>
-                                                <SelectItem value="3">Quarta-feira</SelectItem>
-                                                <SelectItem value="4">Quinta-feira</SelectItem>
-                                                <SelectItem value="5">Sexta-feira</SelectItem>
-                                                <SelectItem value="6">Sábado</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <p className="text-[10px] text-muted-foreground">Dia da semana do sorteio extra.</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Horário do Sorteio</Label>
-                                        <Input
-                                            type="time"
-                                            value={rulesValues.secondChanceDrawTime}
-                                            onChange={(e) => setRulesValues({ ...rulesValues, secondChanceDrawTime: e.target.value })}
-                                        />
-                                        <p className="text-[10px] text-muted-foreground">Horário do sorteio extra (HH:mm).</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2">
-                                        <DollarSign className="w-4 h-4 text-green-500" />
-                                        Prêmio da Segunda Chance (R$)
-                                    </Label>
+                            <div className="p-4 bg-card grid grid-cols-6 gap-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div className="col-span-2 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Faixa Inicial</Label>
                                     <Input
-                                        type="number"
+                                        className="h-8 text-sm"
+                                        value={rulesValues.secondChanceRangeStart}
+                                        onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeStart: e.target.value })}
+                                        placeholder="122300"
+                                    />
+                                </div>
+                                <div className="col-span-2 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Faixa Final</Label>
+                                    <Input
+                                        className="h-8 text-sm"
+                                        value={rulesValues.secondChanceRangeEnd}
+                                        onChange={(e) => setRulesValues({ ...rulesValues, secondChanceRangeEnd: e.target.value })}
+                                        placeholder="125500"
+                                    />
+                                </div>
+                                <div className="col-span-2 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Prêmio (R$)</Label>
+                                    <Input
+                                        className="h-8 text-sm"
                                         value={rulesValues.secondChancePrize}
                                         onChange={(e) => setRulesValues({ ...rulesValues, secondChancePrize: e.target.value })}
-                                        placeholder="Ex: 1000"
+                                        placeholder="1000"
                                     />
-                                    <p className="text-[10px] text-muted-foreground">Valor do prêmio para o ganhador do sorteio de Segunda Chance.</p>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label>Nome Personalizado (opcional)</Label>
+                                <div className="col-span-2 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Dia do Sorteio</Label>
+                                    <Select
+                                        value={rulesValues.secondChanceWeekday}
+                                        onValueChange={(value) => setRulesValues({ ...rulesValues, secondChanceWeekday: value })}
+                                    >
+                                        <SelectTrigger className="h-8 text-sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="6">Sábado</SelectItem>
+                                            <SelectItem value="0">Domingo</SelectItem>
+                                            <SelectItem value="1">Segunda</SelectItem>
+                                            <SelectItem value="2">Terça</SelectItem>
+                                            <SelectItem value="3">Quarta</SelectItem>
+                                            <SelectItem value="4">Quinta</SelectItem>
+                                            <SelectItem value="5">Sexta</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="col-span-1 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Hora</Label>
                                     <Input
-                                        type="text"
+                                        className="h-8 text-sm text-center"
+                                        value={rulesValues.secondChanceDrawTime}
+                                        onChange={(e) => setRulesValues({ ...rulesValues, secondChanceDrawTime: e.target.value })}
+                                        placeholder="19:00"
+                                    />
+                                </div>
+                                <div className="col-span-3 space-y-1.5">
+                                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Label Exibição</Label>
+                                    <Input
+                                        className="h-8 text-sm"
                                         value={rulesValues.secondChanceLabel}
                                         onChange={(e) => setRulesValues({ ...rulesValues, secondChanceLabel: e.target.value })}
-                                        placeholder="Ex: CHANCE EXTRA, SORTE EXTRA"
+                                        placeholder="SEGUNDA CHANCE"
                                     />
-                                    <p className="text-[10px] text-muted-foreground">Deixe em branco para usar "SEGUNDA CHANCE"</p>
                                 </div>
                             </div>
                         )}
                     </div>
+
+                    {/* Messages Section */}
+                    <div className="space-y-3">
+                        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Mensagens do Bilhete</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px]">Mensagem de Incentivo (Topo)</Label>
+                                <Input
+                                    className="h-9 text-xs"
+                                    value={rulesValues.promptMessage}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, promptMessage: e.target.value })}
+                                    placeholder="Ex: VOCÊ GANHA SE..."
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px]">Mensagem de Acerto (Principal)</Label>
+                                <Input
+                                    className="h-9 text-xs"
+                                    value={rulesValues.mainMatchMessage}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, mainMatchMessage: e.target.value })}
+                                    placeholder="Ex: ACERTANDO TODOS..."
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                    <Button onClick={saveRules} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
-                        {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                        Salvar Regras
+
+                <DialogFooter className="px-6 py-4 border-t border-border bg-muted/10">
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={saveRules} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 min-w-[140px]">
+                        {saving ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Salvando...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Salvar Regras
+                            </>
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>
