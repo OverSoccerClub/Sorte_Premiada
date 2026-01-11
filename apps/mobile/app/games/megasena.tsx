@@ -76,7 +76,7 @@ const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: bo
 
 export default function MegaSenaScreen() {
     const router = useRouter();
-    const { token } = useAuth(); // Get token
+    const { token, user } = useAuth(); // Get token and user profile
     const { show, hide } = useLoading(); // Global loading
     const { printerType } = usePrinter();
     const { settings } = useCompany();
@@ -239,7 +239,8 @@ export default function MegaSenaScreen() {
                 secondChanceLabel: "SEGUNDA CHANCE",
                 status: ticketData.status,
                 companyName: settings.companyName,
-                companyLogoUrl: settings.logoUrl
+                companyLogoUrl: settings.logoUrl,
+                areaName: user?.area?.name
             };
 
             setLastTicket(fullTicket);
@@ -390,7 +391,8 @@ export default function MegaSenaScreen() {
                                             date: new Date().toLocaleString('pt-BR'),
                                             ticketId: "PREVIEW",
                                             companyName: settings.companyName,
-                                            companyLogoUrl: settings.logoUrl
+                                            companyLogoUrl: settings.logoUrl,
+                                            areaName: user?.area?.name
                                         }}
                                         mode="preview"
                                     />

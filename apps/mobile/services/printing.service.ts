@@ -15,6 +15,17 @@ const formatDate = (date: Date) => {
   return date.toLocaleString('pt-BR');
 };
 
+const formatDrawDate = (dateStr: string | undefined) => {
+  if (!dateStr) return "";
+  const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+  if (parts) {
+    const [_, day, month, year, hours, minutes] = parts;
+    const shortYear = year.substring(2);
+    return `${day}/${month}/${shortYear} ÀS ${hours}:${minutes}`;
+  }
+  return dateStr;
+};
+
 import { TicketData } from '../components/ticket/TicketContent';
 
 export const printTicket = async (
@@ -22,7 +33,7 @@ export const printTicket = async (
   printerType: PrinterType = 'BLE',
   imageUri?: string
 ) => {
-  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId } = data;
+  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName } = data;
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
@@ -112,7 +123,7 @@ export const printTicket = async (
             <div class="dashed"></div>
             
             <div class="bold big">${gameName.toUpperCase()}</div>
-            <div>${dateStr}</div>
+            <div>SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaName ? ` - ${areaName}` : ''}</div>
             
             <div class="dashed"></div>
             
@@ -234,7 +245,8 @@ export const printTicket = async (
     receipt += "- - - - - - - - - - - - - - - -\n\n";
 
     receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + gameName.toUpperCase() + BOLD_OFF + NORMAL + "\n";
-    receipt += dateStr + "\n\n";
+    const sorteioInfo = `SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaName ? ` - ${areaName}` : ''}`;
+    receipt += sorteioInfo + "\n\n";
 
     const sortedNumbers = numbers.sort((a, b) => a - b);
     const formattedNumbers = sortedNumbers.map(n => n.toString().padStart(padLength, '0'));

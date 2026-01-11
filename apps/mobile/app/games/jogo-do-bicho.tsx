@@ -53,7 +53,7 @@ type Modality = "GRUPO" | "DEZENA" | "CENTENA" | "MILHAR";
 
 export default function JogoDoBichoScreen() {
     const router = useRouter();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
     const { settings } = useCompany();
@@ -231,6 +231,7 @@ export default function JogoDoBichoScreen() {
                 } : undefined,
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
+                areaName: user?.area?.name,
                 promptMessage: gameConfig?.promptMessage,
                 mainMatchMessage: gameConfig?.mainMatchMessage,
                 secondChanceDrawDate: (() => {
@@ -430,7 +431,8 @@ export default function JogoDoBichoScreen() {
                                         dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                                     } : undefined,
                                     companyName: settings.companyName,
-                                    companyLogoUrl: settings.logoUrl
+                                    companyLogoUrl: settings.logoUrl,
+                                    areaName: user?.area?.name
                                 }}
                                 mode="preview"
                             />

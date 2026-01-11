@@ -34,6 +34,7 @@ export interface TicketData {
     // Company Branding
     companyName?: string;
     companyLogoUrl?: string;
+    areaName?: string;
 }
 
 interface TicketContentProps {
@@ -70,6 +71,19 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
         if (match) return `POS ${match[1]}`;
         // Fallback: use limited length device name or Terminal ID
         return data.terminalId || '----';
+    };
+
+    // Helper to format Draw Date as per requirement: DD/MM/YY ÀS HH:MM
+    const formatDrawDate = (dateStr: string | undefined) => {
+        if (!dateStr) return "";
+        // Try to parse: "11/01/2026 18:00:00" or similar
+        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+        if (parts) {
+            const [_, day, month, year, hours, minutes] = parts;
+            const shortYear = year.substring(2);
+            return `${day}/${month}/${shortYear} ÀS ${hours}:${minutes}`;
+        }
+        return dateStr;
     };
 
     return (
@@ -111,7 +125,10 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </Text>
                 </View>
                 <Text style={tw`text-center font-bold text-black text-[10px] mt-1`}>
-                    SORTEIO: <Text style={tw`font-black text-[12px]`}>{data.drawDate || data.date.split(' ')[0]} - 19H</Text>
+                    SORTEIO: <Text style={tw`font-black text-[12px]`}>
+                        {formatDrawDate(data.drawDate || data.date)}
+                        {data.areaName ? ` - ${data.areaName}` : ''}
+                    </Text>
                 </Text>
             </View>
 

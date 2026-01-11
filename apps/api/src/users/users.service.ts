@@ -140,9 +140,10 @@ export class UsersService {
         return Promise.all(results);
     }
 
-    async findById(id: string): Promise<User | null> {
+    async findById(id: string): Promise<any | null> {
         return this.prisma.user.findUnique({
             where: { id },
+            include: { area: true }
         });
     }
 
