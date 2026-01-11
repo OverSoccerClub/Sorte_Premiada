@@ -73,6 +73,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 prizeMultiplier: Number(rulesValues.prizeMultiplier),
                 ticketNumberingMode: rulesValues.ticketNumberingMode,
                 maxTicketsPerSeries: Number(rulesValues.maxTicketsPerSeries),
+                secondChanceEnabled: rulesValues.secondChanceEnabled,
                 secondChanceRangeStart: rulesValues.secondChanceEnabled && rulesValues.secondChanceRangeStart ? Number(rulesValues.secondChanceRangeStart) : null,
                 secondChanceRangeEnd: rulesValues.secondChanceEnabled && rulesValues.secondChanceRangeEnd ? Number(rulesValues.secondChanceRangeEnd) : null,
                 secondChanceWeekday: rulesValues.secondChanceEnabled ? Number(rulesValues.secondChanceWeekday) : null,
