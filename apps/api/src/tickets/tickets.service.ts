@@ -79,11 +79,16 @@ export class TicketsService {
                     name: true,
                     currentSeries: true,
                     ticketsInSeries: true,
-                    maxTicketsPerSeries: true
+                    maxTicketsPerSeries: true,
+                    isActive: true
                 }
             });
 
             if (areaToUpdate) {
+                if (areaToUpdate.isActive === false) {
+                    throw new BadRequestException("As vendas estão temporariamente pausadas para esta praça.");
+                }
+
                 // Check if we need to increment series
                 if (areaToUpdate.ticketsInSeries >= areaToUpdate.maxTicketsPerSeries) {
                     // Increment series
