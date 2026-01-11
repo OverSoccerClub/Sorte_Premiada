@@ -14,6 +14,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { PrinterProvider } from "../context/PrinterContext";
 import { LoadingProvider, useLoading } from "../context/LoadingContext";
 import { CompanyProvider, useCompany } from "../context/CompanyContext";
+import { SettingsProvider } from "../context/SettingsContext";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { CustomAlert, AlertType } from "../components/CustomAlert";
 
@@ -171,21 +172,23 @@ export default function RootLayout() {
     return (
         <LoadingProvider>
             <CompanyProvider>
-                <AuthProvider>
-                    <PrinterProvider>
-                        <SafeAreaProvider>
-                            <AppInit />
-                            <Stack screenOptions={{ headerShown: false }}>
-                                <Stack.Screen name="activation" />
-                                <Stack.Screen name="index" />
-                                <Stack.Screen name="(tabs)" />
-                                <Stack.Screen name="settings/printer" options={{ presentation: 'modal' }} />
-                            </Stack>
-                            <StatusBar style="auto" />
-                            <LoadingOverlay />
-                        </SafeAreaProvider>
-                    </PrinterProvider>
-                </AuthProvider>
+                <SettingsProvider>
+                    <AuthProvider>
+                        <PrinterProvider>
+                            <SafeAreaProvider>
+                                <AppInit />
+                                <Stack screenOptions={{ headerShown: false }}>
+                                    <Stack.Screen name="activation" />
+                                    <Stack.Screen name="index" />
+                                    <Stack.Screen name="(tabs)" />
+                                    <Stack.Screen name="settings/printer" options={{ presentation: 'modal' }} />
+                                </Stack>
+                                <StatusBar style="auto" />
+                                <LoadingOverlay />
+                            </SafeAreaProvider>
+                        </PrinterProvider>
+                    </AuthProvider>
+                </SettingsProvider>
             </CompanyProvider>
         </LoadingProvider>
     );
