@@ -43,9 +43,21 @@ export class AreasService {
     }
 
     async update(id: string, updateAreaDto: UpdateAreaDto) {
+        const data: any = { ...updateAreaDto };
+
+        // If seriesNumber is updated, Sync currentSeries and reset counter
+        // This allows the admin to "Force" a series change/reset
+        if (updateAreaDto.seriesNumber) {
+            data.currentSeries = updateAreaDto.seriesNumber;
+            // Optionally reset tickets count for the new series, assuming it's a fresh start
+            // If we want to keep the count, we wouldn't satisfy the "Jump to 0002" requirement properly without issues.
+            // Let's assume a series change implies a fresh start for that series.
+            data.ticketsInSeries = 0;
+        }
+
         return this.prisma.area.update({
             where: { id },
-            data: updateAreaDto,
+            data,
         });
     }
 
