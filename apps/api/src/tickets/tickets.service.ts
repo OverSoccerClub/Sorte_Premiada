@@ -367,7 +367,8 @@ export class TicketsService {
                         gameId,
                         scDrawDate,
                         rangeStart,
-                        rangeEnd
+                        rangeEnd,
+                        seriesNumber !== null ? Number(seriesNumber) : undefined
                     );
                     createData['secondChanceDrawDate'] = scDrawDate;
                     createData['secondChanceNumber'] = scNumber;
@@ -1113,7 +1114,8 @@ export class TicketsService {
         gameId: string,
         drawDate: Date,
         start: number,
-        end: number
+        end: number,
+        series?: number
     ): Promise<number> {
         const range = end - start + 1;
         if (range <= 0) throw new Error("Invalid Second Chance range");
@@ -1123,14 +1125,20 @@ export class TicketsService {
             const randomOffset = Math.floor(Math.random() * range);
             const candidate = start + randomOffset;
 
-            // Check uniqueness
+            // Check uniqueness - Scope to series if provided
+            const where: any = {
+                gameId: gameId,
+                secondChanceDrawDate: drawDate,
+                secondChanceNumber: candidate,
+                status: { not: 'CANCELLED' }
+            };
+
+            if (series !== undefined) {
+                where.series = series;
+            }
+
             const exists = await this.prisma.ticket.findFirst({
-                where: {
-                    gameId: gameId,
-                    secondChanceDrawDate: drawDate,
-                    secondChanceNumber: candidate,
-                    status: { not: 'CANCELLED' } // Ignore cancelled tickets? Usually yes, we can reuse number.
-                }
+                where: where
             });
 
             if (!exists) {

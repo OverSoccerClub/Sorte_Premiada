@@ -273,6 +273,7 @@ model SecondChanceDraw {
   winningNumber Int
   prizeAmount   Decimal
   drawDate      DateTime // Which Saturday this refers to
+  series        Int?     // Opcional: Para sorteios vinculados a uma série específica
   createdAt     DateTime @default(now())
 
   @@index([companyId])
