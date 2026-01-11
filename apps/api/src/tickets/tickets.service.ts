@@ -230,13 +230,15 @@ export class TicketsService {
             const isAutoPick = !data.numbers || data.numbers.length === 0;
 
             if (isAutoPick) {
-                data.numbers = await this.generateRandomAvailableNumbers(gameId, NUMBERS_PER_TICKET, drawDate!);
+                const sNum = seriesNumber ? Number(seriesNumber) : undefined;
+                data.numbers = await this.generateRandomAvailableNumbers(gameId, NUMBERS_PER_TICKET, drawDate!, sNum);
             } else {
                 if (data.numbers.length !== NUMBERS_PER_TICKET) {
                     throw new Error(`Ticket must have exactly ${NUMBERS_PER_TICKET} thousands.`);
                 }
                 if (!rules.globalCheck) {
-                    await this.validateNumbersAvailability(gameId, data.numbers, drawDate!);
+                    const sNum = seriesNumber ? Number(seriesNumber) : undefined;
+                    await this.validateNumbersAvailability(gameId, data.numbers, drawDate!, sNum);
                 }
             }
 
@@ -245,7 +247,8 @@ export class TicketsService {
             const numberingMode = game.ticketNumberingMode || 'RANDOM';
 
             // Generate ticket number based on configuration
-            const ticketNumber = await this.generateTicketNumber(gameId, drawDate!, maxTickets, numberingMode);
+            const sNum = seriesNumber ? Number(seriesNumber) : undefined;
+            const ticketNumber = await this.generateTicketNumber(gameId, drawDate!, maxTickets, numberingMode, sNum);
             // Store it temporarily to add to createData later
             (data as any)._ticketNumber = ticketNumber;
         }
@@ -414,10 +417,28 @@ export class TicketsService {
 
             // Invalidate Redis Caches for this game and draw date
             try {
-                const cacheKey = `sold_numbers:${ticket.gameId}:${ticket.drawDate?.toISOString()}`;
+                // Invalidate both global and specific series cache if necessary
+                // Simple approach: invalidate keys by pattern? RedisService might not support pattern del easily.
+                // We'll invalidate the specific series key we just wrote to.
+                // NOTE: If global check is ON, we might need to invalidate global key too.
+
+                const sKey = seriesNumber ? `:${Number(seriesNumber)}` : ':global';
+                const cacheKey = `sold_numbers:${ticket.gameId}:${ticket.drawDate?.toISOString()}${sKey}`;
+
                 const liabilityKey = `liability:${ticket.gameId}:${ticket.drawDate?.toISOString()}`;
                 await this.redis.del(cacheKey);
                 await this.redis.del(liabilityKey);
+
+                // Also invalidate global lookup if we wrote to a series? 
+                // Currently getSoldNumbers segregates by series key. 
+                // If a global check uses :global, it won't see this series update unless we invalidate :global too or :global reads all.
+                // BUT getSoldNumbers(:global) logic above reads ALL tickets in DB (no series filter).
+                // So the DB read will be correct, but the CACHED :global value will be stale.
+                if (seriesNumber) {
+                    const globalKey = `sold_numbers:${ticket.gameId}:${ticket.drawDate?.toISOString()}:global`;
+                    await this.redis.del(globalKey);
+                }
+
             } catch (e) {
                 console.error("Redis invalidation failed", e);
             }
@@ -494,16 +515,16 @@ export class TicketsService {
         return createBrazilDrawDate(extractionTimes[0], tomorrowBrazil).toDate();
     }
 
-    private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date) {
-        const soldNumbers = await this.getSoldNumbers(gameId, drawDate);
+    private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date, series?: number) {
+        const soldNumbers = await this.getSoldNumbers(gameId, drawDate, series);
         const alreadySold = numbers.filter(n => soldNumbers.has(n));
         if (alreadySold.length > 0) {
             throw new Error(`Numbers already sold for draw ${drawDate.toLocaleString()}: ${alreadySold.join(', ')} `);
         }
     }
 
-    private async generateRandomAvailableNumbers(gameId: string, quantity: number, drawDate: Date): Promise<number[]> {
-        const soldNumbers = await this.getSoldNumbers(gameId, drawDate);
+    private async generateRandomAvailableNumbers(gameId: string, quantity: number, drawDate: Date, series?: number): Promise<number[]> {
+        const soldNumbers = await this.getSoldNumbers(gameId, drawDate, series);
         const available: number[] = [];
         // Pool 0000 to 9999
         for (let i = 0; i < 10000; i++) {
@@ -530,16 +551,23 @@ export class TicketsService {
         gameId: string,
         drawDate: Date,
         maxTickets: number,
-        mode: string = 'RANDOM'
+        mode: string = 'RANDOM',
+        series?: number
     ): Promise<number> {
         // Fetch already used ticket numbers for this series (game + drawDate)
+        const where: Prisma.TicketWhereInput = {
+            gameId: gameId,
+            drawDate: drawDate,
+            status: { not: 'CANCELLED' },
+            ticketNumber: { not: null }
+        };
+
+        if (series !== undefined) {
+            where.series = series;
+        }
+
         const usedTickets = await this.prisma.ticket.findMany({
-            where: {
-                gameId: gameId,
-                drawDate: drawDate,
-                status: { not: 'CANCELLED' },
-                ticketNumber: { not: null }
-            },
+            where: where,
             select: { ticketNumber: true },
             orderBy: { ticketNumber: 'desc' }
         });
@@ -587,8 +615,9 @@ export class TicketsService {
     }
 
 
-    private async getSoldNumbers(gameId: string, drawDate: Date): Promise<Set<number>> {
-        const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}`;
+    private async getSoldNumbers(gameId: string, drawDate: Date, series?: number): Promise<Set<number>> {
+        const seriesKey = series !== undefined ? `:${series}` : ':global';
+        const cacheKey = `sold_numbers:${gameId}:${drawDate.toISOString()}${seriesKey}`;
         let cached: string | null = null;
 
         try {
@@ -601,12 +630,18 @@ export class TicketsService {
             return new Set(JSON.parse(cached));
         }
 
+        const where: Prisma.TicketWhereInput = {
+            gameId: gameId,
+            status: { not: 'CANCELLED' },
+            drawDate: drawDate
+        };
+
+        if (series !== undefined) {
+            where.series = series;
+        }
+
         const tickets = await this.prisma.ticket.findMany({
-            where: {
-                gameId: gameId,
-                status: { not: 'CANCELLED' },
-                drawDate: drawDate
-            },
+            where: where,
             select: { numbers: true }
         });
 
@@ -627,12 +662,25 @@ export class TicketsService {
         return new Set(soldArr);
     }
 
-    async getAvailability(gameId: string): Promise<number[]> {
-        // Default availability: Next Draw?
-        // Or we should pass drawDate?
-        // Ideally we assume next draw logic implies "Current Selling Cycle".
+    async getAvailability(gameId: string, userId?: string): Promise<number[]> {
         const nextDraw = await this.getNextDrawDate(gameId);
-        const soldSet = await this.getSoldNumbers(gameId, nextDraw);
+        let series: number | undefined;
+
+        if (userId) {
+            const user = await this.prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    area: {
+                        select: { currentSeries: true }
+                    }
+                }
+            });
+            if (user?.area?.currentSeries) {
+                series = Number(user.area.currentSeries);
+            }
+        }
+
+        const soldSet = await this.getSoldNumbers(gameId, nextDraw, series);
         return Array.from(soldSet);
     }
 

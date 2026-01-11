@@ -54,8 +54,8 @@ export class TicketsController {
     }
     @Get('availability/:gameId')
     @UseGuards(JwtAuthGuard)
-    async getAvailability(@Param('gameId') gameId: string) {
-        return this.ticketsService.getAvailability(gameId);
+    async getAvailability(@Request() req: any, @Param('gameId') gameId: string) {
+        return this.ticketsService.getAvailability(gameId, req.user?.userId);
     }
 
     @Get('series-stats/:gameId')
