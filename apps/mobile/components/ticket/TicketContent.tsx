@@ -22,6 +22,8 @@ export interface TicketData {
     secondChanceNumber?: number;
     secondChanceDrawDate?: string;
     secondChanceLabel?: string;
+    promptMessage?: string;
+    mainMatchMessage?: string;
     prizes?: {
         milhar?: string;
         centena?: string;
@@ -59,6 +61,16 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     // Determinar se deve mostrar logo ou ícone
     const shouldShowLogo = data.companyLogoUrl && !logoError;
+
+    // Helper to get formatted POS name
+    const getPosName = () => {
+        if (!data.deviceName) return data.terminalId || '----';
+        // Tries to match POS 001, TERM 001, TERMINAL 001, or POS-001, etc.
+        const match = data.deviceName.match(/(?:POS|TERM|TERMINAL)\s*-?\s*(\d+)/i);
+        if (match) return `POS ${match[1]}`;
+        // Fallback: use limited length device name or Terminal ID
+        return data.terminalId || '----';
+    };
 
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
@@ -137,7 +149,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             <View style={tw`border-b-2 border-dashed border-black mb-2 mx-2`} />
 
             <Text style={tw`text-center font-bold text-[11px] text-black mb-1 uppercase`}>
-                VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:
+                {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
             </Text>
 
             {data.prizes ? (
@@ -184,7 +196,9 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                             ))}
                         </View>
                     </View>
-                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>ACERTANDO TODOS OS NÚMEROS NA ORDEM</Text>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
+                        {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                    </Text>
                 </View>
             )}
 
@@ -213,7 +227,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </View>
                     <View style={tw`w-[30%] items-center`}>
                         <Text style={tw`text-[10px] text-black font-bold`}>
-                            Term: {data.deviceName?.match(/POS\s*\d+/i)?.[0] || data.terminalId || '----'}
+                            Term: {getPosName()}
                         </Text>
                     </View>
                     <View style={tw`w-[38%] items-end`}>

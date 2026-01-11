@@ -226,6 +226,8 @@ model Game {
   secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
   secondChancePrize      Decimal? @default(1000) // Prêmio do sorteio de Segunda Chance
   secondChanceLabel      String?  @default("SEGUNDA CHANCE") // Label customizável para exibição
+  promptMessage          String?  @default("VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS")
+  mainMatchMessage       String?  @default("ACERTANDO TODOS OS NÚMEROS NA ORDEM")
   lastSecondChanceSeries Int      @default(0)
 
   // Custom Prize Configuration (Printed on Ticket)

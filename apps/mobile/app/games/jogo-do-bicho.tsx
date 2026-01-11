@@ -230,8 +230,32 @@ export default function JogoDoBichoScreen() {
                     dezena: gameConfig.prizeDezena ? `R$ ${Number(gameConfig.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                 } : undefined,
                 companyName: settings.companyName,
-                companyLogoUrl: settings.logoUrl
+                companyLogoUrl: settings.logoUrl,
+                promptMessage: gameConfig?.promptMessage,
+                mainMatchMessage: gameConfig?.mainMatchMessage,
+                secondChanceDrawDate: (() => {
+                    if (!gameConfig?.secondChanceWeekday || !gameConfig?.secondChanceDrawTime) return undefined;
+                    const weekday = parseInt(gameConfig.secondChanceWeekday.toString());
+                    const timeStr = gameConfig.secondChanceDrawTime;
+                    const now = new Date();
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    const result = new Date(now);
+                    result.setHours(hours, minutes, 0, 0);
+
+                    const currentDay = now.getDay();
+                    let daysUntil = weekday - currentDay;
+                    if (daysUntil < 0 || (daysUntil === 0 && now > result)) {
+                        daysUntil += 7;
+                    }
+                    result.setDate(now.getDate() + daysUntil);
+
+                    const weekDays = ["DOMINGO", "SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO"];
+                    const dayName = weekDays[weekday];
+                    const dateStr = result.toLocaleDateString('pt-BR'); // DD/MM/YYYY
+                    return `${dayName}, ${dateStr} - ${timeStr}`;
+                })()
             };
+
             setLastTicket(ticketObj);
 
             // 1. Show Standard Loading

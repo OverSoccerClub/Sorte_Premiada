@@ -30,7 +30,10 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
         secondChanceWeekday: "6",
         secondChanceDrawTime: "19:00",
         secondChancePrize: "1000",
-        secondChanceLabel: ""
+        secondChancePrize: "1000",
+        secondChanceLabel: "",
+        promptMessage: "",
+        mainMatchMessage: ""
     })
     const [saving, setSaving] = useState(false)
 
@@ -50,7 +53,11 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceWeekday: game.secondChanceWeekday !== null && game.secondChanceWeekday !== undefined ? String(game.secondChanceWeekday) : "6",
                 secondChanceDrawTime: game.secondChanceDrawTime || "19:00",
                 secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000",
-                secondChanceLabel: game.secondChanceLabel || ""
+                secondChanceDrawTime: game.secondChanceDrawTime || "19:00",
+                secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000",
+                secondChanceLabel: game.secondChanceLabel || "",
+                promptMessage: game.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS",
+                mainMatchMessage: game.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"
             })
         }
     }, [open, game])
@@ -79,7 +86,10 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceWeekday: rulesValues.secondChanceEnabled ? Number(rulesValues.secondChanceWeekday) : null,
                 secondChanceDrawTime: rulesValues.secondChanceEnabled ? rulesValues.secondChanceDrawTime : null,
                 secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null,
-                secondChanceLabel: rulesValues.secondChanceEnabled && rulesValues.secondChanceLabel ? rulesValues.secondChanceLabel : null
+                secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null,
+                secondChanceLabel: rulesValues.secondChanceEnabled && rulesValues.secondChanceLabel ? rulesValues.secondChanceLabel : null,
+                promptMessage: rulesValues.promptMessage,
+                mainMatchMessage: rulesValues.mainMatchMessage
             }
 
             const res = await fetch(`${API_URL}/games/${game.id}`, {
@@ -139,6 +149,33 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                             onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
                             className="data-[state=checked]:bg-emerald-600"
                         />
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-border">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Ticket className="w-4 h-4 text-blue-500" />
+                            <Label className="text-base font-semibold">Mensagens do Bilhete</Label>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Mensagem de Incentivo</Label>
+                                <Input
+                                    value={rulesValues.promptMessage}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, promptMessage: e.target.value })}
+                                    placeholder="Ex: VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS"
+                                />
+                                <p className="text-[10px] text-muted-foreground">Exibida acima dos números apostados.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Mensagem de Acerto Principal</Label>
+                                <Input
+                                    value={rulesValues.mainMatchMessage}
+                                    onChange={(e) => setRulesValues({ ...rulesValues, mainMatchMessage: e.target.value })}
+                                    placeholder="Ex: ACERTANDO TODOS OS NÚMEROS NA ORDEM"
+                                />
+                                <p className="text-[10px] text-muted-foreground">Exibida perto do prêmio principal.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">

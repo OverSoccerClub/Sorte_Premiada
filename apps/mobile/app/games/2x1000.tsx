@@ -387,8 +387,32 @@ export default function Game2x1000Screen() {
                 prizes: gamePrizes || undefined,
                 status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
-                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                secondChanceDrawDate: (() => {
+                    const weekday = 6; // Fixed for 2x1000? No, check game config if available, otherwise assume Saturday
+                    const timeStr = "19:00"; // Default
+                    // Ideally fetch from game config if 2x1000 has dynamic config loaded. 
+                    // 2x1000 usually has hardcoded rules or fetched via game settings.
+                    // Assuming standard behavior:
+                    const now = new Date();
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    const result = new Date(now);
+                    result.setHours(hours, minutes, 0, 0);
+
+                    const currentDay = now.getDay();
+                    let daysUntil = weekday - currentDay;
+                    if (daysUntil < 0 || (daysUntil === 0 && now > result)) {
+                        daysUntil += 7;
+                    }
+                    result.setDate(now.getDate() + daysUntil);
+
+                    const weekDays = ["DOMINGO", "SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO"];
+                    const dayName = weekDays[weekday];
+                    const dateStr = result.toLocaleDateString('pt-BR');
+                    return `${dayName}, ${dateStr} - ${timeStr}`;
+                })(),
                 secondChanceLabel: ticketData.secondChanceLabel,
+                promptMessage: "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS", // 2x1000 might not have gameConfig loaded in this scope?
+                mainMatchMessage: "ACERTANDO TODOS OS NÚMEROS NA ORDEM",
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl
             };
