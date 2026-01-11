@@ -388,7 +388,7 @@ export default function Game2x1000Screen() {
                 status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
-                secondChanceLabel: "SEGUNDA CHANCE",
+                secondChanceLabel: ticketData.secondChanceLabel,
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl
             };

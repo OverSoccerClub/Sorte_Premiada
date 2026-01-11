@@ -378,7 +378,7 @@ export default function HistoryScreen() {
                     possiblePrize: selectedTicket.possiblePrize ? `R$ ${Number(selectedTicket.possiblePrize).toFixed(2).replace('.', ',')}` : undefined,
                     secondChanceNumber: selectedTicket.secondChanceNumber,
                     secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? new Date(selectedTicket.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
-                    secondChanceLabel: "SEGUNDA CHANCE",
+                    secondChanceLabel: selectedTicket.game?.secondChanceLabel || "SEGUNDA CHANCE",
                     secondChanceStatus: selectedTicket.secondChanceStatus,
                     status: selectedTicket.status,
                     vendorName: selectedTicket.user?.name || selectedTicket.user?.username,

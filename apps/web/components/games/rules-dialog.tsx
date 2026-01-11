@@ -29,7 +29,8 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
         secondChanceRangeEnd: "",
         secondChanceWeekday: "6",
         secondChanceDrawTime: "19:00",
-        secondChancePrize: "1000"
+        secondChancePrize: "1000",
+        secondChanceLabel: ""
     })
     const [saving, setSaving] = useState(false)
 
@@ -48,7 +49,8 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceRangeEnd: game.secondChanceRangeEnd ? String(game.secondChanceRangeEnd) : "",
                 secondChanceWeekday: game.secondChanceWeekday !== null && game.secondChanceWeekday !== undefined ? String(game.secondChanceWeekday) : "6",
                 secondChanceDrawTime: game.secondChanceDrawTime || "19:00",
-                secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000"
+                secondChancePrize: game.secondChancePrize ? String(game.secondChancePrize) : "1000",
+                secondChanceLabel: game.secondChanceLabel || ""
             })
         }
     }, [open, game])
@@ -75,7 +77,8 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                 secondChanceRangeEnd: rulesValues.secondChanceEnabled && rulesValues.secondChanceRangeEnd ? Number(rulesValues.secondChanceRangeEnd) : null,
                 secondChanceWeekday: rulesValues.secondChanceEnabled ? Number(rulesValues.secondChanceWeekday) : null,
                 secondChanceDrawTime: rulesValues.secondChanceEnabled ? rulesValues.secondChanceDrawTime : null,
-                secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null
+                secondChancePrize: rulesValues.secondChanceEnabled && rulesValues.secondChancePrize ? Number(rulesValues.secondChancePrize) : null,
+                secondChanceLabel: rulesValues.secondChanceEnabled && rulesValues.secondChanceLabel ? rulesValues.secondChanceLabel : null
             }
 
             const res = await fetch(`${API_URL}/games/${game.id}`, {
@@ -314,6 +317,17 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                                         placeholder="Ex: 1000"
                                     />
                                     <p className="text-[10px] text-muted-foreground">Valor do prêmio para o ganhador do sorteio de Segunda Chance.</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Nome Personalizado (opcional)</Label>
+                                    <Input
+                                        type="text"
+                                        value={rulesValues.secondChanceLabel}
+                                        onChange={(e) => setRulesValues({ ...rulesValues, secondChanceLabel: e.target.value })}
+                                        placeholder="Ex: CHANCE EXTRA, SORTE EXTRA"
+                                    />
+                                    <p className="text-[10px] text-muted-foreground">Deixe em branco para usar "SEGUNDA CHANCE"</p>
                                 </div>
                             </div>
                         )}

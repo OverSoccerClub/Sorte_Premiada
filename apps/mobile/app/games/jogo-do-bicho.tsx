@@ -221,6 +221,7 @@ export default function JogoDoBichoScreen() {
                 possiblePrize: ticketData.possiblePrize ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ticketData.possiblePrize)) : undefined,
                 status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
+                secondChanceLabel: gameConfig?.secondChanceLabel || ticketData.secondChanceLabel,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
                 drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
                 prizes: gameConfig ? {
