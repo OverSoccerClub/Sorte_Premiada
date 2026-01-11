@@ -193,15 +193,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <Text style={tw`text-center font-black text-[12px] text-black mb-1 mt-1 uppercase border-t-2 border-dashed border-black pt-1`}>
                     INFORMAÇÕES DO BILHETE
                 </Text>
+                {/* Row 1: ID, Série, Bilhete */}
                 <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Identificador: {displayTicketId}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
-                    <Text style={tw`text-[12px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                    <View style={tw`w-[32%]`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>ID: {displayTicketId}</Text>
+                    </View>
+                    <View style={tw`w-[30%] items-center`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
+                    </View>
+                    <View style={tw`w-[38%] items-end`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                    </View>
                 </View>
+
+                {/* Row 2: Preço, Terminal, Vendedor */}
                 <View style={tw`flex-row justify-between mb-1`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Term: {data.terminalId || "----"}</Text>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Vend: {data.vendorName?.substring(0, 10) || "Cambista"}</Text>
+                    <View style={tw`w-[32%]`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                    </View>
+                    <View style={tw`w-[30%] items-center`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>
+                            Term: {data.deviceName?.match(/POS\s*\d+/i)?.[0] || data.terminalId || '----'}
+                        </Text>
+                    </View>
+                    <View style={tw`w-[38%] items-end`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>
+                            Vend: {data.vendorName?.substring(0, 10) || "Cambista"}
+                        </Text>
+                    </View>
                 </View>
                 <View style={tw`flex-row justify-between mb-1`}>
                     <Text style={tw`text-[12px] text-black font-bold`}>Data: {data.date}</Text>
