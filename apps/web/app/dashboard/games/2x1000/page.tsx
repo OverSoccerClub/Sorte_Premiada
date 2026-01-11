@@ -358,6 +358,18 @@ export default function TwoXOneThousandReportPage() {
                                             <span>Extração</span>
                                         </div>
                                     </TableHead>
+                                    <TableHead className="w-[100px]">
+                                        <div className="flex items-center gap-2 text-center justify-center">
+                                            <Hash className="w-4 h-4" />
+                                            <span>Nº</span>
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="w-[120px]">
+                                        <div className="flex items-center gap-2">
+                                            <Trophy className="w-4 h-4" />
+                                            <span>Chance</span>
+                                        </div>
+                                    </TableHead>
                                     <TableHead className="cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('user')}>
                                         <div className="flex items-center gap-2">
                                             <User className="w-4 h-4" />
@@ -442,6 +454,16 @@ export default function TwoXOneThousandReportPage() {
                                                             </span>
                                                         </div>
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                                                        {ticket.ticketNumber ? ticket.ticketNumber.toString().padStart(4, '0') : '-'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="font-mono text-xs text-muted-foreground">
+                                                        {ticket.secondChanceNumber || '-'}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
