@@ -336,10 +336,12 @@ export class TicketsService {
             };
 
             // Second Chance ...
-            if (game.secondChanceEnabled &&
-                game.secondChanceRangeStart !== null && game.secondChanceRangeStart !== undefined &&
-                game.secondChanceRangeEnd !== null && game.secondChanceRangeEnd !== undefined) {
+            if (game.secondChanceEnabled) {
                 try {
+                    // Use default ranges if not configured
+                    const rangeStart = game.secondChanceRangeStart ?? 100000;
+                    const rangeEnd = game.secondChanceRangeEnd ?? 999999;
+
                     const scDrawDate = this.getNextSecondChanceDate(
                         game.secondChanceWeekday ?? 6,
                         game.secondChanceDrawTime || '19:00'
@@ -347,12 +349,13 @@ export class TicketsService {
                     const scNumber = await this.generateUniqueSecondChanceNumber(
                         gameId,
                         scDrawDate,
-                        game.secondChanceRangeStart,
-                        game.secondChanceRangeEnd
+                        rangeStart,
+                        rangeEnd
                     );
                     createData['secondChanceDrawDate'] = scDrawDate;
                     createData['secondChanceNumber'] = scNumber;
                 } catch (e) {
+                    console.error('[TicketsService] Error generating second chance:', e);
                     throw new BadRequestException("Erro ao gerar segunda chance.");
                 }
             }
