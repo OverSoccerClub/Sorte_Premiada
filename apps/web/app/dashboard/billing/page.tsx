@@ -28,8 +28,7 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer,
-    TooltipProps
+    ResponsiveContainer
 } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -87,7 +86,7 @@ export default function BillingPage() {
         }).format(value);
     };
 
-    const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+    const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-background border rounded p-2 shadow-md">
@@ -114,7 +113,7 @@ export default function BillingPage() {
             <StandardPageHeader
                 title="Financeiro Global"
                 description="Visão geral de receitas, inadimplência e projeções"
-                icon={Wallet}
+                icon={<Wallet className="h-6 w-6 text-emerald-600" />}
             />
 
             {/* Métricas Principais */}
@@ -182,8 +181,8 @@ export default function BillingPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[350px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="h-[350px] w-full min-w-0">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                 <BarChart data={revenueData}>
                                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                                     <XAxis
