@@ -80,14 +80,14 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 {shouldShowLogo ? (
                     <Image
                         source={{ uri: data.companyLogoUrl }}
-                        style={{ width: 120, height: 80, resizeMode: 'contain', marginBottom: 6 }}
+                        style={{ width: 120, height: 60, resizeMode: 'contain', marginBottom: 6 }}
                         onError={() => {
                             console.warn('[TicketContent] Failed to load company logo, using fallback icon');
                             setLogoError(true);
                         }}
                     />
                 ) : (
-                    <MaterialCommunityIcons name="clover" size={60} color="#000" style={tw`mb-2`} />
+                    <MaterialCommunityIcons name="clover" size={45} color="#000" style={tw`mb-2`} />
                 )}
 
                 {/* Nome da Empresa */}
@@ -174,12 +174,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             ) : null}
 
-            {/* Main Match Message (Moved OUTSIDE logic blocks) */}
-            <View style={tw`mb-4 px-2`}>
-                <Text style={[tw`text-center font-bold text-[10px] text-black uppercase bg-black text-white py-1 rounded`, { letterSpacing: 0.5 }]}>
-                    {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
-                </Text>
-            </View>
+
 
             {/* Second Chance */}
             {data.secondChanceNumber !== undefined && data.secondChanceNumber !== null && (
@@ -208,6 +203,13 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                                 <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
                             ))}
                         </View>
+                    </View>
+
+                    {/* Main Match Message (Now below SC Numbers) */}
+                    <View style={tw`mt-2 px-2 w-full pt-2 border-t border-dashed border-black`}>
+                        <Text style={[tw`text-center font-bold text-[9px] text-black uppercase`, { letterSpacing: 0.5 }]}>
+                            {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                        </Text>
                     </View>
                 </View>
             )}

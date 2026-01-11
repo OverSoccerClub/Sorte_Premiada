@@ -142,7 +142,8 @@ export const printTicket = async (
             <div class="bold big" style="font-size: 28px; letter-spacing: 8px;">
               ${data.secondChanceNumber.toString().split('').join(' ')}
             </div>
-            <div style="font-size: 9px; margin-bottom: 10px;">ACERTANDO TODOS OS NÚMEROS NA ORDEM</div>
+            <div class="dashed"></div>
+            <div style="font-size: 9px; margin-bottom: 5px;">ACERTANDO TODOS OS NÚMEROS NA ORDEM</div>
             <div class="dashed"></div>
             ` : ''}
             
@@ -264,6 +265,7 @@ export const printTicket = async (
       receipt += CENTER + BOLD_ON + "SEGUNDA CHANCE" + BOLD_OFF + "\n";
       receipt += "SORTEIO EXTRA - " + (data.secondChanceDrawDate || "SABADO") + "\n";
       receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + data.secondChanceNumber.toString().split('').join(' ') + BOLD_OFF + NORMAL + "\n";
+      receipt += "- - - - - - - - - - - - - - - -\n";
       receipt += "ACERTANDO TODOS OS NUMEROS NA ORDEM\n";
     }
 
