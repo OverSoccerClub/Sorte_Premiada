@@ -360,6 +360,10 @@ export default function Game2x1000Screen() {
                     fetchSoldNumbers(gameId);
                     throw new Error("Alguns números escolhidos acabaram de ser vendidos! Atualizando...");
                 }
+                // Check for paused series
+                if (errorText.includes("pausadas") || errorText.includes("bloqueada")) {
+                    throw new Error("⚠️ Vendas Pausadas\n\nEsta praça está temporariamente bloqueada para vendas. Aguarde a liberação do administrador.");
+                }
                 throw new Error(`Falha ao salvar: ${errorText}`);
             }
 
@@ -441,14 +445,19 @@ export default function Game2x1000Screen() {
             hide();
             setTimeout(() => {
                 const isTimeout = error.name === 'AbortError';
+                const isPaused = error.message?.includes("Pausadas") || error.message?.includes("pausadas");
+
+                const errorTitle = isPaused ? "Vendas Pausadas" : "Erro";
                 const errorMessage = isTimeout
                     ? "O servidor demorou muito para responder. Verifique sua conexão ou tente novamente."
                     : (error.message || "Erro desconhecido.");
 
                 setTimeout(() => {
-                    showAlert("Erro", errorMessage, "error");
+                    showAlert(errorTitle, errorMessage, isPaused ? "warning" : "error");
                 }, 300);
             }, 300);
+            // CRITICAL: Do NOT reset state on error - preserve selected numbers and counter
+            // State should only be reset on successful ticket creation (in handleCloseReceipt)
         }
     };
 
