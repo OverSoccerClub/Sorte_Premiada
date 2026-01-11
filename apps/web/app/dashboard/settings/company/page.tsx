@@ -29,6 +29,7 @@ interface CompanySettings {
     primaryColor: string;
     updateUrl: string;
     showPlanTotalValue: boolean;
+    ticketTemplate: string;
 }
 
 const defaultSettings: CompanySettings = {
@@ -45,6 +46,7 @@ const defaultSettings: CompanySettings = {
     primaryColor: "#50C878",
     updateUrl: "",
     showPlanTotalValue: true,
+    ticketTemplate: "default",
 };
 
 function CompanySettingsContent() {
@@ -427,6 +429,84 @@ function CompanySettingsContent() {
                                 checked={settings.showPlanTotalValue}
                                 onCheckedChange={(checked) => handleChange("showPlanTotalValue", checked as any)}
                             />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Ticket Template Selection */}
+                <Card className="bg-card border-border lg:col-span-2">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Eye className="w-5 h-5 text-emerald-500" />
+                            Template de Bilhete
+                        </CardTitle>
+                        <CardDescription>
+                            Escolha o layout dos bilhetes impressos
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Default Template */}
+                            <div
+                                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'default'
+                                        ? 'border-emerald-500 bg-emerald-500/10'
+                                        : 'border-border hover:border-emerald-500/50'
+                                    }`}
+                                onClick={() => handleChange('ticketTemplate', 'default')}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${settings.ticketTemplate === 'default'
+                                            ? 'border-emerald-500 bg-emerald-500'
+                                            : 'border-border'
+                                        }`}>
+                                        {settings.ticketTemplate === 'default' && (
+                                            <div className="w-2 h-2 bg-white rounded-full" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-semibold text-sm mb-1">Padrão (Layout Vertical)</h4>
+                                        <p className="text-xs text-muted-foreground mb-2">
+                                            Layout tradicional com números em lista vertical
+                                        </p>
+                                        <div className="bg-muted/50 rounded p-2 text-[10px] space-y-1">
+                                            <div className="font-mono">• Logo centralizado</div>
+                                            <div className="font-mono">• Números em lista</div>
+                                            <div className="font-mono">• Segunda Chance destacada</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Alternative Template */}
+                            <div
+                                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'alternative'
+                                        ? 'border-emerald-500 bg-emerald-500/10'
+                                        : 'border-border hover:border-emerald-500/50'
+                                    }`}
+                                onClick={() => handleChange('ticketTemplate', 'alternative')}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${settings.ticketTemplate === 'alternative'
+                                            ? 'border-emerald-500 bg-emerald-500'
+                                            : 'border-border'
+                                        }`}>
+                                        {settings.ticketTemplate === 'alternative' && (
+                                            <div className="w-2 h-2 bg-white rounded-full" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-semibold text-sm mb-1">Alternativo (Fezinha de Hoje)</h4>
+                                        <p className="text-xs text-muted-foreground mb-2">
+                                            Layout em grid 2x2 com labels nos dígitos
+                                        </p>
+                                        <div className="bg-muted/50 rounded p-2 text-[10px] space-y-1">
+                                            <div className="font-mono">• Grid 2x2 para fezinhas</div>
+                                            <div className="font-mono">• Labels (um, dois, três...)</div>
+                                            <div className="font-mono">• QR Code + Código de barras</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

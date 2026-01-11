@@ -32,6 +32,7 @@ model Company {
   
   // === CONFIGURAÇÕES DE EXIBIÇÃO ===
   showPlanTotalValue Boolean @default(true) // Exibir valor total calculado nos planos
+  ticketTemplate     String  @default("default") // Template de bilhete: "default" | "alternative"
 
   // === LICENCIAMENTO ===
   licenseStatus    LicenseStatus @default(TRIAL)
