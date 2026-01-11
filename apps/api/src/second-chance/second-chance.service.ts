@@ -7,7 +7,7 @@ import { toBrazilTime, dayjs } from '../utils/date.util';
 export class SecondChanceService {
     constructor(private prisma: PrismaService) { }
 
-    async create(data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string }) {
+    async create(data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string; series?: number }) {
         return this.prisma.$transaction(async (tx) => {
             const drawDate = toBrazilTime(data.drawDate).startOf('day').toDate();
 
@@ -18,6 +18,7 @@ export class SecondChanceService {
                     winningNumber: data.winningNumber,
                     prizeAmount: new Prisma.Decimal(data.prizeAmount),
                     drawDate: drawDate,
+                    series: data.series ? Number(data.series) : null
                 }
             });
 
@@ -33,16 +34,23 @@ export class SecondChanceService {
         const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
         // Find tickets for the same game, same range of day, with matching number
+        const where: any = {
+            gameId: draw.gameId,
+            secondChanceDrawDate: {
+                gte: startOfDay,
+                lte: endOfDay
+            },
+            secondChanceNumber: draw.winningNumber,
+            status: { not: 'CANCELLED' }
+        };
+
+        // NEW: Filter by series if draw is series-specific
+        if (draw.series !== null && draw.series !== undefined) {
+            where.series = draw.series;
+        }
+
         const tickets = await tx.ticket.findMany({
-            where: {
-                gameId: draw.gameId,
-                secondChanceDrawDate: {
-                    gte: startOfDay,
-                    lte: endOfDay
-                },
-                secondChanceNumber: draw.winningNumber,
-                status: { not: 'CANCELLED' }
-            }
+            where: where
         });
 
         for (const ticket of tickets) {
@@ -83,16 +91,22 @@ export class SecondChanceService {
         const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
         const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
-        return this.prisma.ticket.findMany({
-            where: {
-                gameId: draw.gameId,
-                secondChanceDrawDate: {
-                    gte: startOfDay,
-                    lte: endOfDay
-                },
-                secondChanceNumber: draw.winningNumber,
-                status: { not: 'CANCELLED' }
+        const where: any = {
+            gameId: draw.gameId,
+            secondChanceDrawDate: {
+                gte: startOfDay,
+                lte: endOfDay
             },
+            secondChanceNumber: draw.winningNumber,
+            status: { not: 'CANCELLED' }
+        };
+
+        if (draw.series !== null && draw.series !== undefined) {
+            where.series = (draw as any).series;
+        }
+
+        return this.prisma.ticket.findMany({
+            where: where,
             include: {
                 user: {
                     include: { area: true }
@@ -111,15 +125,21 @@ export class SecondChanceService {
         const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
         const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
 
-        return this.prisma.ticket.findMany({
-            where: {
-                gameId: draw.gameId,
-                secondChanceDrawDate: {
-                    gte: startOfDay,
-                    lte: endOfDay
-                },
-                status: { not: 'CANCELLED' }
+        const where: any = {
+            gameId: draw.gameId,
+            secondChanceDrawDate: {
+                gte: startOfDay,
+                lte: endOfDay
             },
+            status: { not: 'CANCELLED' }
+        };
+
+        if (draw.series !== null && draw.series !== undefined) {
+            where.series = (draw as any).series;
+        }
+
+        return this.prisma.ticket.findMany({
+            where: where,
             include: {
                 user: {
                     select: { name: true, username: true, area: { select: { name: true } } }
