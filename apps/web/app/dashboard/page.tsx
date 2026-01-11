@@ -30,7 +30,9 @@ interface DashboardStats {
         };
         cambistaDailyTotal: number;
         ticketNumber: number | null;
+
         secondChanceNumber: number | null;
+        hash: string | null;
     }[];
     ranking: {
         userId: string;
@@ -475,8 +477,8 @@ export default function DashboardPage() {
                                     return paginated.map((sale) => (
                                         <tr key={sale.id} className="hover:bg-muted/20 transition-colors group">
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="font-mono text-[10px] text-muted-foreground bg-muted p-1 rounded">
-                                                    {sale.id.split('-')[0]}
+                                                <span className="font-mono text-[10px] text-muted-foreground bg-muted p-1 rounded uppercase">
+                                                    {sale.hash || '-'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
