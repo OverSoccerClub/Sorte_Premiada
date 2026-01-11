@@ -31,6 +31,7 @@ interface Area {
     city: string
     state: string
     seriesNumber?: string
+    currentSeries?: string
     _count?: {
         users: number
     }
@@ -492,6 +493,7 @@ export default function AreasPage() {
                                         <TableHead>Localização</TableHead>
                                         <TableHead>Empresa</TableHead>
                                         <TableHead>Área</TableHead>
+                                        <TableHead>Série Atual</TableHead>
                                         <TableHead>Cambistas</TableHead>
                                         <TableHead className="text-right">Ações</TableHead>
                                     </TableRow>
@@ -509,7 +511,7 @@ export default function AreasPage() {
 
                                         if (filteredAreas.length === 0) return (
                                             <TableRow>
-                                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground italic">
+                                                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground italic">
                                                     Nenhuma praça encontrada.
                                                 </TableCell>
                                             </TableRow>
@@ -531,6 +533,11 @@ export default function AreasPage() {
                                                         <MapPin className="w-4 h-4 text-slate-400" />
                                                         {area.name}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className="font-mono bg-muted/50">
+                                                        {area.currentSeries || area.seriesNumber || "N/A"}
+                                                    </Badge>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">

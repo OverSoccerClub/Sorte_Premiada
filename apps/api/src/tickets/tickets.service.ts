@@ -669,26 +669,69 @@ export class TicketsService {
 
         console.log(`[getAvailability] Start for Game ${gameId}, User: ${userId}`);
 
+        let user: { areaId?: string | null } | null = null;
         if (userId) {
-            const user = await this.prisma.user.findUnique({
+            user = await this.prisma.user.findUnique({
                 where: { id: userId },
+                select: { areaId: true }
+            });
+        }
+
+        let areaToUpdate: {
+            id: string;
+            name: string;
+            currentSeries: string;
+            ticketsInSeries: number;
+            maxTicketsPerSeries: number;
+            isActive: boolean;
+        } | null = null;
+        let seriesNumber: string | undefined;
+
+        if (user?.areaId) {
+            areaToUpdate = await this.prisma.area.findUnique({
+                where: { id: user.areaId },
                 select: {
-                    area: {
-                        select: { id: true, name: true, currentSeries: true }
-                    }
+                    id: true,
+                    name: true,
+                    currentSeries: true,
+                    ticketsInSeries: true,
+                    maxTicketsPerSeries: true,
+                    isActive: true
                 }
             });
 
-            console.log(`[getAvailability] User Area Config:`, JSON.stringify(user?.area));
+            if (areaToUpdate) {
+                // Check if Area is Active
+                if (areaToUpdate.isActive === false) {
+                    throw new BadRequestException("As vendas estão temporariamente pausadas para esta praça.");
+                }
 
-            if (user?.area?.currentSeries) {
-                series = Number(user.area.currentSeries);
-                console.log(`[getAvailability] Detected Series: ${series} for Area: ${user.area.name}`);
-            } else {
-                console.log(`[getAvailability] No series configured for user area (or no area). Fallback to global?`);
+                // Check if we need to increment series
+                if (areaToUpdate.ticketsInSeries >= areaToUpdate.maxTicketsPerSeries) {
+                    // Increment series
+                    const currentSeriesNum = parseInt(areaToUpdate.currentSeries);
+                    const newSeries = (currentSeriesNum + 1).toString().padStart(4, '0');
+
+                    console.log(`[Series Auto-Increment] Area ${user.areaId} reached ${areaToUpdate.ticketsInSeries} tickets. Incrementing series: ${areaToUpdate.currentSeries} → ${newSeries}`);
+
+                    areaToUpdate.currentSeries = newSeries;
+                    areaToUpdate.ticketsInSeries = 0;
+                }
+
+                seriesNumber = areaToUpdate.currentSeries;
+                console.log(`[TicketsService] Using series ${seriesNumber} from area (${areaToUpdate.ticketsInSeries + 1}/${areaToUpdate.maxTicketsPerSeries})`);
             }
+        }
+
+        // Fetch Area Override
+        const areaConfig = (user?.areaId && gameId) ? await this.prisma.areaConfig.findUnique({
+            where: { areaId_gameId: { areaId: user.areaId, gameId } }
+        }) : null;
+
+        if (seriesNumber) {
+            series = parseInt(seriesNumber);
         } else {
-            console.log(`[getAvailability] No userId provided. Using global scope.`);
+            console.log(`[getAvailability] No userId provided or no area/areaConfig. Using global scope.`);
         }
 
         const soldSet = await this.getSoldNumbers(gameId, nextDraw, series);
@@ -712,52 +755,37 @@ export class TicketsService {
 
         const maxTicketsPerSeries = game.maxTicketsPerSeries || 2500;
 
-        // Get all tickets for this game and company
-        const tickets = await this.prisma.ticket.findMany({
-            where: {
-                gameId,
-                companyId,
-                status: { not: 'CANCELLED' },
-                ...(drawDate ? { drawDate } : {})
-            },
+        // NEW LOGIC: Fetch status from AREAS directly (Real-Time Monitor)
+        const areas = await this.prisma.area.findMany({
+            where: { companyId },
             select: {
-                series: true,
-                drawDate: true
-            }
+                id: true,
+                name: true,
+                currentSeries: true,
+                ticketsInSeries: true,
+                maxTicketsPerSeries: true,
+                isActive: true
+            },
+            orderBy: { name: 'asc' }
         });
 
-        // Group by series and drawDate
-        const seriesMap = new Map<string, { seriesNumber: number; drawDate: Date; count: number }>();
+        // Map areas to SeriesStats format
+        const series = areas.map(area => {
+            const currentCount = area.ticketsInSeries;
+            const seriesNum = parseInt(area.currentSeries);
 
-        for (const ticket of tickets) {
-            if (ticket.series === null) continue;
-
-            const key = `${ticket.series}-${ticket.drawDate?.toISOString()}`;
-            const existing = seriesMap.get(key);
-
-            if (existing) {
-                existing.count++;
-            } else {
-                seriesMap.set(key, {
-                    seriesNumber: ticket.series,
-                    drawDate: ticket.drawDate!,
-                    count: 1
-                });
-            }
-        }
-
-        // Convert to array and calculate stats
-        const series = Array.from(seriesMap.values()).map(s => ({
-            seriesNumber: s.seriesNumber,
-            drawDate: s.drawDate.toISOString(),
-            ticketsSold: s.count,
-            ticketsRemaining: maxTicketsPerSeries - s.count,
-            percentageFilled: Math.round((s.count / maxTicketsPerSeries) * 100),
-            status: s.count >= maxTicketsPerSeries ? 'FULL' : 'ACTIVE'
-        }));
-
-        // Sort by series number
-        series.sort((a, b) => a.seriesNumber - b.seriesNumber);
+            return {
+                seriesNumber: seriesNum,
+                drawDate: drawDate ? drawDate.toISOString() : 'ACTIVE', // Or 'EM ANDAMENTO'
+                ticketsSold: currentCount,
+                ticketsRemaining: maxTicketsPerSeries - currentCount,
+                percentageFilled: Math.round((currentCount / maxTicketsPerSeries) * 100),
+                status: (area.isActive === false) ? 'PAUSED' : (currentCount >= maxTicketsPerSeries ? 'FULL' : 'ACTIVE'),
+                areaName: area.name,
+                areaId: area.id, // Useful for frontend to toggle
+                isActive: area.isActive // Explicit status
+            };
+        });
 
         return {
             gameId,

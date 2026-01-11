@@ -349,7 +349,7 @@ export default function TwoXOneThousandReportPage() {
                                     <TableHead className="w-[150px]">
                                         <div className="flex items-center gap-2">
                                             <Hash className="w-4 h-4" />
-                                            <span>Bilhete</span>
+                                            <span>ID</span>
                                         </div>
                                     </TableHead>
                                     <TableHead>
@@ -361,13 +361,13 @@ export default function TwoXOneThousandReportPage() {
                                     <TableHead className="w-[100px]">
                                         <div className="flex items-center gap-2 text-center justify-center">
                                             <Hash className="w-4 h-4" />
-                                            <span>Nº</span>
+                                            <span>Nº Bilhete</span>
                                         </div>
                                     </TableHead>
                                     <TableHead className="w-[120px]">
                                         <div className="flex items-center gap-2">
                                             <Trophy className="w-4 h-4" />
-                                            <span>Chance</span>
+                                            <span>Chance Extra</span>
                                         </div>
                                     </TableHead>
                                     <TableHead className="cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('user')}>

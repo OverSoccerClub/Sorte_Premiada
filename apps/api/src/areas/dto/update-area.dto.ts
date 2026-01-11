@@ -3,4 +3,5 @@ export class UpdateAreaDto {
     city?: string;
     state?: string;
     seriesNumber?: string;
+    isActive?: boolean;
 }

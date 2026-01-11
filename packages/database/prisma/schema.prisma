@@ -180,6 +180,7 @@ model Area {
   currentSeries       String // Série atual em uso (incrementa automaticamente)
   ticketsInSeries     Int    @default(0) // Contador de bilhetes na série atual
   maxTicketsPerSeries Int    @default(2500) // Máximo de bilhetes por série
+  isActive            Boolean @default(true) // Controla se a praça está operando
   users               User[]
   configs             AreaConfig[]
   posTerminals        PosTerminal[]
