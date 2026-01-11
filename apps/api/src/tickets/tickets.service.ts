@@ -69,7 +69,7 @@ export class TicketsService {
         // === AUTOMATIC SERIES CONTROL ===
         // Fetch area with series control fields
         let seriesNumber: string | null = null;
-        let areaToUpdate: { id: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number } | null = null;
+        let areaToUpdate: { id: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean } | null = null;
 
         if (user?.areaId) {
             areaToUpdate = await this.prisma.area.findUnique({
