@@ -767,30 +767,38 @@ export class TicketsService {
                 id: true,
                 name: true,
                 currentSeries: true,
-                ticketsInSeries: true,
                 maxTicketsPerSeries: true,
                 isActive: true
             },
             orderBy: { name: 'asc' }
         });
 
-        // Map areas to SeriesStats format
-        const series = areas.map(area => {
-            const currentCount = area.ticketsInSeries;
+        // Map areas to SeriesStats format with REAL-TIME counts
+        const series = await Promise.all(areas.map(async (area) => {
             const seriesNum = parseInt(area.currentSeries);
+
+            // Calculate REAL count from database to ensure accuracy
+            const currentCount = await this.prisma.ticket.count({
+                where: {
+                    series: seriesNum,
+                    user: { areaId: area.id }, // Ensure ticket belongs to this area
+                    status: { not: 'CANCELLED' },
+                    gameId // Ensure it matches the game (though series usually implies game, good to be safe)
+                }
+            });
 
             return {
                 seriesNumber: seriesNum,
-                drawDate: drawDate ? drawDate.toISOString() : 'ACTIVE', // Or 'EM ANDAMENTO'
+                drawDate: drawDate ? drawDate.toISOString() : 'ACTIVE',
                 ticketsSold: currentCount,
-                ticketsRemaining: maxTicketsPerSeries - currentCount,
-                percentageFilled: Math.round((currentCount / maxTicketsPerSeries) * 100),
-                status: (area.isActive === false) ? 'PAUSED' : (currentCount >= maxTicketsPerSeries ? 'FULL' : 'ACTIVE'),
+                ticketsRemaining: area.maxTicketsPerSeries - currentCount, // Use area max
+                percentageFilled: Math.round((currentCount / (area.maxTicketsPerSeries || maxTicketsPerSeries)) * 100),
+                status: (area.isActive === false) ? 'PAUSED' : (currentCount >= (area.maxTicketsPerSeries || maxTicketsPerSeries) ? 'FULL' : 'ACTIVE'),
                 areaName: area.name,
-                areaId: area.id, // Useful for frontend to toggle
-                isActive: area.isActive // Explicit status
+                areaId: area.id,
+                isActive: area.isActive
             };
-        });
+        }));
 
         return {
             gameId,
