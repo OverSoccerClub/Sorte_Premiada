@@ -33,7 +33,7 @@ export const printTicket = async (
   printerType: PrinterType = 'BLE',
   imageUri?: string
 ) => {
-  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName } = data;
+  const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName, city } = data;
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
@@ -123,7 +123,7 @@ export const printTicket = async (
             <div class="dashed"></div>
             
             <div class="bold big">${gameName.toUpperCase()}</div>
-            <div>SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaName ? ` - ${areaName}` : ''}</div>
+            <div>SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${city || areaName ? ` - ${city ? `${city}/` : ''}${areaName || ''}` : ''}</div>
             
             <div class="dashed"></div>
             
@@ -153,9 +153,8 @@ export const printTicket = async (
             <div class="bold big" style="font-size: 28px; letter-spacing: 8px;">
               ${data.secondChanceNumber.toString().split('').join(' ')}
             </div>
-            <div class="dashed"></div>
-            <div style="font-size: 9px; margin-bottom: 5px;">ACERTANDO TODOS OS NÚMEROS NA ORDEM</div>
-            <div class="dashed"></div>
+            <div style="background: black; color: white; padding: 4px; font-size: 9px; font-weight: bold; margin-top: 5px;">${data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}</div>
+            <div class="dashed" style="margin-top: 2px;"></div>
             ` : ''}
             
             <div class="flex">
@@ -245,7 +244,8 @@ export const printTicket = async (
     receipt += "- - - - - - - - - - - - - - - -\n\n";
 
     receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + gameName.toUpperCase() + BOLD_OFF + NORMAL + "\n";
-    const sorteioInfo = `SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaName ? ` - ${areaName}` : ''}`;
+    const areaStr = city || areaName ? ` - ${city ? `${city}/` : ''}${areaName || ''}` : '';
+    const sorteioInfo = `SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaStr}`;
     receipt += sorteioInfo + "\n\n";
 
     const sortedNumbers = numbers.sort((a, b) => a - b);
@@ -277,8 +277,8 @@ export const printTicket = async (
       receipt += CENTER + BOLD_ON + "SEGUNDA CHANCE" + BOLD_OFF + "\n";
       receipt += "SORTEIO EXTRA - " + (data.secondChanceDrawDate || "SABADO") + "\n";
       receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + data.secondChanceNumber.toString().split('').join(' ') + BOLD_OFF + NORMAL + "\n";
+      receipt += (data.mainMatchMessage || "ACERTANDO TODOS OS NUMEROS NA ORDEM") + "\n";
       receipt += "- - - - - - - - - - - - - - - -\n";
-      receipt += "ACERTANDO TODOS OS NUMEROS NA ORDEM\n";
     }
 
     receipt += "- - - - - - - - - - - - - - - -\n";

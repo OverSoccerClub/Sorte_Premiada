@@ -415,7 +415,8 @@ export default function Game2x1000Screen() {
                 mainMatchMessage: "ACERTANDO TODOS OS NÚMEROS NA ORDEM",
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
-                areaName: user?.area?.name
+                areaName: user?.area?.name,
+                city: user?.area?.city
             };
 
             setLastTicket(fullTicket);

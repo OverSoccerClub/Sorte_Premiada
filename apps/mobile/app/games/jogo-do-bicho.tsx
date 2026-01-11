@@ -232,6 +232,7 @@ export default function JogoDoBichoScreen() {
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
                 areaName: user?.area?.name,
+                city: user?.area?.city,
                 promptMessage: gameConfig?.promptMessage,
                 mainMatchMessage: gameConfig?.mainMatchMessage,
                 secondChanceDrawDate: (() => {
@@ -432,7 +433,8 @@ export default function JogoDoBichoScreen() {
                                     } : undefined,
                                     companyName: settings.companyName,
                                     companyLogoUrl: settings.logoUrl,
-                                    areaName: user?.area?.name
+                                    areaName: user?.area?.name,
+                                    city: user?.area?.city
                                 }}
                                 mode="preview"
                             />

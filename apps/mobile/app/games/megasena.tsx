@@ -240,7 +240,8 @@ export default function MegaSenaScreen() {
                 status: ticketData.status,
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
-                areaName: user?.area?.name
+                areaName: user?.area?.name,
+                city: user?.area?.city
             };
 
             setLastTicket(fullTicket);
@@ -392,7 +393,8 @@ export default function MegaSenaScreen() {
                                             ticketId: "PREVIEW",
                                             companyName: settings.companyName,
                                             companyLogoUrl: settings.logoUrl,
-                                            areaName: user?.area?.name
+                                            areaName: user?.area?.name,
+                                            city: user?.area?.city
                                         }}
                                         mode="preview"
                                     />

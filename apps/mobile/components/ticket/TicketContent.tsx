@@ -35,6 +35,7 @@ export interface TicketData {
     companyName?: string;
     companyLogoUrl?: string;
     areaName?: string;
+    city?: string;
 }
 
 interface TicketContentProps {
@@ -94,14 +95,14 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 {shouldShowLogo ? (
                     <Image
                         source={{ uri: data.companyLogoUrl }}
-                        style={{ width: 120, height: 60, resizeMode: 'contain', marginBottom: 6 }}
+                        style={{ width: 160, height: 85, resizeMode: 'contain', marginBottom: 6 }}
                         onError={() => {
                             console.warn('[TicketContent] Failed to load company logo, using fallback icon');
                             setLogoError(true);
                         }}
                     />
                 ) : (
-                    <MaterialCommunityIcons name="clover" size={45} color="#000" style={tw`mb-2`} />
+                    <MaterialCommunityIcons name="clover" size={60} color="#000" style={tw`mb-2`} />
                 )}
 
                 {/* Nome da Empresa */}
@@ -127,7 +128,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <Text style={tw`text-center font-bold text-black text-[10px] mt-1`}>
                     SORTEIO: <Text style={tw`font-black text-[12px]`}>
                         {formatDrawDate(data.drawDate || data.date)}
-                        {data.areaName ? ` - ${data.areaName}` : ''}
+                        {data.city || data.areaName ? ` - ${data.city ? `${data.city}/` : ''}${data.areaName || ''}` : ''}
                     </Text>
                 </Text>
             </View>
@@ -222,12 +223,14 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         </View>
                     </View>
 
-                    {/* Main Match Message (Now below SC Numbers) */}
-                    <View style={tw`mt-2 px-2 w-full pt-2 border-t border-dashed border-black`}>
-                        <Text style={[tw`text-center font-bold text-[9px] text-black uppercase`, { letterSpacing: 0.5 }]}>
+                    {/* Main Match Message (Above dashed line with Black Strip) */}
+                    <View style={tw`mt-4 bg-black py-1.5 px-4 w-full shadow-sm`}>
+                        <Text style={[tw`text-white text-center font-black text-[10px] uppercase`, { letterSpacing: 0.5 }]}>
                             {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
                         </Text>
                     </View>
+
+                    <View style={tw`mt-1 w-full border-t border-dashed border-black`} />
                 </View>
             )}
 
