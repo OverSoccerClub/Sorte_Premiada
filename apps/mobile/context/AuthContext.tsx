@@ -146,6 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const data = await res.json();
             const accessToken = data.access_token;
             setToken(accessToken);
+            await AsyncStorage.setItem("user_token", accessToken);
 
             // Fetch Profile
             const profileRes = await fetch(`${API_URL}/users/profile`, {
@@ -177,9 +178,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
-    const signOut = () => {
+    const signOut = async () => {
         setUser(null);
         setToken(null);
+        await AsyncStorage.removeItem("user_token");
         router.replace("/");
     };
 
