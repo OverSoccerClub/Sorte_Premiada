@@ -26,6 +26,8 @@ import { TenantInterceptor } from './common/tenant.interceptor';
 import { LicensingModule } from './licensing/licensing.module';
 import { PlansModule } from './plans/plans.module';
 import { PaymentsModule } from './payments/payments.module';
+import { PublicSiteModule } from './public-site/public-site.module';
+
 
 import { BugsModule } from './bugs/bugs.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -62,6 +64,7 @@ import { LicenseGuard } from './licensing/license.guard';
     CompanyModule,
     LicensingModule, // Sistema de licenciamento
     BugsModule, // Sistema de rastreamento de bugs
+    PublicSiteModule, // Endpoints públicos para o site de marketing
   ],
   controllers: [AppController],
   providers: [

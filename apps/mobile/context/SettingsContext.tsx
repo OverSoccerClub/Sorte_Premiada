@@ -36,10 +36,12 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
         try {
             const token = await AsyncStorage.getItem("token");
             if (!token) {
+                console.log("[SettingsContext] No token found, using default settings");
                 setIsLoading(false);
                 return;
             }
 
+            console.log("[SettingsContext] Fetching settings from API...");
             const response = await fetch(`${AppConfig.api.baseUrl}/company/settings`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -48,11 +50,19 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 
             if (response.ok) {
                 const data = await response.json();
-                setSettings({
+                console.log("[SettingsContext] API Response:", JSON.stringify(data, null, 2));
+                console.log("[SettingsContext] ticketTemplate from API:", data.ticketTemplate);
+
+                const newSettings = {
                     companyName: data.companyName || defaultSettings.companyName,
                     logoUrl: data.logoUrl || defaultSettings.logoUrl,
                     ticketTemplate: data.ticketTemplate || defaultSettings.ticketTemplate,
-                });
+                };
+
+                console.log("[SettingsContext] Setting ticketTemplate to:", newSettings.ticketTemplate);
+                setSettings(newSettings);
+            } else {
+                console.error("[SettingsContext] API request failed:", response.status);
             }
         } catch (error) {
             console.error("[SettingsContext] Failed to fetch settings:", error);
