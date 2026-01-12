@@ -173,6 +173,9 @@ export class CompanyService {
             email: company.email,
             primaryColor: company.primaryColor,
             updateUrl: company.updateUrl,
+            showPlanTotalValue: company.showPlanTotalValue,
+            // @ts-ignore - Field exists in DB but Prisma types not regenerated yet
+            ticketTemplate: company.ticketTemplate,
             // @ts-ignore
             plan: (company as any).plan ? {
                 // @ts-ignore

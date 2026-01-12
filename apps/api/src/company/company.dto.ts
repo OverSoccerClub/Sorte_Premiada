@@ -10,6 +10,8 @@ export interface UpdateCompanySettingsDto {
     state?: string;
     primaryColor?: string;
     updateUrl?: string;
+    showPlanTotalValue?: boolean;
+    ticketTemplate?: string;
 }
 
 export interface CreateCompanyDto {
