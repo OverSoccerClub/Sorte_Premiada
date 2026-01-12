@@ -151,7 +151,7 @@ export class CompanyService {
     /**
      * Get public settings by slug or ID (for App/Web initialization)
      */
-    async getPublicSettings(slug?: string, companyId?: string): Promise<Partial<Company>> {
+    async getPublicSettings(slug?: string, companyId?: string): Promise<any> {
         let company: Company;
 
         if (companyId) {

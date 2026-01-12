@@ -792,9 +792,9 @@ export class TicketsService {
                 seriesNumber: seriesNum,
                 drawDate: drawDate ? drawDate.toISOString() : 'ACTIVE',
                 ticketsSold: currentCount,
-                ticketsRemaining: area.maxTicketsPerSeries - currentCount, // Use area max
-                percentageFilled: Math.round((currentCount / (area.maxTicketsPerSeries || maxTicketsPerSeries)) * 100),
-                status: (area.isActive === false) ? 'PAUSED' : (currentCount >= (area.maxTicketsPerSeries || maxTicketsPerSeries) ? 'FULL' : 'ACTIVE'),
+                ticketsRemaining: maxTicketsPerSeries - currentCount, // Use game max
+                percentageFilled: Math.round((currentCount / maxTicketsPerSeries) * 100),
+                status: (area.isActive === false) ? 'PAUSED' : (currentCount >= maxTicketsPerSeries ? 'FULL' : 'ACTIVE'),
                 areaName: area.name,
                 areaId: area.id,
                 isActive: area.isActive

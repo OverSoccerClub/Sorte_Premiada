@@ -4,6 +4,8 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
+import { usePrinter } from "../../context/PrinterContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useCallback, useEffect } from "react";
 import { FinanceService } from "../../services/finance.service";
 import { CustomAlert } from "../../components/CustomAlert";
@@ -130,7 +132,9 @@ export default function Dashboard() {
         }
     };
 
-    const handleGamePress = (game: GameConfig) => {
+    const { printerType } = usePrinter();
+
+    const handleGamePress = async (game: GameConfig) => {
         if (isDayClosed) {
             setAlertConfig({
                 visible: true,
@@ -140,6 +144,24 @@ export default function Dashboard() {
                 onConfirm: () => setAlertConfig(prev => ({ ...prev, visible: false }))
             });
             return;
+        }
+
+        // Check Printer Configuration
+        if (printerType === 'BLE') {
+            const savedMac = await AsyncStorage.getItem('@printer_mac_address');
+            if (!savedMac) {
+                setAlertConfig({
+                    visible: true,
+                    title: "Impressora Não Configurada",
+                    message: "É necessário configurar uma impressora Bluetooth antes de iniciar as vendas.",
+                    type: "warning",
+                    onConfirm: () => {
+                        setAlertConfig(prev => ({ ...prev, visible: false }));
+                        router.push("/settings/printer"); // Redirect to printer settings if available, or just close
+                    }
+                });
+                return;
+            }
         }
 
         if (!game || !game.name) {
