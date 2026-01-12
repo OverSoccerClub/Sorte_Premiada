@@ -5,8 +5,33 @@ import { Platform } from "react-native";
 import * as Application from 'expo-application';
 import { AppConfig } from "../constants/AppConfig";
 import { useSettings } from "./SettingsContext";
+import { useLoading } from "./LoadingContext";
+import { usePushNotifications } from "../hooks/usePushNotifications";
+import { useLicenseCheck } from "../hooks/useLicenseCheck";
 
-// ... existing imports
+interface User {
+    id: string;
+    username: string;
+    name?: string;
+    email: string;
+    role: string;
+    companyId?: string; // Multi-tenant: ID da empresa do usuário
+    canResetActivation?: boolean;
+    area?: { name: string; city: string };
+}
+
+interface AuthContextType {
+    user: User | null;
+    token: string | null;
+    isLoading: boolean;
+    signIn: (username: string, pass: string) => Promise<void>;
+    signOut: () => void;
+    updateUser: (data: Partial<User>) => void;
+}
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
