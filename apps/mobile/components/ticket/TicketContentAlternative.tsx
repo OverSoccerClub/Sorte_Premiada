@@ -48,6 +48,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const year = date.getFullYear();
             const hours = date.getHours().toString().padStart(2, '0');
+            // Assuming image format: 26/12/2025 - 11H
             return `${day}/${month}/${year} - ${hours}H`;
         }
         return "";
@@ -66,85 +67,82 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
     return (
         <View style={tw`bg-white w-[384px] p-4`}>
-            {/* Header with Logo */}
-            <View style={tw`items-center mb-3 border-2 border-black rounded-xl p-3`}>
-                <View style={tw`flex-row items-center gap-2`}>
-                    <MaterialCommunityIcons name="clover" size={32} color="#000" />
+            {/* Header with Rounded Border */}
+            <View style={tw`items-center mb-1 border-2 border-black rounded-3xl pt-2 pb-3 px-4 mx-4`}>
+                <View style={tw`flex-row items-center justify-center gap-1`}>
+                    <MaterialCommunityIcons name="clover" size={36} color="#454545" style={tw`mt-1`} />
                     <View>
-                        <Text style={tw`text-xl font-black text-black uppercase`}>FEZINHA</Text>
-                        <Text style={tw`text-xs font-bold text-black`}>DE HOJE</Text>
+                        <View style={tw`flex-row items-baseline`}>
+                            <Text style={[tw`text-4xl font-black text-slate-700 uppercase -mb-1`, { fontFamily: 'serif' }]}>FEZINHA</Text>
+                        </View>
+                        <View style={tw`flex-row items-center justify-center gap-1 -mt-1`}>
+                            <MaterialCommunityIcons name="calendar-month" size={16} color="#454545" />
+                            <Text style={tw`text-[10px] font-bold text-slate-600 uppercase`}>DE HOJE</Text>
+                        </View>
                     </View>
                 </View>
             </View>
 
             {/* Draw Info */}
-            <Text style={tw`text-center font-black text-black text-[11px] mb-3`}>
+            <Text style={tw`text-center font-black text-black text-[10px] mb-4`}>
                 SORTEIO {formatDrawNumber()} - {formatDrawDateHeader()}
             </Text>
 
-            {/* 4 Fezinhas in 2x2 Grid */}
-            <View style={tw`mb-3`}>
+            {/* 4 Fezinhas in Grid */}
+            <View style={tw`mb-2 border-b-2 border-dashed border-gray-400 pb-4`}>
                 {/* Row 1 */}
-                <View style={tw`flex-row justify-between mb-2`}>
+                <View style={tw`flex-row justify-between mb-4 px-2`}>
                     {/* Fezinha 1 */}
-                    <View style={tw`w-[48%]`}>
-                        <Text style={tw`text-center font-bold text-[10px] mb-1`}>Fezinha 1</Text>
-                        <View style={tw`flex-row justify-center gap-1`}>
+                    <View style={tw`w-[45%]`}>
+                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 1</Text>
+                        <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[0]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-2xl font-black text-black`}>{num}</Text>
-                            ))}
-                        </View>
-                        <View style={tw`flex-row justify-center gap-1 mt-0.5`}>
-                            {fezinhas[0]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-[7px] text-black`}>{numberToText(num)}</Text>
+                                <View key={idx} style={tw`items-center`}>
+                                    <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
+                                    <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
+                                </View>
                             ))}
                         </View>
                     </View>
 
                     {/* Fezinha 2 */}
-                    <View style={tw`w-[48%]`}>
-                        <Text style={tw`text-center font-bold text-[10px] mb-1`}>Fezinha 2</Text>
-                        <View style={tw`flex-row justify-center gap-1`}>
+                    <View style={tw`w-[45%]`}>
+                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 2</Text>
+                        <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[1]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-2xl font-black text-black`}>{num}</Text>
-                            ))}
-                        </View>
-                        <View style={tw`flex-row justify-center gap-1 mt-0.5`}>
-                            {fezinhas[1]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-[7px] text-black`}>{numberToText(num)}</Text>
+                                <View key={idx} style={tw`items-center`}>
+                                    <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
+                                    <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
+                                </View>
                             ))}
                         </View>
                     </View>
                 </View>
 
                 {/* Row 2 */}
-                <View style={tw`flex-row justify-between`}>
+                <View style={tw`flex-row justify-between px-2`}>
                     {/* Fezinha 3 */}
-                    <View style={tw`w-[48%]`}>
-                        <Text style={tw`text-center font-bold text-[10px] mb-1`}>Fezinha 3</Text>
-                        <View style={tw`flex-row justify-center gap-1`}>
+                    <View style={tw`w-[45%]`}>
+                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 3</Text>
+                        <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[2]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-2xl font-black text-black`}>{num}</Text>
-                            ))}
-                        </View>
-                        <View style={tw`flex-row justify-center gap-1 mt-0.5`}>
-                            {fezinhas[2]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-[7px] text-black`}>{numberToText(num)}</Text>
+                                <View key={idx} style={tw`items-center`}>
+                                    <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
+                                    <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
+                                </View>
                             ))}
                         </View>
                     </View>
 
                     {/* Fezinha 4 */}
-                    <View style={tw`w-[48%]`}>
-                        <Text style={tw`text-center font-bold text-[10px] mb-1`}>Fezinha 4</Text>
-                        <View style={tw`flex-row justify-center gap-1`}>
+                    <View style={tw`w-[45%]`}>
+                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 4</Text>
+                        <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[3]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-2xl font-black text-black`}>{num}</Text>
-                            ))}
-                        </View>
-                        <View style={tw`flex-row justify-center gap-1 mt-0.5`}>
-                            {fezinhas[3]?.map((num, idx) => (
-                                <Text key={idx} style={tw`text-[7px] text-black`}>{numberToText(num)}</Text>
+                                <View key={idx} style={tw`items-center`}>
+                                    <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
+                                    <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
+                                </View>
                             ))}
                         </View>
                     </View>
@@ -152,93 +150,94 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             </View>
 
             {/* Prize Message Box */}
-            <View style={tw`border-2 border-black rounded-lg p-2 mb-3`}>
-                <Text style={tw`text-center font-bold text-[9px] text-black mb-1`}>
+            <View style={tw`mb-4`}>
+                <Text style={tw`text-center font-bold text-[10px] text-black mb-1 uppercase`}>
                     {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
                 </Text>
                 {data.prizes && (
-                    <Text style={tw`text-center font-bold text-[9px] text-black`}>
-                        QUADRA - {data.prizes.milhar || 'R$ 1.000,00'}  TRINCA: {data.prizes.centena || 'R$ 60,00'} - DUQUE: {data.prizes.dezena || 'R$ 6,00'}
+                    <Text style={tw`text-center font-black text-[10px] text-black uppercase`}>
+                        QUADRA - {data.prizes.milhar || 'R$ 1.000,00'}   TRINCA: {data.prizes.centena || 'R$ 60,00'} - DUQUE: {data.prizes.dezena || 'R$ 6,00'}
                     </Text>
                 )}
             </View>
 
-            {/* Second Chance Section */}
+            {/* Second Chance Section (Fezinha Extra) */}
             {data.secondChanceNumber && (
-                <View style={tw`mb-3`}>
-                    {/* Black Header */}
-                    <View style={tw`bg-black rounded-t-xl py-2 px-3`}>
-                        <Text style={tw`text-white text-center font-black text-sm uppercase`}>
-                            {data.secondChanceLabel || 'FEZINHA EXTRA'}
-                        </Text>
-                        <Text style={tw`text-white text-center text-[8px] font-bold mt-0.5`}>
-                            SORTEIO EXTRA SÁBADO, DIA {formatSecondChanceDate()}
-                        </Text>
+                <View style={tw`mb-6`}>
+                    {/* Black Header Pill */}
+                    <View style={tw`items-center`}>
+                        <View style={tw`bg-black rounded-full py-1.5 px-8 mb-1`}>
+                            <Text style={tw`text-white text-center font-black text-lg uppercase`}>
+                                {data.secondChanceLabel || 'FEZINHA EXTRA'}
+                            </Text>
+                        </View>
                     </View>
 
-                    {/* Numbers */}
-                    <View style={tw`border-2 border-t-0 border-black rounded-b-xl p-2`}>
-                        <View style={tw`flex-row justify-center gap-2 mb-1`}>
-                            {scDigits.map((digit, idx) => (
-                                <Text key={idx} style={tw`text-3xl font-black text-black`}>{digit}</Text>
-                            ))}
-                        </View>
-                        <View style={tw`flex-row justify-center gap-2 mb-2`}>
-                            {scDigits.map((digit, idx) => (
-                                <Text key={idx} style={tw`text-[7px] text-black`}>{numberToText(digit)}</Text>
-                            ))}
-                        </View>
+                    <Text style={tw`text-white bg-black self-center px-2 py-0.5 text-[8px] font-bold uppercase rounded-md mb-2`}>
+                        SORTEIO EXTRA SÁBADO, DIA {formatSecondChanceDate()}
+                    </Text>
 
-                        {/* Prize Info */}
-                        <Text style={tw`text-center font-bold text-[9px] text-black mb-1`}>
-                            PRÊMIO DA FEZINHA EXTRA - R$ 5.000,00
-                        </Text>
-                        <Text style={tw`text-center font-bold text-[8px] text-black`}>
-                            {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
-                        </Text>
+
+                    {/* Extra Numbers */}
+                    <View style={tw`flex-row justify-center gap-3 mb-1`}>
+                        {scDigits.map((digit, idx) => (
+                            <View key={idx} style={tw`items-center`}>
+                                <Text style={[tw`text-4xl font-medium text-black`, { fontFamily: 'serif' }]}>{digit}</Text>
+                                <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(digit)}</Text>
+                            </View>
+                        ))}
                     </View>
+
+                    {/* Extra Prize Info */}
+                    <Text style={tw`text-center font-bold text-[10px] text-black mb-0.5 px-2`}>
+                        PRÊMIO DA FEZINHA EXTRA - R$ 5.000,00
+                    </Text>
+                    <Text style={tw`text-center font-bold text-[8px] text-black uppercase`}>
+                        {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                    </Text>
                 </View>
             )}
 
             {/* Footer Information */}
-            <View style={tw`border-t-2 border-dashed border-black pt-2`}>
-                <Text style={tw`text-[9px] text-black font-bold mb-0.5`}>
+            <View style={tw`mx-2`}>
+                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
                     Bilhete Número: {data.ticketNumber?.toString().padStart(4, '0') || '----'} - Série: {data.series?.toString().padStart(3, '0') || '---'}
                 </Text>
-                <Text style={tw`text-[9px] text-black font-bold mb-0.5`}>
+                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
                     Preço da Aposta: {data.price}
                 </Text>
-                <Text style={tw`text-[9px] text-black font-bold mb-0.5`}>
+                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
                     Terminal número: {data.terminalId || '--------'} - Vendedor: {data.vendorName || '------'}
                 </Text>
-                <Text style={tw`text-[9px] text-black font-bold mb-2`}>
+                <Text style={tw`text-[10px] text-black font-bold mb-3`}>
                     Data da aposta: {data.date}
                 </Text>
 
                 {/* Barcode */}
                 {data.hash && (
-                    <View style={tw`items-center mb-2`}>
-                        <Barcode value={data.hash} width={1.5} height={40} />
-                        <Text style={tw`text-[7px] text-black mt-1`}>{data.hash}</Text>
+                    <View style={tw`items-center mb-1`}>
+                        <Barcode value={data.hash} width={1.8} height={50} />
+                        <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>{data.hash}</Text>
                     </View>
                 )}
 
                 {/* QR Code and Download Message */}
-                <View style={tw`flex-row items-center justify-center gap-3 mt-2`}>
-                    <View style={tw`items-center`}>
-                        <Text style={tw`text-[8px] text-black font-bold text-center mb-1`}>
-                            Baixe o App{'\n'}para conferir a{'\n'}sua aposta
-                        </Text>
-                        <Text style={tw`text-[7px] text-black font-bold`}>
-                            www.fezinhadehoje.com.br
+                <View style={tw`flex-row items-end justify-center gap-4 mt-2`}>
+                    <View style={tw`items-center pb-1`}>
+                        <Text style={tw`text-[12px] text-black font-bold text-center leading-tight`}>
+                            Baixe o App{'\n'}para{'\n'}conferir a{'\n'}sua aposta
                         </Text>
                     </View>
                     {data.hash && (
-                        <View style={tw`border-2 border-black p-1`}>
-                            <QRCode value={data.hash} size={60} />
+                        <View style={tw`border-[3px] border-black p-1`}>
+                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
                         </View>
                     )}
                 </View>
+
+                <Text style={tw`text-center font-bold text-[11px] text-black mt-3`}>
+                    www.fezinhadehoje.com.br
+                </Text>
             </View>
         </View>
     );
