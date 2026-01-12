@@ -174,13 +174,9 @@ export class CompanyService {
             primaryColor: company.primaryColor,
             updateUrl: company.updateUrl,
             showPlanTotalValue: company.showPlanTotalValue,
-            // @ts-ignore - Field exists in DB but Prisma types not regenerated yet
             ticketTemplate: company.ticketTemplate,
-            // @ts-ignore
             plan: (company as any).plan ? {
-                // @ts-ignore
                 name: (company as any).plan.name,
-                // @ts-ignore
                 features: (company as any).plan.features,
             } : { name: company.subscriptionPlan }, // Fallback to enum if no plan relation
         };
