@@ -4,33 +4,9 @@ import { useRouter, useSegments } from "expo-router";
 import { Platform } from "react-native";
 import * as Application from 'expo-application';
 import { AppConfig } from "../constants/AppConfig";
-import { useLoading } from "./LoadingContext";
-import { usePushNotifications } from "../hooks/usePushNotifications";
-import { useLicenseCheck } from "../hooks/useLicenseCheck";
+import { useSettings } from "./SettingsContext";
 
-interface User {
-    id: string;
-    username: string;
-    name?: string;
-    email: string;
-    role: string;
-    companyId?: string; // Multi-tenant: ID da empresa do usuário
-    canResetActivation?: boolean;
-    area?: { name: string; city: string };
-}
-
-interface AuthContextType {
-    user: User | null;
-    token: string | null;
-    isLoading: boolean;
-    signIn: (username: string, pass: string) => Promise<void>;
-    signOut: () => void;
-    updateUser: (data: Partial<User>) => void;
-}
-
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
-
-export const useAuth = () => useContext(AuthContext);
+// ... existing imports
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -38,6 +14,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { show, hide } = useLoading(); // Global loading
     const router = useRouter();
     const segments = useSegments();
+
+    // Access Settings to refresh on login
+    const { refreshSettings } = useSettings();
 
     // Push Notifications
     const { expoPushToken } = usePushNotifications();
@@ -52,8 +31,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const storedToken = await AsyncStorage.getItem("user_token"); // Assuming standard key
                 if (storedToken) {
                     setToken(storedToken);
-                    // Optionally fetch profile here or let lazy load handle it
-                    // For now, just setting token restores "logged in" state if logic depends on it
+                    // Refresh settings as soon as we have a token
+                    refreshSettings();
                 }
             } catch (e) {
                 console.error("Failed to load auth token", e);
@@ -156,6 +135,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             const profileData = await profileRes.json();
             setUser(profileData);
+
+            // Refresh settings now that we have a valid token
+            await refreshSettings();
 
             // Navigate to dashboard
             router.replace("/(tabs)");

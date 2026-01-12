@@ -4,7 +4,7 @@
 
 const CONFIG = {
     // URL da API - ajuste conforme seu ambiente
-    API_URL: 'http://localhost:3000',
+    API_URL: 'https://pos-jogos-api.uawtgc.easypanel.host',
 
     // ID da empresa (multi-tenancy)
     // Use o slug da sua empresa ou 'default'
