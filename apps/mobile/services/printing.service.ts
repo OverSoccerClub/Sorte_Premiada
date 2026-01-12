@@ -31,9 +31,11 @@ import { TicketData } from '../components/ticket/TicketContent';
 export const printTicket = async (
   data: TicketData,
   printerType: PrinterType = 'BLE',
-  imageUri?: string
+  imageUri?: string,
+  template: 'default' | 'alternative' = 'default'
 ) => {
   const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName, city } = data;
+  console.log(`[printTicket] Printing with template: ${template}`);
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 

@@ -3,6 +3,7 @@ import { printTicket } from '../services/printing.service';
 import { TicketData } from '../components/ticket/TicketContent';
 import { usePrinter } from '../context/PrinterContext';
 import { useCompany } from '../context/CompanyContext';
+import { useSettings } from '../context/SettingsContext';
 
 /**
  * useTicketPrint
@@ -11,13 +12,15 @@ import { useCompany } from '../context/CompanyContext';
  */
 export function useTicketPrint() {
     const { printerType } = usePrinter();
-    const { settings } = useCompany();
+    const { settings: companySettings } = useCompany();
+    const { settings } = useSettings();
     const [isPrinting, setIsPrinting] = useState(false);
 
     const print = async (data: TicketData, viewShotRef?: React.RefObject<any>) => {
         setIsPrinting(true);
         try {
             console.log(`[useTicketPrint] Starting print job for ticket: ${data.hash || data.ticketId}`);
+            console.log(`[useTicketPrint] Using template: ${settings.ticketTemplate}`);
 
             let uri;
             if (viewShotRef?.current?.capture) {
@@ -37,9 +40,10 @@ export function useTicketPrint() {
                 : data.price;
 
             const success = await printTicket(
-                { ...data, companyLogoUrl: settings.logoUrl },
+                { ...data, companyLogoUrl: companySettings.logoUrl },
                 printerType,
-                uri
+                uri,
+                settings.ticketTemplate
             );
 
             return success;
