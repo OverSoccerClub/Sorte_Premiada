@@ -15,10 +15,10 @@ export const LoadingOverlay = () => {
                 <View style={tw`bg-zinc-900 p-8 rounded-2xl items-center border border-emerald-600/30 shadow-2xl w-3/4 max-w-sm`}>
 
                     {/* Logo / Icon */}
-                    <View style={tw`bg-white/10 p-4 rounded-full mb-6`}>
+                    <View style={tw`bg-white/10 p-2 rounded-full mb-6`}>
                         <Image
                             source={require('../assets/nova_logo_final.png')}
-                            style={{ width: 120, height: 120 }}
+                            style={{ width: 140, height: 140 }}
                             resizeMode="contain"
                         />
                     </View>
