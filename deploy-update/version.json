@@ -1,0 +1,7 @@
+﻿{
+    "version": "1.4.4",
+    "build": "124",
+    "apkUrl": "InnoBet.apk",
+    "force": true,
+    "notes": "Template de bilhete configurável + correções de impressão"
+}

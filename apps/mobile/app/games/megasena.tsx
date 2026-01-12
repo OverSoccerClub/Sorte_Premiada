@@ -19,6 +19,7 @@ import { useTicketPrint } from "../../hooks/useTicketPrint";
 import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
 import { useCompany } from "../../context/CompanyContext";
+import { useSettings } from "../../context/SettingsContext";
 
 
 // --- Number Ball Component ---
@@ -76,10 +77,11 @@ const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: bo
 
 export default function MegaSenaScreen() {
     const router = useRouter();
-    const { token, user } = useAuth(); // Get token and user profile
+    const { token, user } = useAuth();
     const { show, hide } = useLoading(); // Global loading
     const { printerType } = usePrinter();
-    const { settings } = useCompany();
+    const { settings: companySettings } = useCompany();
+    const { settings } = useSettings();
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
     const viewShotRef = useRef(null);
@@ -320,7 +322,7 @@ export default function MegaSenaScreen() {
             </View>
 
             {/* Hidden Capture Area */}
-            <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+            <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative'} />
 
 
             {/* Grid de Números */}

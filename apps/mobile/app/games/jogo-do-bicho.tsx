@@ -18,6 +18,7 @@ import { TicketData } from "../../components/ticket/TicketContent";
 import { ReceiptModal } from "../../components/ReceiptModal";
 import { AppConfig } from "../../constants/AppConfig";
 import { useCompany } from "../../context/CompanyContext";
+import { useSettings } from "../../context/SettingsContext";
 
 
 // Animal Data
@@ -56,7 +57,8 @@ export default function JogoDoBichoScreen() {
     const { token, user } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
-    const { settings } = useCompany();
+    const { settings: companySettings } = useCompany();
+    const { settings } = useSettings();
     const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
@@ -327,7 +329,7 @@ export default function JogoDoBichoScreen() {
             </View>
 
             {/* Hidden Capture Area */}
-            <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+            <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative'} />
 
 
             <View style={tw`flex-1 p-4`}>

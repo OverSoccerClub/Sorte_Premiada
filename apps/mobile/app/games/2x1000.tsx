@@ -19,6 +19,7 @@ import { useTicketPrint } from "../../hooks/useTicketPrint";
 import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
 import { useCompany } from "../../context/CompanyContext";
+import { useSettings } from "../../context/SettingsContext";
 
 
 export default function Game2x1000Screen() {
@@ -26,7 +27,8 @@ export default function Game2x1000Screen() {
     const { token, user } = useAuth();
     const { show, hide } = useLoading();
     const { printerType } = usePrinter();
-    const { settings } = useCompany();
+    const { settings: companySettings } = useCompany();
+    const { settings } = useSettings();
     const printViewShotRef = useRef<ViewShot>(null);
 
     // Game State
@@ -569,7 +571,7 @@ export default function Game2x1000Screen() {
             <View style={tw`flex-1 items-center`}>
 
                 {/* Hidden Capture Area */}
-                <TicketPrintManager ref={printViewShotRef} data={lastTicket} />
+                <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative'} />
 
 
                 <View style={tw`w-[90%] max-w-[400px] flex-1 p-4`}>
