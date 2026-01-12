@@ -34,7 +34,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 
     const fetchSettings = async () => {
         try {
-            const token = await AsyncStorage.getItem("token");
+            const token = await AsyncStorage.getItem("user_token");
             if (!token) {
                 console.log("[SettingsContext] No token found, using default settings");
                 setIsLoading(false);
