@@ -15,6 +15,8 @@ export function TicketDisplay({ data, mode, scale = 0.80, template = 'default' }
     const isCapture = mode === 'capture';
     const TemplateComponent = template === 'alternative' ? TicketContentAlternative : TicketContent;
 
+    console.log(`[TicketDisplay] Mode: ${mode}, Template: ${template}, Component: ${template === 'alternative' ? 'TicketContentAlternative' : 'TicketContent'}`);
+
     if (isCapture) {
         return <TemplateComponent data={data} isCapture={true} />;
     }

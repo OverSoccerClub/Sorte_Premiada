@@ -35,7 +35,14 @@ export const printTicket = async (
   template: 'default' | 'alternative' = 'default'
 ) => {
   const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName, city } = data;
-  console.log(`[printTicket] Printing with template: ${template}`);
+
+  console.log(`[printTicket] ========== PRINTING SERVICE START ==========`);
+  console.log(`[printTicket] Template: ${template}`);
+  console.log(`[printTicket] Printer Type: ${printerType}`);
+  console.log(`[printTicket] Image URI: ${imageUri ? 'PROVIDED' : 'NOT PROVIDED'}`);
+  console.log(`[printTicket] Ticket ID: ${ticketId}`);
+  console.log(`[printTicket] Game: ${gameName}`);
+
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
 
@@ -43,28 +50,42 @@ export const printTicket = async (
     // Note: Image capture already includes the watermarks if present on screen
     if (printerType === 'BLE' && imageUri) {
       try {
+        console.log(`[printTicket] 🖼️ Attempting BLE IMAGE printing...`);
         let base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
 
         if (base64.startsWith('data:image')) {
           base64 = base64.split(',')[1];
         }
 
-        console.log(`Printing Image Base64: Length=${base64.length}`);
+        console.log(`[printTicket] Image Base64 Length: ${base64.length}`);
 
         await BLEPrinter.printText("\n");
 
         try {
+          console.log(`[printTicket] Calling BLEPrinter.printImageBase64 with width=384...`);
           await BLEPrinter.printImageBase64(base64, { imageWidth: 384, paddingX: 0 });
+          console.log(`[printTicket] ✅ Image printed successfully with standard settings`);
         } catch (innerErr) {
-          console.warn("Standard printImageBase64 failed, making one fallback attempt", innerErr);
+          console.warn("[printTicket] ⚠️ Standard printImageBase64 failed, trying fallback...", innerErr);
           await BLEPrinter.printImageBase64(base64);
+          console.log(`[printTicket] ✅ Image printed successfully with fallback settings`);
         }
 
         await BLEPrinter.printText("\n\n\n"); // Feed
+        console.log(`[printTicket] ✅ BLE IMAGE PRINT COMPLETE`);
+        console.log(`[printTicket] ========== PRINTING SERVICE END ==========`);
         return true;
       } catch (imgError) {
-        console.warn("Failed to print image FINAL, falling back to text:", imgError);
+        console.error("[printTicket] ❌ IMAGE PRINT FAILED:", imgError);
+        console.warn("[printTicket] ⚠️ Falling back to TEXT printing...");
         // Fallback to text if image fails
+      }
+    } else {
+      if (!imageUri) {
+        console.warn(`[printTicket] ⚠️ No image URI provided, will use TEXT printing`);
+      }
+      if (printerType !== 'BLE') {
+        console.log(`[printTicket] Printer type is ${printerType}, checking for NATIVE printing...`);
       }
     }
 
@@ -183,6 +204,14 @@ export const printTicket = async (
     }
 
     // BLE Printing Logic
+    console.log(`[printTicket] 📝 Using TEXT-based BLE printing...`);
+
+    if (template === 'alternative') {
+      console.warn(`[printTicket] ⚠️ WARNING: Alternative template selected but TEXT printing doesn't support it!`);
+      console.warn(`[printTicket] ⚠️ The printed ticket will use DEFAULT layout instead.`);
+      console.warn(`[printTicket] ⚠️ This usually means image capture/printing failed.`);
+    }
+
     let receipt = "";
 
     // ESC/POS Commands
@@ -302,9 +331,12 @@ export const printTicket = async (
     else if (BLEPrinter.printText) await BLEPrinter.printText(receipt);
     else throw new Error("No text printing method found");
 
+    console.log(`[printTicket] ✅ TEXT PRINT COMPLETE`);
+    console.log(`[printTicket] ========== PRINTING SERVICE END ==========`);
     return true;
   } catch (error) {
-    console.error("Print error:", error);
+    console.error("[printTicket] ❌ PRINT ERROR:", error);
+    console.log(`[printTicket] ========== PRINTING SERVICE END (ERROR) ==========`);
     return false;
   }
 };

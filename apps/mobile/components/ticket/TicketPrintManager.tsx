@@ -18,6 +18,8 @@ interface TicketPrintManagerProps {
 export const TicketPrintManager = forwardRef<ViewShot, TicketPrintManagerProps>(({ data, template = 'default' }, ref) => {
     if (!data) return null;
 
+    console.log(`[TicketPrintManager] Rendering with template: ${template}`);
+
     return (
         <View
             style={{ position: 'absolute', top: -5000, left: -5000 }}

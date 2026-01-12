@@ -1,7 +1,7 @@
 ﻿{
-    "version": "1.4.4",
-    "build": "124",
+    "version": "1.4.5",
+    "build": "125",
     "apkUrl": "InnoBet.apk",
     "force": true,
-    "notes": "Template de bilhete configurável + correções de impressão"
+    "notes": "Correção CRÍTICA: Template alternativo agora funciona corretamente na impressão"
 }
