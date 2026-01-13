@@ -51,16 +51,26 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     };
 
     const formatDrawDateHeader = () => {
-        if (data.drawDate) {
-            const date = new Date(data.drawDate);
+        if (!data.drawDate) return "";
+
+        try {
+            // Handle both string and Date object
+            const date = typeof data.drawDate === 'string' ? new Date(data.drawDate) : data.drawDate;
+
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return "";
+            }
+
             const day = date.getDate().toString().padStart(2, '0');
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const year = date.getFullYear();
             const hours = date.getHours().toString().padStart(2, '0');
-            // Assuming image format: 26/12/2025 - 11H
             return `${day}/${month}/${year} - ${hours}H`;
+        } catch (error) {
+            console.error('Error formatting draw date:', error);
+            return "";
         }
-        return "";
     };
 
     // Format second chance date
@@ -80,7 +90,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 360, height: 90, resizeMode: 'contain' }}
+                    style={{ width: 340, height: 85, resizeMode: 'contain' }}
                 />
             </View>
 
