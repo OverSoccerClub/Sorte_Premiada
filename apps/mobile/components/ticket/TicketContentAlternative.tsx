@@ -90,7 +90,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 460, height: 85, resizeMode: 'contain' }}
+                    style={{ width: 370, height: 85, resizeMode: 'contain' }}
                 />
             </View>
 
@@ -230,12 +230,11 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                 {/* Barcode */}
                 {data.hash && (
-                    <View style={tw`items-center mb-2 bg-white w-full`}>
+                    <View style={tw`items-center mb-2 bg-white w-full overflow-hidden`}>
                         <Barcode
-                            value={String(data.hash)}
-                            width={2.5}
-                            height={70}
-
+                            value={data.hash}
+                            width={370}
+                            height={80}
                         />
                         <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>
                             {data.hash}
@@ -249,7 +248,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                         <View style={tw`p-1 border-[3px] border-black rounded-none`}>
                             <QRCode
                                 value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
-                                size={100}
+                                size={120}
                             />
                         </View>
                     )}
