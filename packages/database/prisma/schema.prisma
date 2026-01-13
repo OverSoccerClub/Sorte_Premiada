@@ -33,6 +33,12 @@ model Company {
   // === CONFIGURAÇÕES DE EXIBIÇÃO ===
   showPlanTotalValue Boolean @default(true) // Exibir valor total calculado nos planos
   ticketTemplate     String  @default("default") // Template de bilhete: "default" | "alternative"
+  
+  // Configurações do Template Alternativo
+  alternativeLogoWidth  Int? @default(500) // Largura da logo no template alternativo (px)
+  alternativeLogoHeight Int? @default(85)  // Altura da logo no template alternativo (px)
+  alternativeQrWidth    Int? @default(120) // Largura do QR Code no template alternativo (px)
+  alternativeQrHeight   Int? @default(120) // Altura do QR Code no template alternativo (px)
 
   // === LICENCIAMENTO ===
   licenseStatus    LicenseStatus @default(TRIAL)

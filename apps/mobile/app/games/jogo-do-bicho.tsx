@@ -436,7 +436,11 @@ export default function JogoDoBichoScreen() {
                                     companyName: settings.companyName,
                                     companyLogoUrl: settings.logoUrl,
                                     areaName: user?.area?.name,
-                                    city: user?.area?.city
+                                    city: user?.area?.city,
+                                    alternativeLogoWidth: settings.alternativeLogoWidth,
+                                    alternativeLogoHeight: settings.alternativeLogoHeight,
+                                    alternativeQrWidth: settings.alternativeQrWidth,
+                                    alternativeQrHeight: settings.alternativeQrHeight,
                                 }}
                                 mode="preview"
                                 template={settings.ticketTemplate as 'default' | 'alternative'}

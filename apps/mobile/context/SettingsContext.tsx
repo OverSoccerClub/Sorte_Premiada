@@ -6,6 +6,10 @@ interface CompanySettings {
     companyName: string;
     logoUrl?: string;
     ticketTemplate: 'default' | 'alternative';
+    alternativeLogoWidth?: number;
+    alternativeLogoHeight?: number;
+    alternativeQrWidth?: number;
+    alternativeQrHeight?: number;
 }
 
 interface SettingsContextType {
@@ -18,6 +22,10 @@ const defaultSettings: CompanySettings = {
     companyName: "A Perseverança",
     logoUrl: "",
     ticketTemplate: "default",
+    alternativeLogoWidth: 500,
+    alternativeLogoHeight: 85,
+    alternativeQrWidth: 120,
+    alternativeQrHeight: 120,
 };
 
 const SettingsContext = createContext<SettingsContextType>({
@@ -57,6 +65,10 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
                     companyName: data.companyName || defaultSettings.companyName,
                     logoUrl: data.logoUrl || defaultSettings.logoUrl,
                     ticketTemplate: data.ticketTemplate || defaultSettings.ticketTemplate,
+                    alternativeLogoWidth: data.alternativeLogoWidth || defaultSettings.alternativeLogoWidth,
+                    alternativeLogoHeight: data.alternativeLogoHeight || defaultSettings.alternativeLogoHeight,
+                    alternativeQrWidth: data.alternativeQrWidth || defaultSettings.alternativeQrWidth,
+                    alternativeQrHeight: data.alternativeQrHeight || defaultSettings.alternativeQrHeight,
                 };
 
                 console.log("[SettingsContext] Setting ticketTemplate to:", newSettings.ticketTemplate);

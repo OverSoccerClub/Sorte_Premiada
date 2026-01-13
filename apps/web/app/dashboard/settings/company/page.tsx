@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { StandardPageHeader } from "@/components/standard-page-header";
-import { Building2, Save, Upload, Phone, Mail, MapPin, Palette, Loader2, CheckCircle2, RefreshCw, Crown, Eye } from "lucide-react";
+import { Building2, Save, Upload, Phone, Mail, MapPin, Palette, Loader2, CheckCircle2, RefreshCw, Crown, Eye, Settings2 } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,10 @@ interface CompanySettings {
     updateUrl: string;
     showPlanTotalValue: boolean;
     ticketTemplate: string;
+    alternativeLogoWidth?: number;
+    alternativeLogoHeight?: number;
+    alternativeQrWidth?: number;
+    alternativeQrHeight?: number;
 }
 
 const defaultSettings: CompanySettings = {
@@ -47,6 +51,10 @@ const defaultSettings: CompanySettings = {
     updateUrl: "",
     showPlanTotalValue: true,
     ticketTemplate: "default",
+    alternativeLogoWidth: 500,
+    alternativeLogoHeight: 85,
+    alternativeQrWidth: 120,
+    alternativeQrHeight: 120,
 };
 
 function CompanySettingsContent() {
@@ -93,7 +101,7 @@ function CompanySettingsContent() {
     }, [activeCompanyId, user]);
 
     // Handle input changes
-    const handleChange = (field: keyof CompanySettings, value: string) => {
+    const handleChange = (field: keyof CompanySettings, value: string | number | boolean) => {
         setSettings((prev) => ({ ...prev, [field]: value }));
         setSaveSuccess(false);
     };
@@ -449,15 +457,15 @@ function CompanySettingsContent() {
                             {/* Default Template */}
                             <div
                                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'default'
-                                        ? 'border-emerald-500 bg-emerald-500/10'
-                                        : 'border-border hover:border-emerald-500/50'
+                                    ? 'border-emerald-500 bg-emerald-500/10'
+                                    : 'border-border hover:border-emerald-500/50'
                                     }`}
                                 onClick={() => handleChange('ticketTemplate', 'default')}
                             >
                                 <div className="flex items-start gap-3">
                                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${settings.ticketTemplate === 'default'
-                                            ? 'border-emerald-500 bg-emerald-500'
-                                            : 'border-border'
+                                        ? 'border-emerald-500 bg-emerald-500'
+                                        : 'border-border'
                                         }`}>
                                         {settings.ticketTemplate === 'default' && (
                                             <div className="w-2 h-2 bg-white rounded-full" />
@@ -480,15 +488,15 @@ function CompanySettingsContent() {
                             {/* Alternative Template */}
                             <div
                                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'alternative'
-                                        ? 'border-emerald-500 bg-emerald-500/10'
-                                        : 'border-border hover:border-emerald-500/50'
+                                    ? 'border-emerald-500 bg-emerald-500/10'
+                                    : 'border-border hover:border-emerald-500/50'
                                     }`}
                                 onClick={() => handleChange('ticketTemplate', 'alternative')}
                             >
                                 <div className="flex items-start gap-3">
                                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${settings.ticketTemplate === 'alternative'
-                                            ? 'border-emerald-500 bg-emerald-500'
-                                            : 'border-border'
+                                        ? 'border-emerald-500 bg-emerald-500'
+                                        : 'border-border'
                                         }`}>
                                         {settings.ticketTemplate === 'alternative' && (
                                             <div className="w-2 h-2 bg-white rounded-full" />
@@ -508,79 +516,152 @@ function CompanySettingsContent() {
                                 </div>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
-
-                {/* Atualização do Aplicativo - MASTER ONLY */}
-                {user?.role === 'MASTER' && (
-                    <Card className="bg-card border-border lg:col-span-2 border-emerald-500/20 bg-emerald-500/5">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <RefreshCw className="w-5 h-5 text-emerald-500" />
-                                Atualização do Aplicativo (Master Only)
-                            </CardTitle>
-                            <CardDescription>
-                                Configure o repositório onde o App mobile buscará novas versões
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="updateUrl">URL do Repositório</Label>
-                                <Input
-                                    id="updateUrl"
-                                    value={settings.updateUrl || ""}
-                                    onChange={(e) => handleChange("updateUrl", e.target.value)}
-                                    placeholder="Ex: https://meu-repo.com/app"
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Esta URL será usada pelo aplicativo para baixar o arquivo <strong>version.json</strong> e o <strong>APK</strong>.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
-
-            {/* Preview */}
-            <Card className="bg-card border-border">
-                <CardHeader>
-                    <CardTitle>Pré-visualização</CardTitle>
-                    <CardDescription>
-                        Como o nome e logo aparecerão no sistema
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="bg-sidebar p-6 rounded-lg inline-flex items-center gap-3">
-                        {settings.logoUrl ? (
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-                                <img
-                                    src={settings.logoUrl}
-                                    alt="Logo Preview"
-                                    className="max-w-full max-h-full object-contain"
-                                />
-                            </div>
-                        ) : (
-                            <div
-                                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                style={{ backgroundColor: settings.primaryColor || "#50C878" }}
-                            >
-                                <Building2 className="w-6 h-6 text-white" />
-                            </div>
-                        )}
-                        <div>
-                            <span className="font-bold text-xl text-white">
-                                {settings.companyName || "Nome da Empresa"}
-                            </span>
-                            {settings.slogan && (
-                                <p className="text-xs text-muted-foreground">
-                                    {settings.slogan}
-                                </p>
-                            )}
-                        </div>
                     </div>
+
+                    {/* Configurações Avançadas do Template Alternativo */}
+                    {settings.ticketTemplate === 'alternative' && (
+                        <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-4 border border-border animate-in fade-in slide-in-from-top-4 duration-500">
+                            <h4 className="font-semibold text-sm flex items-center gap-2 text-emerald-600">
+                                <Settings2 className="w-4 h-4" />
+                                Personalizar Dimensões (Template Alternativo)
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Largura da Logo (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeLogoWidth || 500}
+                                            onChange={(e) => handleChange("alternativeLogoWidth", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={100}
+                                            max={1000}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 500px</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Altura da Logo (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeLogoHeight || 85}
+                                            onChange={(e) => handleChange("alternativeLogoHeight", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={20}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 85px</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Largura QR Code (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeQrWidth || 120}
+                                            onChange={(e) => handleChange("alternativeQrWidth", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={50}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Altura QR Code (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeQrHeight || 120}
+                                            onChange={(e) => handleChange("alternativeQrHeight", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={50}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
+
+            {/* Atualização do Aplicativo - MASTER ONLY */}
+            {user?.role === 'MASTER' && (
+                <Card className="bg-card border-border lg:col-span-2 border-emerald-500/20 bg-emerald-500/5">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <RefreshCw className="w-5 h-5 text-emerald-500" />
+                            Atualização do Aplicativo (Master Only)
+                        </CardTitle>
+                        <CardDescription>
+                            Configure o repositório onde o App mobile buscará novas versões
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="updateUrl">URL do Repositório</Label>
+                            <Input
+                                id="updateUrl"
+                                value={settings.updateUrl || ""}
+                                onChange={(e) => handleChange("updateUrl", e.target.value)}
+                                placeholder="Ex: https://meu-repo.com/app"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Esta URL será usada pelo aplicativo para baixar o arquivo <strong>version.json</strong> e o <strong>APK</strong>.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
+
+            {/* Preview */ }
+    <Card className="bg-card border-border">
+        <CardHeader>
+            <CardTitle>Pré-visualização</CardTitle>
+            <CardDescription>
+                Como o nome e logo aparecerão no sistema
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="bg-sidebar p-6 rounded-lg inline-flex items-center gap-3">
+                {settings.logoUrl ? (
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                        <img
+                            src={settings.logoUrl}
+                            alt="Logo Preview"
+                            className="max-w-full max-h-full object-contain"
+                        />
+                    </div>
+                ) : (
+                    <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: settings.primaryColor || "#50C878" }}
+                    >
+                        <Building2 className="w-6 h-6 text-white" />
+                    </div>
+                )}
+                <div>
+                    <span className="font-bold text-xl text-white">
+                        {settings.companyName || "Nome da Empresa"}
+                    </span>
+                    {settings.slogan && (
+                        <p className="text-xs text-muted-foreground">
+                            {settings.slogan}
+                        </p>
+                    )}
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+        </div >
     );
 }
 

@@ -36,6 +36,11 @@ export interface TicketData {
     companyLogoUrl?: string;
     areaName?: string;
     city?: string;
+    // Alternative Template Dimensions
+    alternativeLogoWidth?: number;
+    alternativeLogoHeight?: number;
+    alternativeQrWidth?: number;
+    alternativeQrHeight?: number;
 }
 
 interface TicketContentProps {

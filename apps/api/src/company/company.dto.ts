@@ -12,6 +12,12 @@ export interface UpdateCompanySettingsDto {
     updateUrl?: string;
     showPlanTotalValue?: boolean;
     ticketTemplate?: string;
+
+    // Alternative Template Dimensions
+    alternativeLogoWidth?: number;
+    alternativeLogoHeight?: number;
+    alternativeQrWidth?: number;
+    alternativeQrHeight?: number;
 }
 
 export interface CreateCompanyDto {

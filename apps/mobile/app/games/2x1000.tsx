@@ -709,7 +709,11 @@ export default function Game2x1000Screen() {
                                         ticketId: "PREVIEW",
                                         prizes: gamePrizes || undefined,
                                         companyName: settings.companyName,
-                                        companyLogoUrl: settings.logoUrl
+                                        companyLogoUrl: settings.logoUrl,
+                                        alternativeLogoWidth: settings.alternativeLogoWidth,
+                                        alternativeLogoHeight: settings.alternativeLogoHeight,
+                                        alternativeQrWidth: settings.alternativeQrWidth,
+                                        alternativeQrHeight: settings.alternativeQrHeight,
                                     }}
                                     mode="preview"
                                     template={settings.ticketTemplate as 'default' | 'alternative'}

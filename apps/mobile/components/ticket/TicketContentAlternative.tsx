@@ -85,13 +85,17 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     // Split second chance number into digits
     const scDigits = data.secondChanceNumber ? data.secondChanceNumber.toString().split('').map(Number) : [];
 
+    const logoWidth = data.alternativeLogoWidth || 500;
+    const logoHeight = data.alternativeLogoHeight || 85;
+    const qrSize = data.alternativeQrWidth || 120; // QR code is square, use width
+
     return (
         <View style={tw`bg-white w-[384px] p-4`}>
             {/* Header Image */}
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 500, height: 85, resizeMode: 'stretch' }}
+                    style={{ width: logoWidth, height: logoHeight, resizeMode: 'stretch' }}
                 />
             </View>
 
@@ -256,7 +260,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                         <View style={tw`p-1 border-[3px] border-black rounded-none`}>
                             <QRCode
                                 value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
-                                size={120}
+                                size={qrSize}
                             />
                         </View>
                     )}
