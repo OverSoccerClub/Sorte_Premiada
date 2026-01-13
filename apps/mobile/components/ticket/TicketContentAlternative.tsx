@@ -19,22 +19,22 @@ const numberToText = (num: number): string => {
 export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> = ({ data, isCapture = false }) => {
     const [logoError, setLogoError] = useState(false);
 
-    // Split numbers into 4 groups of 4 (Fezinhas)
-    // Split numbers into 4 groups of 4 (Fezinhas)
-    const rawFezinhas: number[][] = [];
-    for (let i = 0; i < data.numbers.length; i += 4) {
-        rawFezinhas.push(data.numbers.slice(i, i + 4));
-    }
+    // data.numbers contains the 4 thousands as numbers (e.g., [32, 7863, 8838, 9788])
+    // We need to convert each to a 4-digit string and then to array of digits
+    const fezinhasData: number[][] = data.numbers.map(num => {
+        const str = num.toString().padStart(4, '0');
+        return str.split('').map(d => parseInt(d, 10));
+    });
 
     // Sort fezinhas by their integer value (ascending)
-    rawFezinhas.sort((a, b) => {
-        const valA = parseInt(a.join(''), 10) || 0;
-        const valB = parseInt(b.join(''), 10) || 0;
+    fezinhasData.sort((a, b) => {
+        const valA = parseInt(a.join(''), 10);
+        const valB = parseInt(b.join(''), 10);
         return valA - valB;
     });
 
     // Ensure we have exactly 4 fezinhas (pad with empty if needed)
-    const fezinhas = rawFezinhas;
+    const fezinhas = fezinhasData;
     while (fezinhas.length < 4) {
         fezinhas.push([]);
     }
@@ -230,16 +230,11 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     </View>
                 )}
 
-                {/* QR Code and Download Message */}
+                {/* QR Code */}
                 <View style={tw`items-center mt-2`}>
-                    <View style={tw`items-center mb-2`}>
-                        <Text style={tw`text-[12px] text-black font-bold text-center leading-tight`}>
-                            Baixe o App{'\n'}para{'\n'}conferir a{'\n'}sua aposta
-                        </Text>
-                    </View>
                     {data.hash && (
                         <View style={tw`border-[3px] border-black p-1`}>
-                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={100} />
+                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
                         </View>
                     )}
                 </View>
