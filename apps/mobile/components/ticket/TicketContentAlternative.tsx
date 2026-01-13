@@ -80,19 +80,19 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 320, height: 80, resizeMode: 'contain' }}
+                    style={{ width: 400, height: 80, resizeMode: 'contain' }}
                 />
             </View>
 
             {/* Draw Info */}
-            <Text style={tw`text-center font-black text-black text-[10px] mb-4`}>
+            <Text style={tw`text-center font-black text-black text-[10px] mb-1 leading-tight`}>
                 SORTEIO {formatDrawNumber()} - {formatDrawDateHeader()}
             </Text>
 
             {/* 4 Fezinhas in Grid */}
-            <View style={tw`mb-2 border-b-2 border-dashed border-gray-400 pb-4`}>
+            <View style={tw`mb-1 border-b-2 border-dashed border-gray-400 pb-2`}>
                 {/* Row 1 */}
-                <View style={tw`flex-row justify-between mb-2 px-2`}>
+                <View style={tw`flex-row justify-between mb-1 px-2`}>
                     {/* Fezinha 1 */}
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 1</Text>
@@ -151,12 +151,15 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             </View>
 
             {/* Prize Message Box */}
-            <View style={tw`mb-4`}>
-                <Text style={tw`text-center font-bold text-[10px] text-black mb-1 uppercase`}>
+            <View style={tw`mb-2`}>
+                {/* Dashed Line */}
+                <Text style={tw`text-center text-black text-xs mb-0.5`}>__  __  __  __  __  __  __  __  __  __</Text>
+
+                <Text style={tw`text-center font-bold text-[10px] text-black mb-0.5 uppercase leading-tight`}>
                     {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
                 </Text>
                 {data.prizes && (
-                    <Text style={tw`text-center font-black text-[10px] text-black uppercase`}>
+                    <Text style={tw`text-center font-black text-[10px] text-black uppercase leading-tight`}>
                         QUADRA - {data.prizes.milhar || 'R$ 1.000,00'}   TRINCA: {data.prizes.centena || 'R$ 60,00'} - DUQUE: {data.prizes.dezena || 'R$ 6,00'}
                     </Text>
                 )}
@@ -164,7 +167,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
             {/* Second Chance Section (Fezinha Extra) */}
             {data.secondChanceNumber && (
-                <View style={tw`mb-6`}>
+                <View style={tw`mb-2`}>
                     {/* Black Header with Draw Info */}
                     <View style={tw`items-center mb-2`}>
                         <View style={tw`bg-black rounded-full py-1 px-8`}>
@@ -172,7 +175,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                                 {data.secondChanceLabel || 'FEZINHA EXTRA'}
                             </Text>
                             <Text style={tw`text-white text-center text-[8px] font-bold uppercase leading-tight`}>
-                                SORTEIO EXTRA SÁBADO, DIA {formatSecondChanceDate()}
+                                SORTEIO EXTRA, DIA {formatSecondChanceDate()}
                             </Text>
                         </View>
                     </View>
@@ -209,7 +212,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
                     Terminal número: {data.terminalId || '--------'} - Vendedor: {data.vendorName || '------'}
                 </Text>
-                <Text style={tw`text-[10px] text-black font-bold mb-3`}>
+                <Text style={tw`text-[10px] text-black font-bold mb-1 leading-tight`}>
                     Data da aposta: {data.date}
                 </Text>
 
