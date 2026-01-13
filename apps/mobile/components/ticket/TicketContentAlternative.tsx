@@ -20,12 +20,21 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     const [logoError, setLogoError] = useState(false);
 
     // Split numbers into 4 groups of 4 (Fezinhas)
-    const fezinhas: number[][] = [];
+    // Split numbers into 4 groups of 4 (Fezinhas)
+    const rawFezinhas: number[][] = [];
     for (let i = 0; i < data.numbers.length; i += 4) {
-        fezinhas.push(data.numbers.slice(i, i + 4));
+        rawFezinhas.push(data.numbers.slice(i, i + 4));
     }
 
+    // Sort fezinhas by their integer value (ascending)
+    rawFezinhas.sort((a, b) => {
+        const valA = parseInt(a.join(''), 10) || 0;
+        const valB = parseInt(b.join(''), 10) || 0;
+        return valA - valB;
+    });
+
     // Ensure we have exactly 4 fezinhas (pad with empty if needed)
+    const fezinhas = rawFezinhas;
     while (fezinhas.length < 4) {
         fezinhas.push([]);
     }
@@ -91,7 +100,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             {/* 4 Fezinhas in Grid */}
             <View style={tw`mb-2 border-b-2 border-dashed border-gray-400 pb-4`}>
                 {/* Row 1 */}
-                <View style={tw`flex-row justify-between mb-4 px-2`}>
+                <View style={tw`flex-row justify-between mb-2 px-2`}>
                     {/* Fezinha 1 */}
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 1</Text>
@@ -222,15 +231,15 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 )}
 
                 {/* QR Code and Download Message */}
-                <View style={tw`flex-row items-end justify-center gap-4 mt-2`}>
-                    <View style={tw`items-center pb-1`}>
+                <View style={tw`items-center mt-2`}>
+                    <View style={tw`items-center mb-2`}>
                         <Text style={tw`text-[12px] text-black font-bold text-center leading-tight`}>
                             Baixe o App{'\n'}para{'\n'}conferir a{'\n'}sua aposta
                         </Text>
                     </View>
                     {data.hash && (
                         <View style={tw`border-[3px] border-black p-1`}>
-                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
+                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={100} />
                         </View>
                     )}
                 </View>
