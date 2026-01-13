@@ -82,19 +82,6 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     source={require('../../assets/fezinha_header.png')}
                     style={{ width: 320, height: 80, resizeMode: 'contain' }}
                 />
-                <View style={tw`flex-row items-center justify-between w-full`}>
-                    {/* Trevo à esquerda */}
-                    <MaterialCommunityIcons name="clover" size={40} color="#454545" />
-
-                    {/* Texto central */}
-                    <View style={tw`flex-1 items-center`}>
-                        <Text style={[tw`text-3xl font-black text-slate-700 uppercase leading-tight`, { fontFamily: 'serif' }]}>FEZINHA</Text>
-                        <Text style={[tw`text-lg font-bold text-slate-600 uppercase -mt-1`, { fontFamily: 'serif' }]}>DE HOJE</Text>
-                    </View>
-
-                    {/* Calendário à direita */}
-                    <MaterialCommunityIcons name="calendar-month" size={35} color="#454545" />
-                </View>
             </View>
 
             {/* Draw Info */}
@@ -180,11 +167,11 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`mb-6`}>
                     {/* Black Header with Draw Info */}
                     <View style={tw`items-center mb-2`}>
-                        <View style={tw`bg-black rounded-full py-2 px-8`}>
-                            <Text style={tw`text-white text-center font-black text-lg uppercase`}>
+                        <View style={tw`bg-black rounded-full py-1 px-8`}>
+                            <Text style={tw`text-white text-center font-black text-lg uppercase leading-tight`}>
                                 {data.secondChanceLabel || 'FEZINHA EXTRA'}
                             </Text>
-                            <Text style={tw`text-white text-center text-[8px] font-bold uppercase mt-0.5`}>
+                            <Text style={tw`text-white text-center text-[8px] font-bold uppercase leading-tight`}>
                                 SORTEIO EXTRA SÁBADO, DIA {formatSecondChanceDate()}
                             </Text>
                         </View>
@@ -228,8 +215,8 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                 {/* Barcode */}
                 {data.hash && (
-                    <View style={tw`items-center mb-2`}>
-                        <Barcode value={data.hash} width={2.2} height={60} />
+                    <View style={tw`items-center mb-2 bg-white`}>
+                        <Barcode value={data.hash} width={2.5} height={70} />
                         <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>{data.hash}</Text>
                     </View>
                 )}
