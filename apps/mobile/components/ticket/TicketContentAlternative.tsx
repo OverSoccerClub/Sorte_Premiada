@@ -80,16 +80,16 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-1 border-2 border-black rounded-3xl pt-2 pb-2 px-4 mx-4`}>
                 <View style={tw`flex-row items-center justify-between w-full`}>
                     {/* Trevo à esquerda */}
-                    <MaterialCommunityIcons name="clover" size={60} color="#454545" />
+                    <MaterialCommunityIcons name="clover" size={40} color="#454545" />
 
                     {/* Texto central */}
                     <View style={tw`flex-1 items-center`}>
-                        <Text style={[tw`text-5xl font-black text-slate-700 uppercase leading-tight`, { fontFamily: 'serif' }]}>FEZINHA</Text>
-                        <Text style={[tw`text-2xl font-bold text-slate-600 uppercase -mt-1`, { fontFamily: 'serif' }]}>DE HOJE</Text>
+                        <Text style={[tw`text-3xl font-black text-slate-700 uppercase leading-tight`, { fontFamily: 'serif' }]}>FEZINHA</Text>
+                        <Text style={[tw`text-lg font-bold text-slate-600 uppercase -mt-1`, { fontFamily: 'serif' }]}>DE HOJE</Text>
                     </View>
 
                     {/* Calendário à direita */}
-                    <MaterialCommunityIcons name="calendar-month" size={50} color="#454545" />
+                    <MaterialCommunityIcons name="calendar-month" size={35} color="#454545" />
                 </View>
             </View>
 
@@ -235,9 +235,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`items-center mt-2`}>
                     {data.hash && (
                         <View style={tw`border-[3px] border-black p-1`}>
-                            <View style={{ transform: [{ scaleY: 0.7 }] }}>
-                                <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
-                            </View>
+                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
                         </View>
                     )}
                 </View>
