@@ -93,10 +93,18 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
         <View style={tw`bg-white w-[384px] p-4`}>
             {/* Header Image */}
             <View style={tw`items-center mb-2`}>
-                <Image
-                    source={require('../../assets/fezinha_header.png')}
-                    style={{ width: logoWidth, height: logoHeight, resizeMode: 'stretch' }}
-                />
+                {shouldShowLogo ? (
+                    <Image
+                        source={{ uri: data.companyLogoUrl }}
+                        style={{ width: logoWidth, height: logoHeight, resizeMode: 'contain' }}
+                        onError={() => setLogoError(true)}
+                    />
+                ) : (
+                    <Image
+                        source={require('../../assets/fezinha_header.png')}
+                        style={{ width: logoWidth, height: logoHeight, resizeMode: 'stretch' }}
+                    />
+                )}
             </View>
 
             {/* Draw Info */}

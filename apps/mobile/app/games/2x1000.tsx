@@ -422,7 +422,12 @@ export default function Game2x1000Screen() {
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
                 areaName: user?.area?.name,
-                city: user?.area?.city
+                city: user?.area?.city,
+                // Pass configured dimensions
+                alternativeLogoWidth: settings.alternativeLogoWidth,
+                alternativeLogoHeight: settings.alternativeLogoHeight,
+                alternativeQrWidth: settings.alternativeQrWidth,
+                alternativeQrHeight: settings.alternativeQrHeight,
             };
 
             setLastTicket(fullTicket);

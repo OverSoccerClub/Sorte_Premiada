@@ -235,6 +235,10 @@ export default function JogoDoBichoScreen() {
                 companyLogoUrl: settings.logoUrl,
                 areaName: user?.area?.name,
                 city: user?.area?.city,
+                alternativeLogoWidth: settings.alternativeLogoWidth,
+                alternativeLogoHeight: settings.alternativeLogoHeight,
+                alternativeQrWidth: settings.alternativeQrWidth,
+                alternativeQrHeight: settings.alternativeQrHeight,
                 promptMessage: gameConfig?.promptMessage,
                 mainMatchMessage: gameConfig?.mainMatchMessage,
                 secondChanceDrawDate: (() => {
