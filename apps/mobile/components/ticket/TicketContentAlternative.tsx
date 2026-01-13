@@ -66,7 +66,8 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const year = date.getFullYear();
             const hours = date.getHours().toString().padStart(2, '0');
-            return `${day}/${month}/${year} - ${hours}H`;
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${day}/${month}/${year} - ${hours}:${minutes}`;
         } catch (error) {
             console.error('Error formatting draw date:', error);
             return "";
@@ -90,7 +91,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 460, height: 85, resizeMode: 'contain' }}
+                    style={{ width: 600, height: 85, resizeMode: 'stretch' }}
                 />
             </View>
 
