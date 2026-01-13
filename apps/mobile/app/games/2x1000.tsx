@@ -712,6 +712,7 @@ export default function Game2x1000Screen() {
                                         companyLogoUrl: settings.logoUrl
                                     }}
                                     mode="preview"
+                                    template={settings.ticketTemplate as 'default' | 'alternative'}
                                 />
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>

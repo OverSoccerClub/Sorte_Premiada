@@ -399,6 +399,7 @@ export default function MegaSenaScreen() {
                                             city: user?.area?.city
                                         }}
                                         mode="preview"
+                                        template={settings.ticketTemplate as 'default' | 'alternative'}
                                     />
                                 </ViewShot>
                             </View>

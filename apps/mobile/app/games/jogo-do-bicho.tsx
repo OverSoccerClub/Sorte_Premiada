@@ -439,6 +439,7 @@ export default function JogoDoBichoScreen() {
                                     city: user?.area?.city
                                 }}
                                 mode="preview"
+                                template={settings.ticketTemplate as 'default' | 'alternative'}
                             />
                             <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 mt-6`} onPress={handlePrint}>
                                 <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>

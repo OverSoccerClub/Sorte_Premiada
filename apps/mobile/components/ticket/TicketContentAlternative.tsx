@@ -80,7 +80,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 400, height: 80, resizeMode: 'contain' }}
+                    style={{ width: 360, height: 90, resizeMode: 'contain' }}
                 />
             </View>
 
@@ -228,7 +228,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`items-center mt-2`}>
                     {data.hash && (
                         <View style={tw`border-[3px] border-black p-1`}>
-                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={80} />
+                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={100} />
                         </View>
                     )}
                 </View>
