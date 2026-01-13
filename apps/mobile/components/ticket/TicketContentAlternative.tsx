@@ -91,7 +91,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 600, height: 85, resizeMode: 'stretch' }}
+                    style={{ width: 500, height: 85, resizeMode: 'stretch' }}
                 />
             </View>
 
