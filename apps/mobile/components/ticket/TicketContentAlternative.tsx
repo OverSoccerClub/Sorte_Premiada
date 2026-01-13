@@ -77,16 +77,19 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     return (
         <View style={tw`bg-white w-[384px] p-4`}>
             {/* Header with Rounded Border */}
-            <View style={tw`items-center mb-1 border-2 border-black rounded-3xl pt-2 pb-3 px-4 mx-4`}>
-                <View style={tw`flex-row items-center justify-center gap-1`}>
-                    <MaterialCommunityIcons name="clover" size={36} color="#454545" style={tw`mt-1`} />
-                    <View>
-                        <Text style={[tw`text-4xl font-black text-slate-700 uppercase`, { fontFamily: 'serif' }]}>FEZINHA</Text>
-                        <View style={tw`flex-row items-center justify-end gap-1 -mt-1`}>
-                            <MaterialCommunityIcons name="calendar-month" size={14} color="#454545" />
-                            <Text style={tw`text-[9px] font-bold text-slate-600 uppercase`}>DE HOJE</Text>
-                        </View>
+            <View style={tw`items-center mb-1 border-2 border-black rounded-3xl pt-2 pb-2 px-4 mx-4`}>
+                <View style={tw`flex-row items-center justify-between w-full`}>
+                    {/* Trevo à esquerda */}
+                    <MaterialCommunityIcons name="clover" size={60} color="#454545" />
+
+                    {/* Texto central */}
+                    <View style={tw`flex-1 items-center`}>
+                        <Text style={[tw`text-5xl font-black text-slate-700 uppercase leading-tight`, { fontFamily: 'serif' }]}>FEZINHA</Text>
+                        <Text style={[tw`text-2xl font-bold text-slate-600 uppercase -mt-1`, { fontFamily: 'serif' }]}>DE HOJE</Text>
                     </View>
+
+                    {/* Calendário à direita */}
+                    <MaterialCommunityIcons name="calendar-month" size={50} color="#454545" />
                 </View>
             </View>
 
