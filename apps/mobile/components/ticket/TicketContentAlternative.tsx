@@ -90,7 +90,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 376, height: 85, resizeMode: 'contain' }}
+                    style={{ width: 460, height: 85, resizeMode: 'contain' }}
                 />
             </View>
 
@@ -98,6 +98,13 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <Text style={tw`text-center font-black text-black text-[10px] mb-1 leading-tight`}>
                 SORTEIO {formatDrawNumber()} - {formatDrawDateHeader()}
             </Text>
+
+            {/* Plaza Info */}
+            {data.areaName && (
+                <Text style={tw`text-center font-bold text-black text-[9px] mb-1 leading-tight`}>
+                    Praça: {data.areaName}{data.city ? ` - ${data.city}` : ''}
+                </Text>
+            )}
 
             {/* 4 Fezinhas in Grid */}
             <View style={tw`mb-1 border-b-2 border-dashed border-gray-400 pb-2`}>
@@ -161,7 +168,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             </View>
 
             {/* Prize Message Box */}
-            <View style={tw`mb-2`}>
+            <View style={tw`mb-2 -mt-1`}>
                 {/* Dashed Line */}
                 <Text style={tw`text-center text-black text-lg font-black mb-0.5 tracking-widest`}>
                     ___  ___  ___  ___  ___  ___  ___  ___
