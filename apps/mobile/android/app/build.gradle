@@ -91,8 +91,8 @@ android {
         applicationId 'com.anonymous.sortepremiada'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 142
-        versionName "1.4.22"
+        versionCode 144
+        versionName "1.4.24"
     }
     signingConfigs {
         debug {
