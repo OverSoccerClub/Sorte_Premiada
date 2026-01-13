@@ -175,6 +175,10 @@ export class CompanyService {
             updateUrl: company.updateUrl,
             showPlanTotalValue: company.showPlanTotalValue,
             ticketTemplate: company.ticketTemplate,
+            alternativeLogoWidth: company.alternativeLogoWidth,
+            alternativeLogoHeight: company.alternativeLogoHeight,
+            alternativeQrWidth: company.alternativeQrWidth,
+            alternativeQrHeight: company.alternativeQrHeight,
             plan: (company as any).plan ? {
                 name: (company as any).plan.name,
                 features: (company as any).plan.features,
