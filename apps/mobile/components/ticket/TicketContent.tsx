@@ -41,6 +41,8 @@ export interface TicketData {
     alternativeLogoHeight?: number;
     alternativeQrWidth?: number;
     alternativeQrHeight?: number;
+    qrcodeWidth?: number;
+    qrcodeHeight?: number;
 }
 
 interface TicketContentProps {
@@ -284,22 +286,24 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         height={isCapture ? 80 : 90}
                     />
                     <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
-                        <Text style={tw`font-black text-2xl text-white tracking-[3px]`}>{displayTicketId}</Text>
+                        <Text style={tw`font-black text-4xl text-white tracking-[3px]`}>{displayTicketId}</Text>
                     </View>
                 </View>
 
                 <View style={[
                     tw`items-center justify-center w-full mt-2`,
-                    isCapture && {
-                        transform: [{ scaleY: 0.45 }],
-                        marginTop: -90,
-                        marginBottom: -90
+                    {
+                        transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.45 : 1) }],
+                    },
+                    (!!data.qrcodeHeight || isCapture) && {
+                        marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.45)) / 2),
+                        marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.45)) / 2)
                     }
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>
                         <QRCode
-                            value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
-                            size={240}
+                            value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
+                            size={Number(data.qrcodeWidth) || 240}
                         />
                     </View>
                 </View>

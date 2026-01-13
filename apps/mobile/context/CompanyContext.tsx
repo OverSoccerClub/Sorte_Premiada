@@ -12,6 +12,8 @@ export interface CompanySettings {
     email?: string;
     primaryColor: string;
     updateUrl?: string;
+    qrcodeWidth?: number;
+    qrcodeHeight?: number;
 }
 
 const defaultSettings: CompanySettings = {

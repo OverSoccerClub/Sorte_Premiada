@@ -3,6 +3,7 @@
 
 param (
     [switch]$Clean = $false,
+    [switch]$Fast = $false,
     [string]$Arch = ""
 )
 
@@ -17,6 +18,7 @@ function Write-Step {
 function Show-Progress {
     param([string]$Activity, [string]$Status, [int]$Percent)
     Write-Progress -Activity $Activity -Status $Status -PercentComplete $Percent
+    Write-Host "   [COMMAND_PROGRESS] $Percent% - $Status" -ForegroundColor Cyan
 }
 
 Clear-Host
@@ -59,17 +61,23 @@ try {
     Write-Step "2/5 Verificando Ambiente..." -Color "Yellow"
     
     # Prebuild
-    Show-Progress -Activity "Gerando APK" -Status "Executando Expo Prebuild..." -PercentComplete 30
-    Write-Step "3/5 Executando Prebuild..." -Color "Yellow"
+    if (-not $Fast) {
+        Show-Progress -Activity "Gerando APK" -Status "Executando Expo Prebuild..." -PercentComplete 30
+        Write-Step "3/5 Executando Prebuild..." -Color "Yellow"
 
-    $prebuildCmd = "npx expo prebuild --platform android"
-    if ($Clean) { 
-        $prebuildCmd += " --clean" 
-        Write-Host "   -> Modo Limpo (Clean) Ativado" -ForegroundColor Magenta
+        $prebuildCmd = "npx expo prebuild --platform android"
+        if ($Clean) { 
+            $prebuildCmd += " --clean" 
+            Write-Host "   -> Modo Limpo (Clean) Ativado" -ForegroundColor Magenta
+        }
+        
+        cmd /c $prebuildCmd
+        if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
     }
-    
-    cmd /c $prebuildCmd
-    if ($LASTEXITCODE -ne 0) { throw "Falha no Prebuild." }
+    else {
+        Write-Step "3/5 Pulando Prebuild (Modo Rápido)..." -Color "Green"
+        Show-Progress -Activity "Gerando APK" -Status "Pulando Prebuild..." -PercentComplete 30
+    }
 
     # PATCH: Restore Display Name in strings.xml using Node for safety
     Write-Step "Restaurando nome de exibição..." -Color "Cyan"
@@ -163,7 +171,14 @@ try {
     Write-Step "4/5 Compilando APK (Gradle)..." -Color "Yellow"
     
     Set-Location $absAndroidDir
-    $gradleArgs = "assembleRelease -Pandroid.kotlinVersion=1.9.24 -PkotlinCompilerExtensionVersion=1.5.14 -PsuppressKotlinVersionCompatibilityCheck=true"
+    
+    if ($Fast) {
+        $gradleArgs = "assembleRelease -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 -PsuppressKotlinVersionCompatibilityCheck=true"
+        Write-Host "   -> Modo Rápido: 'clean' removido do Gradle" -ForegroundColor Green
+    }
+    else {
+        $gradleArgs = "clean assembleRelease -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 -PsuppressKotlinVersionCompatibilityCheck=true"
+    }
     
     # Otimização de Memória e Envs
     $env:GRADLE_OPTS = "-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"
@@ -179,7 +194,7 @@ try {
     # Local properties já foi configurado acima
     
     Write-Step "Iniciando compilação final..." -Color "Cyan"
-    cmd /c "gradlew $gradleArgs -x lint"
+    cmd /c "gradlew $gradleArgs -x lint > gradle_build.log 2>&1"
     
     if ($LASTEXITCODE -ne 0) { 
         Set-Location ..

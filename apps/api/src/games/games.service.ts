@@ -43,7 +43,7 @@ export class GamesService {
             }
         }
 
-        return this.prisma.game.create({ data: createData });
+        return this.prisma.client.game.create({ data: createData });
     }
 
     async findAll(options?: { activeOnly?: boolean, companyId?: string, slug?: string }) {
@@ -62,21 +62,21 @@ export class GamesService {
             where.company = { slug: options.slug };
         }
 
-        return this.prisma.game.findMany({
+        return this.prisma.client.game.findMany({
             where,
             include: { extractionSeries: true }
         });
     }
 
     async findOne(id: string) {
-        return this.prisma.game.findUnique({
+        return this.prisma.client.game.findUnique({
             where: { id },
             include: { extractionSeries: true }
         });
     }
 
     async update(id: string, data: any, adminId?: string) {
-        const oldGame = await this.prisma.game.findUnique({
+        const oldGame = await this.prisma.client.game.findUnique({
             where: { id },
             include: { extractionSeries: true }
         });
@@ -84,7 +84,7 @@ export class GamesService {
         const { extractionSeries, ...gameData } = data;
 
         // Update the game basic info
-        const updatedGame = await this.prisma.game.update({
+        const updatedGame = await this.prisma.client.game.update({
             where: { id },
             data: gameData
         });
@@ -102,7 +102,7 @@ export class GamesService {
                 if (series.time && series.lastSeries !== undefined) {
                     console.log(`[GamesService] Upserting series: time=${series.time}, lastSeries=${series.lastSeries}`);
 
-                    const result = await this.prisma.extractionSeries.upsert({
+                    const result = await this.prisma.client.extractionSeries.upsert({
                         where: {
                             gameId_areaId_time: {
                                 gameId: id,

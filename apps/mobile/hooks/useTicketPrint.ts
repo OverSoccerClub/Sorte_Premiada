@@ -46,7 +46,12 @@ export function useTicketPrint() {
 
             console.log(`[useTicketPrint] Calling printTicket with template: ${settings.ticketTemplate}, imageUri: ${uri ? 'YES' : 'NO'}`);
             const success = await printTicket(
-                { ...data, companyLogoUrl: companySettings.logoUrl },
+                {
+                    ...data,
+                    companyLogoUrl: companySettings.logoUrl,
+                    qrcodeWidth: companySettings.qrcodeWidth,
+                    qrcodeHeight: companySettings.qrcodeHeight
+                },
                 printerType,
                 uri,
                 settings.ticketTemplate

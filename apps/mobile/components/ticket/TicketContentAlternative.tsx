@@ -89,6 +89,9 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     const logoHeight = data.alternativeLogoHeight || 85;
     const qrSize = data.alternativeQrWidth || 120; // QR code is square, use width
 
+    const qrHeight = data.alternativeQrHeight || qrSize;
+    const scaleY = qrHeight / qrSize;
+
     return (
         <View style={tw`bg-white w-[384px] p-4`}>
             {/* Header Image */}
@@ -265,10 +268,14 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 {/* QR Code */}
                 <View style={tw`items-center mt-2`}>
                     {data.hash && (
-                        <View style={tw`p-1 border-[3px] border-black rounded-none`}>
+                        <View style={[
+                            tw`p-1 border-[3px] border-black rounded-none`,
+                            { transform: [{ scaleY }] },
+                            scaleY < 1 && { marginTop: -(qrSize * (1 - scaleY) / 2), marginBottom: -(qrSize * (1 - scaleY) / 2) }
+                        ]}>
                             <QRCode
-                                value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
-                                size={qrSize}
+                                value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
+                                size={Number(qrSize)}
                             />
                         </View>
                     )}

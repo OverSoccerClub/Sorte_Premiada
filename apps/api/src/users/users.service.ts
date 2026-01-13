@@ -14,13 +14,13 @@ export class UsersService {
     ) { }
 
     async findOne(username: string): Promise<User | null> {
-        return this.prisma.user.findUnique({
+        return this.prisma.client.user.findUnique({
             where: { username },
         });
     }
 
     async getArea(areaId: string) {
-        return this.prisma.area.findUnique({ where: { id: areaId } });
+        return this.prisma.client.area.findUnique({ where: { id: areaId } });
     }
 
     async create(data: Prisma.UserCreateInput): Promise<User> {
@@ -48,7 +48,7 @@ export class UsersService {
             }
         }
 
-        return this.prisma.user.create({
+        return this.prisma.client.user.create({
             data,
         });
     }
@@ -65,7 +65,7 @@ export class UsersService {
         }
 
         if (requestingUserId) {
-            const requester = await this.prisma.user.findUnique({
+            const requester = await this.prisma.client.user.findUnique({
                 where: { id: requestingUserId }
             });
 
@@ -74,7 +74,7 @@ export class UsersService {
             }
         }
 
-        let users = await this.prisma.user.findMany({
+        let users = await this.prisma.client.user.findMany({
             where,
             include: {
                 area: true,
@@ -84,7 +84,7 @@ export class UsersService {
 
         // Check for expiry and rotate if needed (only for COBRADORES)
         const now = new Date();
-        const results = users.map(async (user) => {
+        const results = users.map(async (user: User) => {
             let userToReturn = { ...user } as any;
 
             if (user.role === 'COBRADOR') {
@@ -107,7 +107,7 @@ export class UsersService {
 
                 if (needsUpdate) {
                     // Update user in DB
-                    userToReturn = await this.prisma.user.update({
+                    userToReturn = await this.prisma.client.user.update({
                         where: { id: user.id },
                         data: updateData,
                         include: { area: true }
@@ -125,7 +125,7 @@ export class UsersService {
                 const endOfDay = new Date();
                 endOfDay.setHours(23, 59, 59, 999);
 
-                const dailyClose = await this.prisma.dailyClose.findFirst({
+                const dailyClose = await this.prisma.client.dailyClose.findFirst({
                     where: {
                         closedByUserId: user.id,
                         createdAt: { gte: startOfDay, lte: endOfDay }
@@ -141,16 +141,16 @@ export class UsersService {
     }
 
     async findById(id: string): Promise<any | null> {
-        return this.prisma.user.findUnique({
+        return this.prisma.client.user.findUnique({
             where: { id },
             include: { area: true }
         });
     }
 
     async update(id: string, data: Prisma.UserUpdateInput, adminId?: string): Promise<User> {
-        const oldUser = await this.prisma.user.findUnique({ where: { id } });
+        const oldUser = await this.prisma.client.user.findUnique({ where: { id } });
 
-        const updatedUser = await this.prisma.user.update({
+        const updatedUser = await this.prisma.client.user.update({
             where: { id },
             data,
         });
@@ -173,13 +173,13 @@ export class UsersService {
     }
 
     async remove(id: string): Promise<User> {
-        return this.prisma.user.delete({
+        return this.prisma.client.user.delete({
             where: { id },
         });
     }
 
     async updatePushToken(id: string, pushToken: string): Promise<User> {
-        return this.prisma.user.update({
+        return this.prisma.client.user.update({
             where: { id },
             data: { pushToken },
         });
@@ -202,7 +202,7 @@ export class UsersService {
      */
     async generateUsername(fullName: string, companyId: string): Promise<string> {
         // Buscar nome da empresa
-        const company = await this.prisma.company.findUnique({
+        const company = await this.prisma.client.company.findUnique({
             where: { id: companyId },
             select: { companyName: true }
         });

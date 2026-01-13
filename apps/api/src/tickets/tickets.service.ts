@@ -35,7 +35,7 @@ export class TicketsService {
         }
 
         // Fetch Game & Rules
-        const game = await this.prisma.game.findUnique({
+        const game = await this.prisma.client.game.findUnique({
             where: { id: gameId },
         });
 
@@ -52,7 +52,7 @@ export class TicketsService {
         const rules = (game.rules as any) || {};
 
         // Fetch User with Area for Commission Rate AND Series Number
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.client.user.findUnique({
             where: { id: userId },
             select: {
                 commissionRate: true,
@@ -72,7 +72,7 @@ export class TicketsService {
         let areaToUpdate: { id: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean } | null = null;
 
         if (user?.areaId) {
-            areaToUpdate = await this.prisma.area.findUnique({
+            areaToUpdate = await this.prisma.client.area.findUnique({
                 where: { id: user.areaId },
                 select: {
                     id: true,
@@ -107,7 +107,7 @@ export class TicketsService {
         }
 
         // Fetch Area Override
-        const areaConfig = (user?.areaId && gameId) ? await this.prisma.areaConfig.findUnique({
+        const areaConfig = (user?.areaId && gameId) ? await this.prisma.client.areaConfig.findUnique({
             where: { areaId_gameId: { areaId: user.areaId, gameId } }
         }) : null;
 
@@ -201,7 +201,7 @@ export class TicketsService {
 
             for (const num of data.numbers) {
                 // Find tickets with this number for this draw
-                const relevantTickets = await this.prisma.ticket.findMany({
+                const relevantTickets = await this.prisma.client.ticket.findMany({
                     where: {
                         gameId: gameId,
                         drawDate: drawDate,
@@ -303,7 +303,7 @@ export class TicketsService {
         if (data._deviceId) {
             try {
                 // Try to find device by token first (x-device-token)
-                const deviceByToken = await this.prisma.posTerminal.findFirst({
+                const deviceByToken = await this.prisma.client.posTerminal.findFirst({
                     where: { deviceToken: data._deviceId },
                     select: { name: true, activationCode: true }
                 });
@@ -312,7 +312,7 @@ export class TicketsService {
                     deviceName = deviceByToken.name || deviceByToken.activationCode || null;
                 } else {
                     // Fallback: try to find by deviceId (x-device-id)
-                    const deviceById = await this.prisma.posTerminal.findFirst({
+                    const deviceById = await this.prisma.client.posTerminal.findFirst({
                         where: { deviceId: data._deviceId },
                         select: { name: true, activationCode: true }
                     });
@@ -405,13 +405,13 @@ export class TicketsService {
                 drawDate: createData.drawDate
             });
 
-            const ticket = await this.prisma.ticket.create({
+            const ticket = await this.prisma.client.ticket.create({
                 data: createData
             });
 
             // Update area series counter
             if (areaToUpdate) {
-                await this.prisma.area.update({
+                await this.prisma.client.area.update({
                     where: { id: areaToUpdate.id },
                     data: {
                         currentSeries: areaToUpdate.currentSeries,
@@ -474,7 +474,7 @@ export class TicketsService {
     }
 
     private async getNextDrawDate(gameId: string): Promise<Date> {
-        const game = await this.prisma.game.findUnique({
+        const game = await this.prisma.client.game.findUnique({
             where: { id: gameId },
             select: { extractionTimes: true }
         });
@@ -572,7 +572,7 @@ export class TicketsService {
             where.series = series;
         }
 
-        const usedTickets = await this.prisma.ticket.findMany({
+        const usedTickets = await this.prisma.client.ticket.findMany({
             where: where,
             select: { ticketNumber: true },
             orderBy: { ticketNumber: 'desc' }
@@ -647,7 +647,7 @@ export class TicketsService {
             where.series = series;
         }
 
-        const tickets = await this.prisma.ticket.findMany({
+        const tickets = await this.prisma.client.ticket.findMany({
             where: where,
             select: { numbers: true }
         });
@@ -677,7 +677,7 @@ export class TicketsService {
 
         let user: { areaId?: string | null } | null = null;
         if (userId) {
-            user = await this.prisma.user.findUnique({
+            user = await this.prisma.client.user.findUnique({
                 where: { id: userId },
                 select: { areaId: true }
             });
@@ -694,7 +694,7 @@ export class TicketsService {
         let seriesNumber: string | undefined;
 
         if (user?.areaId) {
-            areaToUpdate = await this.prisma.area.findUnique({
+            areaToUpdate = await this.prisma.client.area.findUnique({
                 where: { id: user.areaId },
                 select: {
                     id: true,
@@ -730,7 +730,7 @@ export class TicketsService {
         }
 
         // Fetch Area Override
-        const areaConfig = (user?.areaId && gameId) ? await this.prisma.areaConfig.findUnique({
+        const areaConfig = (user?.areaId && gameId) ? await this.prisma.client.areaConfig.findUnique({
             where: { areaId_gameId: { areaId: user.areaId, gameId } }
         }) : null;
 
@@ -747,7 +747,7 @@ export class TicketsService {
 
     async getSeriesStats(gameId: string, companyId: string, drawDate?: Date) {
         // Get game info
-        const game = await this.prisma.game.findUnique({
+        const game = await this.prisma.client.game.findUnique({
             where: { id: gameId },
             select: {
                 name: true,
@@ -762,7 +762,7 @@ export class TicketsService {
         const maxTicketsPerSeries = game.maxTicketsPerSeries || 2500;
 
         // NEW LOGIC: Fetch status from AREAS directly (Real-Time Monitor)
-        const areas = await this.prisma.area.findMany({
+        const areas = await this.prisma.client.area.findMany({
             where: { companyId },
             select: {
                 id: true,
@@ -779,7 +779,7 @@ export class TicketsService {
             const seriesNum = parseInt(area.currentSeries);
 
             // Calculate REAL count from database to ensure accuracy
-            const currentCount = await this.prisma.ticket.count({
+            const currentCount = await this.prisma.client.ticket.count({
                 where: {
                     series: seriesNum,
                     user: { areaId: area.id }, // Ensure ticket belongs to this area
@@ -812,7 +812,7 @@ export class TicketsService {
 
     private async updateExpiredTickets() {
         // Update tickets that are PENDING and have a drawDate in the past
-        await this.prisma.ticket.updateMany({
+        await this.prisma.client.ticket.updateMany({
             where: {
                 status: 'PENDING',
                 drawDate: {
@@ -848,7 +848,7 @@ export class TicketsService {
                 if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
             }
         }
-        return this.prisma.ticket.findMany({
+        return this.prisma.client.ticket.findMany({
             where,
             include: { user: true, game: true },
             orderBy: { createdAt: 'desc' }
@@ -870,7 +870,7 @@ export class TicketsService {
             }
         }
 
-        return this.prisma.ticket.findMany({
+        return this.prisma.client.ticket.findMany({
             where,
             include: { game: true },
             orderBy: { createdAt: 'desc' }
@@ -886,7 +886,7 @@ export class TicketsService {
 
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ticketId);
 
-        const ticket = await this.prisma.ticket.findFirst({
+        const ticket = await this.prisma.client.ticket.findFirst({
             where: {
                 AND: [
                     {
@@ -963,7 +963,7 @@ export class TicketsService {
      * STRICT RULE: Only the cambista who sold the ticket can pay it out.
      */
     async redeemPrize(ticketId: string, loggedUserId: string) {
-        const ticket = await this.prisma.ticket.findUnique({
+        const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
@@ -975,7 +975,7 @@ export class TicketsService {
             throw new BadRequestException("Este prêmio só pode ser pago pelo Cambista que realizou a venda.");
         }
 
-        return this.prisma.ticket.update({
+        return this.prisma.client.ticket.update({
             where: { id: ticketId },
             data: { status: 'PAID' }
         });
@@ -987,7 +987,7 @@ export class TicketsService {
      * Otherwise, set status to CANCEL_REQUESTED for admin approval.
      */
     async requestCancellation(ticketId: string, userId: string, reason: string) {
-        const ticket = await this.prisma.ticket.findUnique({
+        const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
@@ -1009,7 +1009,7 @@ export class TicketsService {
         const createdAt = dayjs(ticket.createdAt);
 
         // Check if user has permission to auto-cancel
-        const requester = await this.prisma.user.findUnique({
+        const requester = await this.prisma.client.user.findUnique({
             where: { id: userId },
             select: { canCancelTickets: true, role: true }
         });
@@ -1018,7 +1018,7 @@ export class TicketsService {
 
         if (hasAutoCancelPermission && now.diff(createdAt, 'minute') <= GRACE_PERIOD_MINUTES) {
             // Auto-cancel within grace period
-            const updatedTicket = await this.prisma.ticket.update({
+            const updatedTicket = await this.prisma.client.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'CANCELLED',
@@ -1036,7 +1036,7 @@ export class TicketsService {
             return updatedTicket;
         } else {
             // Need Admin/Supervisor approval or user doesn't have auto-cancel permission
-            return this.prisma.ticket.update({
+            return this.prisma.client.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'CANCEL_REQUESTED' as any,
@@ -1050,7 +1050,7 @@ export class TicketsService {
      * Admin/Supervisor approval of a cancellation.
      */
     async approveCancellation(ticketId: string, adminId: string, approved: boolean) {
-        const ticket = await this.prisma.ticket.findUnique({
+        const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
@@ -1060,7 +1060,7 @@ export class TicketsService {
         }
 
         if (approved) {
-            const updatedTicket = await this.prisma.ticket.update({
+            const updatedTicket = await this.prisma.client.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'CANCELLED',
@@ -1077,7 +1077,7 @@ export class TicketsService {
             return updatedTicket;
         } else {
             // Reject: set back to PENDING (or previous state)
-            return this.prisma.ticket.update({
+            return this.prisma.client.ticket.update({
                 where: { id: ticketId },
                 data: {
                     status: 'PENDING',
@@ -1137,7 +1137,7 @@ export class TicketsService {
                 where.series = series;
             }
 
-            const exists = await this.prisma.ticket.findFirst({
+            const exists = await this.prisma.client.ticket.findFirst({
                 where: where
             });
 
