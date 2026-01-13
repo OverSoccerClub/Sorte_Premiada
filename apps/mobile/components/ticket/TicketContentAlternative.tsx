@@ -80,9 +80,9 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-1 border-2 border-black rounded-3xl pt-2 pb-3 px-4 mx-4`}>
                 <View style={tw`flex-row items-center justify-center gap-1`}>
                     <MaterialCommunityIcons name="clover" size={36} color="#454545" style={tw`mt-1`} />
-                    <View style={tw`flex-row items-end gap-1`}>
+                    <View>
                         <Text style={[tw`text-4xl font-black text-slate-700 uppercase`, { fontFamily: 'serif' }]}>FEZINHA</Text>
-                        <View style={tw`flex-row items-center gap-1 mb-1`}>
+                        <View style={tw`flex-row items-center justify-end gap-1 -mt-1`}>
                             <MaterialCommunityIcons name="calendar-month" size={14} color="#454545" />
                             <Text style={tw`text-[9px] font-bold text-slate-600 uppercase`}>DE HOJE</Text>
                         </View>
