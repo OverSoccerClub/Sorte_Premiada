@@ -90,7 +90,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             <View style={tw`items-center mb-2`}>
                 <Image
                     source={require('../../assets/fezinha_header.png')}
-                    style={{ width: 340, height: 85, resizeMode: 'contain' }}
+                    style={{ width: 460, height: 85, resizeMode: 'contain' }}
                 />
             </View>
 
@@ -163,7 +163,9 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             {/* Prize Message Box */}
             <View style={tw`mb-2`}>
                 {/* Dashed Line */}
-                <Text style={tw`text-center text-black text-xs mb-0.5`}>__  __  __  __  __  __  __  __  __  __</Text>
+                <Text style={tw`text-center text-black text-lg font-black mb-0.5 tracking-widest`}>
+                    ___  ___  ___  ___  ___  ___  ___  ___
+                </Text>
 
                 <Text style={tw`text-center font-bold text-[10px] text-black mb-0.5 uppercase leading-tight`}>
                     {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
@@ -228,20 +230,31 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                 {/* Barcode */}
                 {data.hash && (
-                    <View style={tw`items-center mb-2 bg-white`}>
-                        <Barcode value={data.hash} width={2.5} height={70} />
-                        <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>{data.hash}</Text>
+                    <View style={tw`items-center mb-2 bg-white w-full`}>
+                        <Barcode
+                            value={String(data.hash)}
+                            width={2.5}
+                            height={70}
+
+                        />
+                        <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>
+                            {data.hash}
+                        </Text>
                     </View>
                 )}
 
                 {/* QR Code */}
                 <View style={tw`items-center mt-2`}>
                     {data.hash && (
-                        <View style={tw`border-[3px] border-black p-1`}>
-                            <QRCode value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`} size={100} />
+                        <View style={tw`p-1 border-[3px] border-black rounded-none`}>
+                            <QRCode
+                                value={`https://fezinha.uawtgc.easypanel.host/sorteio/${displayTicketId}`}
+                                size={100}
+                            />
                         </View>
                     )}
                 </View>
+
 
                 <Text style={tw`text-center font-bold text-[11px] text-black mt-3`}>
                     www.fezinhadehoje.com.br
