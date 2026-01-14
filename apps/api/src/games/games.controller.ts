@@ -54,7 +54,7 @@ export class GamesController {
                 companyId: companyId // SEMPRE filtrado por empresa
             });
 
-            return games.map(game => ({
+            return games.map((game: any) => ({
                 ...game,
                 price: Number(game.price),
                 prizeMilhar: game.prizeMilhar ? Number(game.prizeMilhar) : null,

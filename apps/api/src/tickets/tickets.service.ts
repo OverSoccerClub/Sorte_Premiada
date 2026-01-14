@@ -211,7 +211,7 @@ export class TicketsService {
                     select: { possiblePrize: true }
                 });
 
-                const existingLiability = relevantTickets.reduce((sum, t) => sum + Number(t.possiblePrize || 0), 0);
+                const existingLiability = relevantTickets.reduce((sum: number, t: any) => sum + Number(t.possiblePrize || 0), 0);
 
                 if (existingLiability + currentPotentialWin > maxLiability) {
                     throw new BadRequestException(`Limite de risco excedido para a milhar ${num}. Banca cheia. Tente outro número.`);
@@ -653,7 +653,7 @@ export class TicketsService {
         });
 
         const soldArr: number[] = [];
-        tickets.forEach(t => {
+        tickets.forEach((t: any) => {
             if (Array.isArray(t.numbers)) {
                 (t.numbers as number[]).forEach(n => soldArr.push(n));
             }
@@ -775,7 +775,7 @@ export class TicketsService {
         });
 
         // Map areas to SeriesStats format with REAL-TIME counts
-        const series = await Promise.all(areas.map(async (area) => {
+        const series = await Promise.all(areas.map(async (area: any) => {
             const seriesNum = parseInt(area.currentSeries);
 
             // Calculate REAL count from database to ensure accuracy
