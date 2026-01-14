@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
+import { useCompany } from "../../context/CompanyContext"; // Added
+import { useSettings } from "../../context/SettingsContext"; // Added
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { TicketsService, Ticket } from "../../services/tickets.service";
@@ -23,7 +25,9 @@ const STATUS_FILTERS = [
 
 export default function HistoryScreen() {
     const router = useRouter();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
+    const { settings: companySettings } = useCompany(); // Added
+    const { settings } = useSettings(); // Added
     const insets = useSafeAreaInsets();
     const BOTTOM_PADDING = 70 + insets.bottom + 50;
 
@@ -368,7 +372,7 @@ export default function HistoryScreen() {
                 isReprint={true}
                 ticketData={selectedTicket ? ({
                     gameName: selectedTicket.gameType,
-                    numbers: selectedTicket.numbers,
+                    numbers: (selectedTicket.numbers || []).map(String),
                     price: `R$ ${Number(selectedTicket.amount).toFixed(2).replace('.', ',')}`,
                     ticketId: selectedTicket.id,
                     hash: selectedTicket.hash,
@@ -387,7 +391,19 @@ export default function HistoryScreen() {
                         milhar: selectedTicket.game.prizeMilhar ? `R$ ${Number(selectedTicket.game.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                         centena: selectedTicket.game.prizeCentena ? `R$ ${Number(selectedTicket.game.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                         dezena: selectedTicket.game.prizeDezena ? `R$ ${Number(selectedTicket.game.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
-                    } : undefined
+                    } : undefined,
+                    // Inject Settings for Alternative Layout
+                    companyName: companySettings.companyName,
+                    companyLogoUrl: companySettings.logoUrl,
+                    areaName: selectedTicket.area?.name || user?.area?.name, // Try ticket area first, then user area
+                    city: selectedTicket.area?.city || user?.area?.city,
+                    alternativeLogoWidth: settings.alternativeLogoWidth,
+                    alternativeLogoHeight: settings.alternativeLogoHeight,
+                    alternativeQrWidth: settings.alternativeQrWidth,
+                    alternativeQrHeight: settings.alternativeQrHeight,
+                    // Additional messages from Game Config if available (might need to fetch game details if not in ticket)
+                    promptMessage: selectedTicket.game?.promptMessage,
+                    mainMatchMessage: selectedTicket.game?.mainMatchMessage,
                 } as TicketData) : null}
             />
 

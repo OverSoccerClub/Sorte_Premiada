@@ -30,12 +30,19 @@ export interface Ticket {
         name?: string;
         username?: string;
     };
+    area?: {
+        name: string;
+        city: string;
+    };
     game?: {
         id: string;
         name: string;
         prizeMilhar?: string;
         prizeCentena?: string;
         prizeDezena?: string;
+        secondChanceLabel?: string;
+        promptMessage?: string;
+        mainMatchMessage?: string;
     };
 }
 
