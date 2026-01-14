@@ -3,12 +3,12 @@
 // ============================================
 
 const CONFIG = {
-    // URL da API - ajuste conforme seu ambiente
-    API_URL: 'https://pos-jogos-api.uawtgc.easypanel.host',
+    // URL da API - preferência para variável de ambiente
+    API_URL: (window.ENV && window.ENV.API_URL) || 'https://pos-jogos-api.uawtgc.easypanel.host',
 
     // ID da empresa (multi-tenancy)
-    // Use o slug da sua empresa ou 'default'
-    COMPANY_ID: 'default',
+    // Preferência para variável de ambiente
+    COMPANY_ID: (window.ENV && window.ENV.COMPANY_ID) || 'default',
 
     // Intervalo de atualização automática (em milissegundos)
     // 30000 = 30 segundos

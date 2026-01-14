@@ -7,8 +7,10 @@ COPY apps/site/*.css /usr/share/nginx/html/
 COPY apps/site/*.js /usr/share/nginx/html/
 COPY apps/site/assets /usr/share/nginx/html/assets
 
-# Expor porta 80
+COPY apps/site/entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 80
 
-# Iniciar Nginx
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
