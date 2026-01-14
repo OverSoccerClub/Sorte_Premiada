@@ -124,7 +124,8 @@ export default function DeviceManagementPage() {
                 setDeviceName("");
                 setDeviceDescription("");
                 fetchDevices(); // Atualizar lista
-                showAlert("Sucesso", "Código de ativação gerado com sucesso!", "success");
+                fetchDevices(); // Atualizar lista
+                // showAlert("Sucesso", "Código de ativação gerado com sucesso!", "success"); // Removed to avoid conflict with modal
             } else {
                 const error = await response.json();
                 showAlert("Erro", error.message || "Não foi possível gerar o código", "error");

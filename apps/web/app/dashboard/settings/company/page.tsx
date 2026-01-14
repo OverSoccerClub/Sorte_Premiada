@@ -13,6 +13,7 @@ import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { useActiveCompanyId } from "@/context/use-active-company";
+import { useAlert } from "@/context/alert-context";
 
 interface CompanySettings {
     id?: string;
@@ -63,11 +64,10 @@ function CompanySettingsContent() {
     // const searchParams = useSearchParams();
     // const targetCompanyId = searchParams.get('companyId'); // replaced by activeCompanyId
 
+    const { showAlert } = useAlert();
     const [settings, setSettings] = useState<CompanySettings>(defaultSettings);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [saveSuccess, setSaveSuccess] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     // Fetch current settings
     useEffect(() => {
@@ -103,14 +103,11 @@ function CompanySettingsContent() {
     // Handle input changes
     const handleChange = (field: keyof CompanySettings, value: string | number | boolean) => {
         setSettings((prev) => ({ ...prev, [field]: value }));
-        setSaveSuccess(false);
     };
 
     // Save settings
     const handleSave = async () => {
         setIsSaving(true);
-        setError(null);
-        setSaveSuccess(false);
 
         try {
             const token = localStorage.getItem("token");
@@ -133,10 +130,9 @@ function CompanySettingsContent() {
                 throw new Error("Falha ao salvar configurações");
             }
 
-            setSaveSuccess(true);
-            setTimeout(() => setSaveSuccess(false), 3000);
+            showAlert("Sucesso", "Configurações salvas com sucesso!", "success");
         } catch (err: any) {
-            setError(err.message || "Erro ao salvar");
+            showAlert("Erro", err.message || "Erro ao salvar", "error");
         } finally {
             setIsSaving(false);
         }
@@ -189,11 +185,6 @@ function CompanySettingsContent() {
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Salvando...
                         </>
-                    ) : saveSuccess ? (
-                        <>
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Salvo!
-                        </>
                     ) : (
                         <>
                             <Save className="w-4 h-4 mr-2" />
@@ -203,11 +194,7 @@ function CompanySettingsContent() {
                 </Button>
             </StandardPageHeader>
 
-            {error && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg">
-                    {error}
-                </div>
-            )}
+
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Identidade Visual */}

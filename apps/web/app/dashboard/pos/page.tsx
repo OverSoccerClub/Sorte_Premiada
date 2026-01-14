@@ -149,7 +149,8 @@ export default function PosManagementPage() {
                 setDeviceName("");
                 setDeviceDescription("");
                 fetchDevices();
-                showAlert("Sucesso", "Código gerado com sucesso!", "success");
+                fetchDevices();
+                // showAlert("Sucesso", "Código gerado com sucesso!", "success"); // Removed to avoid conflict with modal
             } else {
                 showAlert("Erro", "Erro ao gerar código", "error");
             }
