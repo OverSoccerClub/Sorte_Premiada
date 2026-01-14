@@ -80,53 +80,74 @@ export class GamesService {
             where: { id },
             include: { extractionSeries: true }
         });
-        // Separe extractionSeries data if present in data
+
         const { extractionSeries, ...gameData } = data;
 
-        // Update the game basic info
-        const updatedGame = await this.prisma.client.game.update({
-            where: { id },
-            data: gameData
-        });
+        // ✅ Usar transação para garantir que todas as mudanças (jogo + horários) ocorram ou falhem juntas
+        const result = await this.prisma.client.$transaction(async (tx) => {
+            // 1. Atualizar dados básicos do jogo
+            const updated = await tx.game.update({
+                where: { id },
+                data: gameData
+            });
 
-        // If updated extractionSeries are provided, upsert them
-        if (extractionSeries && Array.isArray(extractionSeries)) {
-            // Buscar o companyId do jogo para injetar nas séries
-            const gameCompanyId = updatedGame.companyId;
+            // 2. Se houver novas séries de extração, sincronizá-las
+            if (extractionSeries && Array.isArray(extractionSeries)) {
+                const gameCompanyId = updated.companyId;
+                const incomingTimes = extractionSeries.map(s => s.time);
 
-            console.log('[GamesService] Updating extraction series:', extractionSeries);
-            console.log('[GamesService] Game companyId:', gameCompanyId);
+                console.log(`[GamesService] Syncing extraction series for game ${id}. Times:`, incomingTimes);
 
-            for (const series of extractionSeries) {
-                // Ensure we have time and lastSeries
-                if (series.time && series.lastSeries !== undefined) {
-                    console.log(`[GamesService] Upserting series: time=${series.time}, lastSeries=${series.lastSeries}`);
+                // A. Remover séries que não estão mais na lista (Limpeza de Órfãos)
+                await tx.extractionSeries.deleteMany({
+                    where: {
+                        gameId: id,
+                        time: { notIn: incomingTimes }
+                    }
+                });
 
-                    const result = await this.prisma.client.extractionSeries.upsert({
+                // B. Sincronizar cada série (Upsert manual para evitar problemas com campos nulos em chaves compostas)
+                for (const series of extractionSeries) {
+                    if (!series.time) continue;
+
+                    const areaId = series.areaId || null;
+                    const seriesValue = Number(series.lastSeries || 0);
+
+                    // Verificar se já existe (combinação game + time + area)
+                    const existing = await tx.extractionSeries.findFirst({
                         where: {
-                            gameId_areaId_time: {
-                                gameId: id,
-                                areaId: series.areaId || null,
-                                time: series.time
-                            }
-                        },
-                        update: {
-                            lastSeries: Number(series.lastSeries),
-                            ...(gameCompanyId ? { companyId: gameCompanyId } : {})
-                        },
-                        create: {
                             gameId: id,
-                            areaId: series.areaId || null,
                             time: series.time,
-                            lastSeries: Number(series.lastSeries),
-                            ...(gameCompanyId ? { companyId: gameCompanyId } : {})
+                            areaId: areaId
                         }
                     });
 
-                    console.log(`[GamesService] Upsert result:`, result);
+                    if (existing) {
+                        // Update
+                        await tx.extractionSeries.update({
+                            where: { id: existing.id },
+                            data: {
+                                lastSeries: seriesValue,
+                                ...(gameCompanyId ? { companyId: gameCompanyId } : {})
+                            }
+                        });
+                    } else {
+                        // Create
+                        await tx.extractionSeries.create({
+                            data: {
+                                gameId: id,
+                                time: series.time,
+                                areaId: areaId,
+                                lastSeries: seriesValue,
+                                ...(gameCompanyId ? { companyId: gameCompanyId } : {})
+                            }
+                        });
+                    }
                 }
             }
-        }
+
+            return updated;
+        });
 
         if (adminId) {
             await this.auditLog.log({
@@ -135,10 +156,10 @@ export class GamesService {
                 entity: 'Game',
                 entityId: id,
                 oldValue: oldGame,
-                newValue: updatedGame
+                newValue: result
             });
         }
 
-        return updatedGame;
+        return result;
     }
 }
