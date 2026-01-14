@@ -102,6 +102,59 @@ async function fetchResults() {
   }
 }
 
+async function fetchSecondChanceResults() {
+  showLoading('secondChanceGrid');
+
+  try {
+    const response = await fetch(
+      `${API_URL}/public/results/second-chance?companyId=${COMPANY_ID}&limit=5`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    secondChanceData = data;
+    displaySecondChanceResults(data);
+  } catch (error) {
+    console.error('Erro ao buscar resultados de segunda chance:', error);
+    showError('secondChanceGrid', 'Não foi possível carregar os resultados de segunda chance.');
+  }
+}
+
+function displaySecondChanceResults(results) {
+  const container = document.getElementById('secondChanceGrid');
+  container.innerHTML = '';
+
+  if (!results || results.length === 0) {
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-text-secondary);">Nenhum sorteio de Chance Extra realizado recentemente.</p>';
+    return;
+  }
+
+  results.forEach((result, index) => {
+    const card = document.createElement('div');
+    card.className = 'second-chance-card fade-in';
+    card.style.animationDelay = `${index * 0.1}s`;
+
+    card.innerHTML = `
+            <div class="result-header">
+                <span class="result-game">${result.game}</span>
+                <span class="result-date">${result.date}</span>
+            </div>
+            <div class="result-numbers">
+                <div class="number-ball">${result.winningNumber}</div>
+            </div>
+            <div class="result-prize">
+                <div class="prize-label">👑 Chance Extra</div>
+                <div class="prize-amount">R$ ${formatCurrency(result.prize)}</div>
+            </div>
+        `;
+
+    container.appendChild(card);
+  });
+}
+
 function displayResults(results) {
   const resultsGrid = document.getElementById('resultsGrid');
   resultsGrid.innerHTML = '';
