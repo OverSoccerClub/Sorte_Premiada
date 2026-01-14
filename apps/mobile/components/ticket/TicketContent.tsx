@@ -82,16 +82,29 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     };
 
     // Helper to format Draw Date as per requirement: DD/MM/YY ÀS HH:MM
+    // Enforces Brazil Time (UTC-3) regardless of device timezone
     const formatDrawDate = (dateStr: string | undefined) => {
         if (!dateStr) return "";
-        // Try to parse: "11/01/2026 18:00:00" or similar
-        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
-        if (parts) {
-            const [_, day, month, year, hours, minutes] = parts;
+
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr; // parsing failed, return original
+
+            // Shift UTC time by -3 hours to get Brazil components via getUTC* methods
+            // (Standard Brazil Time is UTC-3)
+            const brazilTime = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+
+            const day = brazilTime.getUTCDate().toString().padStart(2, '0');
+            const month = (brazilTime.getUTCMonth() + 1).toString().padStart(2, '0');
+            const year = brazilTime.getUTCFullYear().toString();
             const shortYear = year.substring(2);
+            const hours = brazilTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = brazilTime.getUTCMinutes().toString().padStart(2, '0');
+
             return `${day}/${month}/${shortYear} ÀS ${hours}:${minutes}`;
+        } catch (e) {
+            return dateStr;
         }
-        return dateStr;
     };
 
     return (

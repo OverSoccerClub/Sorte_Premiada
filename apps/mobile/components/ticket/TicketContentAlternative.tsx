@@ -55,18 +55,22 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
         try {
             // Handle both string and Date object
-            const date = typeof data.drawDate === 'string' ? new Date(data.drawDate) : data.drawDate;
+            const dateInput = typeof data.drawDate === 'string' ? new Date(data.drawDate) : data.drawDate;
+            const date = typeof dateInput === 'object' ? dateInput : new Date(dateInput);
 
             // Check if date is valid
             if (isNaN(date.getTime())) {
                 return "";
             }
 
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
+            // Enforce Brazil Time (UTC-3)
+            const brazilTime = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+
+            const day = brazilTime.getUTCDate().toString().padStart(2, '0');
+            const month = (brazilTime.getUTCMonth() + 1).toString().padStart(2, '0');
+            const year = brazilTime.getUTCFullYear();
+            const hours = brazilTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = brazilTime.getUTCMinutes().toString().padStart(2, '0');
             return `${day}/${month}/${year} - ${hours}:${minutes}`;
         } catch (error) {
             console.error('Error formatting draw date:', error);
@@ -87,10 +91,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
     const logoWidth = data.alternativeLogoWidth || 500;
     const logoHeight = data.alternativeLogoHeight || 85;
-    const qrSize = data.alternativeQrWidth || 120; // QR code is square, use width
 
-    const qrHeight = data.alternativeQrHeight || qrSize;
-    const scaleY = qrHeight / qrSize;
+    // QR Code Dimensions with Fallback to standard settings
+    const qrSize = data.alternativeQrWidth || data.qrcodeWidth || 120;
+    const targetQrHeight = data.alternativeQrHeight || data.qrcodeHeight || qrSize;
+
+    const scaleY = targetQrHeight / qrSize;
 
     return (
         <View style={tw`bg-white w-[384px] p-4`}>

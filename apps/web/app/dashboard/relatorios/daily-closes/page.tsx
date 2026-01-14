@@ -226,7 +226,7 @@ export default function DailyClosesPage() {
                 {/* Print Header */}
                 <div className="hidden print:block p-6 mb-4 border-b">
                     <h1 className="text-2xl font-bold">Relatório de Fechamentos Diários</h1>
-                    <p className="text-sm">Período: {format(new Date(startDate), "dd/MM/yyyy")} até {format(new Date(endDate), "dd/MM/yyyy")}</p>
+                    <p className="text-sm">Período: {startDate.split('-').reverse().join('/')} até {endDate.split('-').reverse().join('/')}</p>
                     {selectedCambista !== "all" && <p className="text-sm">Cambista: {cambistas.find(c => c.id === selectedCambista)?.name}</p>}
                 </div>
 
@@ -257,7 +257,7 @@ export default function DailyClosesPage() {
                             {closes.map((c) => (
                                 <TableRow key={c.id} className="hover:bg-muted/50 transition-colors">
                                     <TableCell className="font-medium pl-4">
-                                        {format(new Date(c.date || c.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                                        {new Date(c.date || c.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                                     </TableCell>
                                     <TableCell>{c.closedByUser?.name || c.closedByUser?.username || "-"}</TableCell>
                                     <TableCell className="text-right">{formatCurrency(c.totalSales)}</TableCell>
@@ -331,7 +331,7 @@ export default function DailyClosesPage() {
                     <div className="hidden print:block border-b pb-4 mb-4">
                         <h2 className="text-xl font-bold">Extrato Detalhado de Caixa</h2>
                         <p className="text-sm">Cambista: {selectedClose?.closedByUser?.name || selectedClose?.closedByUser?.username}</p>
-                        <p className="text-sm">Data: {selectedClose && format(new Date(selectedClose.date || selectedClose.createdAt), "dd/MM/yyyy")}</p>
+                        <p className="text-sm">Data: {selectedClose && new Date(selectedClose.date || selectedClose.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
                     </div>
 
                     {loadingDetail ? (
@@ -383,7 +383,7 @@ export default function DailyClosesPage() {
                                         {detailSummary.transactions.map((t: any) => (
                                             <TableRow key={t.id}>
                                                 <TableCell className="text-muted-foreground font-mono">
-                                                    {format(new Date(t.createdAt), "HH:mm:ss")}
+                                                    {new Date(t.createdAt).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                                                 </TableCell>
                                                 <TableCell className="font-medium text-sm">{t.description}</TableCell>
                                                 <TableCell>

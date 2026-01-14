@@ -31,13 +31,11 @@ export class DrawsService {
                 const areaId = data.areaId || null; // Support area linking
 
                 // Busca ou cria o contador para este horário E PRAÇA
-                let extractionSeries = await tx.extractionSeries.findUnique({
+                let extractionSeries = await tx.extractionSeries.findFirst({
                     where: {
-                        gameId_areaId_time: {
-                            gameId,
-                            areaId: areaId,
-                            time: timeSlot
-                        }
+                        gameId,
+                        areaId: areaId,
+                        time: timeSlot
                     }
                 });
 
@@ -231,6 +229,7 @@ export class DrawsService {
                 gameId: draw.gameId,
                 OR: [
                     { drawDate: exactDate },
+                    // LEGACY FIX: Handle potential timezone differences in older records (UTC-3 vs UTC)
                     { drawDate: minus3h },
                     { drawDate: plus3h }
                 ]

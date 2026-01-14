@@ -484,10 +484,10 @@ export default function DashboardPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col">
                                                     <span className="text-foreground font-medium">
-                                                        {new Date(sale.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                        {new Date(sale.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                                     </span>
                                                     <span className="text-[10px] text-muted-foreground">
-                                                        {new Date(sale.createdAt).toLocaleDateString('pt-BR')}
+                                                        {new Date(sale.createdAt).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
                                                     </span>
                                                 </div>
                                             </td>

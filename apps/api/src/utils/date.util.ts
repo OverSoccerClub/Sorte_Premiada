@@ -45,9 +45,20 @@ export function toDate(date: dayjs.Dayjs): Date {
 
 /**
  * Helper to get strictly "Today" start in Brazil
+ * Returns a native Date object effectively corresponding to YYYY-MM-DDT00:00:00.000-03:00
  */
-export function getBrazilStartOfDay(): Date {
-    return getBrazilTime().startOf('day').toDate();
+export function getBrazilStartOfDay(date?: Date | string): Date {
+    const d = date ? toBrazilTime(date) : getBrazilTime();
+    return d.startOf('day').toDate();
+}
+
+/**
+ * Helper to get strictly "Today" end in Brazil
+ * Returns a native Date object effectively corresponding to YYYY-MM-DDT23:59:59.999-03:00
+ */
+export function getBrazilEndOfDay(date?: Date | string): Date {
+    const d = date ? toBrazilTime(date) : getBrazilTime();
+    return d.endOf('day').toDate();
 }
 
 export { dayjs };

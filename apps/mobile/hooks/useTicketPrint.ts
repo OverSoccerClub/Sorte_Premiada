@@ -50,7 +50,11 @@ export function useTicketPrint() {
                     ...data,
                     companyLogoUrl: companySettings.logoUrl,
                     qrcodeWidth: companySettings.qrcodeWidth,
-                    qrcodeHeight: companySettings.qrcodeHeight
+                    qrcodeHeight: companySettings.qrcodeHeight,
+                    alternativeLogoWidth: companySettings.alternativeLogoWidth,
+                    alternativeLogoHeight: companySettings.alternativeLogoHeight,
+                    alternativeQrWidth: companySettings.alternativeQrWidth,
+                    alternativeQrHeight: companySettings.alternativeQrHeight
                 },
                 printerType,
                 uri,

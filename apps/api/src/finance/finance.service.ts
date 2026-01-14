@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
+import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
 
 enum DailyCloseStatus {
     PENDING = 'PENDING',
@@ -50,11 +51,8 @@ export class FinanceService {
     }
 
     async getSummary(userId: string, companyId?: string) {
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         // 1. Get Tickets Sales (Exclude Cancelled)
         const tickets = await this.prisma.ticket.findMany({
@@ -160,10 +158,8 @@ export class FinanceService {
 
     async getTransactions(userId: string) {
         // Re-using logic or just getting transactions
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         return this.prisma.transaction.findMany({
             where: {
@@ -186,10 +182,8 @@ export class FinanceService {
             : null;
 
         // Check if already closed today
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         const existingClose = await this.prisma.dailyClose.findFirst({
             where: {
@@ -244,10 +238,8 @@ export class FinanceService {
     // Admin: close a day for a specific user and optionally auto-verify
     async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true, physicalCashReported?: number) {
         // Prevent duplicate close for the target user's today
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         const existingClose = await this.prisma.dailyClose.findFirst({
             where: { closedByUserId: targetUserId, createdAt: { gte: startOfDay, lte: endOfDay } }
@@ -348,10 +340,8 @@ export class FinanceService {
 
     // New Validation Logic replacing isDayClosed
     async validateSalesEligibility(userId: string, amountToAdd: number = 0): Promise<void> {
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         // 1. Check if TODAY is closed
         const todayClose = await this.prisma.dailyClose.findFirst({
@@ -448,10 +438,8 @@ export class FinanceService {
 
 
             // Direct query to avoid recursion with getSummary
-            const startOfDay = new Date();
-            startOfDay.setHours(0, 0, 0, 0);
-            const endOfDay = new Date();
-            endOfDay.setHours(23, 59, 59, 999);
+            const startOfDay = getBrazilStartOfDay();
+            const endOfDay = getBrazilEndOfDay();
 
             const salesAgg = await this.prisma.ticket.aggregate({
                 where: {
@@ -480,10 +468,8 @@ export class FinanceService {
         }
     }
     async getDebugInfo(userId: string) {
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
 
         const lastTickets = await this.prisma.ticket.findMany({
             where: { userId },

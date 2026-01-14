@@ -14,6 +14,11 @@ export interface CompanySettings {
     updateUrl?: string;
     qrcodeWidth?: number;
     qrcodeHeight?: number;
+    // Alternative Template Params
+    alternativeLogoWidth?: number;
+    alternativeLogoHeight?: number;
+    alternativeQrWidth?: number;
+    alternativeQrHeight?: number;
 }
 
 const defaultSettings: CompanySettings = {
