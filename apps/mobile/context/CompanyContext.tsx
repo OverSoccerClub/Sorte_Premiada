@@ -25,7 +25,7 @@ const defaultSettings: CompanySettings = {
     companyName: 'A Perseverança',
     slogan: 'Cambista Edition',
     primaryColor: '#50C878',
-    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/InnoBet',
+    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje',
 };
 
 const CACHE_KEY = '@company_settings';

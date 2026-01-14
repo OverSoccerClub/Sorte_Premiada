@@ -1,6 +1,6 @@
 ﻿{
     "expo": {
-        "name": "InnoBet",
+        "name": "A Perseverança",
         "slug": "innobet",
         "version": "1.4.48",
         "runtimeVersion": {
@@ -57,7 +57,8 @@
                 "expo-build-properties",
                 {
                     "android": {
-                        "usesCleartextTraffic": true
+                        "usesCleartextTraffic": true,
+                        "kotlinVersion": "1.9.24"
                     }
                 }
             ]

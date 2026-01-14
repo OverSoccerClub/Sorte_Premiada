@@ -269,7 +269,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                             width={370}
                             height={80}
                         />
-                        <Text style={tw`text-[8px] text-black mt-0.5 font-mono`}>
+                        <Text style={tw`text-[13px] text-black mt-1 font-black font-mono`}>
                             {data.hash}
                         </Text>
                     </View>

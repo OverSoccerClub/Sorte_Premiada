@@ -4,7 +4,7 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import { Alert, Platform, Linking } from 'react-native';
 
 // Fallback update URL - can be overridden by AppConfig if needed
-const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/InnoBet';
+const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje';
 const VERSION_FILE_NAME = 'version.json';
 
 export interface VersionInfo {

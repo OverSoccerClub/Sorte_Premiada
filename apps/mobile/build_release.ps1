@@ -21,10 +21,11 @@ function Show-Progress {
     Write-Host "   [COMMAND_PROGRESS] $Percent% - $Status" -ForegroundColor Cyan
 }
 
-Clear-Host
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "      GERADOR DE APK - INNOBET " -ForegroundColor Cyan
-Write-Host "==================================================" -ForegroundColor Cyan
+# 0. Safety Check
+if (Test-Path ".\apps\mobile") {
+    Set-Location ".\apps\mobile"
+}
+
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 # 1. Configuration
@@ -173,11 +174,11 @@ try {
     Set-Location $absAndroidDir
     
     if ($Fast) {
-        $gradleArgs = "assembleRelease -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 -PsuppressKotlinVersionCompatibilityCheck=true"
+        $gradleArgs = "assembleRelease -Pandroid.kotlinVersion=1.9.24 -PkotlinVersion=1.9.24 -PsuppressKotlinVersionCompatibilityCheck=true"
         Write-Host "   -> Modo Rápido: 'clean' removido do Gradle" -ForegroundColor Green
     }
     else {
-        $gradleArgs = "clean assembleRelease -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 -PsuppressKotlinVersionCompatibilityCheck=true"
+        $gradleArgs = "clean assembleRelease -Pandroid.kotlinVersion=1.9.24 -PkotlinVersion=1.9.24 -PsuppressKotlinVersionCompatibilityCheck=true --parallel --build-cache --configure-on-demand"
     }
     
     # Otimização de Memória e Envs
@@ -194,7 +195,7 @@ try {
     # Local properties já foi configurado acima
     
     Write-Step "Iniciando compilação final..." -Color "Cyan"
-    cmd /c "gradlew $gradleArgs -x lint > gradle_build.log 2>&1"
+    cmd /c "gradlew $gradleArgs -x lint > gradle_build_new.log 2>&1"
     
     if ($LASTEXITCODE -ne 0) { 
         Set-Location ..

@@ -247,7 +247,7 @@ export class TicketsService {
             const conflicts = data.numbers.filter((n: string) => soldSet.has(n.toString()));
 
             if (conflicts.length > 0) {
-                throw new BadRequestException(`Números indisponíveis(Bloqueio Global): ${conflicts.join(', ')} `);
+                throw new BadRequestException(`Números indisponíveis(Bloqueio Global): ${conflicts.join(', ')}. Estes números já foram vendidos em outra série.`);
             }
         }
 
@@ -763,8 +763,19 @@ export class TicketsService {
             console.log(`[getAvailability] No userId provided or no area/areaConfig. Using global scope.`);
         }
 
-        const soldSet = await this.getSoldNumbers(gameId, nextDraw, series);
-        console.log(`[getAvailability] Found ${soldSet.size} sold numbers. Series Filter: ${series}`);
+        // Fetch Game to check for globalCheck rule
+        const game = await this.prisma.client.game.findUnique({
+            where: { id: gameId },
+            select: { rules: true }
+        });
+        const rules = (game?.rules as any) || {};
+
+        // If globalCheck is enabled, we MUST return ALL sold numbers regardless of series
+        // to avoid "phantom availability" in the app.
+        const effectiveSeries = rules.globalCheck ? undefined : series;
+
+        const soldSet = await this.getSoldNumbers(gameId, nextDraw, effectiveSeries);
+        console.log(`[getAvailability] Found ${soldSet.size} sold numbers. Global Check: ${!!rules.globalCheck}, Series Filter: ${effectiveSeries}`);
         return Array.from(soldSet);
     }
 

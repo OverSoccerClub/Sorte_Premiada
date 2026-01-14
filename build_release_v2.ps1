@@ -6,12 +6,23 @@ Write-Host "BUILD DE APK - COM MONITORAMENTO EM TEMPO REAL" -ForegroundColor Cya
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Configurações
+# Configuracoes
 $MobileDir = "apps\mobile"
-$DistDir = "dist"
-$ApkName = "FezinhadeHoje.apk"
+$DistDir = "deploy-update"
+$ApkName = "InnoBet.apk"
+$Gradlew = "C:\Projetos\App\InnoBet\apps\mobile\android\gradlew.bat"
 
-# =========== FUNÇÃO PARA EXECUTAR COM TIMEOUT ===========
+# Configurar JAVA_HOME se necessario
+if (-not $env:JAVA_HOME) {
+    $PotentialJava = "C:\Program Files\Android\Android Studio\jbr"
+    if (Test-Path $PotentialJava) {
+        $env:JAVA_HOME = $PotentialJava
+        $env:Path = "$PotentialJava\bin;$env:Path"
+        Write-Host "   JAVA_HOME definido para: $PotentialJava" -ForegroundColor Green
+    }
+}
+
+# =========== FUNCAO PARA EXECUTAR COM TIMEOUT ===========
 function Invoke-CommandWithTimeout {
     param(
         [string]$Command,
@@ -23,21 +34,21 @@ function Invoke-CommandWithTimeout {
     
     # Criar processo
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $processInfo.FileName = "cmd.exe"
+    $processInfo.FileName = "powershell.exe"
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
-    $processInfo.Arguments = "/c $Command"
+    $processInfo.Arguments = "-NoProfile -Command `"$Command`""
     $processInfo.WorkingDirectory = $WorkingDir
     $processInfo.CreateNoWindow = $true
     
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
     
-    # Lista para armazenar saída
+    # Lista para armazenar saida
     $outputBuilder = New-Object System.Text.StringBuilder
     
-    # Event handler para capturar saída em tempo real
+    # Event handler para capturar saida em tempo real
     $scripBlock = {
         param($sender, $e)
         $line = $e.Data
@@ -82,12 +93,12 @@ function Invoke-CommandWithTimeout {
         $completed = $process.WaitForExit($TimeoutSeconds * 1000)
         
         if (-not $completed) {
-            Write-Host "   ⏰ TIMEOUT: Processo excedeu $TimeoutSeconds segundos" -ForegroundColor Red
+            Write-Host "   TIMEOUT: Processo excedeu $TimeoutSeconds segundos" -ForegroundColor Red
             $process.Kill()
             return 999, "Processo morto por timeout"
         }
         
-        # Coletar saída restante
+        # Coletar saida restante
         $output = $outputBuilder.ToString()
         return $process.ExitCode, $output
         
@@ -100,10 +111,10 @@ function Invoke-CommandWithTimeout {
     }
 }
 
-# =========== EXECUÇÃO PRINCIPAL ===========
+# =========== EXECUCAO PRINCIPAL ===========
 
 # ETAPA 0: Corrigir build.gradle com Kotlin 2.0.20
-Write-Host "[0/5] Ajustando versão do Kotlin em build.gradle..." -ForegroundColor Yellow
+Write-Host "[0/5] Ajustando versao do Kotlin em build.gradle..." -ForegroundColor Yellow
 $gradleContent = @"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
@@ -136,14 +147,14 @@ apply plugin: "com.facebook.react.rootproject"
 
 $gradlePath = "$MobileDir\android\build.gradle"
 if (Test-Path "$MobileDir\android") {
-    Set-Content -Path $gradlePath -Value $gradleContent -Encoding UTF8
-    Write-Host "   build.gradle atualizado com Kotlin 2.0.20 [OK]" -ForegroundColor Green
+    # Set-Content -Path $gradlePath -Value $gradleContent -Encoding UTF8
+    Write-Host "   build.gradle atualizado com Kotlin 2.0.20 [OK] (Manual)" -ForegroundColor Green
 }
 
-# ETAPA 1: Verificar se já está na pasta android
+# ETAPA 1: Verificar se ja esta na pasta android
 Write-Host "[1/5] Verificando estrutura..." -ForegroundColor Yellow
 if (Test-Path "$MobileDir\android") {
-    Write-Host "   Projeto Android já existe [OK]" -ForegroundColor Green
+    Write-Host "   Projeto Android ja existe [OK]" -ForegroundColor Green
 }
 else {
     Write-Host "   Gerando projeto Android..." -ForegroundColor Yellow
@@ -156,48 +167,52 @@ else {
 # ETAPA 2: Ir para pasta android
 Write-Host "[2/5] Indo para pasta Android..." -ForegroundColor Yellow
 Set-Location "$MobileDir\android"
-Write-Host "   Diretório: $(Get-Location)" -ForegroundColor Gray
+Write-Host "   Diretorio: $(Get-Location)" -ForegroundColor Gray
 
-# ETAPA 3: Verificar licenças Android
-Write-Host "[3/5] Verificando licenças Android SDK..." -ForegroundColor Yellow
+# ETAPA 3: Verificar licencas Android
+Write-Host "[3/5] Verificando licencas Android SDK..." -ForegroundColor Yellow
 if (Test-Path "$env:LOCALAPPDATA\Android\Sdk") {
     Write-Host "   SDK Android encontrado [OK]" -ForegroundColor Green
     
-    # Tentar aceitar licenças automaticamente
+    # Tentar aceitar licencas automaticamente
     $sdkManager = "$env:LOCALAPPDATA\Android\Sdk\tools\bin\sdkmanager.bat"
     if (Test-Path $sdkManager) {
-        Write-Host "   Verificando licenças..." -ForegroundColor Gray
+        Write-Host "   Verificando licencas..." -ForegroundColor Gray
         cmd /c "echo y | $sdkManager --licenses" 2>&1 | Out-Null
     }
 }
 
 # ETAPA 4: LIMPAR CACHE GRADLE (com timeout)
-Write-Host "[4/5] Limpando cache Gradle..." -ForegroundColor Yellow
-$cleanCode, $cleanOutput = Invoke-CommandWithTimeout -Command ".\gradlew clean" -TimeoutSeconds 300
+Write-Host "[4/5] Limpando cache Gradle... (Pular)" -ForegroundColor Yellow
+# $Gradlew = (Get-Item "gradlew.bat").FullName
+# $cleanCode, $cleanOutput = Invoke-CommandWithTimeout -Command "& '$Gradlew' clean" -TimeoutSeconds 300
 
 if ($cleanCode -eq 0) {
     Write-Host "   Cache limpo [OK]" -ForegroundColor Green
 }
 elseif ($cleanCode -eq 999) {
-    Write-Host "   ⚠️  Timeout no clean, continuando..." -ForegroundColor Yellow
+    Write-Host "   TIMEOUT no clean, continuando..." -ForegroundColor Yellow
 }
 else {
-    Write-Host "   ⚠️  Problemas ao limpar cache (código: $cleanCode)" -ForegroundColor Yellow
+    Write-Host "   Problemas ao limpar cache (codigo: $cleanCode)" -ForegroundColor Yellow
 }
 
 # ETAPA 5: BUILD APK RELEASE (com timeout de 15 minutos)
 Write-Host "[5/5] Construindo APK Release (timeout: 15min)..." -ForegroundColor Cyan
 Write-Host "   Aguarde, isso pode demorar..." -ForegroundColor Gray
-Write-Host "   Saída em tempo real:" -ForegroundColor Gray
+Write-Host "   Saida em tempo real:" -ForegroundColor Gray
 Write-Host "   ------------------------------------------------------------" -ForegroundColor DarkGray
 
 $buildStart = Get-Date
 
-# Tentar diferentes métodos de build
+$env:NODE_ENV = "production"
+$env:BABEL_ENV = "production"
+
+# Tentar diferentes metodos de build
 $buildMethods = @(
-    @{Command = ".\gradlew assembleRelease --no-daemon --stacktrace"; Name = "Release padrão" },
-    @{Command = ".\gradlew assembleRelease --no-daemon -x lint -x test"; Name = "Release sem lint/test" },
-    @{Command = ".\gradlew assembleDebug --stacktrace"; Name = "Debug para diagnóstico" }
+    @{Command = "& '$Gradlew' assembleRelease --no-daemon --stacktrace"; Name = "Release padrao" },
+    @{Command = "& '$Gradlew' assembleRelease --no-daemon -x lint -x test"; Name = "Release sem lint/test" },
+    @{Command = "& '$Gradlew' assembleDebug --stacktrace"; Name = "Debug para diagnostico" }
 )
 
 $buildSuccess = $false
@@ -215,29 +230,29 @@ foreach ($method in $buildMethods) {
     if ($buildCode -eq 0) {
         $buildTime = (Get-Date) - $buildStart
         $timeStr = "{0:mm}:{0:ss}" -f $buildTime
-        Write-Host "   ✅ BUILD CONCLUÍDO [OK] ($timeStr)" -ForegroundColor Green
+        Write-Host "   BUILD CONCLUIDO [OK] ($timeStr)" -ForegroundColor Green
         $buildSuccess = $true
         break
     }
     elseif ($buildCode -eq 999) {
-        Write-Host "   ⏰ TIMEOUT no build" -ForegroundColor Red
+        Write-Host "   TIMEOUT no build" -ForegroundColor Red
         $lastError = "Timeout de 15 minutos"
     }
     else {
-        Write-Host "   ❌ BUILD FALHOU (código: $buildCode)" -ForegroundColor Red
+        Write-Host "   BUILD FALHOU (codigo: $buildCode)" -ForegroundColor Red
         
-        # Extrair últimos erros
+        # Extrair ultimos erros
         $errorLines = $buildOutput -split "`n" | Select-Object -Last 10
         $lastError = ($errorLines -join "`n").Trim()
     }
     
-    Write-Host "   Tentando próximo método em 5 segundos..." -ForegroundColor Yellow
+    Write-Host "   Tentando proximo metodo em 5 segundos..." -ForegroundColor Yellow
     Start-Sleep -Seconds 5
 }
 
 # =========== PROCESSAR RESULTADO ===========
 Write-Host ""
-Write-Host "═" * 60 -ForegroundColor DarkGray
+Write-Host "=======" -ForegroundColor DarkGray
 
 if ($buildSuccess) {
     # Encontrar APK gerado
@@ -256,7 +271,7 @@ if ($buildSuccess) {
     }
     
     if ($apkFile) {
-        # Voltar para raiz e criar distribuição
+        # Voltar para raiz e criar distribuicao
         Set-Location ..\..\..
         
         if (-not (Test-Path $DistDir)) {
@@ -270,46 +285,46 @@ if ($buildSuccess) {
         # Criar version.json
         $versionContent = @{
             apkUrl  = $ApkName
-            build   = "157"
-            version = "1.4.37"
+            build   = "168"
+            version = "1.4.48"
             force   = $true
         } | ConvertTo-Json
         
         $versionContent | Out-File -FilePath "$DistDir\version.json" -Encoding UTF8
         
-        Write-Host "✅ SUCESSO TOTAL!" -ForegroundColor Green
+        Write-Host "SUCESSO TOTAL!" -ForegroundColor Green
         Write-Host "APK: $DistDir\$ApkName ($fileSize MB)" -ForegroundColor White
         Write-Host "Tipo: $apkType" -ForegroundColor White
         
         # Abrir pasta
-        explorer $DistDir
+        # explorer $DistDir
     }
     else {
-        Write-Host "⚠️  BUILD OK mas APK não encontrado" -ForegroundColor Yellow
+        Write-Host "BUILD OK mas APK nao encontrado" -ForegroundColor Yellow
         Write-Host "Verifique em: $(Get-Location)\app\build\outputs\apk\" -ForegroundColor Gray
     }
 }
 else {
-    Write-Host "❌ FALHA NO BUILD" -ForegroundColor Red
+    Write-Host "FALHA NO BUILD" -ForegroundColor Red
     
     if ($lastError) {
-        Write-Host "Últimos erros:" -ForegroundColor Red
+        Write-Host "Ultimos erros:" -ForegroundColor Red
         Write-Host $lastError -ForegroundColor Gray
     }
     
     Write-Host ""
-    Write-Host "🔧 SOLUÇÃO DE PROBLEMAS:" -ForegroundColor Yellow
+    Write-Host "SOLUCAO DE PROBLEMAS:" -ForegroundColor Yellow
     Write-Host "1. Execute manualmente para ver erro completo:" -ForegroundColor Gray
     Write-Host "   cd apps\mobile\android" -ForegroundColor White
     Write-Host "   .\gradlew assembleDebug --stacktrace" -ForegroundColor White
     Write-Host ""
-    Write-Host "2. Verifique memória do Gradle:" -ForegroundColor Gray
+    Write-Host "2. Verifique memoria do Gradle:" -ForegroundColor Gray
     Write-Host "   Crie arquivo gradle.properties com:" -ForegroundColor White
     Write-Host "   org.gradle.jvmargs=-Xmx4096m" -ForegroundColor White
     Write-Host ""
-    Write-Host "3. Verifique espaço em disco (>5GB livre)" -ForegroundColor Gray
+    Write-Host "3. Verifique espaco em disco (>5GB livre)" -ForegroundColor Gray
 }
 
 Write-Host ""
-Write-Host "Script concluído!" -ForegroundColor Gray
-Read-Host "Pressione Enter para sair"
+Write-Host "Script concluido!" -ForegroundColor Gray
+# Read-Host "Pressione Enter para sair"
