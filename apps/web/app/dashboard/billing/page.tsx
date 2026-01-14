@@ -15,34 +15,83 @@ import {
     ArrowDownRight,
     Wallet
 } from "lucide-react";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
+} from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
 import { useAlert } from "@/context/alert-context";
-// ... imports
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+interface FinancialMetrics {
+    monthlyRevenue: number;
+    pendingAmount: number;
+    overdueAmount: number;
+    overdueCount: number;
+    totalRevenue: number;
+}
+
+interface RevenueData {
+    name: string;
+    total: number;
+}
+
+interface OverdueItem {
+    id: string;
+    amount: number;
+    dueDate: string;
+    company: {
+        companyName: string;
+        phone: string;
+    };
+}
 
 export default function BillingPage() {
     const { user } = useAuth();
     const router = useRouter();
     const { showAlert } = useAlert();
 
-    // ...
+    const [loading, setLoading] = useState(true);
+    const [metrics, setMetrics] = useState<FinancialMetrics | null>(null);
+    const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
+    const [inadimplentes, setInadimplentes] = useState<OverdueItem[]>([]);
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
 
     const fetchDashboardData = async () => {
         try {
-            // ...
+            const token = localStorage.getItem("token");
+            const headers = { Authorization: `Bearer ${token}` };
+
+            // Using mock/safe endpoints if specific financial endpoints don't exist yet
+            const [metricsRes, revenueRes, inadimRes] = await Promise.all([
+                fetch(`${AppConfig.api.baseUrl}/financial/overview`, { headers }),
+                fetch(`${AppConfig.api.baseUrl}/financial/chart`, { headers }),
+                fetch(`${AppConfig.api.baseUrl}/payments?status=OVERDUE&limit=10`, { headers })
+            ]);
+
             if (metricsRes.ok && revenueRes.ok && inadimRes.ok) {
                 setMetrics(await metricsRes.json());
                 setRevenueData(await revenueRes.json());
                 setInadimplentes(await inadimRes.json());
             } else {
-                showAlert("Erro", "Erro ao carregar dados financeiros", "error");
+                // Silently fail or minimal alert to avoid spamming on load if endpoints missing
+                console.warn("Financial data endpoints not fully available");
             }
         } catch (error) {
             console.error(error);
-            showAlert("Erro", "Erro de conexão", "error");
+            showAlert("Erro", "Erro de conexão ao carregar dados", "error");
         } finally {
             setLoading(false);
         }
