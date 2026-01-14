@@ -14,10 +14,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 
 export default function DailyClosesPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [closes, setCloses] = useState<any[]>([])
     const [cambistas, setCambistas] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
@@ -67,13 +68,13 @@ export default function DailyClosesPage() {
             if (res.ok) {
                 const data = await res.json()
                 setCloses(data)
-                if (data.length === 0) toast.info("Nenhum fechamento encontrado no período.")
+                if (data.length === 0) showAlert("Aviso", "Nenhum fechamento encontrado no período.", "info")
             } else {
-                toast.error("Erro ao carregar fechamentos")
+                showAlert("Erro", "Erro ao carregar fechamentos", "error")
             }
         } catch (err) {
             console.error(err)
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
         } finally {
             setLoading(false)
         }
@@ -97,10 +98,10 @@ export default function DailyClosesPage() {
                 const data = await res.json()
                 setDetailSummary(data)
             } else {
-                toast.error("Erro ao carregar detalhes do caixa")
+                showAlert("Erro", "Erro ao carregar detalhes do caixa", "error")
             }
         } catch (err) {
-            toast.error("Erro de conexão ao buscar detalhes")
+            showAlert("Erro", "Erro de conexão ao buscar detalhes", "error")
         } finally {
             setLoadingDetail(false)
         }
@@ -118,13 +119,13 @@ export default function DailyClosesPage() {
                 body: JSON.stringify({ status })
             })
             if (res.ok) {
-                toast.success(status === 'VERIFIED' ? "Caixa conferido e liberado!" : "Fechamento rejeitado.")
+                showAlert("Sucesso!", status === 'VERIFIED' ? "Caixa conferido e liberado!" : "Fechamento rejeitado.", "success")
                 fetchCloses()
             } else {
-                toast.error("Erro ao verificar caixa")
+                showAlert("Erro", "Erro ao verificar caixa", "error")
             }
         } catch (err) {
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
         }
     }
 

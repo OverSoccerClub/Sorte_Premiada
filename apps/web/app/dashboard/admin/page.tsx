@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
@@ -11,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { API_URL } from "@/lib/api"
 import { CreateCompanyDialog } from "@/components/admin/create-company-dialog"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 
 interface CompanySummary {
     id: string
@@ -26,6 +24,7 @@ interface CompanySummary {
 
 export default function AdminDashboardPage() {
     const { user, loading: authLoading } = useAuth()
+    const { showAlert } = useAlert()
     const router = useRouter()
     const [companies, setCompanies] = useState<CompanySummary[]>([])
     const [isLoading, setIsLoading] = useState(false)
@@ -33,7 +32,7 @@ export default function AdminDashboardPage() {
 
     useEffect(() => {
         if (!authLoading && user?.role !== 'MASTER') {
-            toast.error("Acesso negado. Apenas Master Admin.")
+            showAlert("Erro!", "Acesso negado. Apenas Master Admin.", "error")
             router.replace("/dashboard")
         }
     }, [user, authLoading, router])
@@ -49,11 +48,11 @@ export default function AdminDashboardPage() {
                 const data = await res.json()
                 setCompanies(data)
             } else {
-                toast.error("Erro ao carregar empresas")
+                showAlert("Erro!", "Erro ao carregar empresas", "error")
             }
         } catch (error) {
             console.error(error)
-            toast.error("Erro de conexão")
+            showAlert("Erro!", "Erro de conexão", "error")
         } finally {
             setIsLoading(false)
         }

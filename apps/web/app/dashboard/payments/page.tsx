@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DollarSign, Loader2, CheckCircle, XCircle, Clock, AlertTriangle, Filter, MoreVertical, Trash2, Edit, Save, ExternalLink } from "lucide-react";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
-import { toast } from "sonner";
+
+import { useAlert } from "@/context/alert-context";
 import {
     Select,
     SelectContent,
@@ -50,6 +51,7 @@ interface Payment {
 export default function PaymentsPage() {
     const router = useRouter();
     const { user } = useAuth();
+    const { showAlert } = useAlert();
     const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<string>("all");
@@ -97,7 +99,7 @@ export default function PaymentsPage() {
                 setPayments(data);
             }
         } catch (error) {
-            toast.error("Erro ao carregar pagamentos");
+            showAlert("Erro", "Erro ao carregar pagamentos", "error");
         } finally {
             setLoading(false);
         }
@@ -125,71 +127,87 @@ export default function PaymentsPage() {
             );
 
             if (response.ok) {
-                toast.success("Pagamento marcado como pago!");
+                showAlert("Sucesso!", "Pagamento marcado como pago!", "success");
                 setMarkPaidDialog(false);
                 setPaymentMethod("");
                 setTransactionId("");
                 fetchPayments();
             } else {
-                toast.error("Erro ao marcar pagamento");
+                showAlert("Erro", "Erro ao marcar pagamento", "error");
             }
         } catch (error) {
-            toast.error("Erro ao processar");
+            showAlert("Erro", "Erro ao processar", "error");
         } finally {
             setProcessing(false);
         }
     };
 
     const handleCancelPayment = async (paymentId: string) => {
-        if (!confirm("Tem certeza que deseja cancelar este pagamento?")) return;
+        showAlert(
+            "Confirmar Cancelamento",
+            "Tem certeza que deseja cancelar este pagamento?",
+            "warning",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(
+                        `${AppConfig.api.baseUrl}/payments/${paymentId}/mark-overdue`,
+                        {
+                            method: "PUT",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
 
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(
-                `${AppConfig.api.baseUrl}/payments/${paymentId}/mark-overdue`,
-                {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    if (response.ok) {
+                        showAlert("Sucesso!", "Pagamento cancelado!", "success");
+                        fetchPayments();
+                    } else {
+                        showAlert("Erro", "Erro ao cancelar pagamento", "error");
+                    }
+                } catch (error) {
+                    showAlert("Erro", "Erro ao processar", "error");
                 }
-            );
-
-            if (response.ok) {
-                toast.success("Pagamento cancelado!");
-                fetchPayments();
-            } else {
-                toast.error("Erro ao cancelar pagamento");
-            }
-        } catch (error) {
-            toast.error("Erro ao processar");
-        }
+            },
+            "Sim, cancelar",
+            "Não"
+        );
     };
 
     const handleDeletePayment = async (paymentId: string) => {
-        if (!confirm("Tem certeza que deseja EXCLUIR este pagamento? Esta ação não pode ser desfeita!")) return;
+        showAlert(
+            "Excluir Pagamento",
+            "Tem certeza que deseja EXCLUIR este pagamento? Esta ação não pode ser desfeita!",
+            "error",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(
+                        `${AppConfig.api.baseUrl}/payments/${paymentId}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
 
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(
-                `${AppConfig.api.baseUrl}/payments/${paymentId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    if (response.ok) {
+                        showAlert("Sucesso!", "Pagamento excluído!", "success");
+                        fetchPayments();
+                    } else {
+                        showAlert("Erro", "Erro ao excluir pagamento", "error");
+                    }
+                } catch (error) {
+                    showAlert("Erro", "Erro ao processar", "error");
                 }
-            );
-
-            if (response.ok) {
-                toast.success("Pagamento excluído!");
-                fetchPayments();
-            } else {
-                toast.error("Erro ao excluir pagamento");
-            }
-        } catch (error) {
-            toast.error("Erro ao processar");
-        }
+            },
+            "Sim, excluir",
+            "Cancelar"
+        );
     };
 
     const handleEditClick = (payment: Payment) => {
@@ -231,14 +249,14 @@ export default function PaymentsPage() {
             );
 
             if (response.ok) {
-                toast.success("Pagamento atualizado!");
+                showAlert("Sucesso!", "Pagamento atualizado!", "success");
                 setEditPaymentDialog(false);
                 fetchPayments();
             } else {
-                toast.error("Erro ao atualizar pagamento");
+                showAlert("Erro", "Erro ao atualizar pagamento", "error");
             }
         } catch (error) {
-            toast.error("Erro ao processar");
+            showAlert("Erro", "Erro ao processar", "error");
         } finally {
             setProcessing(false);
         }

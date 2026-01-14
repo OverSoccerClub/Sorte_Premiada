@@ -8,7 +8,7 @@ import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Pa
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { API_URL } from "@/lib/api"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { GameFormDialog } from "@/components/games/game-form-dialog"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { DisplayConfigDialog } from "@/components/games/display-dialog"
@@ -42,6 +42,7 @@ interface Game {
 
 export default function GamesPage() {
     const { user } = useAuth()
+    const { showAlert } = useAlert()
     const activeCompanyId = useActiveCompanyId()
     const [games, setGames] = useState<Game[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -77,7 +78,7 @@ export default function GamesPage() {
             setGames(data)
         } catch (error) {
             console.error(error)
-            toast.error("Erro ao carregar jogos")
+            showAlert("Erro!", "Erro ao carregar jogos", "error")
         } finally {
             setIsLoading(false)
         }
@@ -126,13 +127,13 @@ export default function GamesPage() {
             })
 
             if (res.ok) {
-                toast.success(game.isActive ? "Jogo desativado" : "Jogo ativado")
+                showAlert("Sucesso!", game.isActive ? "Jogo desativado" : "Jogo ativado", "success")
                 fetchGames()
             } else {
-                toast.error("Erro ao alterar status")
+                showAlert("Erro!", "Erro ao alterar status", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         }
     }
 
@@ -154,14 +155,14 @@ export default function GamesPage() {
             })
 
             if (res.ok) {
-                toast.success("Preço atualizado")
+                showAlert("Sucesso!", "Preço atualizado", "success")
                 setEditingPriceId(null)
                 fetchGames()
             } else {
-                toast.error("Erro ao atualizar")
+                showAlert("Erro!", "Erro ao atualizar", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         }
     }
 

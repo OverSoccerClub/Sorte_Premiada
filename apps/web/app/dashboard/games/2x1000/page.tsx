@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TicketDetails } from "@/components/dashboard/tickets/TicketDetails"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 import { DrawSimulator } from "@/components/draw/DrawSimulator"
 import {
@@ -33,6 +33,7 @@ import {
 } from "lucide-react"
 
 export default function TwoXOneThousandReportPage() {
+    const { showAlert } = useAlert()
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [gameId, setGameId] = useState<string | null>(null)
@@ -113,7 +114,7 @@ export default function TwoXOneThousandReportPage() {
                 })
             }
         } catch (e) {
-            toast.error("Erro ao carregar vendas")
+            showAlert("Erro!", "Erro ao carregar vendas", "error")
         } finally {
             setLoading(false)
         }
@@ -168,12 +169,12 @@ export default function TwoXOneThousandReportPage() {
                 const data = await res.json()
                 setSelectedTicketResult(data)
             } else {
-                toast.error("Erro ao carregar detalhes do bilhete")
+                showAlert("Erro!", "Erro ao carregar detalhes do bilhete", "error")
                 setDetailsOpen(false)
             }
         } catch (error) {
             console.error(error)
-            toast.error("Erro ao conectar com o servidor")
+            showAlert("Erro!", "Erro ao conectar com o servidor", "error")
             setDetailsOpen(false)
         } finally {
             setDetailsLoading(false)

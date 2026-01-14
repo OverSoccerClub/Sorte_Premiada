@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Activity, DollarSign, Save, Hash, Ticket } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface RulesDialogProps {
@@ -17,6 +17,7 @@ interface RulesDialogProps {
 }
 
 export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialogProps) {
+    const { showAlert } = useAlert()
     const [rulesValues, setRulesValues] = useState({
         globalCheck: false,
         restrictedMode: false,
@@ -101,14 +102,14 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
             })
 
             if (res.ok) {
-                toast.success("Regras atualizadas com sucesso")
+                showAlert("Sucesso!", "Regras atualizadas com sucesso", "success")
                 onSuccess()
                 onOpenChange(false)
             } else {
-                toast.error("Erro ao salvar regras")
+                showAlert("Erro!", "Erro ao salvar regras", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }

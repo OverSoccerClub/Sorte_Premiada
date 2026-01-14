@@ -15,13 +15,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
 export default function RelatoriosPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [cambistas, setCambistas] = useState<any[]>([])
     const [games, setGames] = useState<any[]>([])
     const [tickets, setTickets] = useState<any[]>([])
@@ -53,11 +54,11 @@ export default function RelatoriosPage() {
                 const data = await res.json()
                 setCambistas(data)
             } else {
-                toast.error(`Erro ao buscar cambistas: ${res.status}`)
+                showAlert("Erro", `Erro ao buscar cambistas: ${res.status}`, "error")
             }
         } catch (error: any) {
             console.error(error)
-            toast.error("Erro de conexão na busca")
+            showAlert("Erro", "Erro de conexão na busca", "error")
         }
     }
 
@@ -118,14 +119,14 @@ export default function RelatoriosPage() {
                 setGranularSummary(data.granularSummary || [])
                 setTotalPages(data.totalPages || 1)
                 if ((data.tickets?.length || 0) === 0 && (resetPage ? 1 : page) === 1) {
-                    toast.info("Nenhuma venda encontrada no período.")
+                    showAlert("Aviso", "Nenhuma venda encontrada no período.", "info")
                 }
             } else {
-                toast.error("Erro ao buscar relatório")
+                showAlert("Erro", "Erro ao buscar relatório", "error")
             }
         } catch (error) {
             console.error(error)
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
         } finally {
             setLoading(false)
         }
@@ -415,7 +416,7 @@ export default function RelatoriosPage() {
                                                                     'LOST': 'Expirado',
                                                                     'CANCELLED': 'Cancelado',
                                                                     'EXPIRED': 'Expirado'
-                                                                }[ticket.status] || ticket.status}
+                                                                }[ticket.status as string] || ticket.status}
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell className="text-right font-medium text-emerald-600">

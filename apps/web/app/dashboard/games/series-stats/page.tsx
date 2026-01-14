@@ -6,7 +6,7 @@ import { useActiveCompanyId } from "@/context/use-active-company"
 import { SeriesStatsCard } from "@/components/dashboard/series-stats-card"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, BarChart3 } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 
 interface SeriesStats {
     seriesNumber: number;
@@ -28,6 +28,7 @@ interface GameSeriesStats {
 }
 
 export default function GameSeriesStatsPage() {
+    const { showAlert } = useAlert()
     const activeCompanyId = useActiveCompanyId()
     const [stats, setStats] = useState<GameSeriesStats | null>(null)
     const [loading, setLoading] = useState(true)
@@ -54,12 +55,12 @@ export default function GameSeriesStatsPage() {
                     if (game2x1000) {
                         setGameId(game2x1000.id)
                     } else {
-                        toast.error("Jogo 2x1000 não encontrado")
+                        showAlert("Erro!", "Jogo 2x1000 não encontrado", "error")
                     }
                 }
             } catch (error) {
                 console.error("Error fetching games:", error)
-                toast.error("Erro ao carregar jogos")
+                showAlert("Erro!", "Erro ao carregar jogos", "error")
             }
         }
 
@@ -123,15 +124,15 @@ export default function GameSeriesStatsPage() {
             });
 
             if (res.ok) {
-                toast.success(newStatus ? "Praça ativada com sucesso!" : "Praça pausada com sucesso!");
+                showAlert("Sucesso!", newStatus ? "Praça ativada com sucesso!" : "Praça pausada com sucesso!", "success");
                 fetchStats(); // Refresh to ensure sync
             } else {
-                toast.error("Erro ao atualizar status da praça.");
+                showAlert("Erro!", "Erro ao atualizar status da praça.", "error");
                 fetchStats(); // Revert on error
             }
         } catch (error) {
             console.error("Error toggling status:", error);
-            toast.error("Erro de conexão.");
+            showAlert("Erro!", "Erro de conexão.", "error");
             fetchStats(); // Revert on error
         }
     }

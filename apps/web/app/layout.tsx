@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google"; // Premium modern font
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 import { AlertProvider } from "@/context/alert-context";
 import { AuthProvider } from "@/context/auth-context";
 import { CompanyProvider } from "@/context/company-context";
@@ -34,7 +33,6 @@ export default function RootLayout({
           <CompanyProvider>
             <AlertProvider>
               {children}
-              <Toaster />
             </AlertProvider>
           </CompanyProvider>
         </AuthProvider>

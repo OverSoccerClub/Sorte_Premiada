@@ -6,7 +6,6 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { DollarSign, Users, Ticket, TrendingUp, ArrowUpRight, User, Calendar, LayoutDashboard, Trophy, Medal, Star, Search, Filter, Hash, BarChart3, PieChart as PieChartIcon, Activity, Wallet, Percent } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -356,7 +355,7 @@ export default function DashboardPage() {
                                     />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                                        formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+                                        formatter={(value: number | undefined) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0)}
                                     />
                                     <Bar dataKey="amount" radius={[0, 4, 4, 0]} barSize={25}>
                                         {(stats.revenueByGame || []).map((entry, index) => (

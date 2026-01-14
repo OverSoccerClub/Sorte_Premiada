@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { API_URL } from "@/lib/api"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { Loader2, Save } from "lucide-react"
 
 import { useActiveCompanyId } from "@/context/use-active-company"
@@ -17,6 +17,7 @@ interface GameFormDialogProps {
 }
 
 export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: GameFormDialogProps) {
+    const { showAlert } = useAlert()
     const activeCompanyId = useActiveCompanyId()
     const [name, setName] = useState("")
     const [price, setPrice] = useState("5.00")
@@ -66,12 +67,12 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
 
             if (!response.ok) throw new Error("Erro ao salvar jogo")
 
-            toast.success(gameToEdit ? "Jogo atualizado!" : "Jogo criado com sucesso!")
+            showAlert("Sucesso!", gameToEdit ? "Jogo atualizado!" : "Jogo criado com sucesso!", "success")
             onSuccess()
             onOpenChange(false)
         } catch (error) {
             console.error(error)
-            toast.error("Falha ao salvar. Verifique os dados.")
+            showAlert("Erro!", "Falha ao salvar. Verifique os dados.", "error")
         } finally {
             setIsLoading(false)
         }

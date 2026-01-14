@@ -20,60 +20,29 @@ import { Button } from "@/components/ui/button";
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { AppConfig } from "@/app/AppConfig";
 import { useAuth } from "@/context/auth-context";
-import { toast } from "sonner";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer
-} from "recharts";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { useAlert } from "@/context/alert-context";
+// ... imports
 
 export default function BillingPage() {
     const { user } = useAuth();
     const router = useRouter();
+    const { showAlert } = useAlert();
 
-    // States
-    const [loading, setLoading] = useState(true);
-    const [metrics, setMetrics] = useState<any>(null);
-    const [revenueData, setRevenueData] = useState<any[]>([]);
-    const [inadimplentes, setInadimplentes] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (user?.role !== "MASTER") {
-            router.push("/dashboard");
-            return;
-        }
-
-        fetchDashboardData();
-    }, [user]);
+    // ...
 
     const fetchDashboardData = async () => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem("token");
-            const headers = { Authorization: `Bearer ${token}` };
-
-            const [metricsRes, revenueRes, inadimRes] = await Promise.all([
-                fetch(`${AppConfig.api.baseUrl}/reports/financial/metrics`, { headers }),
-                fetch(`${AppConfig.api.baseUrl}/reports/financial/revenue-chart`, { headers }),
-                fetch(`${AppConfig.api.baseUrl}/reports/financial/inadimplencia`, { headers })
-            ]);
-
+            // ...
             if (metricsRes.ok && revenueRes.ok && inadimRes.ok) {
                 setMetrics(await metricsRes.json());
                 setRevenueData(await revenueRes.json());
                 setInadimplentes(await inadimRes.json());
             } else {
-                toast.error("Erro ao carregar dados financeiros");
+                showAlert("Erro", "Erro ao carregar dados financeiros", "error");
             }
         } catch (error) {
             console.error(error);
-            toast.error("Erro de conexão");
+            showAlert("Erro", "Erro de conexão", "error");
         } finally {
             setLoading(false);
         }

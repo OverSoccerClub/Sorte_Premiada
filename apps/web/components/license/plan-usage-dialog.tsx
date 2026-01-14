@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Check, AlertCircle, TrendingUp, Smartphone, Users, Ticket, Gamepad2, ArrowRight } from "lucide-react"
 import { licenseService, UsageReport } from "@/services/license.service"
 import { plansService, Plan } from "@/services/plans.service"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { useCompany } from "@/context/company-context"
 import { formatCurrency } from "@/lib/utils"
 
@@ -27,6 +27,7 @@ interface PlanUsageDialogProps {
 }
 
 export function PlanUsageDialog({ trigger, open: controlledOpen, onOpenChange }: PlanUsageDialogProps) {
+    const { showAlert } = useAlert()
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [usage, setUsage] = useState<UsageReport | null>(null)
@@ -57,9 +58,7 @@ export function PlanUsageDialog({ trigger, open: controlledOpen, onOpenChange }:
             const allPlans = await plansService.getAll()
             setPlans(allPlans.filter(p => p.isActive))
         } catch (error) {
-            toast.error("Erro ao carregar dados", {
-                description: "Não foi possível carregar as informações do plano."
-            })
+            showAlert("Erro ao carregar dados", "Não foi possível carregar as informações do plano.", "error")
         } finally {
             setLoading(false)
         }
@@ -69,15 +68,11 @@ export function PlanUsageDialog({ trigger, open: controlledOpen, onOpenChange }:
         setLoading(true)
         try {
             await licenseService.requestUpgrade(plan.id)
-            toast.success("Upgrade realizado com sucesso!", {
-                description: `Seu plano foi atualizado para ${plan.name}.`,
-            })
+            showAlert("Upgrade realizado com sucesso!", `Seu plano foi atualizado para ${plan.name}.`, "success")
             await refreshSettings()
             handleOpenChange(false)
         } catch (error: any) {
-            toast.error("Erro no upgrade", {
-                description: error.message || "Não foi possível realizar o upgrade."
-            })
+            showAlert("Erro no upgrade", error.message || "Não foi possível realizar o upgrade.", "error")
         } finally {
             setLoading(false)
         }

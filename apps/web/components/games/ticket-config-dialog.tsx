@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Save, Hash } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface TicketConfigDialogProps {
@@ -16,6 +16,7 @@ interface TicketConfigDialogProps {
 }
 
 export function TicketConfigDialog({ open, onOpenChange, game, onSuccess }: TicketConfigDialogProps) {
+    const { showAlert } = useAlert()
     const [config, setConfig] = useState({
         ticketNumberingMode: "RANDOM",
         maxTicketsPerSeries: "2500"
@@ -52,14 +53,14 @@ export function TicketConfigDialog({ open, onOpenChange, game, onSuccess }: Tick
             })
 
             if (res.ok) {
-                toast.success("Configuração de bilhetes atualizada")
+                showAlert("Sucesso!", "Configuração de bilhetes atualizada", "success")
                 onSuccess()
                 onOpenChange(false)
             } else {
-                toast.error("Erro ao salvar configuração")
+                showAlert("Erro!", "Erro ao salvar configuração", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }

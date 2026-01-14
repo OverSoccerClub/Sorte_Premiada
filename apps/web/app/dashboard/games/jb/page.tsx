@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 import { Loader2, Calendar, Search, Filter, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, Tag, LayoutDashboard } from "lucide-react"
 
 export default function JogoDoBichoReportPage() {
+    const { showAlert } = useAlert()
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [gameId, setGameId] = useState<string | null>(null)
@@ -85,7 +86,7 @@ export default function JogoDoBichoReportPage() {
                 })
             }
         } catch (e) {
-            toast.error("Erro ao carregar vendas")
+            showAlert("Erro!", "Erro ao carregar vendas", "error")
         } finally {
             setLoading(false)
         }

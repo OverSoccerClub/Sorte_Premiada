@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Ticket, Save, Banknote, Gamepad2, Dices, PawPrint, Trophy, Star, Diamond, Info } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface DisplayConfigDialogProps {
@@ -38,6 +38,7 @@ const colorOptions = [
 ]
 
 export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: DisplayConfigDialogProps) {
+    const { showAlert } = useAlert()
     const [displayValues, setDisplayValues] = useState({ name: "", displayName: "", iconName: "", colorClass: "" })
     const [saving, setSaving] = useState(false)
 
@@ -75,14 +76,14 @@ export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: Dis
             })
 
             if (res.ok) {
-                toast.success("Configuração atualizada com sucesso")
+                showAlert("Sucesso!", "Configuração atualizada com sucesso", "success")
                 onSuccess()
                 onOpenChange(false)
             } else {
-                toast.error("Erro ao salvar configuração")
+                showAlert("Erro!", "Erro ao salvar configuração", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }

@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { AlertTriangle, TrendingDown, TrendingUp, BarChart3, Filter, Calendar, Activity, ShieldAlert, BadgeInfo } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,7 @@ interface Game {
 }
 
 export default function RiskPage() {
+    const { showAlert } = useAlert()
     const activeCompanyId = useActiveCompanyId()
     const [games, setGames] = useState<Game[]>([])
     const [selectedGame, setSelectedGame] = useState<string>("")
@@ -76,7 +77,7 @@ export default function RiskPage() {
                     setReport(data)
                 }
             } catch (error) {
-                toast.error("Erro ao carregar mapa de risco")
+                showAlert("Erro!", "Erro ao carregar mapa de risco", "error")
             } finally {
                 setLoading(false)
             }
@@ -218,7 +219,7 @@ export default function RiskPage() {
                                         />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                                            formatter={(val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)}
+                                            formatter={(val: number | undefined) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0)}
                                         />
                                         <Bar dataKey="liability" radius={[4, 4, 0, 0]} barSize={40}>
                                             {report.slice(0, 10).map((entry, index) => (

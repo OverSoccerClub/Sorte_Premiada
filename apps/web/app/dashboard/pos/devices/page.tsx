@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AppConfig } from "../../../AppConfig";
 import { StandardCardHeader } from "@/components/standard-card-header";
-import { toast } from "sonner";
 import { useActiveCompanyId } from "@/context/use-active-company";
+import { useAlert } from "@/context/alert-context";
 
 interface PosDevice {
     id: string;
@@ -44,6 +44,7 @@ interface PosDevice {
 
 export default function DeviceManagementPage() {
     const activeCompanyId = useActiveCompanyId();
+    const { showAlert } = useAlert();
     const [devices, setDevices] = useState<PosDevice[]>([]);
     const [loading, setLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -72,7 +73,7 @@ export default function DeviceManagementPage() {
             }
             const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
 
-            const response = await fetch(`${AppConfig.API_BASE_URL}/devices${queryString}`, {
+            const response = await fetch(`${AppConfig.api.baseUrl}/devices${queryString}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -84,7 +85,7 @@ export default function DeviceManagementPage() {
             }
         } catch (error) {
             console.error("Erro ao buscar dispositivos:", error);
-            toast.error("Não foi possível carregar os dispositivos");
+            showAlert("Erro", "Não foi possível carregar os dispositivos", "error");
         } finally {
             setLoading(false);
         }
@@ -92,7 +93,7 @@ export default function DeviceManagementPage() {
 
     const handleGenerateCode = async () => {
         if (!deviceName.trim()) {
-            toast.error("Por favor, informe o nome do dispositivo");
+            showAlert("Atenção", "Por favor, informe o nome do dispositivo", "warning");
             return;
         }
 
@@ -123,14 +124,14 @@ export default function DeviceManagementPage() {
                 setDeviceName("");
                 setDeviceDescription("");
                 fetchDevices(); // Atualizar lista
-                toast.success("Código de ativação gerado com sucesso!");
+                showAlert("Sucesso", "Código de ativação gerado com sucesso!", "success");
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Não foi possível gerar o código");
+                showAlert("Erro", error.message || "Não foi possível gerar o código", "error");
             }
         } catch (error) {
             console.error("Erro ao gerar código:", error);
-            toast.error("Erro ao gerar código de ativação");
+            showAlert("Erro", "Erro ao gerar código de ativação", "error");
         } finally {
             setIsGenerating(false);
         }
@@ -140,7 +141,7 @@ export default function DeviceManagementPage() {
         if (generatedCode) {
             navigator.clipboard.writeText(generatedCode.code);
             setCopiedCode(true);
-            toast.success("Código copiado para a área de transferência");
+            showAlert("Copiado!", "Código copiado para a área de transferência", "success");
             setTimeout(() => setCopiedCode(false), 2000);
         }
     };
@@ -157,14 +158,14 @@ export default function DeviceManagementPage() {
             });
 
             if (response.ok) {
-                toast.success(`Dispositivo ${currentStatus ? "desativado" : "reativado"} com sucesso!`);
+                showAlert("Sucesso", `Dispositivo ${currentStatus ? "desativado" : "reativado"} com sucesso!`, "success");
                 fetchDevices();
             } else {
-                toast.error("Não foi possível alterar o status do dispositivo");
+                showAlert("Erro", "Não foi possível alterar o status do dispositivo", "error");
             }
         } catch (error) {
             console.error("Erro ao alterar status:", error);
-            toast.error("Erro ao alterar status do dispositivo");
+            showAlert("Erro", "Erro ao alterar status do dispositivo", "error");
         }
     };
 

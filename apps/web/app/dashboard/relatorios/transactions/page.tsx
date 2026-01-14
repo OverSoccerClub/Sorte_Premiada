@@ -7,18 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Download } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
 export default function TransactionsExportPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
 
     const exportCsv = () => {
         const token = localStorage.getItem("token")
         if (!token) {
-            toast.error("Usuário não autenticado")
+            showAlert("Erro", "Usuário não autenticado", "error")
             return
         }
         const startStr = new Date(startDate + 'T00:00:00').toISOString()

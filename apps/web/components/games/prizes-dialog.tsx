@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Save } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface PrizesDialogProps {
@@ -15,6 +15,7 @@ interface PrizesDialogProps {
 }
 
 export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDialogProps) {
+    const { showAlert } = useAlert()
     const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
     const [saving, setSaving] = useState(false)
 
@@ -50,14 +51,14 @@ export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDial
             })
 
             if (res.ok) {
-                toast.success("Premiação atualizada com sucesso")
+                showAlert("Sucesso!", "Premiação atualizada com sucesso", "success")
                 onSuccess()
                 onOpenChange(false)
             } else {
-                toast.error("Erro ao salvar premiação")
+                showAlert("Erro!", "Erro ao salvar premiação", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }

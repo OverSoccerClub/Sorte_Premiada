@@ -9,15 +9,16 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { toast } from "sonner"
 import { API_URL } from "@/lib/api"
 import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag, Ticket } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { useAlert } from "@/context/alert-context"
 
 export default function DrawsSettingsPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [games, setGames] = useState<any[]>([])
     const [selectedGameId, setSelectedGameId] = useState<string>("")
     const [draws, setDraws] = useState<any[]>([])
@@ -48,11 +49,11 @@ export default function DrawsSettingsPage() {
                 const data = await res.json()
                 setDrawDetails(data)
             } else {
-                toast.error("Erro ao carregar detalhes")
+                showAlert("Erro", "Erro ao carregar detalhes", "error")
                 setDetailModalOpen(false)
             }
         } catch (error) {
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
             setDetailModalOpen(false)
         }
     }
@@ -92,7 +93,7 @@ export default function DrawsSettingsPage() {
                     setSelectedGameId(data[0].id)
                 }
             }
-        } catch (e) { toast.error("Erro ao carregar jogos") }
+        } catch (e) { showAlert("Erro", "Erro ao carregar jogos", "error") }
     }
 
     const fetchDraws = async (gameId: string) => {
@@ -103,7 +104,7 @@ export default function DrawsSettingsPage() {
                 headers: { Authorization: `Bearer ${token}` }
             })
             if (res.ok) setDraws(await res.json())
-        } catch (e) { toast.error("Erro ao carregar sorteios") }
+        } catch (e) { showAlert("Erro", "Erro ao carregar sorteios", "error") }
         finally { setLoading(false) }
     }
 
@@ -152,30 +153,39 @@ export default function DrawsSettingsPage() {
             })
 
             if (res.ok) {
-                toast.success(selectedDraw ? "Sorteio atualizado!" : "Sorteio agendado!")
+                showAlert("Sucesso", selectedDraw ? "Sorteio atualizado!" : "Sorteio agendado!", "success")
                 setModalOpen(false)
                 fetchDraws(selectedGameId)
             } else {
-                toast.error("Erro ao salvar sorteio")
+                showAlert("Erro", "Erro ao salvar sorteio", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }
     }
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Tem certeza que deseja excluir?")) return
-        try {
-            const token = localStorage.getItem("token")
-            await fetch(`${API_URL}/draws/${id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            fetchDraws(selectedGameId)
-            toast.success("Sorteio excluído")
-        } catch (e) { toast.error("Erro ao excluir") }
+    const handleDelete = async (id: string, drawDate: string) => {
+        showAlert(
+            "Confirmar Exclusão",
+            `Tem certeza que deseja excluir o sorteio de ${new Date(drawDate).toLocaleString('pt-BR')}?`,
+            "error",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token")
+                    await fetch(`${API_URL}/draws/${id}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                    fetchDraws(selectedGameId)
+                    showAlert("Sucesso", "Sorteio excluído", "success")
+                } catch (e) { showAlert("Erro", "Erro ao excluir", "error") }
+            },
+            "Sim, excluir",
+            "Cancelar"
+        )
     }
 
     return (
@@ -301,7 +311,7 @@ export default function DrawsSettingsPage() {
                                                         <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200" onClick={() => handleOpenModal(draw)}>
                                                             <SquarePen className="w-4 h-4" />
                                                         </Button>
-                                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleDelete(draw.id)}>
+                                                        <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => handleDelete(draw.id, draw.drawDate)}>
                                                             <Trash2 className="w-4 h-4" />
                                                         </Button>
                                                     </TableCell>

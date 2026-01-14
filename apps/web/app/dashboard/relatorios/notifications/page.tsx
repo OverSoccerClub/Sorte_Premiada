@@ -10,10 +10,11 @@ import { useActiveCompanyId } from "@/context/use-active-company"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 
 export default function NotificationsReportPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [logs, setLogs] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -30,13 +31,13 @@ export default function NotificationsReportPage() {
             if (res.ok) {
                 const data = await res.json()
                 setLogs(data)
-                if (data.length === 0) toast.info("Nenhum log de notificação encontrado.")
+                if (data.length === 0) showAlert("Aviso", "Nenhum log de notificação encontrado.", "info")
             } else {
-                toast.error("Erro ao carregar logs de notificação")
+                showAlert("Erro", "Erro ao carregar logs de notificação", "error")
             }
         } catch (err) {
             console.error(err)
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
         } finally {
             setLoading(false)
         }

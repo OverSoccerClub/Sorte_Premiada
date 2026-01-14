@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { toast } from "sonner"
 import { useAlert } from "@/context/alert-context"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
@@ -70,19 +69,19 @@ export default function CashConferencePage() {
                     return r === "CAMBISTA";
                 })
                 if (cambistasOnly.length === 0) {
-                    toast.warning(`Nenhum cambista encontrado. Total de usuários: ${data.length}`)
+                    showAlert("Aviso", `Nenhum cambista encontrado. Total de usuários: ${data.length}`, "warning")
                 }
                 setCambistas(cambistasOnly)
             }
         } catch (error) {
             console.error(error)
-            toast.error("Erro ao carregar lista de cambistas")
+            showAlert("Erro", "Erro ao carregar lista de cambistas", "error")
         }
     }
 
     const handleSearch = async () => {
         if (!selectedCambista) {
-            toast.warning("Selecione um cambista para gerar o relatório")
+            showAlert("Atenção", "Selecione um cambista para gerar o relatório", "warning")
             return
         }
 
@@ -100,14 +99,14 @@ export default function CashConferencePage() {
                 const data = await res.json()
                 setSummary(data)
                 if (data.transactions.length === 0) {
-                    toast.info("Nenhuma movimentação encontrada na data selecionada.")
+                    showAlert("Informação", "Nenhuma movimentação encontrada na data selecionada.", "info")
                 }
             } else {
-                toast.error("Erro ao buscar conferência de caixa")
+                showAlert("Erro", "Erro ao buscar conferência de caixa", "error")
             }
         } catch (error) {
             console.error(error)
-            toast.error("Erro de conexão")
+            showAlert("Erro", "Erro de conexão", "error")
         } finally {
             setLoading(false)
         }
@@ -151,19 +150,27 @@ export default function CashConferencePage() {
                         },
                         body
                     })
-                    hideAlert()
+                    hideAlert() // Hide confirmation alert
 
                     if (res.ok) {
-                        toast.success("O caixa foi fechado com sucesso e as vendas liberadas!")
+                        // Show success alert after operation
+                        setTimeout(() => {
+                            showAlert("Sucesso!", "O caixa foi fechado com sucesso e as vendas liberadas!", "success")
+                        }, 300)
+
                         handleSearch()
                         // Also update the cambista list to reflect the new status
                         fetchCambistas()
                     } else {
                         const err = await res.text()
-                        toast.error(`Falha ao processar: ${err}`)
+                        setTimeout(() => {
+                            showAlert("Erro", `Falha ao processar: ${err}`, "error")
+                        }, 300)
                     }
                 } catch (e) {
-                    toast.error("Não foi possível conectar ao servidor.")
+                    setTimeout(() => {
+                        showAlert("Erro", "Não foi possível conectar ao servidor.", "error")
+                    }, 300)
                 }
             },
             isPending ? "Confirmar Liberação" : "Confirmar Fechamento",

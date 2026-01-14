@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { useAlert } from "@/context/alert-context";
 import {
     Dialog,
     DialogContent,
@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { plansService, Plan, CreatePlanData } from "@/services/plans.service";
 
 export default function PlansPage() {
+    const { showAlert } = useAlert();
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function PlansPage() {
             setPlans(data);
         } catch (error: any) {
             console.error('Error fetching plans:', error);
-            toast.error(error.message || "Erro ao carregar planos.");
+            showAlert("Erro!", error.message || "Erro ao carregar planos.", "error");
         } finally {
             setLoading(false);
         }
@@ -71,11 +72,11 @@ export default function PlansPage() {
             if (editingPlan) {
                 console.log('Updating plan:', editingPlan.id);
                 await plansService.update(editingPlan.id, payload);
-                toast.success("Plano atualizado com sucesso!");
+                showAlert("Sucesso!", "Plano atualizado com sucesso!", "success");
             } else {
                 console.log('Creating new plan');
                 await plansService.create(payload);
-                toast.success("Plano criado com sucesso!");
+                showAlert("Sucesso!", "Plano criado com sucesso!", "success");
             }
             setIsDialogOpen(false);
             fetchPlans();
@@ -84,7 +85,7 @@ export default function PlansPage() {
         } catch (error: any) {
             console.error('Error saving plan:', error);
             const errorMessage = error.response?.data?.message || error.message || "Erro ao salvar plano.";
-            toast.error(errorMessage);
+            showAlert("Erro!", errorMessage, "error");
         }
     };
 
@@ -117,19 +118,26 @@ export default function PlansPage() {
 
     const confirmDelete = (plan: Plan) => {
         setPlanToDelete(plan);
-        setIsDeleteDialogOpen(true);
+        showAlert(
+            "Confirmar Exclusão?",
+            `Deseja realmente remover o plano "${plan.name}"? Esta ação não pode ser desfeita.`,
+            "warning",
+            true,
+            () => {
+                handleDelete(plan.id);
+            },
+            "Excluir",
+            "Cancelar"
+        );
     };
 
-    const handleDelete = async () => {
-        if (!planToDelete) return;
+    const handleDelete = async (id: string) => {
         try {
-            await plansService.delete(planToDelete.id);
-            toast.success("Plano removido com sucesso!");
-            setIsDeleteDialogOpen(false);
-            setPlanToDelete(null);
+            await plansService.delete(id);
+            showAlert("Sucesso!", "Plano removido com sucesso!", "success");
             fetchPlans();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Erro ao remover plano.");
+            showAlert("Erro!", error.response?.data?.message || "Erro ao remover plano.", "error");
         }
     };
 

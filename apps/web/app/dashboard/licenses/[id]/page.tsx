@@ -15,12 +15,13 @@ import { useAuth } from "@/context/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import { useAlert } from "@/context/alert-context";
 
 export default function LicenseDetailsPage() {
     const router = useRouter();
     const params = useParams();
     const { user } = useAuth(); // Removido token, vamos usar localStorage
+    const { showAlert } = useAlert();
     const companyId = params.id as string;
 
     const [loading, setLoading] = useState(true);
@@ -120,14 +121,14 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success("Empresa ativada com sucesso!");
+                showAlert("Sucesso!", "Empresa ativada com sucesso!", "success");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao ativar empresa");
+                showAlert("Erro!", error.message || "Erro ao ativar empresa", "error");
             }
         } catch (error) {
-            toast.error("Erro ao ativar empresa");
+            showAlert("Erro!", "Erro ao ativar empresa", "error");
         } finally {
             setSaving(false);
         }
@@ -135,7 +136,7 @@ export default function LicenseDetailsPage() {
 
     const handleSuspend = async () => {
         if (!suspendReason.trim()) {
-            toast.error("Motivo da suspensão é obrigatório");
+            showAlert("Atenção!", "Motivo da suspensão é obrigatório", "warning");
             return;
         }
 
@@ -152,15 +153,15 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success("Empresa suspensa com sucesso!");
+                showAlert("Sucesso!", "Empresa suspensa com sucesso!", "success");
                 setSuspendReason("");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao suspender empresa");
+                showAlert("Erro!", error.message || "Erro ao suspender empresa", "error");
             }
         } catch (error) {
-            toast.error("Erro ao suspender empresa");
+            showAlert("Erro!", "Erro ao suspender empresa", "error");
         } finally {
             setSaving(false);
         }
@@ -168,7 +169,7 @@ export default function LicenseDetailsPage() {
 
     const handleRenew = async () => {
         if (renewMonths < 1) {
-            toast.error("Número de meses inválido");
+            showAlert("Atenção!", "Número de meses inválido", "warning");
             return;
         }
 
@@ -185,14 +186,14 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success(`Licença renovada por ${renewMonths} mês(es)!`);
+                showAlert("Sucesso!", `Licença renovada por ${renewMonths} mês(es)!`, "success");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao renovar licença");
+                showAlert("Erro!", error.message || "Erro ao renovar licença", "error");
             }
         } catch (error) {
-            toast.error("Erro ao renovar licença");
+            showAlert("Erro!", "Erro ao renovar licença", "error");
         } finally {
             setSaving(false);
         }
@@ -212,14 +213,14 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success("Limites atualizados com sucesso!");
+                showAlert("Sucesso!", "Limites atualizados com sucesso!", "success");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao atualizar limites");
+                showAlert("Erro!", error.message || "Erro ao atualizar limites", "error");
             }
         } catch (error) {
-            toast.error("Erro ao atualizar limites");
+            showAlert("Erro!", "Erro ao atualizar limites", "error");
         } finally {
             setSaving(false);
         }
@@ -227,7 +228,7 @@ export default function LicenseDetailsPage() {
 
     const handleSetTrial = async () => {
         if (trialDays < 1) {
-            toast.error("Número de dias inválido");
+            showAlert("Atenção!", "Número de dias inválido", "warning");
             return;
         }
 
@@ -244,14 +245,14 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success(`Período de teste configurado para ${trialDays} dia(s)!`);
+                showAlert("Sucesso!", `Período de teste configurado para ${trialDays} dia(s)!`, "success");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao configurar período de teste");
+                showAlert("Erro!", error.message || "Erro ao configurar período de teste", "error");
             }
         } catch (error) {
-            toast.error("Erro ao configurar período de teste");
+            showAlert("Erro!", "Erro ao configurar período de teste", "error");
         } finally {
             setSaving(false);
         }
@@ -259,7 +260,7 @@ export default function LicenseDetailsPage() {
 
     const handleChangePlan = async () => {
         if (!selectedPlanId) {
-            toast.error("Selecione um plano");
+            showAlert("Atenção!", "Selecione um plano", "warning");
             return;
         }
 
@@ -274,15 +275,15 @@ export default function LicenseDetailsPage() {
             });
 
             if (response.ok) {
-                toast.success("Plano aplicado com sucesso!");
+                showAlert("Sucesso!", "Plano aplicado com sucesso!", "success");
                 setSelectedPlanId("");
                 fetchLicenseDetails();
             } else {
                 const error = await response.json();
-                toast.error(error.message || "Erro ao aplicar plano");
+                showAlert("Erro!", error.message || "Erro ao aplicar plano", "error");
             }
         } catch (error) {
-            toast.error("Erro ao alterar plano");
+            showAlert("Erro!", "Erro ao alterar plano", "error");
         } finally {
             setSaving(false);
         }

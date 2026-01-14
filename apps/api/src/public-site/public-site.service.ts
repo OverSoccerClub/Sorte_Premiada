@@ -42,7 +42,8 @@ export class PublicSiteService {
         });
 
         // Formata os dados para o frontend
-        return draws.map(draw => ({
+        // Reverte o array para exibir em ordem cronológica (Antigo -> Novo) da esquerda para a direita
+        return draws.reverse().map(draw => ({
             id: draw.id,
             game: draw.game.displayName || draw.game.name,
             date: this.formatDate(draw.drawDate),

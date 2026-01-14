@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 import { Loader2, Calendar, Trophy, Trash2, Eye, Plus, User, MapPin, Hash, DollarSign } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
@@ -17,6 +17,7 @@ import { useActiveCompanyId } from "@/context/use-active-company"
 
 export default function SecondChancePage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [games, setGames] = useState<any[]>([])
     const [draws, setDraws] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
@@ -59,7 +60,7 @@ export default function SecondChancePage() {
                 const data = await res.json()
                 setGames(data.filter((g: any) => g.secondChanceEnabled))
             }
-        } catch (e) { toast.error("Erro ao carregar jogos") }
+        } catch (e) { showAlert("Erro!", "Erro ao carregar jogos", "error") }
     }
 
     const fetchDraws = async () => {
@@ -73,7 +74,7 @@ export default function SecondChancePage() {
                 headers: { Authorization: `Bearer ${token}` }
             })
             if (res.ok) setDraws(await res.json())
-        } catch (e) { toast.error("Erro ao carregar históricos") }
+        } catch (e) { showAlert("Erro!", "Erro ao carregar históricos", "error") }
         finally { setLoading(false) }
     }
 
@@ -93,10 +94,10 @@ export default function SecondChancePage() {
             if (res.ok) {
                 setWinners(await res.json())
             } else {
-                toast.error("Erro ao carregar ganhadores")
+                showAlert("Erro!", "Erro ao carregar ganhadores", "error")
             }
         } catch (error) {
-            toast.error("Erro de conexão")
+            showAlert("Erro!", "Erro de conexão", "error")
         } finally {
             setLoadingDetails(false)
         }
@@ -118,10 +119,10 @@ export default function SecondChancePage() {
             if (res.ok) {
                 setParticipants(await res.json())
             } else {
-                toast.error("Erro ao carregar participantes")
+                showAlert("Erro!", "Erro ao carregar participantes", "error")
             }
         } catch (error) {
-            toast.error("Erro de conexão")
+            showAlert("Erro!", "Erro de conexão", "error")
         } finally {
             setLoadingDetails(false)
         }
@@ -129,7 +130,7 @@ export default function SecondChancePage() {
 
     const handleSave = async () => {
         if (!selectedGameId || !winningNumber || !prizeAmount) {
-            toast.error("Preencha todos os campos")
+            showAlert("Atenção!", "Preencha todos os campos", "warning")
             return
         }
 
@@ -154,7 +155,7 @@ export default function SecondChancePage() {
             })
 
             if (res.ok) {
-                toast.success("Sorteio registrado e ganhadores processados!")
+                showAlert("Sucesso!", "Sorteio registrado e ganhadores processados!", "success")
                 setModalOpen(false)
                 fetchDraws()
                 // Reset form
@@ -162,29 +163,30 @@ export default function SecondChancePage() {
                 setPrizeAmount("")
             } else {
                 const err = await res.json()
-                toast.error(err.message || "Erro ao salvar sorteio")
+                showAlert("Erro!", err.message || "Erro ao salvar sorteio", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Tem certeza que deseja excluir este registro? (Isso não estornará os créditos já lançados)")) return
-        try {
-            const token = localStorage.getItem("token")
-            let url = `${API_URL}/second-chance-draws/${id}`
-            if (activeCompanyId) url += `?targetCompanyId=${activeCompanyId}`
+        showAlert("Atenção!", "Tem certeza que deseja excluir este registro? (Isso não estornará os créditos já lançados)", "warning", true, async () => {
+            try {
+                const token = localStorage.getItem("token")
+                let url = `${API_URL}/second-chance-draws/${id}`
+                if (activeCompanyId) url += `?targetCompanyId=${activeCompanyId}`
 
-            await fetch(url, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            fetchDraws()
-            toast.success("Registro removido")
-        } catch (e) { toast.error("Erro ao excluir") }
+                await fetch(url, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                fetchDraws()
+                showAlert("Sucesso!", "Registro removido", "success")
+            } catch (e) { showAlert("Erro!", "Erro ao excluir", "error") }
+        })
     }
 
     return (

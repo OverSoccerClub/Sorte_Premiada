@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Save, Building2, User } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface CreateCompanyDialogProps {
@@ -14,6 +14,7 @@ interface CreateCompanyDialogProps {
 }
 
 export function CreateCompanyDialog({ open, onOpenChange, onSuccess }: CreateCompanyDialogProps) {
+    const { showAlert } = useAlert()
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
         // Company
@@ -53,7 +54,7 @@ export function CreateCompanyDialog({ open, onOpenChange, onSuccess }: CreateCom
                 throw new Error(data.message || "Erro ao criar empresa")
             }
 
-            toast.success("Empresa criada com sucesso!")
+            showAlert("Sucesso!", "Empresa criada com sucesso!", "success")
             onSuccess()
             onOpenChange(false)
             setFormData({
@@ -68,7 +69,7 @@ export function CreateCompanyDialog({ open, onOpenChange, onSuccess }: CreateCom
             })
         } catch (error: any) {
             console.error(error)
-            toast.error(error.message || "Falha ao criar empresa.")
+            showAlert("Erro!", error.message || "Falha ao criar empresa.", "error")
         } finally {
             setIsLoading(false)
         }

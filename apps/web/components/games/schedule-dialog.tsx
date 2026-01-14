@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Plus, Clock, Trash2, Save } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
 
 interface ScheduleDialogProps {
@@ -15,6 +15,7 @@ interface ScheduleDialogProps {
 }
 
 export function ScheduleDialog({ open, onOpenChange, game, onSuccess }: ScheduleDialogProps) {
+    const { showAlert } = useAlert()
     const [extractionTimes, setExtractionTimes] = useState<{ time: string, series: number, areaId?: string | null }[]>([])
     const [newTime, setNewTime] = useState("")
     const [newSeries, setNewSeries] = useState("")
@@ -43,7 +44,7 @@ export function ScheduleDialog({ open, onOpenChange, game, onSuccess }: Schedule
     const addTime = () => {
         if (!newTime) return
         if (extractionTimes.some(t => t.time === newTime)) {
-            toast.warning("Horário já existe")
+            showAlert("Atenção!", "Horário já existe", "warning")
             return
         }
         const sorted = [...extractionTimes, { time: newTime, series: Number(newSeries) || 0, areaId: null }].sort((a, b) => a.time.localeCompare(b.time))
@@ -88,14 +89,14 @@ export function ScheduleDialog({ open, onOpenChange, game, onSuccess }: Schedule
             })
 
             if (res.ok) {
-                toast.success("Horários atualizados com sucesso")
+                showAlert("Sucesso!", "Horários atualizados com sucesso", "success")
                 onSuccess()
                 onOpenChange(false)
             } else {
-                toast.error("Erro ao salvar horários")
+                showAlert("Erro!", "Erro ao salvar horários", "error")
             }
         } catch (e) {
-            toast.error("Erro ao salvar")
+            showAlert("Erro!", "Erro ao salvar", "error")
         } finally {
             setSaving(false)
         }

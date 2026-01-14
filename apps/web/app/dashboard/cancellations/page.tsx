@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Check, X, XCircle, RefreshCcw, AlertCircle, Clock, Search } from "lucide-react"
-import { toast } from "sonner"
+import { useAlert } from "@/context/alert-context"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -30,6 +30,7 @@ interface Ticket {
 
 export default function CancellationsPage() {
     const activeCompanyId = useActiveCompanyId()
+    const { showAlert } = useAlert()
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [history, setHistory] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
@@ -68,7 +69,7 @@ export default function CancellationsPage() {
 
         } catch (error) {
             console.error(error);
-            toast.error("Erro de conexão");
+            showAlert("Erro", "Erro de conexão", "error");
         } finally {
             setLoading(false);
         }
@@ -91,14 +92,14 @@ export default function CancellationsPage() {
             });
 
             if (res.ok) {
-                toast.success(approved ? "Cancelamento aprovado!" : "Solicitação rejeitada.");
+                showAlert("Sucesso", approved ? "Cancelamento aprovado!" : "Solicitação rejeitada.", "success");
                 fetchData();
             } else {
                 const err = await res.json();
-                toast.error(err.message || "Falha ao processar ação");
+                showAlert("Erro", err.message || "Falha ao processar ação", "error");
             }
         } catch (error) {
-            toast.error("Erro de conexão");
+            showAlert("Erro", "Erro de conexão", "error");
         }
     };
 

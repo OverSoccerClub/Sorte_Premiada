@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Smartphone, Plus, Copy, Check, Power, PowerOff, Calendar, Tag, RotateCw, MapPin, Search, User, Cpu, Radio, Trash2, AlertTriangle } from "lucide-react";
@@ -12,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppConfig } from "../../AppConfig";
 import { StandardPageHeader } from "@/components/standard-page-header";
 import { StandardPagination } from "@/components/standard-pagination";
-import { toast } from "sonner";
 import { useActiveCompanyId } from "@/context/use-active-company";
 import { useCompany } from "@/context/company-context";
 import { useAuth } from "@/context/auth-context";
+import { useAlert } from "@/context/alert-context";
 
 interface PosDevice {
     id: string;
@@ -48,6 +46,7 @@ export default function PosManagementPage() {
     const activeCompanyId = useActiveCompanyId();
     const { user } = useAuth();
     const { settings } = useCompany();
+    const { showAlert } = useAlert();
     const [devices, setDevices] = useState<PosDevice[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ONLINE' | 'ACTIVE' | 'PENDING'>('ALL');
@@ -69,7 +68,6 @@ export default function PosManagementPage() {
     const [copiedCode, setCopiedCode] = useState(false);
     const [deviceName, setDeviceName] = useState("");
     const [deviceDescription, setDeviceDescription] = useState("");
-    const [deviceToDelete, setDeviceToDelete] = useState<PosDevice | null>(null);
 
     const [tick, setTick] = useState(0);
 
@@ -149,13 +147,13 @@ export default function PosManagementPage() {
                 setDeviceName("");
                 setDeviceDescription("");
                 fetchDevices();
-                toast.success("Código gerado com sucesso!");
+                showAlert("Sucesso", "Código gerado com sucesso!", "success");
             } else {
-                toast.error("Erro ao gerar código");
+                showAlert("Erro", "Erro ao gerar código", "error");
             }
         } catch (e) {
             console.error("Failed to generate code", e);
-            toast.error("Erro ao gerar código");
+            showAlert("Erro", "Erro ao gerar código", "error");
         } finally {
             setIsGenerating(false);
         }
@@ -165,7 +163,7 @@ export default function PosManagementPage() {
         if (generatedCode) {
             navigator.clipboard.writeText(generatedCode.activationCode);
             setCopiedCode(true);
-            toast.success("Código copiado!");
+            showAlert("Copiado!", "Código copiado para a área de transferência.", "success");
             setTimeout(() => setCopiedCode(false), 2000);
         }
     };
@@ -184,40 +182,47 @@ export default function PosManagementPage() {
             });
 
             if (res.ok) {
-                toast.success(isActive ? "Dispositivo desativado" : "Dispositivo reativado");
+                showAlert("Sucesso", isActive ? "Dispositivo desativado" : "Dispositivo reativado", "success");
                 fetchDevices();
             } else {
-                toast.error("Erro ao alterar status do dispositivo");
+                showAlert("Erro", "Erro ao alterar status do dispositivo", "error");
             }
         } catch (e) {
             console.error("Failed to toggle device", e);
-            toast.error("Erro ao alterar status");
+            showAlert("Erro", "Erro ao alterar status", "error");
         }
     };
 
-    const handleDeleteDevice = async () => {
-        if (!deviceToDelete) return;
+    const handleDeleteDevice = (device: PosDevice) => {
+        showAlert(
+            "Confirmar Exclusão",
+            `Tem certeza que deseja excluir o dispositivo ${device.name}? Esta ação é irreversível e removerá o histórico e configurações deste terminal.`,
+            "error",
+            true,
+            async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const res = await fetch(`${AppConfig.api.baseUrl}/devices/${device.id}`, {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
 
-        try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${AppConfig.api.baseUrl}/devices/${deviceToDelete.id}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`
+                    if (res.ok) {
+                        showAlert("Sucesso", "Dispositivo excluído com sucesso", "success");
+                        fetchDevices();
+                    } else {
+                        showAlert("Erro", "Erro ao excluir dispositivo", "error");
+                    }
+                } catch (e) {
+                    console.error("Failed to delete device", e);
+                    showAlert("Erro", "Erro ao excluir", "error");
                 }
-            });
-
-            if (res.ok) {
-                toast.success("Dispositivo excluído com sucesso");
-                fetchDevices();
-                setDeviceToDelete(null);
-            } else {
-                toast.error("Erro ao excluir dispositivo");
-            }
-        } catch (e) {
-            console.error("Failed to delete device", e);
-            toast.error("Erro ao excluir");
-        }
+            },
+            "Sim, excluir",
+            "Cancelar"
+        );
     };
 
     const filteredDevices = devices.filter(d => {
@@ -443,7 +448,7 @@ export default function PosManagementPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                            onClick={() => setDeviceToDelete(device)}
+                                                            onClick={() => handleDeleteDevice(device)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
@@ -573,7 +578,7 @@ export default function PosManagementPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                            onClick={() => setDeviceToDelete(device)}
+                                                            onClick={() => handleDeleteDevice(device)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
@@ -662,32 +667,6 @@ export default function PosManagementPage() {
                             </div>
                         </div>
                     )}
-                </DialogContent>
-            </Dialog>
-
-            {/* Delete Confirmation Modal */}
-            <Dialog open={!!deviceToDelete} onOpenChange={(open) => !open && setDeviceToDelete(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 text-destructive">
-                            <AlertTriangle className="h-5 w-5" />
-                            Confirmar Exclusão
-                        </DialogTitle>
-                        <DialogDescription>
-                            Tem certeza que deseja excluir o dispositivo <strong>{deviceToDelete?.name}</strong>?
-                            <br />
-                            <br />
-                            Esta ação é irreversível e removerá o histórico e configurações deste terminal.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDeviceToDelete(null)}>
-                            Cancelar
-                        </Button>
-                        <Button variant="destructive" onClick={handleDeleteDevice}>
-                            Excluir Dispositivo
-                        </Button>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
