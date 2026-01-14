@@ -68,7 +68,7 @@ export class TicketsService {
         // === AUTOMATIC SERIES CONTROL ===
         // Fetch area with series control fields
         let seriesNumber: string | null = null;
-        let areaToUpdate: { id: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean } | null = null;
+        let areaToUpdate: { id: string; name: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean; warningThreshold: number; notifyOnWarning: boolean } | null = null;
 
         if (user?.areaId) {
             areaToUpdate = await this.prisma.client.area.findUnique({
@@ -102,8 +102,8 @@ export class TicketsService {
                     areaToUpdate.ticketsInSeries = 0;
                 } else {
                     // Check Warning Threshold
-                    const threshold = (areaToUpdate as any).warningThreshold || 80;
-                    const notify = (areaToUpdate as any).notifyOnWarning ?? true;
+                    const threshold = areaToUpdate.warningThreshold || 80;
+                    const notify = areaToUpdate.notifyOnWarning ?? true;
 
                     const saturation = (areaToUpdate.ticketsInSeries / areaToUpdate.maxTicketsPerSeries) * 100;
 
