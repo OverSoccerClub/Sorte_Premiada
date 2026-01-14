@@ -42,7 +42,13 @@ export class UsersController {
         }
 
         // Extrair areaId e username se vier no body
-        const { areaId, username, companyId: _cid, ...restDto } = createUserDto;
+        // Extrair campos que não devem ir no restDto (serão tratados manualmente ou filtrados pelo Prisma)
+        const { areaId, username, companyId: _cid, company: _c, ...restDto } = createUserDto;
+
+        // Limpeza extra para garantir que não haja conflito com a extensão de Tenant ou Tipos do Prisma
+        delete (restDto as any).companyId;
+        delete (restDto as any).company;
+        delete (restDto as any).areaId;
 
         // Validar e inferir Company ID a partir da Área se necessário
         if (areaId) {

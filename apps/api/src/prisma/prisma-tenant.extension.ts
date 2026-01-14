@@ -101,8 +101,11 @@ export function createTenantExtension(tenantContext: TenantContextService) {
                     const companyId = tenantContext.getCompanyId();
 
                     if (companyId && isTenantModel(model)) {
-                        // Only inject if not already provided and data is an object
-                        if (args.data && typeof args.data === 'object' && !('companyId' in args.data)) {
+                        // Injection logic: only if neither companyId nor company relation is provided
+                        const hasCompanyId = args.data && typeof args.data === 'object' && 'companyId' in args.data;
+                        const hasCompanyRelation = args.data && typeof args.data === 'object' && 'company' in args.data;
+
+                        if (args.data && typeof args.data === 'object' && !hasCompanyId && !hasCompanyRelation) {
                             args.data = {
                                 ...args.data,
                                 companyId,
