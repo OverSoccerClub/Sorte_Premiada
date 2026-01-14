@@ -4,4 +4,6 @@ export class UpdateAreaDto {
     state?: string;
     seriesNumber?: string;
     isActive?: boolean;
+    warningThreshold?: number;
+    notifyOnWarning?: boolean;
 }

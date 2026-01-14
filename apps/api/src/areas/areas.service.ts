@@ -67,4 +67,20 @@ export class AreasService {
             where: { id },
         });
     }
+
+    async cycleSeries(areaId: string) {
+        const area = await this.prisma.area.findUnique({ where: { id: areaId } });
+        if (!area) throw new Error("Praça não encontrada");
+
+        const currentSeriesNum = parseInt(area.currentSeries);
+        const newSeries = (currentSeriesNum + 1).toString().padStart(4, '0');
+
+        return this.prisma.area.update({
+            where: { id: areaId },
+            data: {
+                currentSeries: newSeries,
+                ticketsInSeries: 0
+            }
+        });
+    }
 }

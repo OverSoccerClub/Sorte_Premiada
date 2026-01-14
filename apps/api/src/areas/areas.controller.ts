@@ -62,4 +62,12 @@ export class AreasController {
     remove(@Param('id') id: string) {
         return this.areasService.remove(id);
     }
+
+    @Post(':id/cycle-series')
+    @Roles('ADMIN', 'MASTER')
+    async cycleSeries(@Param('id') id: string, @Request() req: any) {
+        // Log audit manually or in service (simplified here)
+        console.log(`[API] Manual Series Cycle for Area ${id} by User ${req.user.userId}`);
+        return this.areasService.cycleSeries(id);
+    }
 }

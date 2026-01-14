@@ -188,6 +188,11 @@ model Area {
   ticketsInSeries     Int    @default(0) // Contador de bilhetes na série atual
   maxTicketsPerSeries Int    @default(2500) // Máximo de bilhetes por série
   isActive            Boolean @default(true) // Controla se a praça está operando
+  
+  // Series Control Extensions
+  warningThreshold    Int     @default(80) // Porcentagem para aviso (ex: 80%)
+  notifyOnWarning     Boolean @default(true) // Enviar notificação ao atingir threshold
+
   users               User[]
   configs             AreaConfig[]
   posTerminals        PosTerminal[]

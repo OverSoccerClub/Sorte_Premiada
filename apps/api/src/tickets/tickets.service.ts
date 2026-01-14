@@ -4,8 +4,7 @@ import { FinanceService } from '../finance/finance.service';
 import { SecurityService } from '../security/security.service';
 import { RedisService } from '../redis/redis.service';
 import { Prisma } from '@prisma/client';
-import dayjs from 'dayjs';
-import { getBrazilTime } from '../utils/date.util';
+import { getBrazilTime, dayjs } from '../utils/date.util';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -80,7 +79,9 @@ export class TicketsService {
                     currentSeries: true,
                     ticketsInSeries: true,
                     maxTicketsPerSeries: true,
-                    isActive: true
+                    isActive: true,
+                    warningThreshold: true,
+                    notifyOnWarning: true
                 }
             });
 
@@ -99,6 +100,27 @@ export class TicketsService {
 
                     areaToUpdate.currentSeries = newSeries;
                     areaToUpdate.ticketsInSeries = 0;
+                } else {
+                    // Check Warning Threshold
+                    const threshold = (areaToUpdate as any).warningThreshold || 80;
+                    const notify = (areaToUpdate as any).notifyOnWarning ?? true;
+
+                    const saturation = (areaToUpdate.ticketsInSeries / areaToUpdate.maxTicketsPerSeries) * 100;
+
+                    if (notify && saturation >= threshold) {
+                        try {
+                            // Log/Notify about high saturation
+                            // Check if we already notified recently? Or just log for now?
+                            // Ideally, we create a NotificationLog for Master/Admin
+                            console.warn(`[SERIES WARNING] Area ${areaToUpdate.name} (${areaToUpdate.id}) series ${areaToUpdate.currentSeries} is at ${saturation.toFixed(1)}% capacity.`);
+
+                            // Create Notification via Prisma if it doesn't exist for this series/threshold combo recently?
+                            // For now, simple console log as a placeholder for the notification service hook
+                            // this.notificationsService.sendToRole('MASTER', 'Alerta de Série', `A praça ${areaToUpdate.name} atingiu ${saturation.toFixed(0)}% da série atual.`);
+                        } catch (e) {
+                            console.error("Failed to process warning", e);
+                        }
+                    }
                 }
 
                 seriesNumber = areaToUpdate.currentSeries;
@@ -1147,5 +1169,35 @@ export class TicketsService {
         }
 
         throw new Error("Unable to generate unique Second Chance number after multiple attempts.");
+    }
+    async cycleAreaSeries(areaId: string, userId: string) {
+        const area = await this.prisma.client.area.findUnique({ where: { id: areaId } });
+        if (!area) throw new BadRequestException("Praça não encontrada");
+
+        const currentSeriesNum = parseInt(area.currentSeries);
+        const newSeries = (currentSeriesNum + 1).toString().padStart(4, '0');
+
+        console.log(`[Manual Series Cycle] Area ${area.name} (${areaId}) cycled by user ${userId}. ${area.currentSeries} -> ${newSeries}`);
+
+        // Log audit
+        await this.prisma.client.auditLog.create({
+            data: {
+                action: "CYCLE_SERIES",
+                entity: "Area",
+                entityId: areaId,
+                oldValue: { series: area.currentSeries },
+                newValue: { series: newSeries },
+                userId: userId,
+                companyId: area.companyId
+            }
+        });
+
+        return this.prisma.client.area.update({
+            where: { id: areaId },
+            data: {
+                currentSeries: newSeries,
+                ticketsInSeries: 0
+            }
+        });
     }
 }
