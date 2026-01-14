@@ -180,7 +180,7 @@ function displayUpcomingDraws(draws) {
     card.innerHTML = `
             <h3 class="upcoming-game">${draw.game}</h3>
             <div class="countdown" id="${countdownId}"></div>
-            <p class="upcoming-prize">Prêmio: R$ ${formatCurrency(draw.prize)}</p>
+            <p class="upcoming-prize">👑 Prêmio: R$ ${formatCurrency(draw.prize)}</p>
         `;
 
     upcomingGrid.appendChild(card);
