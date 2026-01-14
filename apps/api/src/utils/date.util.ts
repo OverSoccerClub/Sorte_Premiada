@@ -33,7 +33,7 @@ export function toBrazilTime(date: string | Date | dayjs.Dayjs): dayjs.Dayjs {
 
     // If string is simple ISO "YYYY-MM-DDTHH:mm:ss", parse it directly in the zone
     // dayjs.tz(string, zone) tries to parse strictly in that zone logic
-    return dayjs.tz(date, BRAZIL_TZ);
+    return dayjs(date).tz(BRAZIL_TZ);
 }
 
 /**
