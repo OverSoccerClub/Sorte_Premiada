@@ -401,6 +401,9 @@ export default function HistoryScreen() {
                     alternativeLogoHeight: settings.alternativeLogoHeight,
                     alternativeQrWidth: settings.alternativeQrWidth,
                     alternativeQrHeight: settings.alternativeQrHeight,
+                    // Map for standard template compatibility
+                    qrcodeWidth: settings.alternativeQrWidth,
+                    qrcodeHeight: settings.alternativeQrHeight,
                     // Additional messages from Game Config if available (might need to fetch game details if not in ticket)
                     promptMessage: selectedTicket.game?.promptMessage,
                     mainMatchMessage: selectedTicket.game?.mainMatchMessage,
