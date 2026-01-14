@@ -42,7 +42,7 @@ export class UsersController {
         }
 
         // Extrair areaId e username se vier no body
-        const { areaId, username, ...restDto } = createUserDto;
+        const { areaId, username, companyId: _cid, ...restDto } = createUserDto;
 
         // Validar e inferir Company ID a partir da Área se necessário
         if (areaId) {
