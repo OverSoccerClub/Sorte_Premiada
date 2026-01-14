@@ -124,7 +124,7 @@ function displayResults(results) {
                 ${result.numbers.map(num => `<div class="number-ball">${num}</div>`).join('')}
             </div>
             <div class="result-prize">
-                <div class="prize-label">Prêmio</div>
+                <div class="prize-label">👑 Prêmio</div>
                 <div class="prize-amount">R$ ${formatCurrency(result.prize)}</div>
             </div>
         `;
