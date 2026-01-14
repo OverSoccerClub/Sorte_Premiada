@@ -758,7 +758,7 @@ export default function CambistasPage() {
                                                                 <SelectContent>
                                                                     {areas.map((area) => (
                                                                         <SelectItem key={area.id} value={area.id}>
-                                                                            {area.city}
+                                                                            {area.city} - {area.name}
                                                                         </SelectItem>
                                                                     ))}
                                                                 </SelectContent>
