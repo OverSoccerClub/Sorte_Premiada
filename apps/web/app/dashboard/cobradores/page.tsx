@@ -316,7 +316,7 @@ export default function CobradoresPage() {
                                 <Plus className="mr-2 h-4 w-4" /> Novo Cobrador
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] bg-popover border-border">
+                        <DialogContent className="sm:max-w-[600px] bg-popover border-border">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2 text-foreground">
                                     <div className="p-2 bg-emerald-500/10 rounded-lg">
@@ -329,195 +329,147 @@ export default function CobradoresPage() {
                                 </DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">Nome Completo</label>
-                                        <div className="relative">
-                                            <Users className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="Ex: João Silva" className="pl-9 bg-muted/50 border-input" value={name} onChange={e => setName(e.target.value)} required />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">Usuário (Login)</label>
-                                        <div className="relative">
-                                            <Wallet className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="Ex: joaosilva" className="pl-9 bg-muted/50 border-input" value={username} onChange={e => setUsername(e.target.value)} required />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">Email (Opcional)</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input type="email" placeholder="Ex: joao@email.com" className="pl-9 bg-muted/50 border-input" value={email} onChange={e => setEmail(e.target.value)} />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="max-h-[70vh] overflow-y-auto px-1 pr-2 space-y-4 custom-scrollbar">
+                                    <div className="grid grid-cols-1 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-muted-foreground">CPF</label>
-                                            <Input placeholder="000.000.000-00" className="bg-muted/50 border-input" value={cpf} onChange={e => setCpf(e.target.value)} />
+                                            <label className="text-xs font-bold text-muted-foreground">Nome Completo</label>
+                                            <div className="relative">
+                                                <Users className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input placeholder="Ex: João Silva" className="pl-9 bg-muted/50 border-input" value={name} onChange={e => setName(e.target.value)} required />
+                                            </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-muted-foreground">Telefone/WhatsApp</label>
-                                            <Input placeholder="(00) 00000-0000" className="bg-muted/50 border-input" value={phone} onChange={e => setPhone(e.target.value)} />
-                                        </div>
-                                    </div>
-
-                                    <div className="border-t border-border/50 my-2 pt-2">
-                                        <h3 className="text-sm font-semibold mb-3 text-emerald-600">Endereço</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">CEP</label>
-                                                <Input placeholder="00000-000" className="bg-muted/50 border-input" value={zipCode} onChange={e => setZipCode(e.target.value)} />
+                                            <label className="text-xs font-bold text-muted-foreground">Usuário (Login)</label>
+                                            <div className="relative">
+                                                <Wallet className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input placeholder="Ex: joaosilva" className="pl-9 bg-muted/50 border-input" value={username} onChange={e => setUsername(e.target.value)} required />
                                             </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">Cidade</label>
-                                                <Input placeholder="Cidade" className="bg-muted/50 border-input" value={city} onChange={e => setCity(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">UF</label>
-                                                <Input placeholder="UF" maxLength={2} className="bg-muted/50 border-input" value={state} onChange={e => setState(e.target.value.toUpperCase())} />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
-                                            <div className="space-y-2 sm:col-span-3">
-                                                <label className="text-xs font-bold text-muted-foreground">Rua / Logradouro</label>
-                                                <Input placeholder="Rua das Flores" className="bg-muted/50 border-input" value={address} onChange={e => setAddress(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">Número</label>
-                                                <Input placeholder="123" className="bg-muted/50 border-input" value={number} onChange={e => setNumber(e.target.value)} />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground">Bairro</label>
-                                                <Input placeholder="Centro" className="bg-muted/50 border-input" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground">Complemento</label>
-                                                <Input placeholder="Apto 101" className="bg-muted/50 border-input" value={complement} onChange={e => setComplement(e.target.value)} />
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-muted-foreground">CPF</label>
-                                            <Input placeholder="000.000.000-00" className="bg-muted/50 border-input" value={cpf} onChange={e => setCpf(e.target.value)} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-muted-foreground">Telefone/WhatsApp</label>
-                                            <Input placeholder="(00) 00000-0000" className="bg-muted/50 border-input" value={phone} onChange={e => setPhone(e.target.value)} />
+                                            <label className="text-xs font-bold text-muted-foreground">Email (Opcional)</label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input type="email" placeholder="Ex: joao@email.com" className="pl-9 bg-muted/50 border-input" value={email} onChange={e => setEmail(e.target.value)} />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="border-t border-border/50 my-2 pt-2">
-                                        <h3 className="text-sm font-semibold mb-3 text-emerald-600">Endereço</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">CEP</label>
-                                                <Input placeholder="00000-000" className="bg-muted/50 border-input" value={zipCode} onChange={e => setZipCode(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">Cidade</label>
-                                                <Input placeholder="Cidade" className="bg-muted/50 border-input" value={city} onChange={e => setCity(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">UF</label>
-                                                <Input placeholder="UF" maxLength={2} className="bg-muted/50 border-input" value={state} onChange={e => setState(e.target.value.toUpperCase())} />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
-                                            <div className="space-y-2 sm:col-span-3">
-                                                <label className="text-xs font-bold text-muted-foreground">Rua / Logradouro</label>
-                                                <Input placeholder="Rua das Flores" className="bg-muted/50 border-input" value={address} onChange={e => setAddress(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2 sm:col-span-1">
-                                                <label className="text-xs font-bold text-muted-foreground">Número</label>
-                                                <Input placeholder="123" className="bg-muted/50 border-input" value={number} onChange={e => setNumber(e.target.value)} />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground">Bairro</label>
-                                                <Input placeholder="Centro" className="bg-muted/50 border-input" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
+                                                <label className="text-xs font-bold text-muted-foreground">CPF</label>
+                                                <Input placeholder="000.000.000-00" className="bg-muted/50 border-input" value={cpf} onChange={e => setCpf(e.target.value)} />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground">Complemento</label>
-                                                <Input placeholder="Apto 101" className="bg-muted/50 border-input" value={complement} onChange={e => setComplement(e.target.value)} />
+                                                <label className="text-xs font-bold text-muted-foreground">Telefone/WhatsApp</label>
+                                                <Input placeholder="(00) 00000-0000" className="bg-muted/50 border-input" value={phone} onChange={e => setPhone(e.target.value)} />
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">{editingUser ? "Nova Senha (opcional)" : "Senha"}</label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                type={showPassword ? "text" : "password"}
-                                                placeholder={editingUser ? "Deixe em branco para manter" : "Senha de acesso"}
-                                                className="pl-9 pr-10 bg-muted/50 border-input"
-                                                value={password}
-                                                onChange={e => setPassword(e.target.value)}
-                                                required={!editingUser}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-                                                tabIndex={-1}
-                                            >
-                                                {showPassword ? (
-                                                    <EyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <Eye className="h-4 w-4" />
-                                                )}
-                                            </button>
+                                        <div className="border-t border-border/50 my-2 pt-2">
+                                            <h3 className="text-sm font-semibold mb-3 text-emerald-600">Endereço</h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                                                <div className="space-y-2 sm:col-span-1">
+                                                    <label className="text-xs font-bold text-muted-foreground">CEP</label>
+                                                    <Input placeholder="00000-000" className="bg-muted/50 border-input" value={zipCode} onChange={e => setZipCode(e.target.value)} />
+                                                </div>
+                                                <div className="space-y-2 sm:col-span-1">
+                                                    <label className="text-xs font-bold text-muted-foreground">Cidade</label>
+                                                    <Input placeholder="Cidade" className="bg-muted/50 border-input" value={city} onChange={e => setCity(e.target.value)} />
+                                                </div>
+                                                <div className="space-y-2 sm:col-span-1">
+                                                    <label className="text-xs font-bold text-muted-foreground">UF</label>
+                                                    <Input placeholder="UF" maxLength={2} className="bg-muted/50 border-input" value={state} onChange={e => setState(e.target.value.toUpperCase())} />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
+                                                <div className="space-y-2 sm:col-span-3">
+                                                    <label className="text-xs font-bold text-muted-foreground">Rua / Logradouro</label>
+                                                    <Input placeholder="Rua das Flores" className="bg-muted/50 border-input" value={address} onChange={e => setAddress(e.target.value)} />
+                                                </div>
+                                                <div className="space-y-2 sm:col-span-1">
+                                                    <label className="text-xs font-bold text-muted-foreground">Número</label>
+                                                    <Input placeholder="123" className="bg-muted/50 border-input" value={number} onChange={e => setNumber(e.target.value)} />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold text-muted-foreground">Bairro</label>
+                                                    <Input placeholder="Centro" className="bg-muted/50 border-input" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold text-muted-foreground">Complemento</label>
+                                                    <Input placeholder="Apto 101" className="bg-muted/50 border-input" value={complement} onChange={e => setComplement(e.target.value)} />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">PIN de Segurança (4 dígitos)</label>
-                                        <div className="flex items-center gap-2">
-                                            <div className="relative flex-1">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground">{editingUser ? "Nova Senha (opcional)" : "Senha"}</label>
+                                            <div className="relative">
                                                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                                 <Input
-                                                    type={showPin ? "text" : "password"}
-                                                    maxLength={4}
-                                                    placeholder="Ex: 1234"
-                                                    className="pl-9 bg-muted/50 border-input"
-                                                    value={pin}
-                                                    onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                                    required
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder={editingUser ? "Deixe em branco para manter" : "Senha de acesso"}
+                                                    className="pl-9 pr-10 bg-muted/50 border-input"
+                                                    value={password}
+                                                    onChange={e => setPassword(e.target.value)}
+                                                    required={!editingUser}
                                                 />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? (
+                                                        <EyeOff className="h-4 w-4" />
+                                                    ) : (
+                                                        <Eye className="h-4 w-4" />
+                                                    )}
+                                                </button>
                                             </div>
-                                            <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 border-input" onClick={() => setShowPin(!showPin)}>
-                                                {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </Button>
                                         </div>
-                                        <p className="text-[10px] text-muted-foreground font-medium italic">O PIN é usado para confirmar sangrias no celular do cambista.</p>
-                                    </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted-foreground">Praça (Área de Atuação)</label>
-                                        <select
-                                            className="w-full h-10 px-3 py-2 bg-muted/50 border border-input rounded-md text-sm outline-hidden focus:ring-2 focus:ring-emerald-500/20"
-                                            value={areaId}
-                                            onChange={e => setAreaId(e.target.value)}
-                                        >
-                                            <option value="">Nenhuma praça selecionada</option>
-                                            {areas.map(area => (
-                                                <option key={area.id} value={area.id}>
-                                                    {area.city} - {area.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground">PIN de Segurança (4 dígitos)</label>
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative flex-1">
+                                                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        type={showPin ? "text" : "password"}
+                                                        maxLength={4}
+                                                        placeholder="Ex: 1234"
+                                                        className="pl-9 bg-muted/50 border-input"
+                                                        value={pin}
+                                                        onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                                        required
+                                                    />
+                                                </div>
+                                                <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 border-input" onClick={() => setShowPin(!showPin)}>
+                                                    {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </Button>
+                                            </div>
+                                            <p className="text-[10px] text-muted-foreground font-medium italic">O PIN é usado para confirmar sangrias no celular do cambista.</p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground">Praça (Área de Atuação)</label>
+                                            <select
+                                                className="w-full h-10 px-3 py-2 bg-muted/50 border border-input rounded-md text-sm outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+                                                value={areaId}
+                                                onChange={e => setAreaId(e.target.value)}
+                                            >
+                                                <option value="">Nenhuma praça selecionada</option>
+                                                {areas.map(area => (
+                                                    <option key={area.id} value={area.id}>
+                                                        {area.city} - {area.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end gap-2 pt-2">
+                                <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
                                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                                         Cancelar
                                     </Button>
