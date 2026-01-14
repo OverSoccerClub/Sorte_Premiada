@@ -7,7 +7,7 @@ import { Barcode } from '../Barcode';
 
 export interface TicketData {
     gameName: string;
-    numbers: number[];
+    numbers: string[];
     price: string;
     date: string;
     ticketId: string;

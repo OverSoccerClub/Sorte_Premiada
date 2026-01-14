@@ -265,7 +265,7 @@ model Draw {
 
   gameId    String
   game      Game     @relation(fields: [gameId], references: [id])
-  numbers   Int[]
+  numbers   String[]
   drawDate  DateTime
   series    Int? // Número sequencial do sorteio
   areaId    String? // Vinculação por praça
@@ -321,7 +321,7 @@ model Ticket {
   gameType             String // e.g., "Mega Sena", "Quina"
   gameId               String?
   game                 Game?        @relation(fields: [gameId], references: [id])
-  numbers              Int[]
+  numbers              String[]
   amount               Decimal
   status               TicketStatus @default(PENDING)
   drawDate             DateTime? // For 2x500: Scheduled Draw Time

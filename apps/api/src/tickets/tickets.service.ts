@@ -227,7 +227,7 @@ export class TicketsService {
                     where: {
                         gameId: gameId,
                         drawDate: drawDate,
-                        numbers: { has: Number(num) },
+                        numbers: { has: num.toString() },
                         status: { not: 'CANCELLED' }
                     },
                     select: { possiblePrize: true }
@@ -244,7 +244,7 @@ export class TicketsService {
         // --- BUSINESS RULE 1: GLOBAL UNIQUENESS ---
         if (rules.globalCheck && drawDate && data.numbers && data.numbers.length > 0) {
             const soldSet = await this.getSoldNumbers(gameId, drawDate);
-            const conflicts = data.numbers.filter((n: number) => soldSet.has(n));
+            const conflicts = data.numbers.filter((n: string) => soldSet.has(n.toString()));
 
             if (conflicts.length > 0) {
                 throw new BadRequestException(`Números indisponíveis(Bloqueio Global): ${conflicts.join(', ')} `);
@@ -543,21 +543,22 @@ export class TicketsService {
         return createBrazilDrawDate(extractionTimes[0], tomorrowBrazil).toDate();
     }
 
-    private async validateNumbersAvailability(gameId: string, numbers: number[], drawDate: Date, series?: number) {
+    private async validateNumbersAvailability(gameId: string, numbers: string[], drawDate: Date, series?: number) {
         const soldNumbers = await this.getSoldNumbers(gameId, drawDate, series);
-        const alreadySold = numbers.filter(n => soldNumbers.has(n));
+        const alreadySold = numbers.filter(n => soldNumbers.has(n.toString()));
         if (alreadySold.length > 0) {
             throw new Error(`Numbers already sold for draw ${drawDate.toLocaleString()}: ${alreadySold.join(', ')} `);
         }
     }
 
-    private async generateRandomAvailableNumbers(gameId: string, quantity: number, drawDate: Date, series?: number): Promise<number[]> {
+    private async generateRandomAvailableNumbers(gameId: string, quantity: number, drawDate: Date, series?: number): Promise<string[]> {
         const soldNumbers = await this.getSoldNumbers(gameId, drawDate, series);
-        const available: number[] = [];
+        const available: string[] = [];
         // Pool 0000 to 9999
         for (let i = 0; i < 10000; i++) {
-            if (!soldNumbers.has(i)) {
-                available.push(i);
+            const numStr = i.toString().padStart(4, '0');
+            if (!soldNumbers.has(numStr)) {
+                available.push(numStr);
             }
         }
 
@@ -565,7 +566,7 @@ export class TicketsService {
             throw new Error(`Not enough available numbers.Only ${available.length} left.`);
         }
 
-        const selected: number[] = [];
+        const selected: string[] = [];
         for (let i = 0; i < quantity; i++) {
             const randomIndex = Math.floor(Math.random() * available.length);
             selected.push(available[randomIndex]);
@@ -643,7 +644,7 @@ export class TicketsService {
     }
 
 
-    private async getSoldNumbers(gameId: string, drawDate: Date, series?: number): Promise<Set<number>> {
+    private async getSoldNumbers(gameId: string, drawDate: Date, series?: number): Promise<Set<string>> {
         const seriesKey = series !== undefined ? `:${series}` : ':global';
         // Prefix V2 to force cache invalidation
         const cacheKey = `sold_numbers_v2:${gameId}:${drawDate.toISOString()}${seriesKey}`;
@@ -674,10 +675,10 @@ export class TicketsService {
             select: { numbers: true }
         });
 
-        const soldArr: number[] = [];
+        const soldArr: string[] = [];
         tickets.forEach((t: any) => {
             if (Array.isArray(t.numbers)) {
-                (t.numbers as number[]).forEach(n => soldArr.push(n));
+                (t.numbers as string[]).forEach(n => soldArr.push(n.toString()));
             }
         });
 
@@ -691,7 +692,7 @@ export class TicketsService {
         return new Set(soldArr);
     }
 
-    async getAvailability(gameId: string, userId?: string): Promise<number[]> {
+    async getAvailability(gameId: string, userId?: string): Promise<string[]> {
         const nextDraw = await this.getNextDrawDate(gameId);
         let series: number | undefined;
 

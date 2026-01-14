@@ -101,13 +101,13 @@ export class DrawsService {
             }
         });
 
-        const drawNumbers = new Set(draw.numbers as number[]);
+        const drawNumbers = new Set(draw.numbers as string[]);
 
         let wonCount = 0;
         let lostCount = 0;
 
         for (const ticket of tickets) {
-            const ticketNumbers = (ticket.numbers as number[]);
+            const ticketNumbers = (ticket.numbers as unknown as string[]);
 
             // "Match Any" Logic (2x1000/JB general rule)
             // If explicit rules needed per game type, add logic here.
@@ -198,7 +198,7 @@ export class DrawsService {
         });
 
         // Trigger result processing if numbers are present
-        if (updatedDraw.numbers && (updatedDraw.numbers as number[]).length > 0) {
+        if (updatedDraw.numbers && (updatedDraw.numbers as unknown as string[]).length > 0) {
             // Re-use main prisma as tx client
             await this.processDrawResults(this.prisma, updatedDraw);
         }
@@ -286,7 +286,7 @@ export class DrawsService {
         const liabilityMap: Record<string, number> = {};
 
         tickets.forEach(ticket => {
-            (ticket.numbers as number[]).forEach(num => {
+            (ticket.numbers as unknown as string[]).forEach(num => {
                 const numStr = num.toString().padStart(4, '0');
                 liabilityMap[numStr] = (liabilityMap[numStr] || 0) + Number(ticket.possiblePrize || 0);
             });

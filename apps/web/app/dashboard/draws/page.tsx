@@ -132,7 +132,7 @@ export default function DrawsSettingsPage() {
             const payload = {
                 gameId: selectedGameId,
                 drawDate: fullDate.toISOString(),
-                numbers: winningNumbers ? winningNumbers.split(',').map(n => Number(n.trim())) : []
+                numbers: winningNumbers ? winningNumbers.split(',').map(n => n.trim()) : []
             }
 
             let url = `${API_URL}/draws`
