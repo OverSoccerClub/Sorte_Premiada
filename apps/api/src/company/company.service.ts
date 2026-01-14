@@ -175,10 +175,14 @@ export class CompanyService {
             updateUrl: company.updateUrl,
             showPlanTotalValue: company.showPlanTotalValue,
             ticketTemplate: company.ticketTemplate,
-            alternativeLogoWidth: company.alternativeLogoWidth,
-            alternativeLogoHeight: company.alternativeLogoHeight,
-            alternativeQrWidth: company.alternativeQrWidth,
-            alternativeQrHeight: company.alternativeQrHeight,
+            // Standard QR Params
+            qrcodeWidth: (company as any).qrcodeWidth, // Cast to any because standard fields might not be in the minimal type if not generated recently or if dynamic
+            qrcodeHeight: (company as any).qrcodeHeight,
+            // Alternative Template Params
+            alternativeLogoWidth: (company as any).alternativeLogoWidth,
+            alternativeLogoHeight: (company as any).alternativeLogoHeight,
+            alternativeQrWidth: (company as any).alternativeQrWidth,
+            alternativeQrHeight: (company as any).alternativeQrHeight,
             plan: (company as any).plan ? {
                 name: (company as any).plan.name,
                 features: (company as any).plan.features,

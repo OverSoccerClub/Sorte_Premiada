@@ -12,6 +12,8 @@ export interface UpdateCompanySettingsDto {
     updateUrl?: string;
     showPlanTotalValue?: boolean;
     ticketTemplate?: string;
+    qrcodeWidth?: number;
+    qrcodeHeight?: number;
 
     // Alternative Template Dimensions
     alternativeLogoWidth?: number;
