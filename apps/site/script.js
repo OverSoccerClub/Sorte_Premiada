@@ -7,6 +7,7 @@ const { API_URL, COMPANY_ID, REFRESH_INTERVAL, MAX_RESULTS, MAX_UPCOMING } = win
 
 // State management
 let resultsData = [];
+let secondChanceData = [];
 let upcomingData = [];
 let countdownIntervals = [];
 
@@ -248,6 +249,7 @@ function startAutoRefresh() {
   setInterval(() => {
     console.log('Auto-refreshing data...');
     fetchResults();
+    fetchSecondChanceResults();
     fetchUpcomingDraws();
   }, REFRESH_INTERVAL);
 }
@@ -283,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetch initial data
   fetchResults();
+  fetchSecondChanceResults();
   fetchUpcomingDraws();
 
   // Start auto-refresh

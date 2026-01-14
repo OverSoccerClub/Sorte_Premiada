@@ -510,6 +510,74 @@ p {
 }
 
 /* ============================================
+   SECOND CHANCE SECTION
+   ============================================ */
+.second-chance-section {
+  background: linear-gradient(180deg, var(--color-bg-dark) 0%, #1a1033 100%);
+  position: relative;
+}
+
+.second-chance-section .section-title {
+  color: #a855f7;
+}
+
+.second-chance-section .section-title::after {
+  background: linear-gradient(135deg, #a855f7 0%, var(--color-accent-gold) 100%);
+}
+
+.second-chance-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-md);
+  max-width: 400px;
+  width: 100%;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.second-chance-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #a855f7, var(--color-accent-gold));
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+}
+
+.second-chance-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2);
+  border-color: #a855f7;
+}
+
+.second-chance-card:hover::before {
+  transform: scaleX(1);
+}
+
+.second-chance-card .result-game {
+  color: #a855f7;
+}
+
+.second-chance-card .number-ball {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  color: white;
+}
+
+.second-chance-card .result-prize {
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.second-chance-card .prize-amount {
+  color: #a855f7;
+}
+
+/* ============================================
    UPCOMING DRAWS SECTION
    ============================================ */
 .upcoming-section {

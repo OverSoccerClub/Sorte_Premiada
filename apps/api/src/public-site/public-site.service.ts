@@ -93,6 +93,42 @@ export class PublicSiteService {
     }
 
     /**
+     * Busca os últimos resultados do sorteio de Segunda Chance
+     * @param companyId ID da empresa
+     * @param limit Limite de resultados
+     */
+    async getLatestSecondChanceResults(companyId: string, limit = 5) {
+        const draws = await this.prisma.secondChanceDraw.findMany({
+            where: {
+                game: {
+                    companyId
+                }
+            },
+            include: {
+                game: {
+                    select: {
+                        name: true,
+                        displayName: true
+                    }
+                }
+            },
+            orderBy: {
+                drawDate: 'desc'
+            },
+            take: limit
+        });
+
+        return draws.map(draw => ({
+            id: draw.id,
+            game: draw.game.displayName || draw.game.name,
+            date: this.formatDate(draw.drawDate),
+            winningNumber: draw.winningNumber,
+            prize: draw.prizeAmount.toString(),
+            series: draw.series
+        }));
+    }
+
+    /**
      * Formata a data para exibição (DD/MM/YYYY às HH:mm) - Horário de Brasília
      */
     private formatDate(date: Date): string {

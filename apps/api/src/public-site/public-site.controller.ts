@@ -36,4 +36,19 @@ export class PublicSiteController {
 
         return this.publicSiteService.getUpcomingDraws(effectiveCompanyId, effectiveLimit);
     }
+
+    /**
+     * Endpoint público para buscar resultados de Segunda Chance
+     * GET /public/results/second-chance?companyId=xxx&limit=5
+     */
+    @Get('results/second-chance')
+    async getLatestSecondChanceResults(
+        @Query('companyId') companyId?: string,
+        @Query('limit') limit?: string
+    ) {
+        const effectiveCompanyId = companyId || 'default';
+        const effectiveLimit = limit ? parseInt(limit, 10) : 5;
+
+        return this.publicSiteService.getLatestSecondChanceResults(effectiveCompanyId, effectiveLimit);
+    }
 }
