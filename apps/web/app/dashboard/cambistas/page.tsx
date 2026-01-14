@@ -864,7 +864,7 @@ export default function CambistasPage() {
                                                 />
                                             </div>
 
-                                            <div className="md:col-span-12 flex justify-end">
+                                            <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormField
                                                     control={form.control}
                                                     name="canCancelTickets"
@@ -884,9 +884,7 @@ export default function CambistasPage() {
                                                         </FormItem>
                                                     )}
                                                 />
-                                            </div>
 
-                                            <div className="md:col-span-12 flex justify-end">
                                                 <FormField
                                                     control={form.control}
                                                     name="canResetActivation"

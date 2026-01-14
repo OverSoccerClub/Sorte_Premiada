@@ -7,7 +7,7 @@ import { API_URL } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet, SquarePen, Mail } from "lucide-react"
+import { Plus, Trash2, Save, X, Eye, EyeOff, Users, Search, Filter, Loader2, Lock, Wallet, SquarePen, Mail, MapPin, ShieldAlert } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -316,7 +316,7 @@ export default function CobradoresPage() {
                                 <Plus className="mr-2 h-4 w-4" /> Novo Cobrador
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px] bg-popover border-border">
+                        <DialogContent className="sm:max-w-[1200px] bg-popover border-border">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2 text-foreground">
                                     <div className="p-2 bg-emerald-500/10 rounded-lg">
@@ -328,9 +328,13 @@ export default function CobradoresPage() {
                                     {editingUser ? 'Atualize os dados do cobrador.' : 'Preencha os dados abaixo para cadastrar um cobrador.'}
                                 </DialogDescription>
                             </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="max-h-[70vh] overflow-y-auto px-1 pr-2 space-y-4 custom-scrollbar">
-                                    <div className="grid grid-cols-1 gap-4">
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {/* --- Coluna 1: Dados Pessoais --- */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-semibold text-emerald-600 flex items-center gap-2 border-b border-border/50 pb-2">
+                                            <Users className="w-4 h-4" /> Dados Pessoais
+                                        </h3>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-muted-foreground">Nome Completo</label>
                                             <div className="relative">
@@ -352,56 +356,64 @@ export default function CobradoresPage() {
                                                 <Input type="email" placeholder="Ex: joao@email.com" className="pl-9 bg-muted/50 border-input" value={email} onChange={e => setEmail(e.target.value)} />
                                             </div>
                                         </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-muted-foreground">CPF</label>
                                                 <Input placeholder="000.000.000-00" className="bg-muted/50 border-input" value={cpf} onChange={e => setCpf(e.target.value)} />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground">Telefone/WhatsApp</label>
+                                                <label className="text-xs font-bold text-muted-foreground">Telefone</label>
                                                 <Input placeholder="(00) 00000-0000" className="bg-muted/50 border-input" value={phone} onChange={e => setPhone(e.target.value)} />
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className="border-t border-border/50 my-2 pt-2">
-                                            <h3 className="text-sm font-semibold mb-3 text-emerald-600">Endereço</h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                                                <div className="space-y-2 sm:col-span-1">
-                                                    <label className="text-xs font-bold text-muted-foreground">CEP</label>
-                                                    <Input placeholder="00000-000" className="bg-muted/50 border-input" value={zipCode} onChange={e => setZipCode(e.target.value)} />
-                                                </div>
-                                                <div className="space-y-2 sm:col-span-1">
-                                                    <label className="text-xs font-bold text-muted-foreground">Cidade</label>
-                                                    <Input placeholder="Cidade" className="bg-muted/50 border-input" value={city} onChange={e => setCity(e.target.value)} />
-                                                </div>
-                                                <div className="space-y-2 sm:col-span-1">
-                                                    <label className="text-xs font-bold text-muted-foreground">UF</label>
-                                                    <Input placeholder="UF" maxLength={2} className="bg-muted/50 border-input" value={state} onChange={e => setState(e.target.value.toUpperCase())} />
-                                                </div>
+                                    {/* --- Coluna 2: Endereço --- */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-semibold text-emerald-600 flex items-center gap-2 border-b border-border/50 pb-2">
+                                            <MapPin className="w-4 h-4" /> Endereço
+                                        </h3>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div className="space-y-2 col-span-1">
+                                                <label className="text-xs font-bold text-muted-foreground">CEP</label>
+                                                <Input placeholder="00000-000" className="bg-muted/50 border-input" value={zipCode} onChange={e => setZipCode(e.target.value)} />
                                             </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
-                                                <div className="space-y-2 sm:col-span-3">
-                                                    <label className="text-xs font-bold text-muted-foreground">Rua / Logradouro</label>
-                                                    <Input placeholder="Rua das Flores" className="bg-muted/50 border-input" value={address} onChange={e => setAddress(e.target.value)} />
-                                                </div>
-                                                <div className="space-y-2 sm:col-span-1">
-                                                    <label className="text-xs font-bold text-muted-foreground">Número</label>
-                                                    <Input placeholder="123" className="bg-muted/50 border-input" value={number} onChange={e => setNumber(e.target.value)} />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-bold text-muted-foreground">Bairro</label>
-                                                    <Input placeholder="Centro" className="bg-muted/50 border-input" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-bold text-muted-foreground">Complemento</label>
-                                                    <Input placeholder="Apto 101" className="bg-muted/50 border-input" value={complement} onChange={e => setComplement(e.target.value)} />
-                                                </div>
+                                            <div className="space-y-2 col-span-2">
+                                                <label className="text-xs font-bold text-muted-foreground">Cidade</label>
+                                                <Input placeholder="Cidade" className="bg-muted/50 border-input" value={city} onChange={e => setCity(e.target.value)} />
                                             </div>
                                         </div>
+                                        <div className="grid grid-cols-4 gap-3">
+                                            <div className="space-y-2 col-span-3">
+                                                <label className="text-xs font-bold text-muted-foreground">Logradouro</label>
+                                                <Input placeholder="Rua das Flores" className="bg-muted/50 border-input" value={address} onChange={e => setAddress(e.target.value)} />
+                                            </div>
+                                            <div className="space-y-2 col-span-1">
+                                                <label className="text-xs font-bold text-muted-foreground">Nº</label>
+                                                <Input placeholder="123" className="bg-muted/50 border-input" value={number} onChange={e => setNumber(e.target.value)} />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-muted-foreground">Bairro</label>
+                                                <Input placeholder="Centro" className="bg-muted/50 border-input" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-muted-foreground">UF</label>
+                                                <Input placeholder="UF" maxLength={2} className="bg-muted/50 border-input" value={state} onChange={e => setState(e.target.value.toUpperCase())} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground">Complemento</label>
+                                            <Input placeholder="Apto 101" className="bg-muted/50 border-input" value={complement} onChange={e => setComplement(e.target.value)} />
+                                        </div>
+                                    </div>
 
+                                    {/* --- Coluna 3: Segurança e Localização --- */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-semibold text-emerald-600 flex items-center gap-2 border-b border-border/50 pb-2">
+                                            <ShieldAlert className="w-4 h-4" /> Segurança e Localização
+                                        </h3>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-muted-foreground">{editingUser ? "Nova Senha (opcional)" : "Senha"}</label>
                                             <div className="relative">
@@ -420,11 +432,7 @@ export default function CobradoresPage() {
                                                     className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
                                                     tabIndex={-1}
                                                 >
-                                                    {showPassword ? (
-                                                        <EyeOff className="h-4 w-4" />
-                                                    ) : (
-                                                        <Eye className="h-4 w-4" />
-                                                    )}
+                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                 </button>
                                             </div>
                                         </div>
@@ -448,7 +456,6 @@ export default function CobradoresPage() {
                                                     {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                 </Button>
                                             </div>
-                                            <p className="text-[10px] text-muted-foreground font-medium italic">O PIN é usado para confirmar sangrias no celular do cambista.</p>
                                         </div>
 
                                         <div className="space-y-2">
@@ -469,13 +476,13 @@ export default function CobradoresPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
-                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
+                                <div className="flex justify-end gap-2 pt-4 border-t border-border/50">
+                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted font-bold">
                                         Cancelar
                                     </Button>
-                                    <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[100px]">
+                                    <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[150px] font-bold">
                                         {editingUser ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-                                        {editingUser ? "Salvar" : "Criar Cobrador"}
+                                        {editingUser ? "Salvar Alterações" : "Criar Cobrador"}
                                     </Button>
                                 </div>
                             </form>
