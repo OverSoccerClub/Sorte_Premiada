@@ -2,7 +2,7 @@
 -- Changes: Draw.numbers (Int[] -> String[]), Draw.series, Game fields, SecondChanceDraw table
 
 -- CreateTable
-CREATE TABLE "SecondChanceDraw" (
+CREATE TABLE IF NOT EXISTS "SecondChanceDraw" (
     "id" TEXT NOT NULL,
     "companyId" TEXT,
     "gameId" TEXT NOT NULL,
@@ -15,11 +15,22 @@ CREATE TABLE "SecondChanceDraw" (
     CONSTRAINT "SecondChanceDraw_pkey" PRIMARY KEY ("id")
 );
 
--- AlterTable
--- Note: Conversion of numbers to TEXT[] might require explicit cast if not already done.
--- We check if we need to alter Draw.numbers. Based on recent changes, it's now String[].
--- However, for safety and to fix the cached plan, we ensure the columns match the client.
+-- AlterTable for Numbers (Int[] -> String[])
+-- Conversão necessária para evitar erro de "cached plan must not change result type"
+DO $$ 
+BEGIN 
+    -- Para tabela Draw
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Draw' AND column_name = 'numbers' AND (data_type = 'ARRAY' OR data_type = 'USER-DEFINED') AND (udt_name = '_int4' OR udt_name = 'integer[]')) THEN
+        ALTER TABLE "Draw" ALTER COLUMN "numbers" TYPE TEXT[] USING "numbers"::TEXT[];
+    END IF;
 
+    -- Para tabela Ticket
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Ticket' AND column_name = 'numbers' AND (data_type = 'ARRAY' OR data_type = 'USER-DEFINED') AND (udt_name = '_int4' OR udt_name = 'integer[]')) THEN
+        ALTER TABLE "Ticket" ALTER COLUMN "numbers" TYPE TEXT[] USING "numbers"::TEXT[];
+    END IF;
+END $$;
+
+-- AlterTable
 ALTER TABLE "Draw" ADD COLUMN IF NOT EXISTS "series" INTEGER;
 
 -- AlterTable
