@@ -19,9 +19,13 @@ const numberToText = (num: number): string => {
 export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> = ({ data, isCapture = false }) => {
     const [logoError, setLogoError] = useState(false);
 
+    // Safety check for numbers
+    const numbers = Array.isArray(data.numbers) ? data.numbers : [];
+
     // data.numbers contains the 4 thousands as numbers (e.g., [32, 7863, 8838, 9788])
     // We need to convert each to a 4-digit string and then to array of digits
-    const fezinhasData: number[][] = data.numbers.map(num => {
+    const fezinhasData: number[][] = numbers.map(num => {
+        if (num === undefined || num === null) return [0, 0, 0, 0];
         const str = num.toString().padStart(4, '0');
         return str.split('').map(d => parseInt(d, 10));
     });
@@ -36,7 +40,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     // Ensure we have exactly 4 fezinhas (pad with empty if needed)
     const fezinhas = fezinhasData;
     while (fezinhas.length < 4) {
-        fezinhas.push([]);
+        fezinhas.push([]); // Empty arrays for missing fezinhas will need handling in render
     }
 
     const shouldShowLogo = data.companyLogoUrl && !logoError;
@@ -136,12 +140,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 1</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
-                            {fezinhas[0]?.map((num, idx) => (
+                            {fezinhas[0]?.length > 0 ? fezinhas[0].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
                                     <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
                                     <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
                                 </View>
-                            ))}
+                            )) : <Text style={tw`text-xs text-black font-bold opacity-30 my-2`}>-----</Text>}
                         </View>
                     </View>
 
@@ -149,12 +153,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 2</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
-                            {fezinhas[1]?.map((num, idx) => (
+                            {fezinhas[1]?.length > 0 ? fezinhas[1].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
                                     <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
                                     <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
                                 </View>
-                            ))}
+                            )) : <Text style={tw`text-xs text-black font-bold opacity-30 my-2`}>-----</Text>}
                         </View>
                     </View>
                 </View>
@@ -165,12 +169,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 3</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
-                            {fezinhas[2]?.map((num, idx) => (
+                            {fezinhas[2]?.length > 0 ? fezinhas[2].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
                                     <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
                                     <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
                                 </View>
-                            ))}
+                            )) : <Text style={tw`text-xs text-black font-bold opacity-30 my-2`}>-----</Text>}
                         </View>
                     </View>
 
@@ -178,12 +182,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     <View style={tw`w-[45%]`}>
                         <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 4</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
-                            {fezinhas[3]?.map((num, idx) => (
+                            {fezinhas[3]?.length > 0 ? fezinhas[3].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
                                     <Text style={[tw`text-4xl font-normal text-black`, { fontFamily: 'serif' }]}>{num}</Text>
                                     <Text style={[tw`text-[7px] text-black -mt-1 font-bold`, { fontFamily: 'serif' }]}>{numberToText(num)}</Text>
                                 </View>
-                            ))}
+                            )) : <Text style={tw`text-xs text-black font-bold opacity-30 my-2`}>-----</Text>}
                         </View>
                     </View>
                 </View>

@@ -14,14 +14,14 @@ export class SecurityService {
      */
     generateTicketSignature(ticketData: {
         id: string;
-        numbers: number[];
+        numbers: (number | string)[];
         amount: string | number;
         userId: string;
         drawDate: Date | null;
     }): string {
         const payload = JSON.stringify({
             id: ticketData.id,
-            numbers: ticketData.numbers.sort((a, b) => a - b),
+            numbers: ticketData.numbers.map(String).sort((a, b) => Number(a) - Number(b)),
             amount: Number(ticketData.amount).toFixed(2),
             userId: ticketData.userId,
             drawDate: ticketData.drawDate?.toISOString() || ''

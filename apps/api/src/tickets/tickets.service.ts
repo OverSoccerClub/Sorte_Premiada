@@ -356,7 +356,7 @@ export class TicketsService {
             const createData: any = {
                 userId: userId,
                 gameType: data.gameType,
-                numbers: data.numbers,
+                numbers: (data.numbers || []).map(String),
                 amount: data.amount,
                 status: data.status || 'PENDING',
                 drawDate: drawDate,

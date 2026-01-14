@@ -12,6 +12,7 @@ import { TicketDisplay } from './ticket/TicketDisplay';
 import { TicketPrintManager } from './ticket/TicketPrintManager';
 import { TicketData } from './ticket/TicketContent';
 import { useTicketPrint } from '../hooks/useTicketPrint';
+import { useSettings } from '../context/SettingsContext';
 
 interface ReceiptModalProps {
     visible: boolean;
@@ -25,7 +26,8 @@ interface ReceiptModalProps {
 export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false }: ReceiptModalProps) {
     const viewShotRef = useRef<ViewShot>(null);
     const { user } = useAuth();
-    const { settings } = useCompany();
+    const { settings: companySettings } = useCompany();
+    const { settings: appSettings } = useSettings();
     const [isSharing, setIsSharing] = useState(false);
     const { print, isPrinting } = useTicketPrint();
 
@@ -45,7 +47,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
     const fullTicketData: TicketData = {
         ...ticketData,
         vendorName: ticketData.vendorName || user?.name || user?.username || "Vendedor",
-        companyName: ticketData.companyName || settings.companyName,
+        companyName: ticketData.companyName || companySettings.companyName,
     };
 
     const handlePrint = async () => {
@@ -70,7 +72,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                 .map(n => n.toString().padStart(is2x1000 ? 4 : 2, '0'))
                 .join(is2x1000 ? '  ' : ' ');
 
-            const message = `🍀 *${settings.companyName}* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 Bilhete: ${ticketData.hash || ticketData.ticketId.slice(0, 8)}\n\n✨ Boa Sorte! ✨`;
+            const message = `🍀 *${companySettings.companyName}* 🍀\n🎟️ *Aposta Confirmada*\n\n🏆 Jogo: *${ticketData.gameName}*\n🔢 Números: *${formattedNums}*\n📅 Data: ${ticketData.date}\n💰 Valor: ${ticketData.price}\n🔑 Bilhete: ${ticketData.hash || ticketData.ticketId.slice(0, 8)}\n\n✨ Boa Sorte! ✨`;
 
             await Clipboard.setStringAsync(message);
             await Sharing.shareAsync(uri, {
@@ -105,6 +107,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                                 data={fullTicketData}
                                 mode="preview"
                                 scale={0.80}
+                                template={appSettings.ticketTemplate}
                             />
                         </View>
                     </ScrollView>
@@ -158,7 +161,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                 </SafeAreaView>
 
                 {/* HIDDEN CAPTURE AREA */}
-                <TicketPrintManager ref={viewShotRef} data={fullTicketData} />
+                <TicketPrintManager ref={viewShotRef} data={fullTicketData} template={appSettings.ticketTemplate} />
             </View>
         </Modal>
     );
