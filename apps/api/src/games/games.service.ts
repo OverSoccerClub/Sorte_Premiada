@@ -84,7 +84,7 @@ export class GamesService {
         const { extractionSeries, ...gameData } = data;
 
         // ✅ Usar transação para garantir que todas as mudanças (jogo + horários) ocorram ou falhem juntas
-        const result = await this.prisma.client.$transaction(async (tx) => {
+        const result = await this.prisma.client.$transaction(async (tx: any) => {
             // 1. Atualizar dados básicos do jogo
             const updated = await tx.game.update({
                 where: { id },
