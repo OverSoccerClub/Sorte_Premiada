@@ -95,9 +95,14 @@ export class DevicesController {
     @Roles('ADMIN', 'MASTER')
     async generateActivationCode(
         @Request() req: any,
-        @Body() body: { name: string; description?: string }
+        @Body() body: { name: string; description?: string; targetCompanyId?: string }
     ) {
-        const { companyId } = req.user;
+        let { companyId } = req.user;
+
+        // MASTER override
+        if (req.user.role === 'MASTER' && body.targetCompanyId) {
+            companyId = body.targetCompanyId;
+        }
 
         this.logger.log(`POST /devices/generate-code - CompanyId: ${companyId}, Name: ${body.name}`);
 
@@ -128,9 +133,10 @@ export class DevicesController {
         @Request() req: any,
         @Param('id') deviceId: string
     ) {
-        const { companyId } = req.user;
+        // Se for MASTER, companyId é opcional (null) para permitir acesso global
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
 
-        this.logger.log(`PUT /devices/${deviceId}/deactivate - CompanyId: ${companyId}`);
+        this.logger.log(`PUT /devices/${deviceId}/deactivate - Action by Role: ${req.user.role}`);
 
         return this.devicesService.deactivateDevice(deviceId, companyId);
     }
@@ -146,9 +152,10 @@ export class DevicesController {
         @Request() req: any,
         @Param('id') deviceId: string
     ) {
-        const { companyId } = req.user;
+        // Se for MASTER, companyId é opcional (null) para permitir acesso global
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
 
-        this.logger.log(`PUT /devices/${deviceId}/reactivate - CompanyId: ${companyId}`);
+        this.logger.log(`PUT /devices/${deviceId}/reactivate - Action by Role: ${req.user.role}`);
 
         return this.devicesService.reactivateDevice(deviceId, companyId);
     }

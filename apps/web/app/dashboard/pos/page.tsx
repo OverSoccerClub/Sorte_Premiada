@@ -138,7 +138,7 @@ export default function PosManagementPage() {
                 body: JSON.stringify({
                     name: deviceName,
                     description: deviceDescription,
-                    companyId: activeCompanyId
+                    targetCompanyId: activeCompanyId
                 })
             });
 
@@ -173,13 +173,14 @@ export default function PosManagementPage() {
     const handleToggleDevice = async (deviceId: string, isActive: boolean) => {
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`${AppConfig.api.baseUrl}/devices/${deviceId}/toggle`, {
-                method: "PATCH",
+            const endpoint = isActive ? "deactivate" : "reactivate";
+
+            const res = await fetch(`${AppConfig.api.baseUrl}/devices/${deviceId}/${endpoint}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ isActive: !isActive })
+                }
             });
 
             if (res.ok) {

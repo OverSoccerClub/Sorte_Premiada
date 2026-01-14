@@ -108,6 +108,7 @@ export default function DeviceManagementPage() {
                 body: JSON.stringify({
                     name: deviceName,
                     description: deviceDescription,
+                    targetCompanyId: activeCompanyId,
                 }),
             });
 

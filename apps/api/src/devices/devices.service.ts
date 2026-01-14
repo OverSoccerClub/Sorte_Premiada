@@ -551,12 +551,14 @@ export class DevicesService {
      * Desativa um dispositivo remotamente
      * Endpoint: PUT /devices/:id/deactivate
      */
-    async deactivateDevice(deviceId: string, companyId: string) {
+    async deactivateDevice(deviceId: string, companyId?: string) {
+        const where: any = { id: deviceId };
+        if (companyId) {
+            where.companyId = companyId;
+        }
+
         const device = await this.prisma.posTerminal.findFirst({
-            where: {
-                id: deviceId,
-                companyId
-            }
+            where
         });
 
         if (!device) {
@@ -576,12 +578,14 @@ export class DevicesService {
      * Reativa um dispositivo
      * Endpoint: PUT /devices/:id/reactivate
      */
-    async reactivateDevice(deviceId: string, companyId: string) {
+    async reactivateDevice(deviceId: string, companyId?: string) {
+        const where: any = { id: deviceId };
+        if (companyId) {
+            where.companyId = companyId;
+        }
+
         const device = await this.prisma.posTerminal.findFirst({
-            where: {
-                id: deviceId,
-                companyId
-            }
+            where
         });
 
         if (!device) {
