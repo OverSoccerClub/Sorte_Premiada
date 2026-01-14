@@ -11,7 +11,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TicketDetails } from "@/components/dashboard/tickets/TicketDetails"
 import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
-import { DrawSimulator } from "@/components/draw/DrawSimulator"
 import {
     Loader2,
     Calendar,
@@ -218,16 +217,6 @@ export default function TwoXOneThousandReportPage() {
                 <p className="text-muted-foreground mt-1 ml-14">Gestão e acompanhamento de vendas em tempo real.</p>
             </div>
 
-            {/* Draw Simulator */}
-            <Card className="border-border bg-card shadow-sm">
-                <CardHeader>
-                    <CardTitle className="text-lg">Simuladador de Sorteio</CardTitle>
-                    <CardDescription>Simule o sorteio das milhares para validação visual.</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-8">
-                    <DrawSimulator />
-                </CardContent>
-            </Card>
 
             {/* KPI Cards */}
             <div className="grid gap-6 md:grid-cols-2">
