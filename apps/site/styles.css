@@ -374,7 +374,7 @@ p {
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-2xl);
 }
@@ -383,7 +383,7 @@ p {
   background: linear-gradient(135deg, rgba(45, 90, 61, 0.1) 0%, rgba(26, 77, 46, 0.05) 100%);
   border: 1px solid rgba(212, 175, 55, 0.2);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
@@ -436,7 +436,7 @@ p {
 .result-numbers {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 .number-ball {
