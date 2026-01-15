@@ -19,39 +19,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 
 export default function VerificationPage() {
     const activeCompanyId = useActiveCompanyId()
-    const [pendingCloses, setPendingCloses] = useState<any[]>([])
+    const [matrix, setMatrix] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState("")
-    const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState<number | "all">(10)
     const [selectedClose, setSelectedClose] = useState<any>(null)
     const { showAlert } = useAlert()
 
-    const fetchPendingCloses = async () => {
+    const fetchAccountability = async () => {
         try {
             setLoading(true)
             const token = localStorage.getItem("token")
             const queryParams = new URLSearchParams()
             if (activeCompanyId) queryParams.append('targetCompanyId', activeCompanyId)
 
-            const res = await fetch(`${API_URL}/finance/pending-closes?${queryParams.toString()}`, {
+            const res = await fetch(`${API_URL}/finance/accountability-matrix?${queryParams.toString()}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
                 const data = await res.json()
-                setPendingCloses(data)
+                setMatrix(data)
             } else {
-                console.error("Failed to fetch pending closes")
+                console.error("Failed to fetch accountability matrix")
             }
         } catch (error) {
-            console.error("Error fetching pending closes", error)
+            console.error("Error fetching accountability matrix", error)
         } finally {
             setLoading(false)
         }
     }
 
     useEffect(() => {
-        fetchPendingCloses()
+        fetchAccountability()
     }, [activeCompanyId])
 
     const handleVerify = async (id: string, status: 'VERIFIED' | 'REJECTED') => {
@@ -76,7 +74,7 @@ export default function VerificationPage() {
                     showAlert("Sucesso", "Caixa rejeitado com sucesso.", "success")
                 }
                 setSelectedClose(null)
-                fetchPendingCloses()
+                fetchAccountability()
             } else {
                 showAlert("Erro", "Não foi possível atualizar o status.", "error")
             }
@@ -93,9 +91,9 @@ export default function VerificationPage() {
         <div className="space-y-6">
             <StandardPageHeader
                 icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />}
-                title="Conferência de Caixas"
-                description="Validação e aprovação de fechamentos diários pendentes."
-                onRefresh={fetchPendingCloses}
+                title="Gestão de Prestação de Contas"
+                description="Visão geral financeira e conferência de caixas dos cambistas."
+                onRefresh={fetchAccountability}
                 refreshing={loading}
             >
                 <div className="flex flex-wrap items-center gap-3">
@@ -105,10 +103,7 @@ export default function VerificationPage() {
                             placeholder="Buscar cambista..."
                             className="pl-9 bg-background border-border h-9 shadow-sm text-xs font-semibold"
                             value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value)
-                                setPage(1)
-                            }}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
@@ -120,119 +115,112 @@ export default function VerificationPage() {
                         <div className="flex justify-center py-12">
                             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
                         </div>
-                    ) : pendingCloses.length === 0 ? (
+                    ) : matrix.length === 0 ? (
                         <div className="text-center py-16 text-muted-foreground flex flex-col items-center gap-3">
                             <CheckCircle2 className="h-10 w-10 opacity-20 text-emerald-500" />
-                            <p className="font-medium">Tudo em dia! Nenhum fechamento pendente.</p>
+                            <p className="font-medium">Nenhum cambista ativo encontrado.</p>
                         </div>
                     ) : (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60 uppercase">
-                                        <TableHead className="pl-6 text-[10px] font-bold">Data/Hora</TableHead>
-                                        <TableHead className="text-[10px] font-bold">Cambista (Operador)</TableHead>
-                                        <TableHead className="text-[10px] font-bold text-center">Resumo do Dia</TableHead>
-                                        <TableHead className="text-[10px] font-bold text-right pr-6">Ações</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(() => {
-                                        const filtered = pendingCloses.filter(item =>
-                                            item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                                        );
-
-                                        const paginated = limit === "all" ? filtered : filtered.slice((page - 1) * limit, Number(page) * Number(limit));
-
-                                        if (filtered.length === 0) return (
-                                            <TableRow>
-                                                <TableCell colSpan={4} className="text-center py-12 text-muted-foreground italic font-medium">
-                                                    Nenhum fechamento encontrado com os filtros atuais.
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-
-                                        return paginated.map((item) => (
-                                            <TableRow key={item.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
-                                                <TableCell className="pl-6 py-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-2 text-foreground font-bold text-xs">
-                                                            <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                                                            {format(new Date(item.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60 uppercase">
+                                    <TableHead className="pl-6 text-[10px] font-bold">Cambista</TableHead>
+                                    <TableHead className="text-[10px] font-bold">Status</TableHead>
+                                    <TableHead className="text-[10px] font-bold text-center">Dias Pendente</TableHead>
+                                    <TableHead className="text-[10px] font-bold text-right">Saldo Devedor (Net)</TableHead>
+                                    <TableHead className="text-[10px] font-bold text-right pr-6">Ações</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {matrix
+                                    .filter(item =>
+                                        item.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        item.user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .map((item) => (
+                                        <TableRow key={item.user.id} className="hover:bg-muted/50 transition-colors border-b border-border/50">
+                                            <TableCell className="pl-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold text-xs ring-1 ring-blue-500/20">
+                                                        {(item.user.username || "U").substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-foreground text-sm">
+                                                            {item.user.name}
                                                         </div>
-                                                        <div className="text-[10px] text-muted-foreground font-medium ml-5 italic">
-                                                            Iniciado em {format(new Date(item.date), "dd/MM", { locale: ptBR })}
+                                                        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1">
+                                                            <span>{item.user.username}</span>
+                                                            <span className="text-border">•</span>
+                                                            <span className="text-emerald-500">{item.user.area}</span>
                                                         </div>
                                                     </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold text-xs ring-1 ring-blue-500/20">
-                                                            {(item.closedByUser?.username || "U").substring(0, 2).toUpperCase()}
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="font-bold text-foreground text-sm">
-                                                                    {item.closedByUser?.name || item.closedByUser?.username}
-                                                                </div>
-                                                                {item.daysPending > 1 && (
-                                                                    <Badge variant="outline" className={`text-[10px] h-5 px-1.5 ${item.daysPending >= 3 ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-amber-500/50 text-amber-500 bg-amber-500/10'}`}>
-                                                                        {item.daysPending} dias em aberto
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                            <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                                                                {item.closedByUser?.username}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center justify-center gap-6">
-                                                        <div className="text-center">
-                                                            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Vendas</p>
-                                                            <p className="text-xs font-bold text-emerald-600">{formatCurrency(item.totalSales)}</p>
-                                                        </div>
-                                                        <div className="w-px h-8 bg-border/60" />
-                                                        <div className="text-center">
-                                                            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Saldo Net</p>
-                                                            <p className="text-sm font-black text-foreground">{formatCurrency(item.finalBalance)}</p>
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right pr-6">
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {item.status === 'PENDING_REVIEW' && (
+                                                    <Badge variant="outline" className="border-orange-500/30 text-orange-500 bg-orange-500/10 hover:bg-orange-500/20 text-[10px]">
+                                                        AGUARDANDO CONFERÊNCIA
+                                                    </Badge>
+                                                )}
+                                                {item.status === 'OPEN_DEBT' && (
+                                                    <Badge variant="outline" className="border-blue-500/30 text-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-[10px]">
+                                                        EM ABERTO
+                                                    </Badge>
+                                                )}
+                                                {item.status === 'CLEAR' && (
+                                                    <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 text-[10px]">
+                                                        TUDO CERTO
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                {item.daysPending > 0 ? (
+                                                    <Badge variant="outline" className={`text-[10px] h-5 px-1.5 ${item.daysPending >= 3 ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-amber-500/50 text-amber-500 bg-amber-500/10'}`}>
+                                                        {item.daysPending} dias
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground/50 text-xs">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <p className={`text-sm font-bold ${item.netBalance > 0 ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                                                    {formatCurrency(item.netBalance)}
+                                                </p>
+                                                {item.lastActivity && (
+                                                    <p className="text-[10px] text-muted-foreground">
+                                                        Desde {format(new Date(item.lastActivity), "dd/MM")}
+                                                    </p>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-6">
+                                                {item.status === 'PENDING_REVIEW' && item.pendingClose ? (
                                                     <Button
                                                         size="sm"
-                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-6 font-bold text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all"
-                                                        onClick={() => setSelectedClose(item)}
+                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4 font-bold text-[10px] uppercase tracking-widest shadow-sm"
+                                                        onClick={() => setSelectedClose(item.pendingClose)}
                                                     >
-                                                        Conferir Extrato
+                                                        Conferir
                                                     </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ));
-                                    })()}
-                                </TableBody>
-                            </Table>
-                            <StandardPagination
-                                currentPage={page}
-                                totalPages={limit === "all" ? 1 : Math.ceil(pendingCloses.filter(item =>
-                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                                ).length / limit)}
-                                limit={limit}
-                                onPageChange={setPage}
-                                onLimitChange={(l) => {
-                                    setLimit(l)
-                                    setPage(1)
-                                }}
-                                totalItems={pendingCloses.filter(item =>
-                                    item.closedByUser?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    item.closedByUser?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-                                ).length}
-                            />
-                        </>
+                                                ) : item.status === 'OPEN_DEBT' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        disabled
+                                                        className="text-muted-foreground h-8 px-4 font-bold text-[10px] uppercase tracking-widest opacity-50"
+                                                    >
+                                                        Aguardando Fechamento
+                                                    </Button>
+                                                ) : (
+                                                    <div className="w-8 h-8 ml-auto flex items-center justify-center">
+                                                        <CheckCircle2 className="w-5 h-5 text-emerald-500/20" />
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                }
+                            </TableBody>
+                        </Table>
                     )}
                 </CardContent>
             </Card>

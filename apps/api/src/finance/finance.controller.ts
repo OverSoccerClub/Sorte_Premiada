@@ -75,4 +75,11 @@ export class FinanceController {
         const companyId = query.targetCompanyId || req.user.companyId;
         return this.financeService.findAllTransactions(companyId, query);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('accountability-matrix')
+    getAccountability(@Request() req: any, @Query() query: any) {
+        const companyId = query.targetCompanyId || req.user.companyId;
+        return this.financeService.getAccountabilityMatrix(companyId);
+    }
 }

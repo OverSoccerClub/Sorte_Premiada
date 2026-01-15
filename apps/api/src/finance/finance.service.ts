@@ -712,4 +712,135 @@ export class FinanceService {
             take: 200
         });
     }
+
+    async getAccountabilityMatrix(companyId: string) {
+        // 1. Fetch all active cambistas for the company
+        const cambistas = await this.prisma.user.findMany({
+            where: {
+                companyId,
+                role: 'CAMBISTA',
+                isActive: true
+            },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                createdAt: true,
+                accountabilityLimitHours: true,
+                area: { select: { name: true } }
+            }
+        });
+
+        const now = new Date();
+
+        // 2. Process each cambista (Parallelized)
+        const matrix = await Promise.all(cambistas.map(async (user) => {
+            // A. Get Last Verified Close
+            const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
+                where: { closedByUserId: user.id, status: 'VERIFIED' },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : user.createdAt;
+
+            // B. Check for Oldest Open Item (Transaction or Ticket) purely for "Days Pending"
+            const oldestOpenTransaction = await this.prisma.transaction.findFirst({
+                where: { userId: user.id, createdAt: { gt: lastVerifiedDate } },
+                orderBy: { createdAt: 'asc' }
+            });
+
+            const oldestOpenTicket = await this.prisma.ticket.findFirst({
+                where: { userId: user.id, createdAt: { gt: lastVerifiedDate }, status: { not: 'CANCELLED' } },
+                orderBy: { createdAt: 'asc' }
+            });
+
+            let oldestDate: Date | null = null;
+            if (oldestOpenTransaction && oldestOpenTicket) {
+                oldestDate = oldestOpenTransaction.createdAt < oldestOpenTicket.createdAt
+                    ? oldestOpenTransaction.createdAt
+                    : oldestOpenTicket.createdAt;
+            } else if (oldestOpenTransaction) {
+                oldestDate = oldestOpenTransaction.createdAt;
+            } else if (oldestOpenTicket) {
+                oldestDate = oldestOpenTicket.createdAt;
+            }
+
+            let daysPending = 0;
+            if (oldestDate) {
+                const diffTime = Math.abs(now.getTime() - oldestDate.getTime());
+                daysPending = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            // C. Calculate Current Balance (Real-time debt)
+            // We need to sum everything AFTER the last verified close.
+            // Why? Because verified close should have "settled" the balance (Conceptually).
+            // BUT: The system might carry over balance?
+            // Let's assume: Balance = Sum of (Tickets + Credits - Debits) since Last Verified Close.
+            // If Last Verified Close had a "finalBalance", was it paid?
+            // Usually "Verify" means "I received the money". So the new balance starts at 0?
+            // OR checks generic getSummary? getSummary calculates from StartOfDay.
+            // We need "Total Debt".
+            // Let's stick to "Since Last Verified Close".
+
+            // Fetch aggregates since last verified date
+            const ticketsAgg = await this.prisma.ticket.aggregate({
+                where: {
+                    userId: user.id,
+                    createdAt: { gt: lastVerifiedDate },
+                    status: { not: 'CANCELLED' }
+                },
+                _sum: { amount: true, commissionValue: true }
+            });
+
+            const transactionsAgg = await this.prisma.transaction.groupBy({
+                by: ['type'],
+                where: {
+                    userId: user.id,
+                    createdAt: { gt: lastVerifiedDate }
+                },
+                _sum: { amount: true }
+            });
+
+            const totalSales = Number(ticketsAgg._sum.amount || 0);
+            const totalCommission = Number(ticketsAgg._sum.commissionValue || 0);
+
+            let manualCredits = 0;
+            let totalDebits = 0;
+
+            transactionsAgg.forEach(t => {
+                if (t.type === 'CREDIT') manualCredits += Number(t._sum.amount || 0);
+                if (t.type === 'DEBIT') totalDebits += Number(t._sum.amount || 0);
+            });
+
+            const totalCredits = totalSales + manualCredits;
+            const finalBalance = totalCredits - totalDebits;
+            const netBalance = finalBalance - totalCommission; // What they owe net
+
+            // D. Check for PENDING (unverified) closes to link/show status
+            const pendingClose = await this.prisma.dailyClose.findFirst({
+                where: { closedByUserId: user.id, status: 'PENDING' },
+                orderBy: { createdAt: 'desc' },
+                include: { closedByUser: true }
+            });
+
+            return {
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    username: user.username,
+                    area: user.area?.name || 'Geral'
+                },
+                daysPending,
+                netBalance,
+                totalSales,
+                lastActivity: oldestDate, // When their debt started accumulating
+                status: pendingClose ? 'PENDING_REVIEW' : (daysPending > 0 ? 'OPEN_DEBT' : 'CLEAR'),
+                accountabilityLimitHours: user.accountabilityLimitHours,
+                pendingClose: pendingClose // Return full object for frontend modal
+            };
+        }));
+
+        // Sort: Most critical (highest days pending) first
+        return matrix.sort((a, b) => b.daysPending - a.daysPending);
+    }
 }
