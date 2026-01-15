@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
-import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
+import { getBrazilStartOfDay, getBrazilEndOfDay, getBrazilTime, dayjs } from '../utils/date.util';
 
 enum DailyCloseStatus {
     PENDING = 'PENDING',
@@ -324,13 +324,24 @@ export class FinanceService {
             // Re-use logic to find oldest open item
             const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
                 where: { closedByUserId: userId, status: 'VERIFIED' },
-                orderBy: { createdAt: 'desc' },
+                orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
                 // We want the last verified close strictly BEFORE this pending close? 
                 // Actually, "days pending" usually means "how long has this person had open stuff".
                 // If this is a pending close from today, and they have open stuff from 3 days ago, it's 3 days pending.
             });
 
-            const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : close.closedByUser?.createdAt;
+            let lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : (close.closedByUser?.createdAt || new Date(0));
+
+            if (lastVerifiedClose) {
+                const closeDate = dayjs(lastVerifiedClose.date).startOf('day');
+                const closeCreatedDay = dayjs(close.date).startOf('day'); // Current pending close date
+
+                if (closeDate.isSame(closeCreatedDay, 'day')) {
+                    lastVerifiedDate = lastVerifiedClose.createdAt;
+                } else {
+                    lastVerifiedDate = getBrazilEndOfDay(lastVerifiedClose.date);
+                }
+            }
 
             // Oldest Transaction
             const oldestOpenTransaction = await this.prisma.transaction.findFirst({
@@ -748,10 +759,23 @@ export class FinanceService {
             // A. Get Last Verified Close
             const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
                 where: { closedByUserId: user.id, status: 'VERIFIED' },
-                orderBy: { createdAt: 'desc' }
+                orderBy: [{ date: 'desc' }, { createdAt: 'desc' }]
             });
 
-            const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : user.createdAt;
+            // Calculate logical cutoff
+            // If they closed "Today", cutoff is the timestamp of closure.
+            // If they closed "Yesterday", cutoff is the end of Yesterday.
+            let lastVerifiedDate = user.createdAt;
+            if (lastVerifiedClose) {
+                const closeDate = dayjs(lastVerifiedClose.date).startOf('day');
+                const today = getBrazilTime().startOf('day');
+
+                if (closeDate.isSame(today, 'day')) {
+                    lastVerifiedDate = lastVerifiedClose.createdAt;
+                } else {
+                    lastVerifiedDate = getBrazilEndOfDay(lastVerifiedClose.date);
+                }
+            }
 
             // B. Check for Oldest Open Item (Transaction or Ticket) purely for "Days Pending"
             const oldestOpenTransaction = await this.prisma.transaction.findFirst({

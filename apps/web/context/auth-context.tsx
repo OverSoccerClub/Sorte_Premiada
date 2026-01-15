@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const signOut = () => {
         localStorage.removeItem("token")
+        sessionStorage.clear() // Limpar sessionStorage para remover selectedCompanyId e outros dados da sessão
         setToken(null)
         setUser(null)
         router.push("/")
