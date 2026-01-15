@@ -3,6 +3,7 @@ import { AnalyticsService } from './analytics.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { User } from '../auth/user.decorator';
 
 @Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -11,25 +12,25 @@ export class AnalyticsController {
 
     @Get('overview')
     @Roles('ADMIN')
-    getOverview() {
-        return this.analyticsService.getGlobalOverview();
+    getOverview(@User() user: any) {
+        return this.analyticsService.getGlobalOverview(user.companyId);
     }
 
     @Get('heatmap')
     @Roles('ADMIN')
-    getHeatmap() {
-        return this.analyticsService.getRegionalHeatmap();
+    getHeatmap(@User() user: any) {
+        return this.analyticsService.getRegionalHeatmap(user.companyId);
     }
 
     @Get('growth')
     @Roles('ADMIN')
-    getGrowth() {
-        return this.analyticsService.getTemporalGrowth();
+    getGrowth(@User() user: any) {
+        return this.analyticsService.getTemporalGrowth(user.companyId);
     }
 
     @Get('efficiency')
     @Roles('ADMIN')
-    getEfficiency() {
-        return this.analyticsService.getCambistaEfficiency();
+    getEfficiency(@User() user: any) {
+        return this.analyticsService.getCambistaEfficiency(user.companyId);
     }
 }

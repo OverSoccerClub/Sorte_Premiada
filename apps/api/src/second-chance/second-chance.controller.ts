@@ -1,5 +1,5 @@
 
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { SecondChanceService } from './second-chance.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -14,33 +14,33 @@ export class SecondChanceController {
     @Post()
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    create(@Body() data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string }) {
-        return this.service.create(data);
+    create(@Body() data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string }, @Request() req: any) {
+        return this.service.create({ ...data, companyId: req.user.companyId });
     }
 
     @Get()
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req: any) {
+        return this.service.findAll(req.user.companyId);
     }
 
     @Get(':id/winners')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    findWinners(@Param('id') id: string) {
-        return this.service.findWinners(id);
+    findWinners(@Param('id') id: string, @Request() req: any) {
+        return this.service.findWinners(id, req.user.companyId);
     }
 
     @Get(':id/participants')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    findParticipants(@Param('id') id: string) {
-        return this.service.findParticipants(id);
+    findParticipants(@Param('id') id: string, @Request() req: any) {
+        return this.service.findParticipants(id, req.user.companyId);
     }
 
     @Delete(':id')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    remove(@Param('id') id: string) {
-        return this.service.remove(id);
+    remove(@Param('id') id: string, @Request() req: any) {
+        return this.service.remove(id, req.user.companyId);
     }
 }

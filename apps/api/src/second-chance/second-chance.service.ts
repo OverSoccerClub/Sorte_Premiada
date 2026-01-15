@@ -7,7 +7,15 @@ import { toBrazilTime, dayjs } from '../utils/date.util';
 export class SecondChanceService {
     constructor(private prisma: PrismaService) { }
 
-    async create(data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string; series?: number }) {
+    async create(data: { gameId: string; winningNumber: number; prizeAmount: number; drawDate: string; series?: number; companyId?: string }) {
+        // Validate Game Ownership
+        if (data.companyId) {
+            const game = await this.prisma.game.findFirst({
+                where: { id: data.gameId, companyId: data.companyId }
+            });
+            if (!game) throw new BadRequestException("Jogo não encontrado ou acesso negado.");
+        }
+
         return this.prisma.$transaction(async (tx) => {
             const drawDate = toBrazilTime(data.drawDate).startOf('day').toDate();
 
@@ -74,19 +82,22 @@ export class SecondChanceService {
         console.log(`[SecondChance] Processed ${tickets.length} winners for draw ${draw.id}`);
     }
 
-    async findAll() {
+    async findAll(companyId?: string) {
         return this.prisma.secondChanceDraw.findMany({
+            where: companyId ? { game: { companyId } } : undefined,
             include: { game: true },
             orderBy: { drawDate: 'desc' }
         });
     }
 
-    async findWinners(drawId: string) {
+    async findWinners(drawId: string, companyId?: string) {
         const draw = await this.prisma.secondChanceDraw.findUnique({
-            where: { id: drawId }
+            where: { id: drawId },
+            include: { game: true }
         });
 
         if (!draw) throw new BadRequestException("Sorteio não encontrado");
+        if (companyId && draw.game.companyId !== companyId) throw new BadRequestException("Acesso negado.");
 
         const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
         const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
@@ -115,12 +126,14 @@ export class SecondChanceService {
         });
     }
 
-    async findParticipants(drawId: string) {
+    async findParticipants(drawId: string, companyId?: string) {
         const draw = await this.prisma.secondChanceDraw.findUnique({
-            where: { id: drawId }
+            where: { id: drawId },
+            include: { game: true }
         });
 
         if (!draw) throw new BadRequestException("Sorteio não encontrado");
+        if (companyId && draw.game.companyId !== companyId) throw new BadRequestException("Acesso negado.");
 
         const startOfDay = toBrazilTime(draw.drawDate).startOf('day').toDate();
         const endOfDay = toBrazilTime(draw.drawDate).endOf('day').toDate();
@@ -149,8 +162,15 @@ export class SecondChanceService {
         });
     }
 
-    async remove(id: string) {
-        // Reversal logic could be added here if needed, but usually draws once processed are final.
+    async remove(id: string, companyId?: string) {
+        const draw = await this.prisma.secondChanceDraw.findUnique({
+            where: { id },
+            include: { game: true }
+        });
+
+        if (!draw) throw new BadRequestException("Sorteio não encontrado");
+        if (companyId && draw.game.companyId !== companyId) throw new BadRequestException("Acesso negado.");
+
         return this.prisma.secondChanceDraw.delete({ where: { id } });
     }
 }

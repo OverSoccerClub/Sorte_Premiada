@@ -6,7 +6,7 @@ import { getBrazilTime } from '../utils/date.util';
 export class AnalyticsService {
     constructor(private prisma: PrismaService) { }
 
-    async getGlobalOverview() {
+    async getGlobalOverview(companyId: string) {
         const now = getBrazilTime();
         const startOfMonth = now.startOf('month').toDate();
         const startOfLastMonth = now.subtract(1, 'month').startOf('month').toDate();
@@ -14,12 +14,20 @@ export class AnalyticsService {
 
         const [currentMonth, lastMonth] = await Promise.all([
             this.prisma.ticket.aggregate({
-                where: { createdAt: { gte: startOfMonth }, status: { not: 'CANCELLED' } },
+                where: {
+                    companyId,
+                    createdAt: { gte: startOfMonth },
+                    status: { not: 'CANCELLED' }
+                },
                 _sum: { amount: true },
                 _count: { id: true }
             }),
             this.prisma.ticket.aggregate({
-                where: { createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }, status: { not: 'CANCELLED' } },
+                where: {
+                    companyId,
+                    createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+                    status: { not: 'CANCELLED' }
+                },
                 _sum: { amount: true }
             })
         ]);
@@ -32,18 +40,22 @@ export class AnalyticsService {
             monthlyRevenue: currentAmt,
             monthlyTickets: currentMonth._count.id,
             growth: parseFloat(growth.toFixed(2)),
-            activeCambistas: await this.prisma.user.count({ where: { role: 'CAMBISTA', isActive: true } }),
-            totalAreas: await this.prisma.area.count()
+            activeCambistas: await this.prisma.user.count({ where: { companyId, role: 'CAMBISTA', isActive: true } }),
+            totalAreas: await this.prisma.area.count({ where: { companyId } })
         };
     }
 
-    async getRegionalHeatmap() {
+    async getRegionalHeatmap(companyId: string) {
         const areas = await this.prisma.area.findMany({
+            where: { companyId },
             include: {
                 users: {
                     select: {
                         tickets: {
-                            where: { status: { not: 'CANCELLED' } },
+                            where: {
+                                companyId,
+                                status: { not: 'CANCELLED' }
+                            },
                             select: { amount: true }
                         }
                     }
@@ -66,7 +78,7 @@ export class AnalyticsService {
         }).sort((a, b) => b.sales - a.sales);
     }
 
-    async getTemporalGrowth() {
+    async getTemporalGrowth(companyId: string) {
         const now = getBrazilTime();
         const days = [];
 
@@ -76,7 +88,11 @@ export class AnalyticsService {
             const end = date.endOf('day').toDate();
 
             const sales = await this.prisma.ticket.aggregate({
-                where: { createdAt: { gte: start, lte: end }, status: { not: 'CANCELLED' } },
+                where: {
+                    companyId,
+                    createdAt: { gte: start, lte: end },
+                    status: { not: 'CANCELLED' }
+                },
                 _sum: { amount: true }
             });
 
@@ -89,16 +105,19 @@ export class AnalyticsService {
         return days;
     }
 
-    async getCambistaEfficiency() {
+    async getCambistaEfficiency(companyId: string) {
         const cambistas = await this.prisma.user.findMany({
-            where: { role: 'CAMBISTA' },
+            where: { companyId, role: 'CAMBISTA' },
             select: {
                 id: true,
                 username: true,
                 name: true,
                 area: { select: { name: true } },
                 tickets: {
-                    where: { status: { not: 'CANCELLED' } },
+                    where: {
+                        companyId,
+                        status: { not: 'CANCELLED' }
+                    },
                     select: { amount: true, createdAt: true }
                 }
             }

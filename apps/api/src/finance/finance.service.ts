@@ -391,7 +391,14 @@ export class FinanceService {
         }));
     }
 
-    async verifyDailyClose(closeId: string, adminId: string, status: 'VERIFIED' | 'REJECTED') {
+    async verifyDailyClose(closeId: string, adminId: string, status: 'VERIFIED' | 'REJECTED', companyId?: string) {
+        const existing = await this.prisma.dailyClose.findUnique({ where: { id: closeId } });
+        if (!existing) throw new BadRequestException("Fechamento não encontrado.");
+
+        if (companyId && existing.companyId && existing.companyId !== companyId) {
+            throw new BadRequestException("Acesso negado: Este fechamento pertence a outra empresa.");
+        }
+
         const dailyClose = await this.prisma.dailyClose.update({
             where: { id: closeId },
             data: {

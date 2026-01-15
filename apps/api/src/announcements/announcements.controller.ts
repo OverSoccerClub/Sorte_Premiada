@@ -31,19 +31,19 @@ export class AnnouncementsController {
 
     @Get(':id')
     @Roles('ADMIN')
-    findOne(@Param('id') id: string) {
-        return this.announcementsService.findOne(id);
+    findOne(@Param('id') id: string, @Request() req: any) {
+        return this.announcementsService.findOne(id, req.user?.companyId);
     }
 
     @Patch(':id')
     @Roles('ADMIN')
-    update(@Param('id') id: string, @Body() data: any) {
-        return this.announcementsService.update(id, data);
+    update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
+        return this.announcementsService.update(id, data, req.user?.companyId);
     }
 
     @Delete(':id')
     @Roles('ADMIN')
-    remove(@Param('id') id: string) {
-        return this.announcementsService.remove(id);
+    remove(@Param('id') id: string, @Request() req: any) {
+        return this.announcementsService.remove(id, req.user?.companyId);
     }
 }

@@ -46,14 +46,14 @@ export class FinanceController {
     @UseGuards(JwtAuthGuard) // Add Roles('ADMIN') if possible, but minimal for now
     @Get('pending-closes')
     getPendingCloses(@Request() req: any, @Query() query: any) {
-        const companyId = query.targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && query.targetCompanyId) ? query.targetCompanyId : req.user.companyId;
         return this.financeService.findAllPendingCloses(companyId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post('close/:id/verify')
     verifyClose(@Param('id') id: string, @Body() body: { status: 'VERIFIED' | 'REJECTED' }, @Request() req: any) {
-        return this.financeService.verifyDailyClose(id, req.user.userId, body.status);
+        return this.financeService.verifyDailyClose(id, req.user.userId, body.status, req.user.companyId);
     }
     @UseGuards(JwtAuthGuard)
     @Get('debug-info')
@@ -65,7 +65,7 @@ export class FinanceController {
     @Roles(Role.ADMIN, Role.MASTER)
     @Get('dashboard-metrics')
     getDashboardMetrics(@Request() req: any, @Query() query: any) {
-        const companyId = query.targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && query.targetCompanyId) ? query.targetCompanyId : req.user.companyId;
         return this.financeService.getDashboardMetrics(companyId);
     }
 
@@ -73,14 +73,14 @@ export class FinanceController {
     @Roles(Role.ADMIN, Role.MASTER)
     @Get('all-transactions')
     findAllTransactions(@Request() req: any, @Query() query: any) {
-        const companyId = query.targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && query.targetCompanyId) ? query.targetCompanyId : req.user.companyId;
         return this.financeService.findAllTransactions(companyId, query);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('accountability-matrix')
     getAccountability(@Request() req: any, @Query() query: any) {
-        const companyId = query.targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && query.targetCompanyId) ? query.targetCompanyId : req.user.companyId;
         return this.financeService.getAccountabilityMatrix(companyId);
     }
 }

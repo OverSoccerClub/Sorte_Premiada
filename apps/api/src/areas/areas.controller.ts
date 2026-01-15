@@ -47,27 +47,31 @@ export class AreasController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.areasService.findOne(id);
+    @Roles('ADMIN', 'MASTER', 'CAMBISTA', 'COBRADOR')
+    findOne(@Param('id') id: string, @Request() req: any) {
+        const restrictedCompanyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.areasService.findOne(id, restrictedCompanyId);
     }
 
     @Patch(':id')
     @Roles('ADMIN', 'MASTER')
-    update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
-        return this.areasService.update(id, updateAreaDto);
+    update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto, @Request() req: any) {
+        const restrictedCompanyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.areasService.update(id, updateAreaDto, restrictedCompanyId);
     }
 
     @Delete(':id')
-    @Roles('ADMIN')
-    remove(@Param('id') id: string) {
-        return this.areasService.remove(id);
+    @Roles('ADMIN', 'MASTER')
+    remove(@Param('id') id: string, @Request() req: any) {
+        const restrictedCompanyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.areasService.remove(id, restrictedCompanyId);
     }
 
     @Post(':id/cycle-series')
     @Roles('ADMIN', 'MASTER')
     async cycleSeries(@Param('id') id: string, @Request() req: any) {
-        // Log audit manually or in service (simplified here)
         console.log(`[API] Manual Series Cycle for Area ${id} by User ${req.user.userId}`);
-        return this.areasService.cycleSeries(id);
+        const restrictedCompanyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.areasService.cycleSeries(id, restrictedCompanyId);
     }
 }

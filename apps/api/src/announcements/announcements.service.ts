@@ -101,20 +101,33 @@ export class AnnouncementsService {
         });
     }
 
-    async findOne(id: string) {
-        return this.prisma.announcement.findUnique({
-            where: { id },
+    async findOne(id: string, companyId?: string) {
+        return this.prisma.announcement.findFirst({
+            where: {
+                id,
+                ...(companyId ? { companyId } : {})
+            },
         });
     }
 
-    async update(id: string, data: any) {
+    async update(id: string, data: any, companyId?: string) {
+        const exists = await this.prisma.announcement.findFirst({
+            where: { id, ...(companyId ? { companyId } : {}) }
+        });
+        if (!exists) throw new Error("Anúncio não encontrado ou acesso negado.");
+
         return this.prisma.announcement.update({
             where: { id },
             data,
         });
     }
 
-    async remove(id: string) {
+    async remove(id: string, companyId?: string) {
+        const exists = await this.prisma.announcement.findFirst({
+            where: { id, ...(companyId ? { companyId } : {}) }
+        });
+        if (!exists) throw new Error("Anúncio não encontrado ou acesso negado.");
+
         return this.prisma.announcement.delete({
             where: { id },
         });

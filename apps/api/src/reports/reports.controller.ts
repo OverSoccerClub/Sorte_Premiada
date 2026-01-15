@@ -14,7 +14,7 @@ export class ReportsController {
 
     @Get('sales-by-cambista')
     async getSalesByCambista(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getSalesByCambista(companyId, req.user.userId);
     }
 
@@ -29,7 +29,7 @@ export class ReportsController {
         @Query('limit') limit?: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getSalesByDate(
             new Date(startDate),
             new Date(endDate),
@@ -49,7 +49,7 @@ export class ReportsController {
         @Query('endDate') endDate: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         // Ensure full day coverage if only date string is passed
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
@@ -62,7 +62,7 @@ export class ReportsController {
 
     @Get('dashboard')
     async getDashboardStats(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getDashboardStats(req.user.userId, companyId);
     }
 
@@ -73,7 +73,7 @@ export class ReportsController {
         @Query('date') date: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         // Finance summary is specific to a user, so we check that user's validity or assume current context
         return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), companyId, req.user.userId);
     }
@@ -87,13 +87,13 @@ export class ReportsController {
         @Query('status') status: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status, req.user.userId, companyId);
     }
 
     @Get('pending-closes')
     async getPendingCloses(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getPendingCloses(req.user.userId, companyId);
     }
 
@@ -106,7 +106,7 @@ export class ReportsController {
         @Query('userId') userId: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId, companyId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="transactions_${Date.now()}.csv"`);
@@ -121,7 +121,7 @@ export class ReportsController {
         @Query('endDate') endDate: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getTicketsByDraw(drawId, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, companyId);
     }
 
@@ -133,14 +133,14 @@ export class ReportsController {
         @Query('endDate') endDate?: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         const l = limit ? Number(limit) : 10;
         return this.reportsService.getTopSellers(l, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, companyId);
     }
 
     @Get('active-users')
     async getActiveUsers(@Request() req: any, @Query('days') days?: string, @Query('targetCompanyId') targetCompanyId?: string) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         const d = days ? Number(days) : 30;
         return this.reportsService.getActiveUsers(d, companyId);
     }
@@ -154,7 +154,7 @@ export class ReportsController {
         @Query('userId') userId?: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getNotificationLogs(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId, companyId);
     }
 
@@ -168,7 +168,7 @@ export class ReportsController {
         @Query('userId') userId: string,
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        const companyId = targetCompanyId || req.user.companyId;
+        const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         const csv = await this.reportsService.exportNotificationLogsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId, companyId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="notification_logs_${Date.now()}.csv"`);

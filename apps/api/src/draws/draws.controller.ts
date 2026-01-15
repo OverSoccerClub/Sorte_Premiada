@@ -40,9 +40,10 @@ export class DrawsController {
 
     @Get('liability-report')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    getLiabilityReport(@Query('gameId') gameId: string, @Query('drawDate') drawDate: string) {
-        return this.drawsService.getLiabilityReport(gameId, drawDate);
+    @Roles(Role.ADMIN, 'MASTER')
+    getLiabilityReport(@Query('gameId') gameId: string, @Query('drawDate') drawDate: string, @Request() req: any) {
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.drawsService.getLiabilityReport(gameId, drawDate, companyId);
     }
 
     @Get(':id')
@@ -52,22 +53,25 @@ export class DrawsController {
 
     @Get(':id/details')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    getDetails(@Param('id') id: string) {
-        return this.drawsService.getDrawDetails(id);
+    @Roles(Role.ADMIN, 'MASTER')
+    getDetails(@Param('id') id: string, @Request() req: any) {
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.drawsService.getDrawDetails(id, companyId);
     }
 
     @Patch(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    update(@Param('id') id: string, @Body() updateDrawDto: any) {
-        return this.drawsService.update(id, updateDrawDto);
+    @Roles(Role.ADMIN, 'MASTER')
+    update(@Param('id') id: string, @Body() updateDrawDto: any, @Request() req: any) {
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.drawsService.update(id, updateDrawDto, companyId);
     }
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    remove(@Param('id') id: string) {
-        return this.drawsService.remove(id);
+    @Roles(Role.ADMIN, 'MASTER')
+    remove(@Param('id') id: string, @Request() req: any) {
+        const companyId = req.user.role === 'MASTER' ? undefined : req.user.companyId;
+        return this.drawsService.remove(id, companyId);
     }
 }

@@ -997,13 +997,18 @@ export class TicketsService {
      * Mark a WON ticket as PAID.
      * STRICT RULE: Only the cambista who sold the ticket can pay it out.
      */
-    async redeemPrize(ticketId: string, loggedUserId: string) {
+    async redeemPrize(ticketId: string, loggedUserId: string, companyId?: string) {
         const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
         if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
         if (ticket.status !== 'WON') throw new BadRequestException(`Status inválido para pagamento: ${ticket.status}`);
+
+        // STRICT COMPANY CHECK
+        if (companyId && ticket.companyId && ticket.companyId !== companyId) {
+            throw new BadRequestException("Acesso negado: Este bilhete pertence a outra empresa.");
+        }
 
         // STRICT OWNERSHIP CHECK
         if (ticket.userId !== loggedUserId) {
@@ -1034,12 +1039,18 @@ export class TicketsService {
      * If within grace period (e.g. 10 mins), auto-cancel.
      * Otherwise, set status to CANCEL_REQUESTED for admin approval.
      */
-    async requestCancellation(ticketId: string, userId: string, reason: string) {
+    async requestCancellation(ticketId: string, userId: string, reason: string, companyId?: string) {
         const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
         if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
+
+        // STRICT COMPANY CHECK
+        if (companyId && ticket.companyId && ticket.companyId !== companyId) {
+            throw new BadRequestException("Acesso negado: Este bilhete pertence a outra empresa.");
+        }
+
         if (ticket.userId !== userId) throw new BadRequestException("Você só pode cancelar seus próprios bilhetes.");
 
         if (ticket.status === 'CANCELLED') return ticket;
@@ -1097,12 +1108,18 @@ export class TicketsService {
     /**
      * Admin/Supervisor approval of a cancellation.
      */
-    async approveCancellation(ticketId: string, adminId: string, approved: boolean) {
+    async approveCancellation(ticketId: string, adminId: string, approved: boolean, companyId?: string) {
         const ticket = await this.prisma.client.ticket.findUnique({
             where: { id: ticketId }
         });
 
         if (!ticket) throw new BadRequestException("Bilhete não encontrado.");
+
+        // STRICT COMPANY CHECK
+        if (companyId && ticket.companyId && ticket.companyId !== companyId) {
+            throw new BadRequestException("Acesso negado: Este bilhete pertence a outra empresa.");
+        }
+
         if (ticket.status !== 'CANCEL_REQUESTED' as any) {
             throw new BadRequestException("Este bilhete não possui uma solicitação de cancelamento pendente.");
         }

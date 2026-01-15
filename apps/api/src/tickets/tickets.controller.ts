@@ -87,13 +87,13 @@ export class TicketsController {
     @Post(':id/redeem')
     @UseGuards(JwtAuthGuard)
     async redeem(@Request() req: any, @Param('id') id: string) {
-        return this.ticketsService.redeemPrize(id, req.user.userId);
+        return this.ticketsService.redeemPrize(id, req.user.userId, req.user.companyId);
     }
 
     @Post(':id/request-cancel')
     @UseGuards(JwtAuthGuard)
     async requestCancel(@Request() req: any, @Param('id') id: string, @Body('reason') reason: string) {
-        return this.ticketsService.requestCancellation(id, req.user.userId, reason);
+        return this.ticketsService.requestCancellation(id, req.user.userId, reason, req.user.companyId);
     }
 
     @Post(':id/approve-cancel')
@@ -102,6 +102,6 @@ export class TicketsController {
         if (req.user.role !== 'ADMIN' && req.user.role !== 'COBRADOR') {
             throw new ForbiddenException("Apenas administradores podem aprovar cancelamentos.");
         }
-        return this.ticketsService.approveCancellation(id, req.user.userId, approved);
+        return this.ticketsService.approveCancellation(id, req.user.userId, approved, req.user.companyId);
     }
 }

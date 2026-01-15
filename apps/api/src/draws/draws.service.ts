@@ -191,7 +191,13 @@ export class DrawsService {
         return this.prisma.draw.findUnique({ where: { id } });
     }
 
-    async update(id: string, data: Prisma.DrawUpdateInput) {
+    async update(id: string, data: Prisma.DrawUpdateInput, companyId?: string) {
+        // Security Check
+        const exists = await this.prisma.draw.findFirst({
+            where: { id, ...(companyId ? { companyId } : {}) }
+        });
+        if (!exists) throw new Error("Sorteio não encontrado ou acesso negado.");
+
         const updatedDraw = await this.prisma.draw.update({
             where: { id },
             data,
@@ -206,13 +212,21 @@ export class DrawsService {
         return updatedDraw;
     }
 
-    async remove(id: string) {
+    async remove(id: string, companyId?: string) {
+        const exists = await this.prisma.draw.findFirst({
+            where: { id, ...(companyId ? { companyId } : {}) }
+        });
+        if (!exists) throw new Error("Sorteio não encontrado ou acesso negado.");
+
         return this.prisma.draw.delete({ where: { id } });
     }
 
-    async getDrawDetails(id: string) {
-        const draw = await this.prisma.draw.findUnique({
-            where: { id },
+    async getDrawDetails(id: string, companyId?: string) {
+        const draw = await this.prisma.draw.findFirst({
+            where: {
+                id,
+                ...(companyId ? { companyId } : {})
+            },
             include: { game: true }
         });
 
@@ -266,7 +280,15 @@ export class DrawsService {
      * Calculates the total potential payout (liability) for each number in a specific draw.
      * Essential for the Admin Risk Dashboard.
      */
-    async getLiabilityReport(gameId: string, drawDate: string) {
+    async getLiabilityReport(gameId: string, drawDate: string, companyId?: string) {
+        // Validation of Game Ownership
+        if (companyId) {
+            const game = await this.prisma.game.findFirst({
+                where: { id: gameId, companyId }
+            });
+            if (!game) throw new Error("Jogo não encontrado ou acesso negado.");
+        }
+
         const cacheKey = `liability:${gameId}:${drawDate}`;
         const cached = await this.redis.get(cacheKey);
 
