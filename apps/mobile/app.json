@@ -2,7 +2,7 @@
     "expo": {
         "name": "A Perseverança",
         "slug": "innobet",
-        "version": "1.4.48",
+        "version": "1.4.49",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -39,7 +39,7 @@
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "package": "com.anonymous.sortepremiada",
-            "versionCode": 168
+            "versionCode": 169
         },
         "web": {
             "favicon": "./assets/favicon.png"
