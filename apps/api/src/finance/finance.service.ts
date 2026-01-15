@@ -295,11 +295,62 @@ export class FinanceService {
         const where: any = { status: 'PENDING' };
         if (companyId) where.companyId = companyId;
 
-        return this.prisma.dailyClose.findMany({
+        const pendingCloses = await this.prisma.dailyClose.findMany({
             where,
             include: { closedByUser: true },
             orderBy: { createdAt: 'desc' }
         });
+
+        // Enrich with "Days Pending"
+        return Promise.all(pendingCloses.map(async (close) => {
+            const userId = close.closedByUserId;
+
+            // Re-use logic to find oldest open item
+            const lastVerifiedClose = await this.prisma.dailyClose.findFirst({
+                where: { closedByUserId: userId, status: 'VERIFIED' },
+                orderBy: { createdAt: 'desc' },
+                // We want the last verified close strictly BEFORE this pending close? 
+                // Actually, "days pending" usually means "how long has this person had open stuff".
+                // If this is a pending close from today, and they have open stuff from 3 days ago, it's 3 days pending.
+            });
+
+            const lastVerifiedDate = lastVerifiedClose ? lastVerifiedClose.createdAt : close.closedByUser?.createdAt;
+
+            // Oldest Transaction
+            const oldestOpenTransaction = await this.prisma.transaction.findFirst({
+                where: { userId, createdAt: { gt: lastVerifiedDate } },
+                orderBy: { createdAt: 'asc' }
+            });
+
+            // Oldest Ticket
+            const oldestOpenTicket = await this.prisma.ticket.findFirst({
+                where: { userId, createdAt: { gt: lastVerifiedDate }, status: { not: 'CANCELLED' } },
+                orderBy: { createdAt: 'asc' }
+            });
+
+            let oldestDate: Date | null = null;
+            if (oldestOpenTransaction && oldestOpenTicket) {
+                oldestDate = oldestOpenTransaction.createdAt < oldestOpenTicket.createdAt
+                    ? oldestOpenTransaction.createdAt
+                    : oldestOpenTicket.createdAt;
+            } else if (oldestOpenTransaction) {
+                oldestDate = oldestOpenTransaction.createdAt;
+            } else if (oldestOpenTicket) {
+                oldestDate = oldestOpenTicket.createdAt;
+            }
+
+            let daysPending = 0;
+            if (oldestDate) {
+                const now = new Date();
+                const diffTime = Math.abs(now.getTime() - oldestDate.getTime());
+                daysPending = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            return {
+                ...close,
+                daysPending
+            };
+        }));
     }
 
     async verifyDailyClose(closeId: string, adminId: string, status: 'VERIFIED' | 'REJECTED') {

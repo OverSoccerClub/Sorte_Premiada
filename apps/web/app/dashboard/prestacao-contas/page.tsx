@@ -172,8 +172,15 @@ export default function VerificationPage() {
                                                             {(item.closedByUser?.username || "U").substring(0, 2).toUpperCase()}
                                                         </div>
                                                         <div>
-                                                            <div className="font-bold text-foreground text-sm">
-                                                                {item.closedByUser?.name || item.closedByUser?.username}
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="font-bold text-foreground text-sm">
+                                                                    {item.closedByUser?.name || item.closedByUser?.username}
+                                                                </div>
+                                                                {item.daysPending > 1 && (
+                                                                    <Badge variant="outline" className={`text-[10px] h-5 px-1.5 ${item.daysPending >= 3 ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-amber-500/50 text-amber-500 bg-amber-500/10'}`}>
+                                                                        {item.daysPending} dias em aberto
+                                                                    </Badge>
+                                                                )}
                                                             </div>
                                                             <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
                                                                 {item.closedByUser?.username}
