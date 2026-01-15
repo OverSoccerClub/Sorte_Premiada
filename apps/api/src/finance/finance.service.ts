@@ -51,9 +51,9 @@ export class FinanceService {
         });
     }
 
-    async getSummary(userId: string, companyId?: string) {
-        const startOfDay = getBrazilStartOfDay();
-        const endOfDay = getBrazilEndOfDay();
+    async getSummary(userId: string, companyId?: string, date?: Date) {
+        const startOfDay = getBrazilStartOfDay(date);
+        const endOfDay = getBrazilEndOfDay(date);
 
         // 1. Get Tickets Sales (Exclude Cancelled)
         const tickets = await this.prisma.ticket.findMany({
@@ -135,7 +135,7 @@ export class FinanceService {
         });
 
         return {
-            date: new Date(),
+            date: date || new Date(),
             isClosed,
             salesLimit: user?.salesLimit ? Number(user.salesLimit) : null,
             limitOverrideExpiresAt: user?.limitOverrideExpiresAt,
@@ -175,21 +175,21 @@ export class FinanceService {
         });
     }
 
-    async closeDay(userId: string, physicalCashReported?: number) {
-        const summary = await this.getSummary(userId);
+    async closeDay(userId: string, physicalCashReported?: number, date?: Date) {
+        const summary = await this.getSummary(userId, undefined, date);
 
         const variance = physicalCashReported !== undefined
             ? Number(physicalCashReported) - summary.finalBalance
             : null;
 
-        // Check if already closed today
-        const startOfDay = getBrazilStartOfDay();
-        const endOfDay = getBrazilEndOfDay();
+        // Check if already closed for that date
+        const startOfDay = getBrazilStartOfDay(date);
+        const endOfDay = getBrazilEndOfDay(date);
 
         const existingClose = await this.prisma.dailyClose.findFirst({
             where: {
                 closedByUserId: userId,
-                createdAt: { gte: startOfDay, lte: endOfDay }
+                date: { gte: startOfDay, lte: endOfDay }
             }
         });
 
@@ -227,6 +227,7 @@ export class FinanceService {
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
                 companyId: user?.companyId, // Save companyId
+                date: startOfDay, // Use logical date
                 totalSales: summary.totalSales,
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,
@@ -244,13 +245,13 @@ export class FinanceService {
     }
 
     // Admin: close a day for a specific user and optionally auto-verify
-    async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true, physicalCashReported?: number) {
-        // Prevent duplicate close for the target user's today
-        const startOfDay = getBrazilStartOfDay();
-        const endOfDay = getBrazilEndOfDay();
+    async closeDayForUser(targetUserId: string, adminId: string, autoVerify: boolean = true, physicalCashReported?: number, date?: Date) {
+        // Prevent duplicate close for the target user's specific date
+        const startOfDay = getBrazilStartOfDay(date);
+        const endOfDay = getBrazilEndOfDay(date);
 
         const existingClose = await this.prisma.dailyClose.findFirst({
-            where: { closedByUserId: targetUserId, createdAt: { gte: startOfDay, lte: endOfDay } }
+            where: { closedByUserId: targetUserId, date: { gte: startOfDay, lte: endOfDay } }
         });
 
         if (existingClose) {
@@ -278,6 +279,7 @@ export class FinanceService {
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
                 companyId: targetUser?.companyId, // Save companyId
+                date: startOfDay, // Set logical date
                 totalSales: summary.totalSales,
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,
@@ -416,7 +418,7 @@ export class FinanceService {
         const todayClose = await this.prisma.dailyClose.findFirst({
             where: {
                 closedByUserId: userId,
-                createdAt: { gte: startOfDay, lte: endOfDay },
+                date: { gte: startOfDay, lte: endOfDay },
             },
         });
 
@@ -425,15 +427,9 @@ export class FinanceService {
         }
 
         // 2. Check if YESTERDAY (or last closed session) is PENDING verification
-        // Logic: Find the *latest* DailyClose. If it exists and is PENDING, block.
-        // Unless we only block if it's strictly "Yesterday"? 
-        // Requirement: "no dia seguinte ele tenha como vender normalmente com o caixa dele conferido"
-        // So if specific previous day is not verified, block.
-        // Let's implement strict "Latest Close must be Verified" policy for safety.
-
         const lastClose = await this.prisma.dailyClose.findFirst({
             where: { closedByUserId: userId },
-            orderBy: { createdAt: 'desc' }
+            orderBy: [{ date: 'desc' }, { createdAt: 'desc' }]
         });
 
         if (lastClose && lastClose.status === 'PENDING') {

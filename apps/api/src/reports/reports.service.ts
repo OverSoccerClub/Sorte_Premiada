@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionType } from '@prisma/client';
 import { objectsToCsv } from './csv.util';
+import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
 
 @Injectable()
 export class ReportsService {
@@ -17,11 +18,8 @@ export class ReportsService {
     }
 
     async getFinanceSummary(userId: string, date: Date, companyId: string, requestingUserId?: string) {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = getBrazilStartOfDay(date);
+        const endOfDay = getBrazilEndOfDay(date);
 
         const companyFilter = { companyId };
 
@@ -106,7 +104,7 @@ export class ReportsService {
             where: {
                 closedByUserId: userId,
                 ...companyFilter,
-                createdAt: {
+                date: {
                     gte: startOfDay,
                     lte: endOfDay,
                 },
@@ -645,13 +643,10 @@ export class ReportsService {
         const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = { companyId };
         if (startDate || endDate) {
-            const start = startDate ? new Date(startDate) : new Date(0);
-            start.setHours(0, 0, 0, 0);
+            const start = getBrazilStartOfDay(startDate);
+            const end = getBrazilEndOfDay(endDate);
 
-            const end = endDate ? new Date(endDate) : new Date();
-            end.setHours(23, 59, 59, 999);
-
-            where.createdAt = { gte: start, lte: end };
+            where.date = { gte: start, lte: end };
         }
         if (userId) where.closedByUserId = userId;
         if (status) where.status = status;

@@ -135,7 +135,10 @@ export default function CashConferencePage() {
 
                     let url = `${API_URL}/finance/close/${selectedCambista}/admin`
                     let method = 'POST'
-                    let body = JSON.stringify({ autoVerify: true })
+                    let body = JSON.stringify({
+                        autoVerify: true,
+                        date: date // Pass the selected date from the state
+                    })
 
                     if (isPending && summary.dailyCloseId) {
                         url = `${API_URL}/finance/close/${summary.dailyCloseId}/verify`
