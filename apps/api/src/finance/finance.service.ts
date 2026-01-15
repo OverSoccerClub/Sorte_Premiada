@@ -422,13 +422,42 @@ export class FinanceService {
             orderBy: { createdAt: 'asc' }
         });
 
-        if (oldestOpenTransaction) {
-            // We have open transactions. Check if the first one is too old.
-            if (oldestOpenTransaction.createdAt < cutoffTime) {
-                const limitDate = new Date(oldestOpenTransaction.createdAt);
+        // Find the first TICKET (Sale) after the last verified close
+        const oldestOpenTicket = await this.prisma.ticket.findFirst({
+            where: {
+                userId: userId,
+                createdAt: { gt: lastVerifiedDate },
+                status: { not: 'CANCELLED' }
+            },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        let oldestItemDate: Date | null = null;
+        let oldestItemType = '';
+
+        if (oldestOpenTransaction && oldestOpenTicket) {
+            if (oldestOpenTransaction.createdAt < oldestOpenTicket.createdAt) {
+                oldestItemDate = oldestOpenTransaction.createdAt;
+                oldestItemType = 'Transação';
+            } else {
+                oldestItemDate = oldestOpenTicket.createdAt;
+                oldestItemType = 'Venda';
+            }
+        } else if (oldestOpenTransaction) {
+            oldestItemDate = oldestOpenTransaction.createdAt;
+            oldestItemType = 'Transação';
+        } else if (oldestOpenTicket) {
+            oldestItemDate = oldestOpenTicket.createdAt;
+            oldestItemType = 'Venda';
+        }
+
+        if (oldestItemDate) {
+            // We have open items. Check if the oldest one is too old.
+            if (oldestItemDate < cutoffTime) {
+                const limitDate = new Date(oldestItemDate);
                 limitDate.setHours(limitDate.getHours() + limitHours);
 
-                throw new BadRequestException(`Bloqueio por falta de prestação de contas. Suas vendas iniciaram em ${oldestOpenTransaction.createdAt.toLocaleString()} e o limite de ${limitHours}h expirou em ${limitDate.toLocaleString()}. Feche o caixa imediatamente.`);
+                throw new BadRequestException(`Bloqueio por falta de prestação de contas. Suas vendas iniciaram em ${oldestItemDate.toLocaleString('pt-BR')} e o limite de ${limitHours}h expirou em ${limitDate.toLocaleString('pt-BR')}. Feche o caixa imediatamente.`);
             }
         }
 
