@@ -291,9 +291,12 @@ export class FinanceService {
         return dailyClose;
     }
 
-    async findAllPendingCloses() {
+    async findAllPendingCloses(companyId?: string) {
+        const where: any = { status: 'PENDING' };
+        if (companyId) where.companyId = companyId;
+
         return this.prisma.dailyClose.findMany({
-            where: { status: 'PENDING' },
+            where,
             include: { closedByUser: true },
             orderBy: { createdAt: 'desc' }
         });

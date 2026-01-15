@@ -44,8 +44,9 @@ export class FinanceController {
 
     @UseGuards(JwtAuthGuard) // Add Roles('ADMIN') if possible, but minimal for now
     @Get('pending-closes')
-    getPendingCloses() {
-        return this.financeService.findAllPendingCloses();
+    getPendingCloses(@Request() req: any, @Query() query: any) {
+        const companyId = query.targetCompanyId || req.user.companyId;
+        return this.financeService.findAllPendingCloses(companyId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -62,14 +63,16 @@ export class FinanceController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.MASTER)
     @Get('dashboard-metrics')
-    getDashboardMetrics(@Request() req: any) {
-        return this.financeService.getDashboardMetrics(req.user.companyId);
+    getDashboardMetrics(@Request() req: any, @Query() query: any) {
+        const companyId = query.targetCompanyId || req.user.companyId;
+        return this.financeService.getDashboardMetrics(companyId);
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.MASTER)
     @Get('all-transactions')
     findAllTransactions(@Request() req: any, @Query() query: any) {
-        return this.financeService.findAllTransactions(req.user.companyId, query);
+        const companyId = query.targetCompanyId || req.user.companyId;
+        return this.financeService.findAllTransactions(companyId, query);
     }
 }
