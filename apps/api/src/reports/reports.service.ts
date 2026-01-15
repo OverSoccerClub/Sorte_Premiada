@@ -67,15 +67,31 @@ export class ReportsService {
         const finalBalance = totalCredits - totalDebits;
 
         // Combine Transactions and Tickets
-        const ticketTransactions = tickets.map(t => ({
-            id: t.id,
-            description: `Venda ${t.gameType} - ${t.numbers.join(', ')}`,
-            amount: t.amount,
-            type: TransactionType.CREDIT,
-            createdAt: t.createdAt,
-            userId: t.userId,
-            isTicket: true,
-        }));
+        const ticketTransactions = tickets.map(t => {
+            let numbers = t.numbers;
+            // Pad to 4 digits for Thousands games (2x1000, Milhar, etc.)
+            if (t.gameType.includes('1000') || t.gameType.toUpperCase().includes('MILHAR')) {
+                numbers = t.numbers.map(n => n.toString().padStart(4, '0'));
+            }
+            // Pad to 3 digits for Hundreds
+            else if (t.gameType.toUpperCase().includes('CENTENA')) {
+                numbers = t.numbers.map(n => n.toString().padStart(3, '0'));
+            }
+            // Pad to 2 digits for Tens (Dezena, Group)
+            else if (t.gameType.toUpperCase().includes('DEZENA') || t.gameType.toUpperCase().includes('GRUPO')) {
+                numbers = t.numbers.map(n => n.toString().padStart(2, '0'));
+            }
+
+            return {
+                id: t.id,
+                description: `Venda ${t.gameType} - ${numbers.join(', ')}`,
+                amount: t.amount,
+                type: TransactionType.CREDIT,
+                createdAt: t.createdAt,
+                userId: t.userId,
+                isTicket: true,
+            };
+        });
 
         const allTransactions = [...transactions.map(t => ({ ...t, isTicket: false })), ...ticketTransactions].sort((a, b) =>
             b.createdAt.getTime() - a.createdAt.getTime()
