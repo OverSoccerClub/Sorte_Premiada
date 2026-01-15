@@ -51,6 +51,10 @@ export const UpdaterService = {
             let remoteData: VersionInfo;
             try {
                 remoteData = JSON.parse(cleanText);
+                // Normalize apkUrl or url
+                if (!remoteData.apkUrl && (remoteData as any).url) {
+                    remoteData.apkUrl = (remoteData as any).url;
+                }
             } catch (e: any) {
                 console.error('[Updater] JSON Parse Error. Raw text head:', text.substring(0, 20));
                 throw new Error(`Erro ao processar dados de versão. Por favor, tente novamente mais tarde.`);
@@ -64,6 +68,12 @@ export const UpdaterService = {
             const hasUpdate = this.compareVersions(remoteData.version, currentVersion, remoteData.build, currentBuild);
 
             if (hasUpdate) {
+                // Return even if invalid to let potential validator handle it or just fail safely later
+                // But better to validate strict requirement here
+                if (!remoteData.apkUrl) {
+                    // Try to guess default name if missing
+                    remoteData.apkUrl = 'InnoBet.apk';
+                }
                 return remoteData;
             }
 
@@ -75,6 +85,10 @@ export const UpdaterService = {
     },
 
     async downloadUpdate(apkUrl: string, updateUrl?: string, onProgress?: (percentage: number) => void): Promise<void> {
+        if (!apkUrl) {
+            throw new Error("URL de download inválida (apkUrl vazia).");
+        }
+
         const baseUrl = this.getUpdateUrl(updateUrl);
         const fullUrl = apkUrl.startsWith('http') ? apkUrl : `${baseUrl}/${apkUrl}`;
 
