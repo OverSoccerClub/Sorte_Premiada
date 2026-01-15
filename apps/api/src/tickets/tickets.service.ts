@@ -54,6 +54,7 @@ export class TicketsService {
         const user = await this.prisma.client.user.findUnique({
             where: { id: userId },
             select: {
+                companyId: true,
                 commissionRate: true,
                 areaId: true,
                 area: {
@@ -362,7 +363,7 @@ export class TicketsService {
                 drawDate: drawDate,
                 hash: this.generateTicketCode(8),
                 gameId: gameId,
-                companyId: data.company?.connect?.id,
+                companyId: user?.companyId || data.company?.connect?.id,
                 // New Financials
                 commissionRate: commissionRate,
                 commissionValue: commissionValue,

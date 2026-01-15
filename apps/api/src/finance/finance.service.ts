@@ -217,9 +217,16 @@ export class FinanceService {
             throw new BadRequestException("O caixa de hoje já foi fechado.");
         }
 
+        // Fetch user to get companyId
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { companyId: true }
+        });
+
         // Create DailyClose Record
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
+                companyId: user?.companyId, // Save companyId
                 totalSales: summary.totalSales,
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,
@@ -262,8 +269,15 @@ export class FinanceService {
             ? Number(physicalCashReported) - summary.finalBalance
             : null;
 
+        // Fetch user to get companyId
+        const targetUser = await this.prisma.user.findUnique({
+            where: { id: targetUserId },
+            select: { companyId: true }
+        });
+
         const dailyClose = await this.prisma.dailyClose.create({
             data: {
+                companyId: targetUser?.companyId, // Save companyId
                 totalSales: summary.totalSales,
                 totalCredits: summary.totalCredits,
                 totalDebits: summary.totalDebits,

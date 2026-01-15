@@ -16,17 +16,20 @@ export class ReportsService {
         return {};
     }
 
-    async getFinanceSummary(userId: string, date: Date, requestingUserId?: string) {
+    async getFinanceSummary(userId: string, date: Date, companyId: string, requestingUserId?: string) {
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date(date);
         endOfDay.setHours(23, 59, 59, 999);
 
+        const companyFilter = { companyId };
+
         // 1. Get Tickets Sales (Exclude Cancelled)
         const tickets = await this.prisma.ticket.findMany({
             where: {
                 userId,
+                ...companyFilter,
                 createdAt: {
                     gte: startOfDay,
                     lte: endOfDay,
@@ -43,6 +46,7 @@ export class ReportsService {
         const transactions = await this.prisma.transaction.findMany({
             where: {
                 userId,
+                ...companyFilter,
                 createdAt: {
                     gte: startOfDay,
                     lte: endOfDay,
@@ -101,6 +105,7 @@ export class ReportsService {
         const dailyClose = await this.prisma.dailyClose.findFirst({
             where: {
                 closedByUserId: userId,
+                ...companyFilter,
                 createdAt: {
                     gte: startOfDay,
                     lte: endOfDay,
@@ -120,9 +125,10 @@ export class ReportsService {
         };
     }
 
-    async getSalesByCambista(requestingUserId?: string) {
+    async getSalesByCambista(companyId: string, requestingUserId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = {
+            companyId,
             status: {
                 not: 'CANCELLED'
             }
@@ -235,6 +241,7 @@ export class ReportsService {
             // Fetch daily closes in this period
             this.prisma.dailyClose.findMany({
                 where: {
+                    companyId,
                     createdAt: { gte: startDate, lte: endDate },
                     ...(cambistaId && cambistaId !== 'all' ? { closedByUserId: cambistaId } : {})
                 }
@@ -559,7 +566,7 @@ export class ReportsService {
             }
         };
     }
-    async getSalesByArea(startDate: Date, endDate: Date, requestingUserId?: string, companyId?: string) {
+    async getSalesByArea(startDate: Date, endDate: Date, companyId: string, requestingUserId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = {
             companyId,

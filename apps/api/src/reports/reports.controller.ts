@@ -13,8 +13,9 @@ export class ReportsController {
     constructor(private readonly reportsService: ReportsService) { }
 
     @Get('sales-by-cambista')
-    async getSalesByCambista(@Request() req: any) {
-        return this.reportsService.getSalesByCambista(req.user.userId);
+    async getSalesByCambista(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
+        const companyId = targetCompanyId || req.user.companyId;
+        return this.reportsService.getSalesByCambista(companyId, req.user.userId);
     }
 
     @Get('sales-by-date')
@@ -56,7 +57,7 @@ export class ReportsController {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
 
-        return this.reportsService.getSalesByArea(start, end, req.user.userId, companyId);
+        return this.reportsService.getSalesByArea(start, end, companyId, req.user.userId);
     }
 
     @Get('dashboard')
@@ -70,9 +71,11 @@ export class ReportsController {
         @Request() req: any,
         @Query('cambistaId') cambistaId: string,
         @Query('date') date: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
+        const companyId = targetCompanyId || req.user.companyId;
         // Finance summary is specific to a user, so we check that user's validity or assume current context
-        return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), req.user.userId);
+        return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), companyId, req.user.userId);
     }
 
     @Get('daily-closes')
