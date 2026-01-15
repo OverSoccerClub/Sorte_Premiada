@@ -20,6 +20,24 @@ import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
+const formatTicketNumbers = (numbers: any[], gameType: string) => {
+    if (!numbers) return "";
+    return numbers.map(n => {
+        const val = n.toString();
+        const gt = gameType?.toUpperCase() || "";
+        if (gt.includes('1000') || gt.includes('MILHAR')) {
+            return val.padStart(4, '0');
+        }
+        if (gt.includes('CENTENA')) {
+            return val.padStart(3, '0');
+        }
+        if (gt.includes('DEZENA') || gt.includes('GRUPO')) {
+            return val.padStart(2, '0');
+        }
+        return val;
+    }).join(', ');
+};
+
 export default function RelatoriosPage() {
     const activeCompanyId = useActiveCompanyId()
     const { showAlert } = useAlert()
@@ -375,6 +393,7 @@ export default function RelatoriosPage() {
                                             <TableHeader>
                                                 <TableRow className="hover:bg-muted/50 bg-muted/30">
                                                     <TableHead className="w-[180px]">Data/Hora</TableHead>
+                                                    <TableHead>Praça</TableHead>
                                                     <TableHead>Cambista</TableHead>
                                                     <TableHead>Jogo</TableHead>
                                                     <TableHead>Números</TableHead>
@@ -389,6 +408,12 @@ export default function RelatoriosPage() {
                                                             {format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                                                         </TableCell>
                                                         <TableCell>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                                                                <span className="text-xs font-medium">{ticket.user?.area?.name || "Geral"}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
                                                             <div className="flex items-center gap-2">
                                                                 <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                                                                     {ticket.user?.username?.substring(0, 2).toUpperCase()}
@@ -397,8 +422,8 @@ export default function RelatoriosPage() {
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-muted-foreground">{ticket.game?.name || ticket.gameType}</TableCell>
-                                                        <TableCell className="font-mono text-xs max-w-[200px] truncate" title={ticket.numbers.join(', ')}>
-                                                            {ticket.numbers.join(', ')}
+                                                        <TableCell className="font-mono text-xs max-w-[200px] truncate" title={formatTicketNumbers(ticket.numbers, ticket.gameType)}>
+                                                            {formatTicketNumbers(ticket.numbers, ticket.gameType)}
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge

@@ -214,7 +214,7 @@ export class ReportsService {
             this.prisma.ticket.findMany({
                 where,
                 include: {
-                    user: { select: { id: true, username: true, name: true } },
+                    user: { select: { id: true, username: true, name: true, area: { select: { name: true } } } },
                     game: { select: { name: true } },
                 },
                 orderBy: {
