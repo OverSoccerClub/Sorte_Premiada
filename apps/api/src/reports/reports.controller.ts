@@ -97,11 +97,11 @@ export class ReportsController {
     @Get('transactions/export')
     async exportTransactions(
         @Request() req: any,
+        @Res() res: Response,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('userId') userId: string,
         @Query('targetCompanyId') targetCompanyId?: string,
-        @Res() res: Response,
     ) {
         const companyId = targetCompanyId || req.user.companyId;
         const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId, companyId);
@@ -158,12 +158,12 @@ export class ReportsController {
     @Get('notifications/export')
     async exportNotificationLogs(
         @Request() req: any,
+        @Res() res: Response,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('status') status: string,
         @Query('userId') userId: string,
         @Query('targetCompanyId') targetCompanyId?: string,
-        @Res() res: Response,
     ) {
         const companyId = targetCompanyId || req.user.companyId;
         const csv = await this.reportsService.exportNotificationLogsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId, companyId);
