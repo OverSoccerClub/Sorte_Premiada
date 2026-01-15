@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { FinanceService } from './finance.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -57,5 +57,19 @@ export class FinanceController {
     @Get('debug-info')
     getDebugInfo(@Request() req: any) {
         return this.financeService.getDebugInfo(req.user.userId);
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.MASTER)
+    @Get('dashboard-metrics')
+    getDashboardMetrics(@Request() req: any) {
+        return this.financeService.getDashboardMetrics(req.user.companyId);
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.MASTER)
+    @Get('all-transactions')
+    findAllTransactions(@Request() req: any, @Query() query: any) {
+        return this.financeService.findAllTransactions(req.user.companyId, query);
     }
 }

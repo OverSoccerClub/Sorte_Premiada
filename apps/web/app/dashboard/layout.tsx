@@ -122,9 +122,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {
             title: "Relatórios & Financeiro",
             items: [
-                { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
+                { icon: BarChart3, label: "Visão Financeira", href: "/dashboard/finance/overview" },
                 { icon: TrendingUp, label: "Inteligência (BI)", href: "/dashboard/analytics" },
                 { icon: Wallet, label: "Prestação de Contas", href: "/dashboard/prestacao-contas" },
+                { icon: BarChart3, label: "Relatórios", href: "/dashboard/relatorios" },
             ]
         },
         {

@@ -1009,10 +1009,23 @@ export class TicketsService {
             throw new BadRequestException("Este prêmio só pode ser pago pelo Cambista que realizou a venda.");
         }
 
-        return this.prisma.client.ticket.update({
+        const updatedTicket = await this.prisma.client.ticket.update({
             where: { id: ticketId },
             data: { status: 'PAID' }
         });
+
+        // INTEGRATION: Create DEBIT transaction for the prize payout
+        // This automatically reduces the balance the cambista owes to the house
+        if (ticket.companyId) {
+            await this.financeService.createTransaction(loggedUserId, ticket.companyId, {
+                description: `Pagamento Prêmio: ${ticket.gameType} (#${ticket.hash})`,
+                amount: Number(ticket.possiblePrize),
+                type: 'DEBIT',
+                category: 'PRIZE_PAYOUT'
+            });
+        }
+
+        return updatedTicket;
     }
 
     /**

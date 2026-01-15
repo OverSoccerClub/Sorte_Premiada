@@ -43,6 +43,7 @@ export class FinanceService {
                 description: data.description,
                 amount: data.amount,
                 type: data.type,
+                category: data.category || 'SALE',
                 userId: userId,
                 companyId: companyId, // Save companyId
                 cobradorId: cobradorId,
@@ -544,5 +545,88 @@ export class FinanceService {
             oldestOpenTransactionDate: oldestOpenTransaction.createdAt,
             limitHours
         };
+    }
+
+    async getDashboardMetrics(companyId: string) {
+        const startOfDay = getBrazilStartOfDay();
+        const endOfDay = getBrazilEndOfDay();
+
+        // 1. Caixas Pendentes de Conferência (Total a receber que já foi fechado mas não conferido)
+        const pendingAccountabilityAgg = await this.prisma.dailyClose.aggregate({
+            where: { companyId, status: 'PENDING' },
+            _sum: { finalBalance: true },
+            _count: { id: true }
+        });
+
+        // 2. Prêmios Pagos Hoje (Pela categoria nova)
+        const prizesTodayAgg = await this.prisma.transaction.aggregate({
+            where: {
+                companyId,
+                category: 'PRIZE_PAYOUT',
+                createdAt: { gte: startOfDay, lte: endOfDay }
+            },
+            _sum: { amount: true }
+        });
+
+        // 3. Vendas Hoje
+        const salesTodayAgg = await this.prisma.ticket.aggregate({
+            where: {
+                companyId,
+                status: { not: 'CANCELLED' },
+                createdAt: { gte: startOfDay, lte: endOfDay }
+            },
+            _sum: { amount: true },
+            _count: { id: true }
+        });
+
+        // 4. Dinheiro na Rua (Estimativa simplificada: Vendas Totais - Prêmios Totais - Caixas Fechados)
+        // Uma forma mais precisa seria iterar por usuário, mas para um dashboard executivo global de hoje:
+        const totalSalesField = Number(salesTodayAgg._sum?.amount || 0);
+        const totalPrizesField = Number(prizesTodayAgg._sum?.amount || 0);
+
+        return {
+            pendingAccountability: Number(pendingAccountabilityAgg._sum?.finalBalance || 0),
+            pendingCount: pendingAccountabilityAgg._count.id,
+            totalPrizesPaidToday: Number(prizesTodayAgg._sum?.amount || 0),
+            totalSalesToday: totalSalesField,
+            ticketsCountToday: salesTodayAgg._count.id,
+            netBalanceToday: totalSalesField - totalPrizesField
+        };
+    }
+
+    async findAllTransactions(companyId: string, filters: {
+        userId?: string;
+        category?: string;
+        startDate?: string;
+        endDate?: string;
+        type?: TransactionType;
+    }) {
+        const where: any = { companyId };
+
+        if (filters.userId && filters.userId !== 'all') where.userId = filters.userId;
+        if (filters.category && filters.category !== 'all') where.category = filters.category;
+        if (filters.type) where.type = filters.type;
+
+        if (filters.startDate || filters.endDate) {
+            where.createdAt = {};
+            if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
+            if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
+        }
+
+        return this.prisma.transaction.findMany({
+            where,
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        username: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: 200
+        });
     }
 }

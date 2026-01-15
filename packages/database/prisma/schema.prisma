@@ -516,6 +516,7 @@ model Transaction {
   description String
   amount      Decimal
   type        TransactionType
+  category    String?          @default("SALE") // SALE, PRIZE_PAYOUT, COLLECTION, COMMISSION_PAYMENT, ADJUSTMENT
   createdAt   DateTime        @default(now())
   userId      String
   user        User            @relation(fields: [userId], references: [id])
