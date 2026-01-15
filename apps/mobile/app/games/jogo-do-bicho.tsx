@@ -207,7 +207,29 @@ export default function JogoDoBichoScreen() {
 
             if (!res.ok) {
                 const errorText = await res.text();
-                throw new Error(`Falha ao salvar: ${errorText}`);
+                let errorMessage = errorText;
+
+                // Try to parse JSON error
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    if (errorJson.message) {
+                        errorMessage = errorJson.message;
+                    }
+                } catch (e) {
+                    // fallback to text
+                }
+
+                // Check for Accountability Block
+                if (errorMessage.includes("falta de prestação de contas")) {
+                    throw new Error("⚠️ Bloqueio Financeiro\n\nVocê possui pendências na prestação de contas. Para voltar a vender, realize o fechamento do caixa e aguarde a validação do financeiro.");
+                }
+
+                // Check for paused series
+                if (errorMessage.includes("pausadas") || errorMessage.includes("bloqueada")) {
+                    throw new Error("⚠️ Vendas Pausadas\n\nEsta praça está temporariamente bloqueada para vendas. Aguarde a liberação do administrador.");
+                }
+
+                throw new Error(errorMessage);
             }
 
             const ticketData = await res.json();
@@ -216,7 +238,7 @@ export default function JogoDoBichoScreen() {
 
             const ticketObj: TicketData = {
                 gameName: `JB - ${modality}`,
-                numbers: ticketData.numbers,
+                numbers: ticketData.numbers.map(String),
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
@@ -428,7 +450,7 @@ export default function JogoDoBichoScreen() {
                             <TicketDisplay
                                 data={{
                                     gameName: `JB - ${modality}`,
-                                    numbers: selectedNumbers,
+                                    numbers: selectedNumbers.map(String),
                                     price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                     date: new Date().toLocaleString('pt-BR'),
                                     ticketId: "PREVIEW",

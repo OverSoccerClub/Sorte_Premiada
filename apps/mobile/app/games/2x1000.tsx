@@ -357,16 +357,33 @@ export default function Game2x1000Screen() {
 
             if (!res.ok) {
                 const errorText = await res.text();
+                let errorMessage = errorText;
+
+                // Try to parse JSON error
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    if (errorJson.message) {
+                        errorMessage = errorJson.message;
+                    }
+                } catch (e) {
+                    // fallback to text
+                }
+
+                // Check for Accountability Block
+                if (errorMessage.includes("falta de prestação de contas")) {
+                    throw new Error("⚠️ Bloqueio Financeiro\n\nVocê possui pendências na prestação de contas. Para voltar a vender, realize o fechamento do caixa e aguarde a validação do financeiro.");
+                }
+
                 // If sold, refresh availability
-                if (errorText.includes("already sold")) {
+                if (errorMessage.includes("already sold")) {
                     fetchSoldNumbers(gameId);
                     throw new Error("Alguns números escolhidos acabaram de ser vendidos! Atualizando...");
                 }
                 // Check for paused series
-                if (errorText.includes("pausadas") || errorText.includes("bloqueada")) {
+                if (errorMessage.includes("pausadas") || errorMessage.includes("bloqueada")) {
                     throw new Error("⚠️ Vendas Pausadas\n\nEsta praça está temporariamente bloqueada para vendas. Aguarde a liberação do administrador.");
                 }
-                throw new Error(`Falha ao salvar: ${errorText}`);
+                throw new Error(errorMessage);
             }
 
             const ticketData = await res.json();
@@ -378,7 +395,7 @@ export default function Game2x1000Screen() {
             // Prepare Unified Ticket Data
             const fullTicket: TicketData = {
                 gameName: "2x1000",
-                numbers: finalNumbers,
+                numbers: finalNumbers.map(String),
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
@@ -707,7 +724,7 @@ export default function Game2x1000Screen() {
                                 <TicketDisplay
                                     data={{
                                         gameName: gameName,
-                                        numbers: selectedNumbers,
+                                        numbers: selectedNumbers.map(String),
                                         price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                         series: drawSeries?.toString(),
                                         date: new Date().toLocaleString('pt-BR'),
