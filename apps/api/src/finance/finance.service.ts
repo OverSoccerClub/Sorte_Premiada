@@ -71,7 +71,7 @@ export class FinanceService {
         });
 
         const totalSales = tickets.reduce((sum, ticket) => sum + Number(ticket.amount), 0);
-        const totalCommission = tickets.reduce((sum, ticket) => sum + Number(ticket.commissionValue || 0), 0);
+        const totalCommissionFromTickets = tickets.reduce((sum, ticket) => sum + Number(ticket.commissionValue || 0), 0);
 
         // 2. Get Transactions
         const transactions = await this.prisma.transaction.findMany({
@@ -94,6 +94,27 @@ export class FinanceService {
         const totalDebits = transactions
             .filter((t) => t.type === TransactionType.DEBIT)
             .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        // Fetch User Configuration (minSalesThreshold, fixedCommission)
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                salesLimit: true,
+                limitOverrideExpiresAt: true,
+                minSalesThreshold: true,
+                fixedCommission: true
+            }
+        });
+
+        // Apply Commission Logic based on minSalesThreshold
+        const minThreshold = user?.minSalesThreshold ? Number(user.minSalesThreshold) : 200;
+        const fixedComm = user?.fixedCommission ? Number(user.fixedCommission) : 40;
+
+        // If sales < threshold: use fixed commission
+        // If sales >= threshold: use percentage-based commission (sum of commissionValue)
+        const totalCommission = totalSales >= minThreshold
+            ? totalCommissionFromTickets  // Percentage-based commission
+            : fixedComm;                  // Fixed commission
 
         // Per user request: Tickets Sales count as Credits
         const totalCredits = manualCredits + totalSales;
@@ -123,16 +144,6 @@ export class FinanceService {
         );
 
         const isClosed = await this.validateSalesEligibility(userId).then(() => false).catch(() => true);
-
-        // Fetch User Limit and Sales Goal Threshold
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                salesLimit: true,
-                limitOverrideExpiresAt: true,
-                minSalesThreshold: true
-            }
-        });
 
         return {
             date: date || new Date(),
@@ -836,7 +847,7 @@ export class FinanceService {
             });
 
             const totalSales = Number(ticketsAgg._sum.amount || 0);
-            const totalCommission = Number(ticketsAgg._sum.commissionValue || 0);
+            const totalCommissionFromTickets = Number(ticketsAgg._sum.commissionValue || 0);
 
             let manualCredits = 0;
             let totalDebits = 0;
@@ -845,6 +856,23 @@ export class FinanceService {
                 if (t.type === 'CREDIT') manualCredits += Number(t._sum.amount || 0);
                 if (t.type === 'DEBIT') totalDebits += Number(t._sum.amount || 0);
             });
+
+            // Fetch User Configuration for Commission Logic
+            const userConfig = await this.prisma.user.findUnique({
+                where: { id: user.id },
+                select: {
+                    minSalesThreshold: true,
+                    fixedCommission: true
+                }
+            });
+
+            const minThreshold = userConfig?.minSalesThreshold ? Number(userConfig.minSalesThreshold) : 200;
+            const fixedComm = userConfig?.fixedCommission ? Number(userConfig.fixedCommission) : 40;
+
+            // Apply Commission Logic based on minSalesThreshold
+            const totalCommission = totalSales >= minThreshold
+                ? totalCommissionFromTickets  // Percentage-based commission
+                : fixedComm;                  // Fixed commission
 
             const totalCredits = totalSales + manualCredits;
             const finalBalance = totalCredits - totalDebits;
