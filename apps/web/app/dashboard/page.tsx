@@ -304,6 +304,7 @@ export default function DashboardPage() {
                                     </Pie>
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#10b981' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -356,6 +357,7 @@ export default function DashboardPage() {
                                     <Tooltip
                                         cursor={{ fill: 'transparent' }}
                                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#10b981' }}
                                         formatter={(value: number | undefined) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0)}
                                     />
                                     <Bar dataKey="amount" radius={[0, 4, 4, 0]} barSize={25}>
