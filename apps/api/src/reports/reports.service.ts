@@ -155,6 +155,7 @@ export class ReportsService {
     async getSalesByDate(
         startDate: Date,
         endDate: Date,
+        companyId: string,
         cambistaId?: string,
         gameId?: string,
         page: number = 1,
@@ -163,6 +164,7 @@ export class ReportsService {
     ) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = {
+            companyId,
             createdAt: {
                 gte: startDate,
                 lte: endDate,
@@ -541,20 +543,19 @@ export class ReportsService {
             }
         };
     }
-    async getSalesByArea(startDate: Date, endDate: Date, requestingUserId?: string) {
+    async getSalesByArea(startDate: Date, endDate: Date, requestingUserId?: string, companyId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
-        // Fetch tickets with user and area relations
+        const where: any = {
+            companyId,
+            createdAt: { gte: startDate, lte: endDate },
+            status: { not: 'CANCELLED' }
+        };
+        if (areaFilter.areaId) {
+            where.user = { areaId: areaFilter.areaId };
+        }
+
         const tickets = await this.prisma.ticket.findMany({
-            where: {
-                createdAt: {
-                    gte: startDate,
-                    lte: endDate,
-                },
-                status: {
-                    not: 'CANCELLED'
-                },
-                ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
-            },
+            where,
             include: {
                 user: {
                     include: { area: true }
@@ -617,9 +618,9 @@ export class ReportsService {
     }
 
     // New report methods
-    async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string, requestingUserId?: string) {
+    async getDailyCloses(startDate?: Date, endDate?: Date, userId?: string, status?: string, requestingUserId?: string, companyId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
-        const where: any = {};
+        const where: any = { companyId };
         if (startDate || endDate) {
             const start = startDate ? new Date(startDate) : new Date(0);
             start.setHours(0, 0, 0, 0);
@@ -666,17 +667,19 @@ export class ReportsService {
         }));
     }
 
-    async getPendingCloses(requestingUserId?: string) {
+    async getPendingCloses(requestingUserId?: string, companyId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
         const where: any = { status: 'PENDING' };
+        if (companyId) where.companyId = companyId;
         if (areaFilter.areaId) {
             where.closedByUser = { areaId: areaFilter.areaId };
         }
         return this.prisma.dailyClose.findMany({ where, include: { closedByUser: true }, orderBy: { createdAt: 'desc' } });
     }
 
-    async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string, requestingUserId?: string) {
+    async exportTransactionsCsv(startDate?: Date, endDate?: Date, userId?: string, requestingUserId?: string, companyId?: string) {
         const where: any = {};
+        if (companyId) where.companyId = companyId;
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
             const lte = endDate ? endDate : new Date();
@@ -699,8 +702,9 @@ export class ReportsService {
         return objectsToCsv(rows);
     }
 
-    async getTicketsByDraw(drawId?: string, startDate?: Date, endDate?: Date) {
+    async getTicketsByDraw(drawId?: string, startDate?: Date, endDate?: Date, companyId?: string) {
         const where: any = {};
+        if (companyId) where.companyId = companyId;
         if (drawId) where.drawId = drawId;
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
@@ -711,12 +715,13 @@ export class ReportsService {
         return this.prisma.ticket.findMany({ where, include: { user: { select: { username: true, name: true } }, game: true }, orderBy: { createdAt: 'desc' } });
     }
 
-    async getTopSellers(limit: number = 10, startDate?: Date, endDate?: Date, requestingUserId?: string) {
-        const areaFilter = await this.getAreaFilter(requestingUserId);
+    async getTopSellers(limit: number = 10, startDate?: Date, endDate?: Date, companyId?: string, requestingUserId?: string) {
+        // requestingUserId kept for compatibility if needed, but companyId is priority for isolation
         const where: any = {
             status: { not: 'CANCELLED' },
-            ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {})
         };
+        if (companyId) where.companyId = companyId;
+
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
             const lte = endDate ? endDate : new Date();
@@ -738,18 +743,22 @@ export class ReportsService {
         }));
     }
 
-    async getActiveUsers(days: number = 30) {
+    async getActiveUsers(days: number = 30, companyId?: string) {
         const since = new Date();
         since.setDate(since.getDate() - days);
 
-        const groups = await this.prisma.ticket.groupBy({ by: ['userId'], where: { createdAt: { gte: since }, status: { not: 'CANCELLED' } } });
+        const where: any = { createdAt: { gte: since }, status: { not: 'CANCELLED' } };
+        if (companyId) where.companyId = companyId;
+
+        const groups = await this.prisma.ticket.groupBy({ by: ['userId'], where });
         const userIds = groups.map(g => g.userId);
 
         return this.prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, username: true, name: true, email: true } });
     }
 
-    async getNotificationLogs(startDate?: Date, endDate?: Date, status?: string, userId?: string) {
+    async getNotificationLogs(startDate?: Date, endDate?: Date, status?: string, userId?: string, companyId?: string) {
         const where: any = {};
+        if (companyId) where.companyId = companyId;
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
             const lte = endDate ? endDate : new Date();
@@ -761,8 +770,8 @@ export class ReportsService {
         return this.prisma.notificationLog.findMany({ where, orderBy: { createdAt: 'desc' }, include: { user: { select: { id: true, username: true, name: true } } } });
     }
 
-    async exportNotificationLogsCsv(startDate?: Date, endDate?: Date, status?: string, userId?: string) {
-        const logs = await this.getNotificationLogs(startDate, endDate, status, userId);
+    async exportNotificationLogsCsv(startDate?: Date, endDate?: Date, status?: string, userId?: string, companyId?: string) {
+        const logs = await this.getNotificationLogs(startDate, endDate, status, userId, companyId);
         const rows = logs.map(l => ({
             id: l.id,
             createdAt: l.createdAt?.toISOString(),

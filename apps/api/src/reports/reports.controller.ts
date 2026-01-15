@@ -26,10 +26,13 @@ export class ReportsController {
         @Query('gameId') gameId?: string,
         @Query('page') page?: string,
         @Query('limit') limit?: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
+        const companyId = targetCompanyId || req.user.companyId;
         return this.reportsService.getSalesByDate(
             new Date(startDate),
             new Date(endDate),
+            companyId,
             cambistaId,
             gameId,
             page ? Number(page) : 1,
@@ -43,7 +46,9 @@ export class ReportsController {
         @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
+        const companyId = targetCompanyId || req.user.companyId;
         // Ensure full day coverage if only date string is passed
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
@@ -51,15 +56,12 @@ export class ReportsController {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
 
-        return this.reportsService.getSalesByArea(start, end, req.user.userId);
+        return this.reportsService.getSalesByArea(start, end, req.user.userId, companyId);
     }
+
     @Get('dashboard')
     async getDashboardStats(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
-        // Se MASTER e targetCompanyId fornecido, usar o target
-        let companyId = req.user.companyId;
-        if (req.user.role === 'MASTER' && targetCompanyId) {
-            companyId = targetCompanyId;
-        }
+        const companyId = targetCompanyId || req.user.companyId;
         return this.reportsService.getDashboardStats(req.user.userId, companyId);
     }
 
@@ -69,6 +71,7 @@ export class ReportsController {
         @Query('cambistaId') cambistaId: string,
         @Query('date') date: string,
     ) {
+        // Finance summary is specific to a user, so we check that user's validity or assume current context
         return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), req.user.userId);
     }
 
@@ -79,13 +82,16 @@ export class ReportsController {
         @Query('endDate') endDate: string,
         @Query('userId') userId: string,
         @Query('status') status: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status, req.user.userId);
+        const companyId = targetCompanyId || req.user.companyId;
+        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status, req.user.userId, companyId);
     }
 
     @Get('pending-closes')
-    async getPendingCloses(@Request() req: any) {
-        return this.reportsService.getPendingCloses(req.user.userId);
+    async getPendingCloses(@Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
+        const companyId = targetCompanyId || req.user.companyId;
+        return this.reportsService.getPendingCloses(req.user.userId, companyId);
     }
 
     @Get('transactions/export')
@@ -94,9 +100,11 @@ export class ReportsController {
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('userId') userId: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
         @Res() res: Response,
     ) {
-        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId);
+        const companyId = targetCompanyId || req.user.companyId;
+        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId, companyId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="transactions_${Date.now()}.csv"`);
         res.send(csv);
@@ -104,48 +112,61 @@ export class ReportsController {
 
     @Get('tickets-by-draw')
     async getTicketsByDraw(
+        @Request() req: any,
         @Query('drawId') drawId: string,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        return this.reportsService.getTicketsByDraw(drawId, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined);
+        const companyId = targetCompanyId || req.user.companyId;
+        return this.reportsService.getTicketsByDraw(drawId, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, companyId);
     }
 
     @Get('top-sellers')
     async getTopSellers(
+        @Request() req: any,
         @Query('limit') limit?: string,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
+        const companyId = targetCompanyId || req.user.companyId;
         const l = limit ? Number(limit) : 10;
-        return this.reportsService.getTopSellers(l, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined);
+        return this.reportsService.getTopSellers(l, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, companyId);
     }
 
     @Get('active-users')
-    async getActiveUsers(@Query('days') days?: string) {
+    async getActiveUsers(@Request() req: any, @Query('days') days?: string, @Query('targetCompanyId') targetCompanyId?: string) {
+        const companyId = targetCompanyId || req.user.companyId;
         const d = days ? Number(days) : 30;
-        return this.reportsService.getActiveUsers(d);
+        return this.reportsService.getActiveUsers(d, companyId);
     }
 
     @Get('notifications')
     async getNotificationLogs(
+        @Request() req: any,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
         @Query('status') status?: string,
         @Query('userId') userId?: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
     ) {
-        return this.reportsService.getNotificationLogs(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId);
+        const companyId = targetCompanyId || req.user.companyId;
+        return this.reportsService.getNotificationLogs(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId, companyId);
     }
 
     @Get('notifications/export')
     async exportNotificationLogs(
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string,
         @Query('status') status: string,
         @Query('userId') userId: string,
+        @Query('targetCompanyId') targetCompanyId?: string,
         @Res() res: Response,
     ) {
-        const csv = await this.reportsService.exportNotificationLogsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId);
+        const companyId = targetCompanyId || req.user.companyId;
+        const csv = await this.reportsService.exportNotificationLogsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, status, userId, companyId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="notification_logs_${Date.now()}.csv"`);
         res.send(csv);
