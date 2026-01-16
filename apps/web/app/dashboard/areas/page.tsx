@@ -37,6 +37,9 @@ interface Area {
     currentSeries?: string
     warningThreshold?: number
     autoCycleSeries?: boolean
+    company?: {
+        companyName: string
+    }
     _count?: {
         users: number
     }
@@ -702,3 +705,4 @@ export default function AreasPage() {
         )
     }
 
+}
