@@ -192,6 +192,7 @@ model Area {
   // Series Control Extensions
   warningThreshold    Int     @default(80) // Porcentagem para aviso (ex: 80%)
   notifyOnWarning     Boolean @default(true) // Enviar notificação ao atingir threshold
+  autoCycleSeries     Boolean @default(true) // Se false, para as vendas ao atingir o limite até intervenção manual
 
   users               User[]
   configs             AreaConfig[]

@@ -79,4 +79,28 @@ export class NotificationsService {
             }
         }
     }
+
+    async sendToRole(role: 'MASTER' | 'ADMIN' | 'CAMBISTA' | 'COBRADOR', title: string, body: string, data?: any, companyId?: string) {
+        try {
+            const where: any = { role: role, isActive: true, pushToken: { not: null } };
+            if (companyId) {
+                where.companyId = companyId;
+            }
+
+            const users = await this.prisma.client.user.findMany({
+                where: where,
+                select: { pushToken: true }
+            });
+
+            const tokens = users.map((u: { pushToken: string | null }) => u.pushToken).filter((t: string | null) => t !== null) as string[];
+
+            if (tokens.length > 0) {
+                await this.sendPushNotification(tokens, title, body, data, companyId);
+                this.logger.log(`Notificação enviada para ${tokens.length} usuários com role ${role}`);
+            }
+        } catch (error) {
+            this.logger.error(`Erro ao enviar notificação para role ${role}`, error);
+        }
+    }
 }
+

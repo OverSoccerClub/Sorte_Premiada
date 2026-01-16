@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { FinanceService } from '../finance/finance.service';
 import { SecurityService } from '../security/security.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { RedisService } from '../redis/redis.service';
 import { Prisma } from '@prisma/client';
 import { getBrazilTime, dayjs } from '../utils/date.util';
@@ -13,6 +14,7 @@ export class TicketsService {
         private prisma: PrismaService,
         private financeService: FinanceService,
         private securityService: SecurityService,
+        @Inject(forwardRef(() => NotificationsService)) private notificationsService: NotificationsService,
         private redis: RedisService
     ) { }
     // Force rebuild 1
@@ -69,7 +71,7 @@ export class TicketsService {
         // === AUTOMATIC SERIES CONTROL ===
         // Fetch area with series control fields
         let seriesNumber: string | null = null;
-        let areaToUpdate: { id: string; name: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean; warningThreshold: number; notifyOnWarning: boolean } | null = null;
+        let areaToUpdate: { id: string; name: string; currentSeries: string; ticketsInSeries: number; maxTicketsPerSeries: number; isActive: boolean; warningThreshold: number; notifyOnWarning: boolean; autoCycleSeries: boolean } | null = null;
 
         if (user?.areaId) {
             areaToUpdate = await this.prisma.client.area.findUnique({
@@ -82,7 +84,8 @@ export class TicketsService {
                     maxTicketsPerSeries: true,
                     isActive: true,
                     warningThreshold: true,
-                    notifyOnWarning: true
+                    notifyOnWarning: true,
+                    autoCycleSeries: true
                 }
             });
 
@@ -93,6 +96,11 @@ export class TicketsService {
 
                 // Check if we need to increment series
                 if (areaToUpdate.ticketsInSeries >= areaToUpdate.maxTicketsPerSeries) {
+                    // Check if Auto Cycle is Enabled
+                    if (areaToUpdate.autoCycleSeries === false) {
+                        throw new BadRequestException("Série Esgotada para esta praça. Aguarde liberação do administrador.");
+                    }
+
                     // Increment series
                     const currentSeriesNum = parseInt(areaToUpdate.currentSeries);
                     const newSeries = (currentSeriesNum + 1).toString().padStart(4, '0');
@@ -115,9 +123,13 @@ export class TicketsService {
                             // Ideally, we create a NotificationLog for Master/Admin
                             console.warn(`[SERIES WARNING] Area ${areaToUpdate.name} (${areaToUpdate.id}) series ${areaToUpdate.currentSeries} is at ${saturation.toFixed(1)}% capacity.`);
 
-                            // Create Notification via Prisma if it doesn't exist for this series/threshold combo recently?
-                            // For now, simple console log as a placeholder for the notification service hook
-                            // this.notificationsService.sendToRole('MASTER', 'Alerta de Série', `A praça ${areaToUpdate.name} atingiu ${saturation.toFixed(0)}% da série atual.`);
+                            // Create Notification via NotificationsService
+                            const companyId = user?.companyId;
+                            if (companyId) {
+                                // Notify MASTER and ADMIN of that company
+                                await this.notificationsService.sendToRole('MASTER', 'Alerta de Série', `A praça ${areaToUpdate.name} atingiu ${saturation.toFixed(0)}% da série ${areaToUpdate.currentSeries}.`, { areaId: areaToUpdate.id }, companyId);
+                                await this.notificationsService.sendToRole('ADMIN', 'Alerta de Série', `A praça ${areaToUpdate.name} atingiu ${saturation.toFixed(0)}% da série ${areaToUpdate.currentSeries}.`, { areaId: areaToUpdate.id }, companyId);
+                            }
                         } catch (e) {
                             console.error("Failed to process warning", e);
                         }
