@@ -408,12 +408,10 @@ export default function AreasPage() {
                                                             className="bg-muted/50 border-input font-mono"
                                                             value={field.value || ''}
                                                             onChange={(e) => {
-                                                                // Permite apenas números
                                                                 const value = e.target.value.replace(/\D/g, '');
                                                                 field.onChange(value);
                                                             }}
                                                             onBlur={(e) => {
-                                                                // Formata com 4 dígitos apenas quando sai do campo
                                                                 const value = e.target.value.replace(/\D/g, '');
                                                                 if (value) {
                                                                     field.onChange(value.padStart(4, '0'));
@@ -442,7 +440,7 @@ export default function AreasPage() {
                                                                 max={100}
                                                                 placeholder="Ex: 80"
                                                                 className="bg-muted/50 border-input"
-                                                                {...field}
+                                                                value={field.value}
                                                                 onChange={(e) => field.onChange(Number(e.target.value))}
                                                             />
                                                             <span className="absolute right-3 top-2 text-sm text-muted-foreground">%</span>
