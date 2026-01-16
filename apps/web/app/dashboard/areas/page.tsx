@@ -24,6 +24,7 @@ const formSchema = z.object({
     city: z.string().min(1, "Cidade é obrigatória"),
     state: z.string().min(1, "Estado é obrigatório").length(2, { message: "Estado deve ser a sigla (ex: SP)." }).toUpperCase(),
     seriesNumber: z.string().min(4, "Série é obrigatória (ex: 0001)"),
+    warningThreshold: z.coerce.number().min(1).max(100).default(80),
     autoCycleSeries: z.boolean().default(true),
 })
 
@@ -34,6 +35,7 @@ interface Area {
     state: string
     seriesNumber?: string
     currentSeries?: string
+    warningThreshold?: number
     autoCycleSeries?: boolean
     _count?: {
         users: number
@@ -74,6 +76,8 @@ export default function AreasPage() {
         defaultValues: {
             city: "",
             state: "",
+            seriesNumber: "",
+            warningThreshold: 80,
             autoCycleSeries: true
         },
     })
@@ -118,7 +122,8 @@ export default function AreasPage() {
         form.reset({
             city: "",
             state: "",
-            autoCycleSeries: true
+            autoCycleSeries: true,
+            warningThreshold: 80,
         })
         setIsDialogOpen(true)
     }
@@ -130,6 +135,7 @@ export default function AreasPage() {
             city: area.city,
             state: area.state,
             seriesNumber: area.seriesNumber?.toString() || "",
+            warningThreshold: area.warningThreshold || 80,
             autoCycleSeries: area.autoCycleSeries ?? true
         })
         setIsDialogOpen(true)
@@ -215,6 +221,7 @@ export default function AreasPage() {
                     state: values.state,
                     seriesNumber: values.seriesNumber || null,
                     autoCycleSeries: values.autoCycleSeries,
+                    warningThreshold: Number(values.warningThreshold),
                     companyId: activeCompanyId
                 }),
             })
@@ -416,6 +423,33 @@ export default function AreasPage() {
                                                     </FormControl>
                                                     <p className="text-xs text-muted-foreground">
                                                         Série única para identificar bilhetes desta área (ex: Centro = 1, Ceasa = 2)
+                                                    </p>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="warningThreshold"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Alerta de Saturação (%)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Input
+                                                                type="number"
+                                                                min={1}
+                                                                max={100}
+                                                                placeholder="Ex: 80"
+                                                                className="bg-muted/50 border-input"
+                                                                {...field}
+                                                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                                            />
+                                                            <span className="absolute right-3 top-2 text-sm text-muted-foreground">%</span>
+                                                        </div>
+                                                    </FormControl>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Porcentagem de vendas para notificar Master/Admin.
                                                     </p>
                                                     <FormMessage />
                                                 </FormItem>
