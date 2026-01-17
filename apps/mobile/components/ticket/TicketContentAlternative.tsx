@@ -117,9 +117,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 )}
             </View>
 
-            {/* Draw Info */}
-            <Text style={tw`text-center font-black text-black text-[10px] mb-1 leading-tight`}>
+            {/* Draw Info with Date and Time */}
+            <Text style={tw`text-center font-black text-black text-[10px] mb-0.5 leading-tight`}>
                 SORTEIO {formatDrawNumber()} - {formatDrawDateHeader()}
+            </Text>
+            <Text style={tw`text-center font-bold text-black text-[9px] mb-1 leading-tight`}>
+                Data/Hora: {data.drawDate ? new Date(data.drawDate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'A definir'}
             </Text>
 
             {/* Plaza Info */}
@@ -197,11 +200,11 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     ___  ___  ___  ___  ___  ___  ___  ___
                 </Text>
 
-                <Text style={tw`text-center font-bold text-[10px] text-black mb-0.5 uppercase leading-tight`}>
+                <Text style={tw`text-center font-bold text-[12px] text-black mb-0.5 uppercase leading-tight`}>
                     {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
                 </Text>
                 {data.prizes && (
-                    <Text style={tw`text-center font-black text-[10px] text-black uppercase leading-tight`}>
+                    <Text style={tw`text-center font-black text-[12px] text-black uppercase leading-tight`}>
                         QUADRA - {data.prizes.milhar || 'R$ 1.000,00'}   TRINCA: {data.prizes.centena || 'R$ 60,00'} - DUQUE: {data.prizes.dezena || 'R$ 6,00'}
                     </Text>
                 )}
@@ -301,8 +304,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     )}
                 </View>
 
+                {/* Call to Action */}
+                <Text style={tw`text-center font-bold text-[11px] text-black mt-3 mb-1`}>
+                    Acesse o site para conferir o resultado
+                </Text>
 
-                <Text style={tw`text-center font-bold text-[18px] text-black mt-3`}>
+                <Text style={tw`text-center font-bold text-[18px] text-black`}>
                     www.fezinhadehoje.com.br
                 </Text>
             </View>
