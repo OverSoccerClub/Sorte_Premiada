@@ -117,20 +117,10 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 )}
             </View>
 
-            {/* Draw Info with Date and Time */}
-            <Text style={tw`text-center font-black text-black text-[10px] mb-0.5 leading-tight`}>
-                SORTEIO {formatDrawNumber()} - {formatDrawDateHeader()}
+            {/* Draw Info - All in one line */}
+            <Text style={tw`text-center font-black text-black text-[9px] mb-1 leading-tight px-1`}>
+                SORTEIO: {formatDrawNumber()} - DATA: {data.drawDate ? new Date(data.drawDate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às') : 'A definir'}{data.areaName && data.city ? ` - ${data.city}/${data.areaName}` : data.areaName ? ` - ${data.areaName}` : ''}
             </Text>
-            <Text style={tw`text-center font-bold text-black text-[9px] mb-1 leading-tight`}>
-                Data/Hora: {data.drawDate ? new Date(data.drawDate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'A definir'}
-            </Text>
-
-            {/* Plaza Info */}
-            {data.areaName && (
-                <Text style={tw`text-center font-bold text-black text-[9px] mb-1 leading-tight`}>
-                    Praça: {data.areaName}{data.city ? ` - ${data.city}` : ''}
-                </Text>
-            )}
 
             {/* 4 Fezinhas in Grid - Reduced margin */}
             <View style={tw`mb-0`}>
@@ -138,7 +128,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`flex-row justify-between mb-1 px-2`}>
                     {/* Fezinha 1 */}
                     <View style={tw`w-[45%]`}>
-                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 1</Text>
+                        <Text style={tw`text-left font-black text-[13px] mb-0 ml-1`}>Fezinha 1</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[0]?.length > 0 ? fezinhas[0].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
@@ -151,7 +141,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                     {/* Fezinha 2 */}
                     <View style={tw`w-[45%]`}>
-                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 2</Text>
+                        <Text style={tw`text-left font-black text-[13px] mb-0 ml-1`}>Fezinha 2</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[1]?.length > 0 ? fezinhas[1].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
@@ -167,7 +157,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`flex-row justify-between px-2`}>
                     {/* Fezinha 3 */}
                     <View style={tw`w-[45%]`}>
-                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 3</Text>
+                        <Text style={tw`text-left font-black text-[13px] mb-0 ml-1`}>Fezinha 3</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[2]?.length > 0 ? fezinhas[2].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
@@ -180,7 +170,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                     {/* Fezinha 4 */}
                     <View style={tw`w-[45%]`}>
-                        <Text style={tw`text-left font-black text-[11px] mb-0 ml-1`}>Fezinha 4</Text>
+                        <Text style={tw`text-left font-black text-[13px] mb-0 ml-1`}>Fezinha 4</Text>
                         <View style={tw`flex-row justify-center gap-2`}>
                             {fezinhas[3]?.length > 0 ? fezinhas[3].map((num, idx) => (
                                 <View key={idx} style={tw`items-center`}>
@@ -214,12 +204,12 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             {data.secondChanceNumber && (
                 <View style={tw`mb-2`}>
                     {/* Black Header with Draw Info */}
-                    <View style={tw`items-center mb-2`}>
-                        <View style={tw`bg-black rounded-full py-1 px-8`}>
-                            <Text style={tw`text-white text-center font-black text-lg uppercase leading-tight`}>
+                    <View style={tw`mb-2 -mx-4`}>
+                        <View style={tw`bg-black py-2 px-4`}>
+                            <Text style={tw`text-white text-center font-black text-xl uppercase leading-tight`}>
                                 {data.secondChanceLabel || 'FEZINHA EXTRA'}
                             </Text>
-                            <Text style={tw`text-white text-center text-[8px] font-bold uppercase leading-tight`}>
+                            <Text style={tw`text-white text-center text-[10px] font-bold uppercase leading-tight`}>
                                 SORTEIO EXTRA, DIA {formatSecondChanceDate()}
                             </Text>
                         </View>
@@ -237,10 +227,10 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     </View>
 
                     {/* Extra Prize Info */}
-                    <Text style={tw`text-center font-bold text-[10px] text-black mb-0.5 px-2`}>
+                    <Text style={tw`text-center font-bold text-[12px] text-black mb-0.5 px-2`}>
                         PRÊMIO DA FEZINHA EXTRA - R$ 5.000,00
                     </Text>
-                    <Text style={tw`text-center font-bold text-[8px] text-black uppercase`}>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
                         {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
                     </Text>
                 </View>
@@ -296,19 +286,19 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                         <View style={tw`p-2 bg-white border-[3px] border-black rounded-none`}>
                             <QRCode
                                 value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                                size={Number(qrSize)}
+                                size={120}
                                 backgroundColor="white"
                                 color="black"
+                                ecl="M"
                             />
                         </View>
                     )}
                 </View>
 
                 {/* Call to Action */}
-                <Text style={tw`text-center font-bold text-[11px] text-black mt-3 mb-1`}>
+                <Text style={tw`text-center font-bold text-[11px] text-black mt-3`}>
                     Acesse o site para conferir o resultado
                 </Text>
-
                 <Text style={tw`text-center font-bold text-[18px] text-black`}>
                     www.fezinhadehoje.com.br
                 </Text>

@@ -1,14 +1,14 @@
 ﻿{
-    "version": "1.4.64",
-    "buildNumber": 180,
+    "version": "1.4.65",
+    "buildNumber": 181,
     "releaseDate": "2026-01-17",
     "downloadUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
     "changelog": [
-        "Correção do QR Code no template Fezinha (agora legível por câmeras)",
-        "Loteria Tradicional completa",
-        "Melhorias no template alternativo",
-        "Tela de perfil melhorada",
-        "Funcionalidade force-unbind para MASTER"
+        "Data e hora do sorteio adicionada no template Fezinha",
+        "Fontes das linhas de prêmios aumentadas para melhor legibilidade",
+        "Texto 'Acesse o site para conferir o resultado' adicionado",
+        "QR Code corrigido (legível por câmeras)",
+        "Loteria Tradicional completa"
     ],
     "minVersion": "1.4.0",
     "forceUpdate": false
