@@ -445,7 +445,7 @@ export default function DashboardPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos os Jogos</SelectItem>
-                                    <SelectItem value="JOGO_DO_BICHO">Bicho</SelectItem>
+                                    <SelectItem value="LOTERIA_TRADICIONAL">Loteria Tradicional</SelectItem>
                                     <SelectItem value="2x1000">2x1000</SelectItem>
                                 </SelectContent>
                             </Select>

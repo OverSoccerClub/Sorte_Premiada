@@ -160,7 +160,7 @@ async function main() {
         update: {},
         create: {
             id: 'jb-imperial',
-            name: 'Jogo do Bicho',
+            name: 'Loteria Tradicional',
             rules: { type: 'BICHO' },
             price: 10.00,
             companyId: company1.id,

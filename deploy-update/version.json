@@ -1,5 +1,6 @@
 ﻿{
-    "version": "1.4.50",
-    "url": "https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje/InnoBet.apk",
-    "notes": "Correção crítica: falha na atualização automática."
+    "apkUrl":  "InnoBet.apk",
+    "build":  "177",
+    "version":  "1.4.61",
+    "force":  true
 }

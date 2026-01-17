@@ -81,13 +81,19 @@ function AppInit() {
                             });
 
                             try {
-                                await UpdaterService.downloadUpdate(updateInfo.apkUrl, settings.updateUrl, (progress) => {
-                                    const percent = Math.round(progress * 100);
-                                    setAlertConfig(prev => ({
-                                        ...prev,
-                                        message: `Baixando atualização... ${percent}%`
-                                    }));
-                                });
+                                await UpdaterService.downloadUpdate(
+                                    updateInfo.apkUrl,
+                                    settings.updateUrl,
+                                    (progress) => {
+                                        const percent = Math.round(progress * 100);
+                                        setAlertConfig(prev => ({
+                                            ...prev,
+                                            message: `Baixando atualização... ${percent}%`
+                                        }));
+                                    },
+                                    // Pass version info to track pending update
+                                    { version: updateInfo.version, build: updateInfo.build }
+                                );
                                 // Close alert once download is done and installer is opened
                                 setAlertConfig(prev => ({ ...prev, visible: false }));
                             } catch (err: any) {

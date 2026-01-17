@@ -248,6 +248,7 @@ model Game {
   prizeMilhar  Decimal? @default(5000) // Prêmio para Milhar Seca
   prizeCentena Decimal? @default(600) // Prêmio para Centena Seca
   prizeDezena  Decimal? @default(60) // Prêmio para Dezena Seca
+  prizeGrupo   Decimal? @default(18) // Prêmio para Grupo (Loteria Tradicional)
 
   // Ticket Numbering Configuration
   ticketNumberingMode String? @default("RANDOM") // "RANDOM" ou "SEQUENTIAL"

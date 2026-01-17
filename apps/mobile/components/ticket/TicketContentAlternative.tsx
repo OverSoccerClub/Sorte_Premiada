@@ -132,8 +132,8 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 </Text>
             )}
 
-            {/* 4 Fezinhas in Grid */}
-            <View style={tw`mb-1 border-b-2 border-dashed border-gray-400 pb-2`}>
+            {/* 4 Fezinhas in Grid - Reduced margin */}
+            <View style={tw`mb-0`}>
                 {/* Row 1 */}
                 <View style={tw`flex-row justify-between mb-1 px-2`}>
                     {/* Fezinha 1 */}
@@ -246,20 +246,35 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 </View>
             )}
 
-            {/* Footer Information */}
+            {/* Footer Information - Rearranged */}
             <View style={tw`mx-2`}>
-                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
-                    Bilhete Número: {data.ticketNumber?.toString().padStart(4, '0') || '----'} - Série: {data.series?.toString().padStart(3, '0') || '---'}
-                </Text>
-                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
-                    Preço da Aposta: {data.price}
-                </Text>
-                <Text style={tw`text-[10px] text-black font-bold mb-0.5`}>
-                    Terminal número: {data.terminalId || '--------'} - Vendedor: {data.vendorName || '------'}
-                </Text>
-                <Text style={tw`text-[10px] text-black font-bold mb-1 leading-tight`}>
-                    Data da aposta: {data.date}
-                </Text>
+                <View style={tw`flex-row justify-between mb-1`}>
+                    <View style={tw`w-[33%]`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                    </View>
+                    <View style={tw`w-[34%] items-center`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
+                    </View>
+                    <View style={tw`w-[33%] items-end`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                    </View>
+                </View>
+
+                <View style={tw`flex-row justify-between mb-1`}>
+                    <View style={tw`w-[33%]`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>
+                            Term: {data.terminalId || '---'}
+                        </Text>
+                    </View>
+                    <View style={tw`w-[34%] items-center`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>
+                            Vend: {data.vendorName?.substring(0, 10) || "Cambista"}
+                        </Text>
+                    </View>
+                    <View style={tw`w-[33%] items-end`}>
+                        <Text style={tw`text-[10px] text-black font-bold`}>{data.date}</Text>
+                    </View>
+                </View>
 
                 {/* Barcode */}
                 {data.hash && (
@@ -267,7 +282,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                         <Barcode
                             value={data.hash}
                             width={370}
-                            height={80}
+                            height={25}
                         />
                         <Text style={tw`text-[13px] text-black mt-1 font-black font-mono`}>
                             {data.hash}
@@ -292,7 +307,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 </View>
 
 
-                <Text style={tw`text-center font-bold text-[11px] text-black mt-3`}>
+                <Text style={tw`text-center font-bold text-[14px] text-black mt-3`}>
                     www.fezinhadehoje.com.br
                 </Text>
             </View>

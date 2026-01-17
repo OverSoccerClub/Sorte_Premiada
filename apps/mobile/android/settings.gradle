@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'A Perseverança'
+rootProject.name = 'InnoBet'
 
 dependencyResolutionManagement {
   versionCatalogs {

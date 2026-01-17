@@ -2,10 +2,13 @@ import * as Application from 'expo-application';
 import * as FileSystem from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { Alert, Platform, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Fallback update URL - can be overridden by AppConfig if needed
-const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje';
+const DEFAULT_UPDATE_URL = 'https://www.inforcomputer.com/Atualizacoes/InnoBet';
 const VERSION_FILE_NAME = 'version.json';
+const FAILED_UPDATES_KEY = '@InnoBet:FailedUpdates';
+const PENDING_UPDATE_KEY = '@InnoBet:PendingUpdate';
 
 export interface VersionInfo {
     version: string;
@@ -15,13 +18,102 @@ export interface VersionInfo {
     notes?: string;
 }
 
+interface PendingUpdateInfo {
+    version: string;
+    build: string;
+    timestamp: number;
+}
+
 export const UpdaterService = {
     getUpdateUrl(overrideUrl?: string): string {
         return overrideUrl || DEFAULT_UPDATE_URL;
     },
 
-    async checkForUpdates(updateUrl?: string): Promise<VersionInfo | null> {
+    /**
+     * Checks if we have a pending update that failed to apply.
+     * Should be called on app startup.
+     */
+    async checkPendingUpdateStatus() {
+        try {
+            const pendingStr = await AsyncStorage.getItem(PENDING_UPDATE_KEY);
+            if (!pendingStr) return;
+
+            const pending: PendingUpdateInfo = JSON.parse(pendingStr);
+            const currentVersion = Application.nativeApplicationVersion || '1.0.0';
+            const currentBuild = Application.nativeBuildVersion || '1';
+
+            // If we are still on an older version than the pending one, it failed.
+            // But we need to be careful: maybe the user just didn't click install?
+            // Detection strategy: If more than 'X' time passed, or if we are running again, 
+            // implies the app process restarted without update.
+            // For simplicity: If we are running this code, and PENDING_UPDATE_KEY exists,
+            // and versions match 'old', then the previous update attempt didn't "stick".
+
+            const isPendingNewer = this.compareVersions(pending.version, currentVersion, pending.build, currentBuild);
+
+            if (isPendingNewer) {
+                console.warn('[Updater] Detected failed update attempt for:', pending.version);
+                // Mark as failed
+                await this.markUpdateAsFailed(pending.version, pending.build);
+            } else {
+                // We successfully updated! (Or at least matched the pending version)
+                console.log('[Updater] Update appears successful or not needed.');
+            }
+
+            // Always clear pending after check
+            await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
+
+        } catch (error) {
+            console.error('[Updater] Error checking pending status:', error);
+        }
+    },
+
+    async markUpdateAsFailed(version: string, build: string) {
+        try {
+            const existingFailedStr = await AsyncStorage.getItem(FAILED_UPDATES_KEY);
+            const failedList: string[] = existingFailedStr ? JSON.parse(existingFailedStr) : [];
+            const key = `${version}-${build}`;
+
+            if (!failedList.includes(key)) {
+                failedList.push(key);
+                // Keep list small, maybe last 5
+                if (failedList.length > 5) failedList.shift();
+                await AsyncStorage.setItem(FAILED_UPDATES_KEY, JSON.stringify(failedList));
+            }
+        } catch (e) {
+            console.error('[Updater] Failed to save failed update record', e);
+        }
+    },
+
+    async isUpdateFailed(version: string, build: string): Promise<boolean> {
+        try {
+            const existingFailedStr = await AsyncStorage.getItem(FAILED_UPDATES_KEY);
+            if (!existingFailedStr) return false;
+            const failedList: string[] = JSON.parse(existingFailedStr);
+            return failedList.includes(`${version}-${build}`);
+        } catch {
+            return false;
+        }
+    },
+
+    /**
+     * Clears ignored updates history. Useful if USER manually triggers check.
+     */
+    async clearFailedUpdates() {
+        await AsyncStorage.removeItem(FAILED_UPDATES_KEY);
+        console.log('[Updater] Ignored updates list cleared.');
+    },
+
+    async checkForUpdates(updateUrl?: string, manualCheck = false): Promise<VersionInfo | null> {
         if (Platform.OS !== 'android') return null;
+
+        // If manual check, clear the ignore list so the user can try again
+        if (manualCheck) {
+            await this.clearFailedUpdates();
+        } else {
+            // Run startup check just in case it wasn't run or this is first call
+            await this.checkPendingUpdateStatus();
+        }
 
         try {
             const baseUrl = this.getUpdateUrl(updateUrl);
@@ -65,6 +157,13 @@ export const UpdaterService = {
 
             console.log(`[Updater] Current: ${currentVersion} (${currentBuild}) | Remote: ${remoteData.version} (${remoteData.build})`);
 
+            // Check if this specific version/build was previously marked as failed
+            const isFailed = await this.isUpdateFailed(remoteData.version, remoteData.build);
+            if (isFailed) {
+                console.warn(`[Updater] Skipping update ${remoteData.version} (${remoteData.build}) because it previously failed.`);
+                return null;
+            }
+
             const hasUpdate = this.compareVersions(remoteData.version, currentVersion, remoteData.build, currentBuild);
 
             if (hasUpdate) {
@@ -84,9 +183,19 @@ export const UpdaterService = {
         }
     },
 
-    async downloadUpdate(apkUrl: string, updateUrl?: string, onProgress?: (percentage: number) => void): Promise<void> {
+    async downloadUpdate(apkUrl: string, updateUrl?: string, onProgress?: (percentage: number) => void, versionInfo?: { version: string, build: string }): Promise<void> {
         if (!apkUrl) {
             throw new Error("URL de download inválida (apkUrl vazia).");
+        }
+
+        // Mark this update as PENDING before we start download/install
+        if (versionInfo) {
+            const pendingInfo: PendingUpdateInfo = {
+                version: versionInfo.version,
+                build: versionInfo.build,
+                timestamp: Date.now()
+            };
+            await AsyncStorage.setItem(PENDING_UPDATE_KEY, JSON.stringify(pendingInfo));
         }
 
         const baseUrl = this.getUpdateUrl(updateUrl);
@@ -169,6 +278,10 @@ export const UpdaterService = {
 
         } catch (error: any) {
             console.error('[Updater] Download/Install error:', error.message);
+            // If download totally failed (exception), maybe we shouldn't mark it as 'pending update' failure immediately?
+            // Actually, if an exception occurred, we haven't launched the intent, so the app won't restart/close.
+            // So we might want to clear the pending flag here so the user can try again immediately.
+            await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
             throw error;
         }
     },

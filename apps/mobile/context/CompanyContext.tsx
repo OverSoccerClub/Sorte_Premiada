@@ -22,10 +22,10 @@ export interface CompanySettings {
 }
 
 const defaultSettings: CompanySettings = {
-    companyName: 'A Perseverança',
+    companyName: 'InnoBet',
     slogan: 'Cambista Edition',
     primaryColor: '#50C878',
-    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/Fezinha_de_Hoje',
+    updateUrl: 'https://www.inforcomputer.com/Atualizacoes/InnoBet',
 };
 
 const CACHE_KEY = '@company_settings';

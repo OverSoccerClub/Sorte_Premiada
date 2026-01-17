@@ -175,7 +175,7 @@ export class TicketsService {
         const numberCount = data.numbers ? data.numbers.length : 1;
         const betPerNumber = numberCount > 0 ? amount / numberCount : 0;
 
-        const possiblePrize = betPerNumber * multiplier;
+        let possiblePrize = betPerNumber * multiplier;
 
         let drawDate: Date | undefined;
 
@@ -292,9 +292,119 @@ export class TicketsService {
             // Store it temporarily to add to createData later
             (data as any)._ticketNumber = ticketNumber;
         }
-        // Jogo do Bicho Logic
-        else if (data.gameType.startsWith('JB-')) {
+        // Loteria Tradicional Logic
+        else if (data.gameType.startsWith('LT-')) {
             const modality = data.gameType.split('-')[1]; // GRUPO, DEZENA, CENTENA, MILHAR
+
+            if (!data.numbers || data.numbers.length === 0) {
+                throw new BadRequestException("Nenhum número selecionado.");
+            }
+
+            const numbers = data.numbers as number[];
+            let finalNumbers: string[] = [];
+
+            // Tabela de Bichos (Grupos) e suas Dezenas
+            const ANIMALS = [
+                { id: 1, name: "Avestruz", tens: ["01", "02", "03", "04"] },
+                { id: 2, name: "Águia", tens: ["05", "06", "07", "08"] },
+                { id: 3, name: "Burro", tens: ["09", "10", "11", "12"] },
+                { id: 4, name: "Borboleta", tens: ["13", "14", "15", "16"] },
+                { id: 5, name: "Cachorro", tens: ["17", "18", "19", "20"] },
+                { id: 6, name: "Cabra", tens: ["21", "22", "23", "24"] },
+                { id: 7, name: "Carneiro", tens: ["25", "26", "27", "28"] },
+                { id: 8, name: "Camelo", tens: ["29", "30", "31", "32"] },
+                { id: 9, name: "Cobra", tens: ["33", "34", "35", "36"] },
+                { id: 10, name: "Coelho", tens: ["37", "38", "39", "40"] },
+                { id: 11, name: "Cavalo", tens: ["41", "42", "43", "44"] },
+                { id: 12, name: "Elefante", tens: ["45", "46", "47", "48"] },
+                { id: 13, name: "Galo", tens: ["49", "50", "51", "52"] },
+                { id: 14, name: "Gato", tens: ["53", "54", "55", "56"] },
+                { id: 15, name: "Jacaré", tens: ["57", "58", "59", "60"] },
+                { id: 16, name: "Leão", tens: ["61", "62", "63", "64"] },
+                { id: 17, name: "Macaco", tens: ["65", "66", "67", "68"] },
+                { id: 18, name: "Porco", tens: ["69", "70", "71", "72"] },
+                { id: 19, name: "Pavão", tens: ["73", "74", "75", "76"] },
+                { id: 20, name: "Peru", tens: ["77", "78", "79", "80"] },
+                { id: 21, name: "Touro", tens: ["81", "82", "83", "84"] },
+                { id: 22, name: "Tigre", tens: ["85", "86", "87", "88"] },
+                { id: 23, name: "Urso", tens: ["89", "90", "91", "92"] },
+                { id: 24, name: "Veado", tens: ["93", "94", "95", "96"] },
+                { id: 25, name: "Vaca", tens: ["97", "98", "99", "00"] },
+            ];
+
+            switch (modality) {
+                case 'GRUPO': // 1-25 (Bichos)
+                    numbers.forEach(n => {
+                        if (n < 1 || n > 25) {
+                            throw new BadRequestException(`Grupo inválido: ${n}. Deve ser entre 1 e 25.`);
+                        }
+                    });
+
+                    // Converter grupos para dezenas
+                    // Quando aposta em um grupo, ganha se sair qualquer uma das 4 dezenas daquele bicho
+                    numbers.forEach(groupNum => {
+                        const animal = ANIMALS.find(a => a.id === groupNum);
+                        if (animal) {
+                            // Adiciona todas as 4 dezenas do bicho
+                            finalNumbers.push(...animal.tens);
+                        }
+                    });
+                    break;
+
+                case 'DEZENA': // 00-99
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 99) {
+                            throw new BadRequestException(`Dezena inválida: ${n}. Deve ser entre 00 e 99.`);
+                        }
+                        finalNumbers.push(n.toString().padStart(2, '0'));
+                    });
+                    break;
+
+                case 'CENTENA': // 000-999
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 999) {
+                            throw new BadRequestException(`Centena inválida: ${n}. Deve ser entre 000 e 999.`);
+                        }
+                        finalNumbers.push(n.toString().padStart(3, '0'));
+                    });
+                    break;
+
+                case 'MILHAR': // 0000-9999
+                    numbers.forEach(n => {
+                        if (n < 0 || n > 9999) {
+                            throw new BadRequestException(`Milhar inválida: ${n}. Deve ser entre 0000 e 9999.`);
+                        }
+                        finalNumbers.push(n.toString().padStart(4, '0'));
+                    });
+                    break;
+
+                default:
+                    throw new BadRequestException(`Modalidade inválida: ${modality}`);
+            }
+
+            // Atualizar números finais (formatados)
+            data.numbers = finalNumbers;
+
+            // Calcular prêmio estimado baseado na modalidade
+            // Nota: Os campos prizeGrupo, prizeDezena, etc. serão adicionados ao schema em breve
+            // Por enquanto, usar valores padrão
+            const prizeMultipliers: any = {
+                GRUPO: Number((game as any).prizeGrupo || 18),
+                DEZENA: Number((game as any).prizeDezena || 60),
+                CENTENA: Number((game as any).prizeCentena || 600),
+                MILHAR: Number((game as any).prizeMilhar || 4000)
+            };
+
+            const betPerNumber = amount / finalNumbers.length;
+            const ltMultiplier = prizeMultipliers[modality] || multiplier; // fallback to existing multiplier
+            possiblePrize = betPerNumber * ltMultiplier;
+        }
+        // Manter compatibilidade com JB- antigo (redirecionar para LT-)
+        else if (data.gameType.startsWith('JB-')) {
+            // Converter JB- para LT- automaticamente
+            data.gameType = data.gameType.replace('JB-', 'LT-');
+
+            const modality = data.gameType.split('-')[1];
 
             if (!data.numbers || data.numbers.length === 0) {
                 throw new BadRequestException("Nenhum número selecionado.");
@@ -303,22 +413,22 @@ export class TicketsService {
             const numbers = data.numbers as number[];
 
             switch (modality) {
-                case 'GRUPO': // 1-25
+                case 'GRUPO':
                     numbers.forEach(n => {
                         if (n < 1 || n > 25) throw new BadRequestException(`Grupo inválido: ${n}. Deve ser entre 1 e 25.`);
                     });
                     break;
-                case 'DEZENA': // 00-99
+                case 'DEZENA':
                     numbers.forEach(n => {
                         if (n < 0 || n > 99) throw new BadRequestException(`Dezena inválida: ${n}. Deve ser entre 00 e 99.`);
                     });
                     break;
-                case 'CENTENA': // 000-999
+                case 'CENTENA':
                     numbers.forEach(n => {
                         if (n < 0 || n > 999) throw new BadRequestException(`Centena inválida: ${n}. Deve ser entre 000 e 999.`);
                     });
                     break;
-                case 'MILHAR': // 0000-9999
+                case 'MILHAR':
                     numbers.forEach(n => {
                         if (n < 0 || n > 9999) throw new BadRequestException(`Milhar inválida: ${n}. Deve ser entre 0000 e 9999.`);
                     });
@@ -327,6 +437,7 @@ export class TicketsService {
                     throw new BadRequestException(`Modalidade inválida: ${modality} `);
             }
         }
+
 
 
         if (!drawDate) {

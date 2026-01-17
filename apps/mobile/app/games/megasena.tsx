@@ -148,6 +148,16 @@ export default function MegaSenaScreen() {
     };
 
     const handleReview = () => {
+        // Check if printer is configured
+        if (!printerType) {
+            showAlert(
+                "Impressora Não Configurada",
+                "Por favor, configure a impressora antes de realizar vendas. Acesse o menu de configurações.",
+                "warning"
+            );
+            return;
+        }
+
         if (selectedNumbers.length !== 6) {
             showAlert("Aposta Incompleta", "Por favor, selecione exatamente 6 números para continuar.", "error");
             return;

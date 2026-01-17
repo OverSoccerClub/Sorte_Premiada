@@ -35,7 +35,7 @@ async function main() {
         update: {},
         create: {
             id: 'jb-default-game-id',
-            name: 'Jogo do Bicho',
+            name: 'Loteria Tradicional',
             rules: { type: 'BICHO' },
             price: 10.00,
         },

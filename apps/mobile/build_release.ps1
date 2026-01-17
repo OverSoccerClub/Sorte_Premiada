@@ -80,11 +80,11 @@ try {
         Show-Progress -Activity "Gerando APK" -Status "Pulando Prebuild..." -PercentComplete 30
     }
 
-    # PATCH: Restore Display Name in strings.xml using Node for safety
-    Write-Step "Restaurando nome de exibição..." -Color "Cyan"
-    if (Test-Path ".\android\app\src\main\res\values\strings.xml") {
-        node -e "const fs = require('fs'); const path = 'android/app/src/main/res/values/strings.xml'; if (fs.existsSync(path)) { let c = fs.readFileSync(path, 'utf8'); c = c.replace(/>APerseveranca</, '>A Perseverança<'); fs.writeFileSync(path, c, {encoding: 'utf8'}); }"
-    }
+    # PATCH Removido: O nome agora vem corretamente do app.json (InnoBet)
+    # Anteriormente forçava "A Perseverança"
+    # if (Test-Path ".\android\app\src\main\res\values\strings.xml") {
+    #    node -e "const fs = require('fs'); const path = 'android/app/src/main/res/values/strings.xml'; if (fs.existsSync(path)) { ... }"
+    # }
 
     # JAVA_HOME Detection
     Write-Step "Configurando JAVA_HOME..." -Color "Gray"

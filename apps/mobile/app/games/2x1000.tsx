@@ -20,6 +20,7 @@ import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
 import { useCompany } from "../../context/CompanyContext";
 import { useSettings } from "../../context/SettingsContext";
+import { GamesService } from "../../services/games.service";
 
 
 export default function Game2x1000Screen() {
@@ -136,16 +137,19 @@ export default function Game2x1000Screen() {
     };
 
     const fetchSoldNumbers = async (id: string) => {
+        if (!token) return;
         setIsLoadingSold(true);
         try {
-            const API_URL = AppConfig.api.baseUrl;
-            const res = await fetch(`${API_URL}/tickets/availability/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const soldArray = await res.json();
-                setSoldNumbers(new Set(soldArray));
-            }
+            const soldArray = await GamesService.getAvailability(token, id);
+            // Ensure we store as strings to match "0001" etc.
+            // Backend returns strings like "1234" or "0123".
+            // Our internal logic uses numbers. Let's store as numbers for easier comparison with loop indices?
+            // OR store as strings and align everything.
+            // 2x1000 uses 0-9999.
+            // If backend sends "0123", parseInt("0123") -> 123.
+            // If backend sends "0000", parseInt("0000") -> 0.
+            const soldSet = new Set(soldArray.map((s: string) => parseInt(s, 10)));
+            setSoldNumbers(soldSet);
         } catch (error) {
             console.error("Error fetching sold numbers:", error);
         } finally {
@@ -244,6 +248,16 @@ export default function Game2x1000Screen() {
     };
 
     const handleReview = () => {
+        // Check if printer is configured
+        if (!printerType) {
+            showAlert(
+                "Impressora Não Configurada",
+                "Por favor, configure a impressora antes de realizar vendas. Acesse o menu de configurações.",
+                "warning"
+            );
+            return;
+        }
+
         if (isAutoPick) {
             // Generate numbers NOW
             const success = generateRandomNumbers();

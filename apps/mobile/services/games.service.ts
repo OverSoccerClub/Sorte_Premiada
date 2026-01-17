@@ -76,4 +76,17 @@ export class GamesService {
         }
         return response.json();
     }
+    /**
+     * Get unavailable (sold) numbers for a game
+     */
+    static async getAvailability(token: string, gameId: string): Promise<string[]> {
+        const response = await ApiClient.fetch(`${API_URL}/tickets/availability/${gameId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            console.warn('Failed to fetch availability');
+            return [];
+        }
+        return response.json();
+    }
 }

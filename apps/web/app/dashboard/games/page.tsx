@@ -183,8 +183,8 @@ export default function GamesPage() {
                         </Button>
                     </Link>
                 )}
-                {games.some(g => g.name.toLowerCase().includes('bicho') || g.displayName?.toLowerCase().includes('jb')) && (
-                    <Link href="/dashboard/games/jb">
+                {games.some(g => g.name.toLowerCase().includes('loteria') || g.name.toLowerCase().includes('tradicional') || g.name.toLowerCase().includes('bicho') || g.displayName?.toLowerCase().includes('jb') || g.displayName?.toLowerCase().includes('lt')) && (
+                    <Link href="/dashboard/games/loteria-tradicional">
                         <Button variant="outline" size="sm" className="hidden sm:flex">
                             <FileText className="w-4 h-4 mr-2" />
                             Relatório JB

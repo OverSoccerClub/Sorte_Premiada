@@ -154,7 +154,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             </View>
 
             {/* Numbers Grid */}
-            <View style={tw`flex-row flex-wrap justify-between mb-2 px-1`}>
+            <View style={tw`flex-row flex-wrap justify-between mb-0 px-1`}>
                 {Array.from({ length: 4 }).map((_, idx) => {
                     const num = sortedNumbers[idx];
                     return (
@@ -181,7 +181,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 })}
             </View>
 
-            <View style={tw`border-b-2 border-dashed border-black mb-3 mx-2`} />
+            <View style={tw`border-b-2 border-dashed border-black mb-1 mx-2 mt-1`} />
 
             {/* Prompt Message (Incentivo) */}
             <View style={tw`mb-3 px-4`}>
@@ -256,38 +256,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
             {/* Info Footer title removed (cleaner) */}
 
-            {/* Row 1: ID, Série, Bilhete */}
+            {/* Row 1: Bilhete, Série, Preço */}
             <View style={tw`flex-row justify-between mb-1`}>
-                <View style={tw`w-[32%]`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>ID: {displayTicketId}</Text>
+                <View style={tw`w-[38%]`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
                 <View style={tw`w-[30%] items-center`}>
                     <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
-                <View style={tw`w-[38%] items-end`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
+                <View style={tw`w-[32%] items-end`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
                 </View>
             </View>
 
-            {/* Row 2: Preço, Terminal, Vendedor */}
+            {/* Row 2: Terminal, Vendedor, Data */}
             <View style={tw`flex-row justify-between mb-1`}>
-                <View style={tw`w-[32%]`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
-                </View>
-                <View style={tw`w-[30%] items-center`}>
+                <View style={tw`w-[30%]`}>
                     <Text style={tw`text-[10px] text-black font-bold`}>
-                        Term: {getPosName()}
+                        Term: {getPosName().replace('POS ', '')}
                     </Text>
                 </View>
-                <View style={tw`w-[38%] items-end`}>
+                <View style={tw`w-[38%] items-center`}>
                     <Text style={tw`text-[10px] text-black font-bold`}>
                         Vend: {data.vendorName?.substring(0, 10) || "Cambista"}
                     </Text>
                 </View>
-            </View>
-            <View style={tw`flex-row justify-between mb-1`}>
-                <Text style={tw`text-[12px] text-black font-bold`}>Data: {data.date}</Text>
-                <Text style={tw`text-[12px] text-black font-bold`}>Ext: {data.drawDate || "Hoje 19H"}</Text>
+                <View style={tw`w-[32%] items-end`}>
+                    <Text style={tw`text-[10px] text-black font-bold`}>{data.date}</Text>
+                </View>
             </View>
 
             {/* Barcode and QR */}
@@ -296,7 +292,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Barcode
                         value={data.ticketId || '000000000000'}
                         width={370}
-                        height={isCapture ? 80 : 90}
+                        height={45} // Reduced by 50%
                     />
                     <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
                         <Text style={tw`font-black text-4xl text-white tracking-[3px]`}>{displayTicketId}</Text>
