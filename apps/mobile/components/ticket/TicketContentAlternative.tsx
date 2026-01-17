@@ -119,7 +119,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
             {/* Draw Info - All in one line */}
             <Text style={tw`text-center font-black text-black text-[9px] mb-1 leading-tight px-1`}>
-                SORTEIO: {formatDrawNumber()} - DATA: {data.drawDate ? new Date(data.drawDate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às') : 'A definir'}{data.areaName && data.city ? ` - ${data.city}/${data.areaName}` : data.areaName ? ` - ${data.areaName}` : ''}
+                SORTEIO: {formatDrawNumber()} - DATA: {formatDrawDateHeader()}{data.areaName && data.city ? ` - ${data.city}/${data.areaName}` : data.areaName ? ` - ${data.areaName}` : ''}
             </Text>
 
             {/* 4 Fezinhas in Grid - Reduced margin */}
