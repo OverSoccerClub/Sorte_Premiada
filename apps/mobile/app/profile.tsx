@@ -108,65 +108,55 @@ export default function ProfileScreen() {
                 {/* Main Card */}
                 <View style={tw`bg-surface p-6 rounded-3xl shadow-xl border border-gray-800 w-full`}>
 
-                    {/* Section: Personal Data */}
-                    <View style={tw`mb-8`}>
-                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
-                            Dados Pessoais
-                        </Text>
-                        <FormField
-                            label="Email"
-                            value={email}
-                            editable={false}
-                            selectTextOnFocus={false}
-                            style={tw`text-gray-500`}
-                        />
-                    </View>
-
-                    {/* Section: Settings */}
-                    <View style={tw`mb-6`}>
-                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
-                            Configurações
-                        </Text>
-                        <TouchableOpacity
-                            style={tw`w-full bg-background p-4 rounded-xl items-center border border-gray-700 mb-2 flex-row justify-between active:bg-gray-800/50`}
-                            onPress={() => router.push("/settings/printer")}
-                        >
-                            <View style={tw`flex-row items-center`}>
-                                <View style={tw`w-10 h-10 rounded-full bg-gray-800 items-center justify-center mr-3 border border-gray-700`}>
-                                    <Ionicons name="print-outline" size={20} color="#94a3b8" />
-                                </View>
-                                <Text style={tw`text-gray-200 font-bold text-base`}>Configurar Impressora</Text>
-                            </View>
-                            <Ionicons name="chevron-forward" size={20} color="#475569" />
-                        </TouchableOpacity>
-                    </View>
-
                     {/* Section: Security */}
-                    <View style={tw`mb-8`}>
-                        <Text style={tw`text-lg font-bold text-white mb-4 flex-row items-center border-l-4 border-primary pl-3`}>
-                            Segurança
-                        </Text>
+                    <View style={tw`mb-6`}>
+                        <View style={tw`flex-row items-center mb-4`}>
+                            <View style={tw`w-10 h-10 rounded-full bg-primary/20 items-center justify-center mr-3 border border-primary/30`}>
+                                <Ionicons name="lock-closed" size={20} color="#50C878" />
+                            </View>
+                            <Text style={tw`text-xl font-bold text-white`}>Alterar Senha</Text>
+                        </View>
 
                         <FormField
                             label="Nova Senha"
                             value={password}
                             onChangeText={setPassword}
                             isPassword
-                            placeholder="Deixe em branco para manter"
+                            placeholder="Digite sua nova senha"
                         />
 
                         <FormField
-                            label="Confirmar Senha"
+                            label="Confirmar Nova Senha"
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
                             isPassword
-                            placeholder="Repita a nova senha"
+                            placeholder="Confirme sua nova senha"
                         />
+                    </View>
+
+                    {/* Section: Settings */}
+                    <View style={tw`mb-6 pt-6 border-t border-gray-800`}>
+                        <View style={tw`flex-row items-center mb-4`}>
+                            <View style={tw`w-10 h-10 rounded-full bg-gray-800 items-center justify-center mr-3 border border-gray-700`}>
+                                <Ionicons name="settings-outline" size={20} color="#94a3b8" />
+                            </View>
+                            <Text style={tw`text-xl font-bold text-white`}>Configurações</Text>
+                        </View>
+                        <TouchableOpacity
+                            style={tw`w-full bg-background p-4 rounded-xl border border-gray-700 flex-row justify-between items-center active:bg-gray-800/50`}
+                            onPress={() => router.push("/settings/printer")}
+                        >
+                            <View style={tw`flex-row items-center`}>
+                                <Ionicons name="print-outline" size={22} color="#94a3b8" style={tw`mr-3`} />
+                                <Text style={tw`text-gray-200 font-semibold text-base`}>Configurar Impressora</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={20} color="#475569" />
+                        </TouchableOpacity>
                     </View>
 
                     {/* Actions */}
                     <TouchableOpacity
-                        style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/30 ${isLoading ? "opacity-70" : ""} mb-4 border-b-4 border-emerald-600 active:border-b-0 active:mt-1`}
+                        style={tw`w-full bg-primary p-4 rounded-xl items-center shadow-lg shadow-primary/30 ${isLoading ? "opacity-70" : ""} mb-3 border-b-4 border-emerald-600 active:border-b-0 active:mt-1`}
                         onPress={handleSave}
                         disabled={isLoading}
                     >

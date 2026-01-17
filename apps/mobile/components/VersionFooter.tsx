@@ -161,7 +161,7 @@ export function VersionFooter() {
                 </View>
 
                 <View style={tw`flex-row items-center gap-2`}>
-                    <Text style={tw`text-gray-700 text-[8px]`}>Versão {Application.nativeApplicationVersion}</Text>
+                    <Text style={tw`text-gray-700 text-[10px] font-semibold`}>Versão {Application.nativeApplicationVersion}</Text>
                     {isChecking && <ActivityIndicator size="small" color="#50C878" style={{ transform: [{ scale: 0.5 }] }} />}
                 </View>
             </TouchableOpacity>
