@@ -1,15 +1,14 @@
 ﻿{
-    "version": "1.4.62",
-    "buildNumber": 178,
+    "version": "1.4.63",
+    "buildNumber": 179,
     "releaseDate": "2026-01-17",
     "downloadUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
     "changelog": [
         "Implementação completa da Loteria Tradicional",
-        "Renomeado 'Jogo do Bicho' para 'Loteria Tradicional'",
         "4 modalidades: GRUPO, DEZENA, CENTENA, MILHAR",
-        "Conversão automática de grupos para dezenas",
-        "Cálculo de prêmios por modalidade (18x, 60x, 600x, 4000x)",
-        "Formatação automática de números",
+        "Ajustes no template Fezinha (código de barras +25%, fonte do site maior)",
+        "Tela de perfil melhorada (removido email, layout reorganizado)",
+        "Fonte da versão aumentada para melhor legibilidade",
         "Melhorias de interface e usabilidade"
     ],
     "minVersion": "1.4.0",
