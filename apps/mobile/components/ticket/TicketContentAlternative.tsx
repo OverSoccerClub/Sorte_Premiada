@@ -282,7 +282,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                         <Barcode
                             value={data.hash}
                             width={370}
-                            height={25}
+                            height={31}
                         />
                         <Text style={tw`text-[13px] text-black mt-1 font-black font-mono`}>
                             {data.hash}
@@ -307,7 +307,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 </View>
 
 
-                <Text style={tw`text-center font-bold text-[14px] text-black mt-3`}>
+                <Text style={tw`text-center font-bold text-[18px] text-black mt-3`}>
                     www.fezinhadehoje.com.br
                 </Text>
             </View>
