@@ -1,15 +1,14 @@
 ﻿{
-    "version": "1.4.63",
-    "buildNumber": 179,
+    "version": "1.4.64",
+    "buildNumber": 180,
     "releaseDate": "2026-01-17",
     "downloadUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
     "changelog": [
-        "Implementação completa da Loteria Tradicional",
-        "4 modalidades: GRUPO, DEZENA, CENTENA, MILHAR",
-        "Ajustes no template Fezinha (código de barras +25%, fonte do site maior)",
-        "Tela de perfil melhorada (removido email, layout reorganizado)",
-        "Fonte da versão aumentada para melhor legibilidade",
-        "Melhorias de interface e usabilidade"
+        "Correção do QR Code no template Fezinha (agora legível por câmeras)",
+        "Loteria Tradicional completa",
+        "Melhorias no template alternativo",
+        "Tela de perfil melhorada",
+        "Funcionalidade force-unbind para MASTER"
     ],
     "minVersion": "1.4.0",
     "forceUpdate": false
