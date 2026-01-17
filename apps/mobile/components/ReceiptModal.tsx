@@ -24,7 +24,8 @@ interface ReceiptModalProps {
 }
 
 export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false }: ReceiptModalProps) {
-    const viewShotRef = useRef<ViewShot>(null);
+    const captureRef = useRef<ViewShot>(null);
+    const printRef = useRef<ViewShot>(null);
     const { user } = useAuth();
     const { settings: companySettings } = useCompany();
     const { settings: appSettings } = useSettings();
@@ -51,15 +52,18 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
     };
 
     const handlePrint = async () => {
-        await print(fullTicketData, viewShotRef);
+        // Para impressão térmica, usamos o TicketPrintManager (printRef)
+        await print(fullTicketData, printRef);
     };
 
     const handleShare = async () => {
-        if (!viewShotRef.current) return;
+        // Para compartilhar, capturamos o que o usuário está vendo (captureRef)
+        if (!captureRef.current) return;
+
         setIsSharing(true);
         try {
-            const uri = await viewShotRef.current?.capture?.();
-            if (!uri) return;
+            const uri = await captureRef.current.capture();
+            if (!uri) throw new Error("Falha na captura");
 
             if (!(await Sharing.isAvailableAsync())) {
                 alert("Compartilhamento não disponível neste dispositivo");
@@ -103,12 +107,18 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                         </Text>
 
                         <View style={tw`items-center mb-6`}>
-                            <TicketDisplay
-                                data={fullTicketData}
-                                mode="preview"
-                                scale={0.80}
-                                template={appSettings.ticketTemplate}
-                            />
+                            <ViewShot
+                                ref={captureRef}
+                                options={{ format: "png", quality: 0.9, result: "tmpfile" }}
+                                style={tw`bg-white`}
+                            >
+                                <TicketDisplay
+                                    data={fullTicketData}
+                                    mode="preview"
+                                    scale={0.80}
+                                    template={appSettings.ticketTemplate}
+                                />
+                            </ViewShot>
                         </View>
                     </ScrollView>
 
@@ -125,7 +135,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                                     <>
                                         <Ionicons name="print" size={24} color="white" style={tw`mr-2`} />
                                         <Text style={tw`text-white font-bold text-base uppercase`}>
-                                            IMPRIMIR
+                                            Imprimir
                                         </Text>
                                     </>
                                 )}
@@ -141,7 +151,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                                 ) : (
                                     <>
                                         <Ionicons name="logo-whatsapp" size={24} color="white" style={tw`mr-2`} />
-                                        <Text style={tw`text-white font-bold text-base uppercase`}>Zap</Text>
+                                        <Text style={tw`text-white font-bold text-base uppercase`}>WhatsApp</Text>
                                     </>
                                 )}
                             </TouchableOpacity>
@@ -160,8 +170,8 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                     </View>
                 </SafeAreaView>
 
-                {/* HIDDEN CAPTURE AREA */}
-                <TicketPrintManager ref={viewShotRef} data={fullTicketData} template={appSettings.ticketTemplate} />
+
+                <TicketPrintManager ref={printRef} data={fullTicketData} template={appSettings.ticketTemplate} />
             </View>
         </Modal>
     );
