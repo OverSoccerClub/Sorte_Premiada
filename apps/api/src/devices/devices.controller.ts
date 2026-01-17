@@ -161,11 +161,21 @@ export class DevicesController {
     }
 
     /**
-     * Remove/Desvincula um dispositivo (Hard Delete ou Soft Delete)
-     * Apenas MASTER pode fazer isso para resolver conflitos de licença
+     * Força a desvinculação de um dispositivo por deviceId físico (MASTER ONLY)
+     * Deleta TODOS os registros relacionados ao deviceId, permitindo nova ativação
      */
+    @Post('force-unbind')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('MASTER')
+    async forceUnbind(
+        @Body() body: { deviceId: string }
+    ) {
+        this.logger.log(`POST /devices/force-unbind - DeviceId: ${body.deviceId} (MASTER ONLY)`);
+        return this.devicesService.forceUnbind(body.deviceId);
+    }
+
     /**
-     * Remove/Exclui um dispositivo do sistema
+     * Remove/Exclui um dispositivo do sistema por ID
      * Apenas MASTER pode fazer isso. Usado para remover códigos de ativação não usados ou limpar registros.
      */
     @Delete(':id')

@@ -603,14 +603,55 @@ export class DevicesService {
     /**
      * Força a desvinculação de um dispositivo (MASTER ONLY)
      * Usado para resolver conflitos de licença quando um deviceId está preso em outra empresa.
+     * Deleta TODOS os registros relacionados ao deviceId físico.
      */
     async forceUnbind(deviceId: string) {
-        // ... legacy code ...
-        return this.delete(deviceId);
+        // Buscar TODOS os registros relacionados ao deviceId
+        const devices = await this.prisma.posTerminal.findMany({
+            where: {
+                OR: [
+                    { deviceId: deviceId },
+                    { deviceId: { contains: deviceId } },
+                    { deviceId: { startsWith: 'archived' } },
+                    { deviceId: { startsWith: 'pending' } }
+                ]
+            },
+            include: {
+                company: {
+                    select: {
+                        companyName: true
+                    }
+                }
+            }
+        });
+
+        if (devices.length === 0) {
+            throw new NotFoundException(`Nenhum dispositivo encontrado com deviceId: ${deviceId}`);
+        }
+
+        // Deletar todos os registros encontrados
+        const deletedIds = [];
+        for (const device of devices) {
+            await this.prisma.posTerminal.delete({
+                where: { id: device.id }
+            });
+            deletedIds.push(device.id);
+        }
+
+        return {
+            message: `${devices.length} registro(s) deletado(s) com sucesso`,
+            deletedCount: devices.length,
+            deletedDevices: devices.map(d => ({
+                id: d.id,
+                deviceId: d.deviceId,
+                companyName: d.company?.companyName || 'Sem empresa',
+                activatedAt: d.activatedAt
+            }))
+        };
     }
 
     /**
-     * Remove permanentemente um dispositivo
+     * Remove permanentemente um dispositivo por ID
      */
     async delete(deviceId: string) {
         const device = await this.prisma.posTerminal.findUnique({
