@@ -452,8 +452,8 @@ export default function Game2x1000Screen() {
                 mainMatchMessage: "ACERTANDO TODOS OS NÚMEROS NA ORDEM",
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
-                areaName: user?.area?.name,
-                city: user?.area?.city,
+                areaName: ticketData.area?.name || user?.area?.name,
+                city: ticketData.area?.city || user?.area?.city,
                 // Pass configured dimensions
                 alternativeLogoWidth: settings.alternativeLogoWidth,
                 alternativeLogoHeight: settings.alternativeLogoHeight,
@@ -699,7 +699,7 @@ export default function Game2x1000Screen() {
                     ) : (
                         <View style={tw`flex-1 justify-center items-center opacity-70`}>
                             <Ionicons name="shuffle" size={80} color="#10b981" style={tw`mb-6`} />
-                            <Text style={tw`text-white text-2xl font-bold text-center mb-4`}>Modo Surpresinha</Text>
+                            <Text style={tw`text-white text-2xl font-bold text-center mb-4`}>Modo Automático</Text>
                             <Text style={tw`text-gray-400 text-center max-w-xs leading-6`}>
                                 O sistema escolherá 4 milhares disponíveis aleatoriamente para você.
                             </Text>
@@ -756,7 +756,7 @@ export default function Game2x1000Screen() {
                                 />
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>
-                                        <Text style={tw`text-white font-bold text-xs uppercase`}>Surpresinha</Text>
+                                        <Text style={tw`text-white font-bold text-xs uppercase`}>Automático</Text>
                                     </View>
                                 )}
                                 {isRestrictedMode && selectedNumbers.length === 1 && (

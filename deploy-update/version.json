@@ -1,16 +1,13 @@
 ﻿{
-    "version": "1.4.66",
-    "buildNumber": 182,
+    "version": "1.4.69",
+    "buildNumber": 186,
     "releaseDate": "2026-01-17",
     "downloadUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
     "changelog": [
-        "QR Code corrigido (sempre quadrado e legível)",
-        "Informações do sorteio consolidadas em 1 linha",
-        "Fontes dos títulos Fezinha aumentadas",
-        "Tarja preta FEZINHA EXTRA em largura total",
-        "Fontes dos prêmios aumentadas",
-        "Espaçamento otimizado no rodapé"
+        "Ajuste visual: Fezinha Extra com cantos arredondados",
+        "Correção QR Code: URL completa e proporção quadrada otimizada",
+        "Correção: Tela branca no Recibo de Aposta (final)"
     ],
     "minVersion": "1.4.0",
-    "forceUpdate": false
+    "forceUpdate": true
 }

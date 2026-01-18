@@ -595,10 +595,23 @@ export class TicketsService {
                 console.error("Redis invalidation failed", e);
             }
 
-            // Return ticket with additional device info
+            // Fetch area information for ticket response
+            let areaInfo: { name: string; city: string } | null = null;
+            if (user?.areaId) {
+                const area = await this.prisma.client.area.findUnique({
+                    where: { id: user.areaId },
+                    select: { name: true, city: true }
+                });
+                if (area) {
+                    areaInfo = area;
+                }
+            }
+
+            // Return ticket with additional device and area info
             return {
                 ...ticket,
-                deviceName: deviceName
+                deviceName: deviceName,
+                area: areaInfo
             };
         } catch (error) {
             console.error("Error creating ticket:", error);

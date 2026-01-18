@@ -119,7 +119,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
             {/* Draw Info - All in one line */}
             <Text style={tw`text-center font-black text-black text-[9px] mb-1 leading-tight px-1`}>
-                SORTEIO: {formatDrawNumber()} - DATA: {formatDrawDateHeader()}{data.areaName && data.city ? ` - ${data.city}/${data.areaName}` : data.areaName ? ` - ${data.areaName}` : ''}
+                SORTEIO: {formatDrawNumber()} - DATA: {formatDrawDateHeader()}{data.city && data.areaName ? ` - ${data.city}/${data.areaName}` : data.city ? ` - ${data.city}` : data.areaName ? ` - ${data.areaName}` : ''}
             </Text>
 
             {/* 4 Fezinhas in Grid - Reduced margin */}
@@ -203,9 +203,9 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             {/* Second Chance Section (Fezinha Extra) */}
             {data.secondChanceNumber && (
                 <View style={tw`mb-2`}>
-                    {/* Black Header with Draw Info */}
-                    <View style={tw`mb-2 -mx-4`}>
-                        <View style={tw`bg-black py-2 px-4`}>
+                    {/* Rounded Header with Draw Info */}
+                    <View style={tw`mb-2 mx-1`}>
+                        <View style={tw`bg-black py-2 px-4 rounded-xl shadow-sm`}>
                             <Text style={tw`text-white text-center font-black text-xl uppercase leading-tight`}>
                                 {data.secondChanceLabel || 'FEZINHA EXTRA'}
                             </Text>
@@ -283,10 +283,10 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 {/* QR Code */}
                 <View style={tw`items-center mt-2`}>
                     {data.hash && (
-                        <View style={tw`p-2 bg-white border-[3px] border-black rounded-none`}>
+                        <View style={[tw`p-2 bg-white border-[3px] border-black rounded-lg`]}>
                             <QRCode
-                                value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                                size={120}
+                                value={`https://www.fezinhadehoje.com.br/sorteio/${data.hash || data.ticketId}`}
+                                size={qrSize}
                                 backgroundColor="white"
                                 color="black"
                                 ecl="M"

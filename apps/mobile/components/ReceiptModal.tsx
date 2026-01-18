@@ -62,7 +62,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
 
         setIsSharing(true);
         try {
-            const uri = await captureRef.current.capture();
+            const uri = await captureRef.current?.capture?.();
             if (!uri) throw new Error("Falha na captura");
 
             if (!(await Sharing.isAvailableAsync())) {
