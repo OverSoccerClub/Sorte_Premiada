@@ -137,8 +137,8 @@ export default function LoginScreen() {
                             onChangeText={setUsername}
                             autoCapitalize="none"
                             placeholder="Digite seu usuário"
-                            containerStyle={tw`mb-4`}
-                            style={tw`h-12 text-sm`}
+                            containerStyle={tw`mb-3`}
+                            style={tw`h-10 text-sm`}
                         />
 
                         <FormField
@@ -147,8 +147,8 @@ export default function LoginScreen() {
                             onChangeText={setPassword}
                             isPassword
                             placeholder="Digite sua senha"
-                            containerStyle={tw`mb-6`}
-                            style={tw`h-12 text-sm`}
+                            containerStyle={tw`mb-4`}
+                            style={tw`h-10 text-sm`}
                         />
 
                         <TouchableOpacity
@@ -171,18 +171,18 @@ export default function LoginScreen() {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Footer Content inside ScrollView to avoid overlap */}
-                    <View style={tw`mt-8 items-center w-full max-w-[360px]`}>
-                        <View style={tw`mb-4 w-full px-4 py-3 bg-gray-900/50 rounded-xl border border-gray-800/50 items-center`}>
-                            <Text style={tw`text-gray-500 text-[10px] font-mono mb-1.5 uppercase tracking-widest`}>Dispositivo</Text>
+                    {/* Footer Content - Compacted to avoid scroll */}
+                    <View style={tw`mt-4 items-center w-full max-w-[360px]`}>
+                        <View style={tw`mb-2 w-full px-4 py-2 bg-gray-900/80 rounded-lg border border-gray-700 items-center`}>
+                            <Text style={tw`text-gray-400 text-[8px] font-mono mb-1 uppercase tracking-widest`}>Dispositivo</Text>
                             <View style={tw`flex-row items-center`}>
-                                <View style={tw`w-2 h-2 rounded-full ${isActivated
-                                    ? (verificationStatus === 'verified' ? 'bg-green-400' : 'bg-yellow-400')
-                                    : 'bg-red-400'
-                                    } mr-2`} />
-                                <Text style={tw`text-gray-300 text-xs font-bold uppercase`}>
+                                <View style={tw`w-1.5 h-1.5 rounded-full ${isActivated
+                                    ? (verificationStatus === 'verified' ? 'bg-green-500' : 'bg-yellow-500')
+                                    : 'bg-red-500'
+                                    } mr-1.5`} />
+                                <Text style={tw`text-white text-[10px] font-bold uppercase tracking-tight`}>
                                     {isActivated
-                                        ? (verificationStatus === 'verified' ? 'Validado' : 'Offline (Cache)')
+                                        ? (verificationStatus === 'verified' ? 'Validado' : 'Offline')
                                         : 'Não Ativado'
                                     }
                                     {isActivated && activationCode ? ` • ${activationCode}` : ''}

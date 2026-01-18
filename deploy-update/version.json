@@ -1,13 +1,5 @@
 ﻿{
-    "version": "1.4.70",
-    "buildNumber": 186,
-    "releaseDate": "2026-01-18",
-    "downloadUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
-    "changelog": [
-        "Correção: Data/hora e cidade/praça no template alternativo",
-        "Correção: QR Code agora mantém formato quadrado perfeito",
-        "Backend: Informações de área incluídas na resposta do ticket"
-    ],
-    "minVersion": "1.4.0",
-    "forceUpdate": true
+    "version": "1.4.73",
+    "buildNumber": 189,
+    "changelog": "Layout: Ajustes de visibilidade e compactação na tela de login."
 }
