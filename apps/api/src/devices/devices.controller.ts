@@ -175,6 +175,29 @@ export class DevicesController {
     }
 
     /**
+     * Remove registros duplicados de dispositivos
+     * ADMIN: limpa duplicados da sua empresa
+     * MASTER: pode limpar duplicados de qualquer empresa
+     */
+    @Post('cleanup-duplicates')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN', 'MASTER')
+    async cleanupDuplicates(
+        @Request() req: any,
+        @Body() body: { targetCompanyId?: string }
+    ) {
+        let { companyId } = req.user;
+
+        // MASTER override
+        if (req.user.role === 'MASTER' && body.targetCompanyId) {
+            companyId = body.targetCompanyId;
+        }
+
+        this.logger.log(`POST /devices/cleanup-duplicates - CompanyId: ${companyId}`);
+        return this.devicesService.cleanupDuplicateDevices(companyId);
+    }
+
+    /**
      * Remove/Exclui um dispositivo do sistema por ID
      * Apenas MASTER pode fazer isso. Usado para remover códigos de ativação não usados ou limpar registros.
      */

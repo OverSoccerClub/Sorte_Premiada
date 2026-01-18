@@ -30,11 +30,42 @@ export class DevicesService {
     async heartbeat(data: { deviceId: string; latitude?: number; longitude?: number; currentUserId?: string; status?: string }) {
         console.log(`[API Heartbeat] Device: ${data.deviceId}, UserID: ${data.currentUserId}, Status: ${data.status}`);
 
-        // Fetch current terminal state
-        const currentTerminal = await this.prisma.posTerminal.findUnique({
+        // === BUSCAR DISPOSITIVO EXISTENTE ===
+        // Primeiro, tentar encontrar pelo deviceId real
+        let currentTerminal = await this.prisma.posTerminal.findUnique({
             where: { deviceId: data.deviceId },
             include: { company: true }
         });
+
+        // Se não encontrou pelo deviceId real, verificar se existe um registro pendente
+        // que foi criado pela geração de código mas ainda não foi ativado com este deviceId
+        if (!currentTerminal) {
+            console.log(`[Heartbeat] Device ${data.deviceId} not found, checking for pending devices...`);
+
+            // Buscar dispositivos pendentes (deviceId começa com "pending-")
+            const pendingDevices = await this.prisma.posTerminal.findMany({
+                where: {
+                    deviceId: { startsWith: 'pending-' },
+                    activatedAt: { not: null }, // Apenas dispositivos já ativados mas ainda com deviceId pendente
+                },
+                include: { company: true }
+            });
+
+            // Se encontrou apenas um pendente, assumir que é este dispositivo
+            if (pendingDevices.length === 1) {
+                currentTerminal = pendingDevices[0];
+                console.log(`[Heartbeat] Found pending device ${currentTerminal.id}, updating with real deviceId: ${data.deviceId}`);
+
+                // Atualizar o deviceId pendente com o deviceId real
+                currentTerminal = await this.prisma.posTerminal.update({
+                    where: { id: currentTerminal.id },
+                    data: { deviceId: data.deviceId },
+                    include: { company: true }
+                });
+            } else if (pendingDevices.length > 1) {
+                console.warn(`[Heartbeat] Found ${pendingDevices.length} pending devices, cannot determine which one to use. Will create new record.`);
+            }
+        }
 
         // === VALIDAÇÃO DE LIMITES ===
         // Se está tentando ficar ONLINE, validar limites
@@ -114,19 +145,27 @@ export class DevicesService {
             }
         }
 
-        return this.prisma.posTerminal.upsert({
-            where: { deviceId: data.deviceId },
-            update: updateData,
-            create: {
-                deviceId: data.deviceId,
-                status: data.status || 'ONLINE',
-                lastSeenAt: new Date(),
-                latitude: data.latitude,
-                longitude: data.longitude,
-                currentUser: connectUser,
-                lastUser: connectUser
-            },
-        });
+        // Usar update ao invés de upsert se já existe
+        if (currentTerminal) {
+            return this.prisma.posTerminal.update({
+                where: { id: currentTerminal.id },
+                data: updateData,
+            });
+        } else {
+            // Só criar novo registro se realmente não existe
+            console.log(`[Heartbeat] Creating new device record for ${data.deviceId}`);
+            return this.prisma.posTerminal.create({
+                data: {
+                    deviceId: data.deviceId,
+                    status: data.status || 'ONLINE',
+                    lastSeenAt: new Date(),
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    currentUser: connectUser,
+                    lastUser: connectUser
+                },
+            });
+        }
     }
 
     async findAll() {
@@ -415,9 +454,13 @@ export class DevicesService {
         }
 
         // Verificar se já existe um dispositivo ATIVADO com este deviceId físico
+        // IMPORTANTE: Ignora dispositivos arquivados (deviceId começando com "archived_")
         const existingActiveDevice = await this.prisma.posTerminal.findFirst({
             where: {
-                deviceId,
+                AND: [
+                    { deviceId },
+                    { deviceId: { not: { startsWith: 'archived_' } } } // Ignora dispositivos arquivados
+                ],
                 activatedAt: { not: null }, // Apenas dispositivos já ativados
                 id: { not: device.id }
             },
@@ -647,6 +690,109 @@ export class DevicesService {
                 companyName: d.company?.companyName || 'Sem empresa',
                 activatedAt: d.activatedAt
             }))
+        };
+    }
+
+    /**
+     * Remove registros duplicados de dispositivos
+     * Mantém o registro com activationCode e mescla informações do registro sem código
+     * Endpoint: POST /devices/cleanup-duplicates
+     */
+    async cleanupDuplicateDevices(companyId: string) {
+        console.log(`[Cleanup] Starting duplicate cleanup for company: ${companyId}`);
+
+        // Buscar todos os dispositivos da empresa
+        const devices = await this.prisma.posTerminal.findMany({
+            where: { companyId },
+            include: { currentUser: true, lastUser: true }
+        });
+
+        console.log(`[Cleanup] Found ${devices.length} total devices for company`);
+
+        // Agrupar por deviceId real (ignorar pending- e archived_)
+        const deviceGroups = new Map<string, typeof devices>();
+
+        for (const device of devices) {
+            // Ignorar dispositivos pendentes ou arquivados
+            if (device.deviceId.startsWith('pending-') || device.deviceId.startsWith('archived_')) {
+                continue;
+            }
+
+            const existing = deviceGroups.get(device.deviceId) || [];
+            existing.push(device);
+            deviceGroups.set(device.deviceId, existing);
+        }
+
+        console.log(`[Cleanup] Found ${deviceGroups.size} unique deviceIds`);
+
+        let totalMerged = 0;
+        let totalDeleted = 0;
+
+        // Processar grupos com duplicatas
+        for (const [deviceId, group] of Array.from(deviceGroups.entries())) {
+            if (group.length <= 1) continue;
+
+            console.log(`[Cleanup] Found ${group.length} duplicates for deviceId: ${deviceId}`);
+
+            // Encontrar o registro com activationCode (preferencial)
+            const withCode = group.find(d => d.activationCode);
+            const withoutCode = group.filter(d => !d.activationCode);
+
+            if (withCode && withoutCode.length > 0) {
+                // Mesclar informações do registro sem código para o registro com código
+                const mergedData: any = {};
+
+                for (const dup of withoutCode) {
+                    if (dup.currentUserId && !withCode.currentUserId) mergedData.currentUserId = dup.currentUserId;
+                    if (dup.lastUserId && !withCode.lastUserId) mergedData.lastUserId = dup.lastUserId;
+                    if (dup.latitude && !withCode.latitude) mergedData.latitude = dup.latitude;
+                    if (dup.longitude && !withCode.longitude) mergedData.longitude = dup.longitude;
+                    if (dup.model && !withCode.model) mergedData.model = dup.model;
+                    if (dup.appVersion && !withCode.appVersion) mergedData.appVersion = dup.appVersion;
+                    if (dup.lastSeenAt > withCode.lastSeenAt) mergedData.lastSeenAt = dup.lastSeenAt;
+                    if (dup.status === 'ONLINE' && withCode.status !== 'ONLINE') mergedData.status = dup.status;
+                }
+
+                // Atualizar registro com código se houver dados para mesclar
+                if (Object.keys(mergedData).length > 0) {
+                    await this.prisma.posTerminal.update({
+                        where: { id: withCode.id },
+                        data: mergedData
+                    });
+                    console.log(`[Cleanup] Merged data into device ${withCode.id}:`, Object.keys(mergedData));
+                    totalMerged++;
+                }
+
+                // Deletar duplicados
+                for (const dup of withoutCode) {
+                    await this.prisma.posTerminal.delete({
+                        where: { id: dup.id }
+                    });
+                    console.log(`[Cleanup] Deleted duplicate: ${dup.id}`);
+                    totalDeleted++;
+                }
+            } else if (!withCode && withoutCode.length > 1) {
+                // Se não há registro com código, manter o mais recente e deletar os outros
+                const sorted = withoutCode.sort((a, b) => b.lastSeenAt.getTime() - a.lastSeenAt.getTime());
+                const toKeep = sorted[0];
+                const toDelete = sorted.slice(1);
+
+                for (const dup of toDelete) {
+                    await this.prisma.posTerminal.delete({
+                        where: { id: dup.id }
+                    });
+                    console.log(`[Cleanup] Deleted duplicate without code: ${dup.id}`);
+                    totalDeleted++;
+                }
+            }
+        }
+
+        return {
+            message: 'Limpeza concluída com sucesso',
+            totalDevices: devices.length,
+            uniqueDevices: deviceGroups.size,
+            totalMerged,
+            totalDeleted
         };
     }
 
