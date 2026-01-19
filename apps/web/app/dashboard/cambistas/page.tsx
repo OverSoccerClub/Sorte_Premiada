@@ -54,8 +54,10 @@ interface Area {
 }
 
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function CambistasPage() {
+    const { user } = useAuth()
     const activeCompanyId = useActiveCompanyId()
     const [cambistas, setCambistas] = useState<any[]>([])
     const [areas, setAreas] = useState<Area[]>([])
@@ -368,34 +370,51 @@ export default function CambistasPage() {
     }
 
     const handleDelete = async (id: string) => {
-        showAlert(
-            "Excluir Cambista",
-            "Tem certeza que deseja excluir este cambista? Esta ação não pode ser desfeita.",
-            "warning",
-            true,
-            async () => {
-                try {
-                    const token = localStorage.getItem("token")
-                    const res = await fetch(`${API_URL}/users/${id}`, {
-                        method: "DELETE",
-                        headers: { Authorization: `Bearer ${token}` },
-                    })
-                    hideAlert()
+        const isMaster = user?.role === 'MASTER';
+        console.log('[DEBUG-CAMBISTAS] Delete requested for:', id, 'User Role:', user?.role, 'isMaster:', isMaster);
 
-                    if (res.ok) {
-                        showAlert("Removido", "O cambista foi removido com sucesso.", "success")
-                        // Recarregar a lista de cambistas
-                        await fetchCambistas()
-                    } else {
-                        showAlert("Erro", "Não foi possível remover o cambista.", "error")
-                    }
-                } catch (error) {
-                    showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
+        const performDelete = async (targetId: string, force: boolean) => {
+            try {
+                const token = localStorage.getItem("token")
+                const res = await fetch(`${API_URL}/users/${targetId}?force=${force}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+
+                if (res.ok) {
+                    fetchCambistas()
+                    showAlert("Removido", force ? "Cambista e histórico excluídos permanentemente." : "Cambista removido com sucesso.", "success")
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showAlert("Erro", err.message || "Não foi possível remover o cambista.", "error")
                 }
-            },
-            "Sim, Excluir",
-            "Cancelar"
-        )
+            } catch (error) {
+                showAlert("Erro de Conexão", "Não foi possível conectar ao servidor.", "error")
+            }
+        }
+
+        if (isMaster) {
+            showAlert(
+                "EXCLUSÃO MASTER (TOTAL)",
+                "ATENÇÃO: Você é MASTER. Esta ação apagará PERMANENTEMENTE:\n\n- O Usuário\n- Todo o Histórico Financeiro (Fechamentos, Caixas)\n- Vendas e Bilhetes\n\nDeseja realmente realizar uma LIMPEZA COMPLETA?",
+                "error", // Red alert
+                true,
+                () => performDelete(id, true),
+                "SIM, APAGAR TUDO",
+                "Cancelar"
+            )
+        } else {
+            // Standard User (Admin)
+            showAlert(
+                "Excluir Cambista",
+                "Tem certeza que deseja excluir este cambista? Se ele tiver histórico financeiro, ele será apenas desativado.",
+                "warning",
+                true,
+                () => performDelete(id, false),
+                "Sim, Excluir",
+                "Cancelar"
+            )
+        }
     }
 
     return (
