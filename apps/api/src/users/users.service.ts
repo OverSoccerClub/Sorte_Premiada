@@ -172,7 +172,40 @@ export class UsersService {
         return updatedUser;
     }
 
-    async remove(id: string): Promise<User> {
+    async remove(id: string, force: boolean = false): Promise<User> {
+        if (force) {
+            // Hard Delete with Cascade (MASTER Only via Controller)
+            return this.prisma.client.$transaction(async (tx: Prisma.TransactionClient) => {
+                // 1. Unlink/Delete POS Terminals connections
+                await tx.posTerminal.updateMany({
+                    where: { currentUserId: id },
+                    data: { currentUserId: null }
+                });
+                await tx.posTerminal.updateMany({
+                    where: { lastUserId: id },
+                    data: { lastUserId: null }
+                });
+
+                // 2. Delete Financial Records (The "Forbidden" Data)
+                await tx.dailyClose.deleteMany({ where: { closedByUserId: id } });
+                await tx.transaction.deleteMany({ where: { userId: id } });
+                await tx.transaction.deleteMany({ where: { cobradorId: id } });
+
+                // 3. Delete Tickets (Sold and Cancelled)
+                await tx.ticket.deleteMany({ where: { userId: id } });
+                await tx.ticket.deleteMany({ where: { cancelledByUserId: id } });
+
+                // 4. Delete Logs & Reports
+                await tx.notificationLog.deleteMany({ where: { userId: id } });
+                await tx.auditLog.deleteMany({ where: { userId: id } });
+                await tx.bugReport.deleteMany({ where: { reportedByUserId: id } });
+                await tx.bugReport.deleteMany({ where: { assignedToUserId: id } });
+
+                // 5. Finally Delete User
+                return tx.user.delete({ where: { id } });
+            });
+        }
+
         try {
             return await this.prisma.client.user.delete({
                 where: { id },
@@ -204,6 +237,7 @@ export class UsersService {
             throw error;
         }
     }
+
 
     async updatePushToken(id: string, pushToken: string): Promise<User> {
         return this.prisma.client.user.update({

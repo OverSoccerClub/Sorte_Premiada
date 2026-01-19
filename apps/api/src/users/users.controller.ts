@@ -194,7 +194,11 @@ export class UsersController {
     @Delete(':id')
     @UseGuards(RolesGuard)
     @Roles('ADMIN', 'MASTER')
-    async remove(@Param('id') id: string, @Request() req: any) {
+    async remove(
+        @Param('id') id: string,
+        @Request() req: any,
+        @Query('force') force?: string
+    ) {
         // Buscar usuário para validar companyId
         const user = await this.usersService.findById(id);
 
@@ -207,7 +211,14 @@ export class UsersController {
             throw new ForbiddenException('Acesso negado a este usuário');
         }
 
-        return this.usersService.remove(id);
+        const isForce = force === 'true';
+
+        // Apenas MASTER pode forçar exclusão (Hard Delete)
+        if (isForce && req.user.role !== 'MASTER') {
+            throw new ForbiddenException('Apenas usuários MASTER podem forçar a exclusão completa de usuários com histórico financeiro.');
+        }
+
+        return this.usersService.remove(id, isForce);
     }
 
     @Patch(':id/limit')
