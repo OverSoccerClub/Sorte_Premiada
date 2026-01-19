@@ -173,9 +173,36 @@ export class UsersService {
     }
 
     async remove(id: string): Promise<User> {
-        return this.prisma.client.user.delete({
-            where: { id },
-        });
+        try {
+            return await this.prisma.client.user.delete({
+                where: { id },
+            });
+        } catch (error) {
+            // Check for Foreign Key Constraint Violation
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+                // Soft Delete Strategy
+                const timestamp = Date.now();
+                const user = await this.prisma.client.user.findUnique({ where: { id } });
+
+                if (!user) {
+                    throw error; // If user not found, let standard error or 404 propagate (though delete would have failed)
+                }
+
+                return this.prisma.client.user.update({
+                    where: { id },
+                    data: {
+                        isActive: false,
+                        username: `deleted_${timestamp}_${user.username}`,
+                        email: user.email ? `deleted_${timestamp}_${user.email}` : undefined,
+                        // Optionally clear sensitive data
+                        pushToken: null,
+                        twoFactorSecret: null,
+                    }
+                });
+            }
+
+            throw error;
+        }
     }
 
     async updatePushToken(id: string, pushToken: string): Promise<User> {

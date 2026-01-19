@@ -231,7 +231,7 @@ export default function DashboardPage() {
                         <CardDescription>Volume de apostas nas últimas 24 horas</CardDescription>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[300px] w-full">
+                        <div className="h-[300px] w-full min-w-0">
                             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                 <AreaChart data={stats.hourlySales || []}>
                                     <defs>
@@ -276,7 +276,7 @@ export default function DashboardPage() {
                         <CardDescription>Distribuição de prêmios e apurações</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center pt-0">
-                        <div className="h-[240px] w-full">
+                        <div className="h-[240px] w-full min-w-0">
                             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                 <PieChart>
                                     <Pie
@@ -340,7 +340,7 @@ export default function DashboardPage() {
                         <CardDescription>Volume financeiro por modalidade</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] w-full">
+                        <div className="h-[300px] w-full min-w-0">
                             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                 <BarChart layout="vertical" data={stats.revenueByGame || []} margin={{ left: 40 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />

@@ -430,63 +430,61 @@ export class DevicesService {
             throw new BadRequestException('Dispositivo não está vinculado a nenhuma empresa');
         }
 
-        // === CONFLICT RESOLUTION ===
-        // Buscar dispositivos da mesma empresa que NÃO têm código de ativação
-        // (foram criados por register() antes da ativação)
-        const duplicateDevices = await this.prisma.posTerminal.findMany({
-            where: {
-                companyId: device.companyId,
-                activationCode: null, // Dispositivos sem código = criados por register()
-                id: { not: device.id } // Excluir o próprio registro do código
-            }
+        // === CONFLICT RESOLUTION V2 (GLOBAL) ===
+        // Verificar se JÁ EXISTE algum dispositivo com o mesmo deviceId físico (Globalmente)
+        const conflictingDevice = await this.prisma.posTerminal.findUnique({
+            where: { deviceId }
         });
 
-        // Deletar todos os dispositivos duplicados criados por register()
-        if (duplicateDevices.length > 0) {
-            console.log(`[Device Activation] Found ${duplicateDevices.length} duplicate device(s) created by register(). Deleting...`);
+        if (conflictingDevice && conflictingDevice.id !== device.id) {
+            // Cenário 1: O dispositivo conflitante já está ATIVADO
+            if (conflictingDevice.activatedAt) {
+                // Se for de outra empresa -> Erro
+                if (conflictingDevice.companyId !== device.companyId) {
+                    const conflictCompany = await this.prisma.company.findUnique({ where: { id: conflictingDevice.companyId! } });
+                    throw new ForbiddenException(
+                        `Este dispositivo já está vinculado à empresa "${conflictCompany?.companyName || 'Outra Empresa'}". ` +
+                        `Entre em contato com o suporte para liberação.`
+                    );
+                }
 
-            for (const dup of duplicateDevices) {
-                console.log(`[Device Activation] Deleting duplicate: ${dup.id} (deviceId: ${dup.deviceId})`);
+                // Se for da MESMA empresa -> Arquivar o antigo para permitir a nova ativação (Reinstalação/Limpeza)
+                console.log(`[Device Activation] Archiving old activation (same company): ${conflictingDevice.id}`);
+                await this.prisma.posTerminal.update({
+                    where: { id: conflictingDevice.id },
+                    data: {
+                        deviceId: `archived_${Date.now()}_${deviceId.substring(0, 50)}`,
+                        isActive: false,
+                        status: 'OFFLINE',
+                        deviceToken: null
+                    }
+                });
+            }
+            // Cenário 2: O dispositivo conflitante NÃO está ativado (registro órfão/heartbeat sem login)
+            else {
+                // Apenas deletar o registro conflitante (ele segura o deviceId mas não tem valor real)
+                console.log(`[Device Activation] Deleting unactivated conflicting device: ${conflictingDevice.id}`);
                 await this.prisma.posTerminal.delete({
-                    where: { id: dup.id }
+                    where: { id: conflictingDevice.id }
                 });
             }
         }
 
-        // Verificar se já existe um dispositivo ATIVADO com este deviceId físico
-        // IMPORTANTE: Ignora dispositivos arquivados (deviceId começando com "archived_")
-        const existingActiveDevice = await this.prisma.posTerminal.findFirst({
+        // CLEANUP LOCAL (mantido por segurança para limpar outros lixos da mesma empresa sem deviceId definido corretamente)
+        const duplicateDevices = await this.prisma.posTerminal.findMany({
             where: {
-                AND: [
-                    { deviceId },
-                    { deviceId: { not: { startsWith: 'archived_' } } } // Ignora dispositivos arquivados
-                ],
-                activatedAt: { not: null }, // Apenas dispositivos já ativados
-                id: { not: device.id }
-            },
-            include: { company: true }
+                companyId: device.companyId,
+                activationCode: null,
+                id: { not: device.id },
+                deviceId: { not: deviceId } // Não mexer no que acabamos de tratar
+            }
         });
 
-        if (existingActiveDevice) {
-            // Dispositivo já ativado em outra empresa
-            if (existingActiveDevice.companyId !== device.companyId) {
-                throw new ForbiddenException(
-                    `Este dispositivo já está vinculado à empresa "${existingActiveDevice.company?.companyName || 'Outra Empresa'}". ` +
-                    `Entre em contato com o suporte para liberação.`
-                );
+        if (duplicateDevices.length > 0) {
+            console.log(`[Device Activation] Found ${duplicateDevices.length} additional duplicates. Cleaning...`);
+            for (const dup of duplicateDevices) {
+                await this.prisma.posTerminal.delete({ where: { id: dup.id } });
             }
-
-            // Mesmo dispositivo, mesma empresa - arquivar o antigo
-            console.log(`[Device Activation] Archiving old activation: ${existingActiveDevice.id}`);
-            await this.prisma.posTerminal.update({
-                where: { id: existingActiveDevice.id },
-                data: {
-                    deviceId: `archived_${Date.now()}_${deviceId.substring(0, 50)}`,
-                    isActive: false,
-                    status: 'OFFLINE',
-                    deviceToken: null
-                }
-            });
         }
 
 
