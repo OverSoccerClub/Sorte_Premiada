@@ -54,7 +54,7 @@ interface Area {
 }
 
 import { useActiveCompanyId } from "@/context/use-active-company"
-import { useAuth } from "@/hooks/use-auth"
+import { useAuth } from "@/context/auth-context"
 
 export default function CambistasPage() {
     const { user } = useAuth()
