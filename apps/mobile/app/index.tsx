@@ -138,7 +138,7 @@ export default function LoginScreen() {
                             autoCapitalize="none"
                             placeholder="Digite seu usuário"
                             containerStyle={tw`mb-3`}
-                            style={tw`h-10 text-sm`}
+                            style={tw`text-sm`}
                         />
 
                         <FormField
@@ -148,7 +148,7 @@ export default function LoginScreen() {
                             isPassword
                             placeholder="Digite sua senha"
                             containerStyle={tw`mb-4`}
-                            style={tw`h-10 text-sm`}
+                            style={tw`text-sm`}
                         />
 
                         <TouchableOpacity

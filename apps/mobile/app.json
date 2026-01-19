@@ -2,7 +2,7 @@
     "expo": {
         "name": "InnoBet",
         "slug": "innobet",
-        "version": "1.4.74",
+        "version": "1.4.89",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -14,7 +14,7 @@
         "splash": {
             "image": "./assets/nova_logo_final.png",
             "resizeMode": "contain",
-            "backgroundColor": "#0F172A"
+            "backgroundColor": "#1E293B"
         },
         "ios": {
             "supportsTablet": true
@@ -22,7 +22,7 @@
         "android": {
             "adaptiveIcon": {
                 "foregroundImage": "./assets/nova_logo_final.png",
-                "backgroundColor": "#0F172A"
+                "backgroundColor": "#1E293B"
             },
             "permissions": [
                 "android.permission.INTERNET",
@@ -39,7 +39,7 @@
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
             "package": "com.anonymous.sortepremiada",
-            "versionCode": 190
+            "versionCode": 205
         },
         "web": {
             "favicon": "./assets/favicon.png"

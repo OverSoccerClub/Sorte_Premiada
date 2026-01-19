@@ -377,7 +377,7 @@ export default function HistoryScreen() {
                     ticketId: selectedTicket.id,
                     hash: selectedTicket.hash,
                     date: new Date(selectedTicket.createdAt).toLocaleString(),
-                    drawDate: selectedTicket.drawDate ? new Date(selectedTicket.drawDate).toLocaleString() : undefined,
+                    drawDate: selectedTicket.drawDate, // Pass raw string for component to format
                     series: selectedTicket.series?.toString(),
                     possiblePrize: selectedTicket.possiblePrize ? `R$ ${Number(selectedTicket.possiblePrize).toFixed(2).replace('.', ',')}` : undefined,
                     secondChanceNumber: selectedTicket.secondChanceNumber,

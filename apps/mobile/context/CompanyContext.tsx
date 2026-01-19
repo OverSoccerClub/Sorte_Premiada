@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppConfig } from '../constants/AppConfig';
+import { Platform } from 'react-native';
+import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 
 export interface CompanySettings {
@@ -162,8 +164,18 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
 
     const activateDevice = useCallback(async (activationCode: string) => {
         try {
-            // Obter ID único do dispositivo
-            const deviceId = Device.osBuildId || Device.modelId || 'unknown-device';
+            // Obter ID único do dispositivo real (Android ID ou iOS Vendor ID)
+            let deviceId = 'unknown-device';
+            if (Platform.OS === 'android') {
+                deviceId = Application.getAndroidId() || 'ANDROID-NO-ID';
+            } else if (Platform.OS === 'ios') {
+                const iosId = await Application.getIosIdForVendorAsync();
+                deviceId = iosId || 'IOS-NO-ID';
+            }
+            // Fallback para dev/test se necessário, mas evitar osBuildId que repete por versão
+            if (deviceId === 'unknown-device' || deviceId.includes('NO-ID')) {
+                deviceId = Device.modelId || 'unknown-device-' + Math.random().toString(36).substring(7);
+            }
 
             const response = await fetch(`${AppConfig.api.baseUrl}/devices/activate`, {
                 method: 'POST',

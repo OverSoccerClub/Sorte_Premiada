@@ -1,5 +1,7 @@
 ﻿{
-    "version": "1.4.74",
-    "buildNumber": 190,
-    "changelog": "Fix: Correção na atualização de versão e ajustes de layout no login."
+    "version": "1.4.89",
+    "build": 205,
+    "apkUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
+    "force": false,
+    "notes": "Atualização Crítica: Correção da geração de ID do dispositivo (Hardware ID único). Requer reativação."
 }

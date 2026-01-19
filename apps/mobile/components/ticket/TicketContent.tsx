@@ -145,8 +145,8 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         {data.gameName}
                     </Text>
                 </View>
-                <Text style={tw`text-center font-bold text-black text-[10px] mt-1`}>
-                    SORTEIO: <Text style={tw`font-black text-[12px]`}>
+                <Text style={tw`text-center font-bold text-black text-[12px] mt-1`}>
+                    EXTRAÇÃO: <Text style={tw`font-black text-[14px]`}>
                         {formatDrawDate(data.drawDate || data.date)}
                         {data.city || data.areaName ? ` - ${data.city ? `${data.city}/` : ''}${data.areaName || ''}` : ''}
                     </Text>
@@ -302,11 +302,11 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <View style={[
                     tw`items-center justify-center w-full mt-2`,
                     {
-                        transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.45 : 1) }],
+                        transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.425 : 1) }],
                     },
                     (!!data.qrcodeHeight || isCapture) && {
-                        marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.45)) / 2),
-                        marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.45)) / 2)
+                        marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2),
+                        marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2)
                     }
                 ]}>
                     <View style={tw`border-[3px] border-black p-1 bg-white`}>

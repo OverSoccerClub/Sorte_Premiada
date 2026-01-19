@@ -96,8 +96,10 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     const logoWidth = data.alternativeLogoWidth || 500;
     const logoHeight = data.alternativeLogoHeight || 85;
 
-    // QR Code Dimensions - Always square for proper scanning
-    const qrSize = data.alternativeQrWidth || data.qrcodeWidth || 120;
+    // QR Code Dimensions - Respect both width and height, keeping it square
+    const width = data.alternativeQrWidth || data.qrcodeWidth || 170;
+    const height = data.alternativeQrHeight || data.qrcodeHeight || 170;
+    const qrSize = Math.min(width, height);
 
     return (
         <View style={tw`bg-white w-[384px] p-4`}>
@@ -118,8 +120,8 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
             </View>
 
             {/* Draw Info - All in one line */}
-            <Text style={tw`text-center font-black text-black text-[9px] mb-1 leading-tight px-1`}>
-                SORTEIO: {formatDrawNumber()} - DATA: {formatDrawDateHeader()}{data.city && data.areaName ? ` - ${data.city}/${data.areaName}` : data.city ? ` - ${data.city}` : data.areaName ? ` - ${data.areaName}` : ''}
+            <Text style={tw`text-center font-bold text-black text-[12px] mb-1 leading-tight px-1`}>
+                Sorteio: <Text style={tw`font-black text-[14px]`}>{formatDrawDateHeader()}</Text>{data.city && data.areaName ? ` - ${data.city}/${data.areaName}` : data.city ? ` - ${data.city}` : data.areaName ? ` - ${data.areaName}` : ''}
             </Text>
 
             {/* 4 Fezinhas in Grid - Reduced margin */}
@@ -205,7 +207,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                 <View style={tw`mb-2`}>
                     {/* Rounded Header with Draw Info */}
                     <View style={tw`mb-2 mx-1`}>
-                        <View style={tw`bg-black py-2 px-4 rounded-xl shadow-sm`}>
+                        <View style={tw`bg-black py-0.5 px-4 rounded-xl shadow-sm`}>
                             <Text style={tw`text-white text-center font-black text-xl uppercase leading-tight`}>
                                 {data.secondChanceLabel || 'FEZINHA EXTRA'}
                             </Text>
@@ -280,28 +282,46 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
                     </View>
                 )}
 
-                {/* QR Code */}
-                <View style={tw`items-center mt-2`}>
-                    {data.hash && (
-                        <View style={[tw`p-2 bg-white border-[3px] border-black rounded-lg`]}>
-                            <QRCode
-                                value={`https://www.fezinhadehoje.com.br/sorteio/${data.hash || data.ticketId}`}
-                                size={qrSize}
-                                backgroundColor="white"
-                                color="black"
-                                ecl="M"
-                            />
-                        </View>
-                    )}
-                </View>
+                {/* Footer: Text Left, QR Right */}
+                <View style={tw`flex-row justify-between items-center mt-2`}>
 
-                {/* Call to Action */}
-                <Text style={tw`text-center font-bold text-[11px] text-black mt-3`}>
-                    Acesse o site para conferir o resultado
-                </Text>
-                <Text style={tw`text-center font-bold text-[18px] text-black`}>
-                    www.fezinhadehoje.com.br
-                </Text>
+                    {/* Left Side: Texts */}
+                    <View style={tw`flex-1 pr-2`}>
+                        <Text style={tw`text-left font-bold text-[11px] text-black`}>
+                            Acesse o site para conferir o resultado
+                        </Text>
+                        <Text style={tw`text-left font-bold text-[16px] text-black leading-tight mt-1`}>
+                            www.fezinhadehoje.com.br
+                        </Text>
+                    </View>
+
+                    {/* Right Side: QR Code */}
+                    <View style={[
+                        tw`items-center`,
+                        {
+                            transform: [
+                                { scaleY: (height / width) * (isCapture ? 0.38 : 1) },
+                                { scaleX: (isCapture ? 1.35 : 1) }
+                            ],
+                        },
+                        {
+                            marginTop: -(width * (1 - ((height / width) * (isCapture ? 0.38 : 1))) / 2),
+                            marginBottom: -(width * (1 - ((height / width) * (isCapture ? 0.38 : 1))) / 2)
+                        }
+                    ]}>
+                        {data.hash && (
+                            <View style={[tw`p-2 bg-white border-[3px] border-black rounded-lg`]}>
+                                <QRCode
+                                    value={`https://www.fezinhadehoje.com.br/sorteio/${data.hash || data.ticketId}`}
+                                    size={qrSize}
+                                    backgroundColor="white"
+                                    color="black"
+                                    ecl="L"
+                                />
+                            </View>
+                        )}
+                    </View>
+                </View>
             </View>
         </View>
     );

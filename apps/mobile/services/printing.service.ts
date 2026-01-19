@@ -146,7 +146,7 @@ export const printTicket = async (
             <div class="dashed"></div>
             
             <div class="bold big">${gameName.toUpperCase()}</div>
-            <div>SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${city || areaName ? ` - ${city ? `${city}/` : ''}${areaName || ''}` : ''}</div>
+            <div>EXTRAÇÃO: ${formatDrawDate(data.drawDate || dateStr)}${city || areaName ? ` - ${city ? `${city}/` : ''}${areaName || ''}` : ''}</div>
             
             <div class="dashed"></div>
             
@@ -276,7 +276,7 @@ export const printTicket = async (
 
     receipt += DOUBLE_WIDTH_HEIGHT + BOLD_ON + gameName.toUpperCase() + BOLD_OFF + NORMAL + "\n";
     const areaStr = city || areaName ? ` - ${city ? `${city}/` : ''}${areaName || ''}` : '';
-    const sorteioInfo = `SORTEIO: ${formatDrawDate(data.drawDate || dateStr)}${areaStr}`;
+    const sorteioInfo = `EXTRAÇÃO: ${formatDrawDate(data.drawDate || dateStr)}${areaStr}`;
     receipt += sorteioInfo + "\n\n";
 
     const sortedNumbers = numbers.sort((a, b) => a - b);

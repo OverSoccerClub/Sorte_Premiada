@@ -1,4 +1,6 @@
 ﻿{
-    "version": "1.4.74",
-    "buildNumber": 190
+    "apkUrl":  "InnoBet.apk",
+    "build":  "205",
+    "version":  "1.4.89",
+    "force":  true
 }

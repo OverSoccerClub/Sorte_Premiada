@@ -57,3 +57,10 @@ error_output*.txt
 # Misc
 .DS_Store
 *.pem
+
+# IDE
+.idea/
+.vscode/
+
+# Temporary / Junk
+b/

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import * as Application from 'expo-application';
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -155,14 +155,13 @@ export function VersionFooter() {
                 onPress={handleCheckUpdate}
                 style={[tw`pt-2 items-center justify-center`, { paddingBottom: 15 }]}
             >
-            >
                 <View style={tw`flex-row items-center mb-1`}>
                     <MaterialCommunityIcons name="clover" size={12} color={settings.primaryColor || "#50C878"} style={tw`mr-1`} />
-                    <Text style={tw`text-gray-900 font-bold text-[10px] tracking-widest`}>{settings.companyName}</Text>
+                    <Text style={tw`text-gray-300 font-bold text-[10px] tracking-widest`}>{settings.companyName}</Text>
                 </View>
 
                 <View style={tw`flex-row items-center gap-2`}>
-                    <Text style={tw`text-black text-[10px] font-black`}>Versão {Application.nativeApplicationVersion}</Text>
+                    <Text style={tw`text-gray-400 text-[10px] font-bold`}>Versão {Application.nativeApplicationVersion}</Text>
                     {isChecking && <ActivityIndicator size="small" color="#50C878" style={{ transform: [{ scale: 0.5 }] }} />}
                 </View>
             </TouchableOpacity>

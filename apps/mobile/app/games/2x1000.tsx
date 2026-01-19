@@ -414,7 +414,7 @@ export default function Game2x1000Screen() {
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
                 date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                drawDate: ticketData.drawDate, // Pass raw string for component to format
                 series: ticketData.series,
                 ticketNumber: ticketData.ticketNumber,
                 terminalId: ticketData.deviceName || Device.deviceName || Device.modelName || "Terminal",
