@@ -199,6 +199,7 @@ export class UsersController {
         @Request() req: any,
         @Query('force') force?: string
     ) {
+        console.log(`[UsersController] Remove called for ID: ${id}, Force: ${force}, Role: ${req.user.role}`);
         // Buscar usuário para validar companyId
         const user = await this.usersService.findById(id);
 
