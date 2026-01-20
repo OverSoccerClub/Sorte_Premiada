@@ -619,7 +619,7 @@ export default function SecondChancePage() {
                                     {ticketDetails.numbers?.map((num: string, idx: number) => {
                                         // Auto-format based on game type if unpadded
                                         let displayNum = num;
-                                        const gType = ticketDetails.game?.type || '';
+                                        const gType = ticketDetails.gameType || '';
                                         if (!num.startsWith('0')) {
                                             if (gType.includes('MILHAR') || gType.includes('2x1000') || gType === '2x500') displayNum = num.padStart(4, '0');
                                             else if (gType.includes('CENTENA')) displayNum = num.padStart(3, '0');

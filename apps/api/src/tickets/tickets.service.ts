@@ -1393,7 +1393,7 @@ export class TicketsService {
                         company: { select: { companyName: true } }
                     }
                 },
-                game: { select: { name: true, type: true } }
+                game: { select: { name: true } }
             }
         });
 
