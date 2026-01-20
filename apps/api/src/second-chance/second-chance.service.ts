@@ -173,4 +173,77 @@ export class SecondChanceService {
 
         return this.prisma.secondChanceDraw.delete({ where: { id } });
     }
+
+    async findUpcomingNumbers(companyId?: string) {
+        const now = new Date();
+        const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+
+        // 1. Determine the next Date that has any tickets with Second Chance
+        const nextDrawTicket = await this.prisma.ticket.findFirst({
+            where: {
+                companyId: companyId,
+                secondChanceDrawDate: { gte: startOfToday },
+                status: { not: 'CANCELLED' }
+            },
+            orderBy: { secondChanceDrawDate: 'asc' },
+            select: { secondChanceDrawDate: true }
+        });
+
+        if (!nextDrawTicket || !nextDrawTicket.secondChanceDrawDate) {
+            return [];
+        }
+
+        const targetDate = nextDrawTicket.secondChanceDrawDate;
+        const startOfTargetDate = new Date(targetDate);
+        startOfTargetDate.setHours(0, 0, 0, 0);
+        const endOfTargetDate = new Date(targetDate);
+        endOfTargetDate.setHours(23, 59, 59, 999);
+
+        // 2. Fetch Tickets for that date, grouping/selecting relevant info
+        // We'll fetch raw tickets to group in JS or use groupBy (distinct) logic.
+        // Prisma groupBy doesn't support relations/include easily for game name.
+        // So we fetch tickets with Game included.
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                companyId: companyId,
+                secondChanceDrawDate: {
+                    gte: startOfTargetDate,
+                    lte: endOfTargetDate
+                },
+                status: { not: 'CANCELLED' }
+            },
+            select: {
+                secondChanceNumber: true,
+                game: {
+                    select: { id: true, name: true }
+                }
+            },
+            orderBy: { game: { name: 'asc' } }
+        });
+
+        // 3. Group by Game
+        const grouped: Record<string, { gameId: string, gameName: string, date: Date, numbers: Set<number> }> = {};
+
+        for (const t of tickets) {
+            if (t.secondChanceNumber === null) continue;
+            const gName = t.game?.name || 'Desconhecido';
+            const gId = t.game?.id || 'unknown';
+
+            if (!grouped[gId]) {
+                grouped[gId] = {
+                    gameId: gId,
+                    gameName: gName,
+                    date: targetDate,
+                    numbers: new Set()
+                };
+            }
+            grouped[gId].numbers.add(t.secondChanceNumber);
+        }
+
+        // 4. Format Result
+        return Object.values(grouped).map(g => ({
+            ...g,
+            numbers: Array.from(g.numbers).sort((a, b) => a - b)
+        }));
+    }
 }

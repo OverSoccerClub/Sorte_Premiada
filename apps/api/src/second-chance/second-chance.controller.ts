@@ -23,6 +23,11 @@ export class SecondChanceController {
         return this.service.findAll(req.user.companyId);
     }
 
+    @Get('upcoming')
+    findUpcoming(@Request() req: any) {
+        return this.service.findUpcomingNumbers(req.user.companyId);
+    }
+
     @Get(':id/winners')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)

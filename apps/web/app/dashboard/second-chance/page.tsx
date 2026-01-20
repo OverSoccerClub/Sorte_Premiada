@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Trophy, Trash2, Eye, Plus, User, MapPin, Hash, DollarSign } from "lucide-react"
+import { Loader2, Calendar, Trophy, Trash2, Eye, Plus, User, MapPin, Hash, DollarSign, Clock } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
@@ -42,10 +42,29 @@ export default function SecondChancePage() {
     const [mainPage, setMainPage] = useState(1)
     const [mainLimit, setMainLimit] = useState<number | "all">(10)
 
+    // Upcoming Draw State
+    const [upcoming, setUpcoming] = useState<any[]>([])
+
     useEffect(() => {
         fetchGames()
         fetchDraws()
+        fetchUpcoming()
     }, [activeCompanyId])
+
+    const fetchUpcoming = async () => {
+        try {
+            const token = localStorage.getItem("token")
+            const queryParams = new URLSearchParams()
+            if (activeCompanyId) queryParams.append('targetCompanyId', activeCompanyId)
+
+            const res = await fetch(`${API_URL}/second-chance-draws/upcoming?${queryParams.toString()}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                setUpcoming(await res.json())
+            }
+        } catch (e) { console.error("Erro ao carregar próximos números", e) }
+    }
 
     const fetchGames = async () => {
         try {
@@ -195,7 +214,7 @@ export default function SecondChancePage() {
                 icon={<Trophy className="w-8 h-8 text-yellow-500" />}
                 title="Gestão Segunda Chance"
                 description="Controle total dos sorteios de sábado, premiações e ganhadores."
-                onRefresh={fetchDraws}
+                onRefresh={() => { fetchDraws(); fetchUpcoming(); }}
                 refreshing={loading}
             >
                 <Button
@@ -207,6 +226,46 @@ export default function SecondChancePage() {
                     Lançar Resultado
                 </Button>
             </StandardPageHeader>
+
+            {/* Upcoming Draw Section */}
+            {Array.isArray(upcoming) && upcoming.length > 0 && (
+                <div className="grid gap-6">
+                    {upcoming.map((group: any) => (
+                        <Card key={group.gameId} className="border-yellow-200 bg-yellow-50/30">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2 text-yellow-800">
+                                    <Clock className="w-5 h-5" />
+                                    Próximo Sorteio: {new Date(group.date).toLocaleDateString('pt-BR')}
+                                    <span className="ml-auto text-sm font-normal text-muted-foreground bg-white/50 px-2 py-1 rounded-md border border-yellow-100">
+                                        Jogo: {group.gameName}
+                                    </span>
+                                </CardTitle>
+                                <CardDescription>
+                                    Números concorrendo automaticamente para este jogo.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {group.numbers.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">Nenhum número gerado ainda.</p>
+                                ) : (
+                                    <>
+                                        <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {group.numbers.map((num: number) => (
+                                                <Badge key={num} variant="secondary" className="font-mono bg-white border-yellow-200 text-yellow-800 hover:bg-yellow-100">
+                                                    {num.toString().padStart(4, '0')}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        <div className="mt-2 text-xs text-muted-foreground text-right">
+                                            Total: <strong>{group.numbers.length}</strong> números.
+                                        </div>
+                                    </>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
 
             <Card className="border-border shadow-sm">
                 <CardHeader className="bg-muted/30 border-b border-border py-4">
