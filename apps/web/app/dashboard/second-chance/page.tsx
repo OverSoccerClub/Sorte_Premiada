@@ -608,7 +608,7 @@ export default function SecondChancePage() {
                                     <span className="text-xs text-muted-foreground">Banca / Empresa</span>
                                     <p className="font-medium flex items-center gap-1.5">
                                         <Trophy className="w-3 h-3 text-muted-foreground" />
-                                        {ticketDetails.user?.company?.name || '---'}
+                                        {ticketDetails.user?.company?.companyName || '---'}
                                     </p>
                                 </div>
                             </div>

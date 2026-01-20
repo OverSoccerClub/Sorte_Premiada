@@ -1389,7 +1389,7 @@ export class TicketsService {
                         name: true,
                         username: true,
                         area: { select: { name: true, city: true } },
-                        company: { select: { name: true } }
+                        company: { select: { companyName: true } }
                     }
                 },
                 game: { select: { name: true } }
