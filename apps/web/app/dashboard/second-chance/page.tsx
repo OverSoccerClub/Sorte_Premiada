@@ -231,12 +231,12 @@ export default function SecondChancePage() {
             {Array.isArray(upcoming) && upcoming.length > 0 && (
                 <div className="grid gap-6">
                     {upcoming.map((group: any) => (
-                        <Card key={group.gameId} className="border-yellow-200 bg-yellow-50/30">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2 text-yellow-800">
-                                    <Clock className="w-5 h-5" />
-                                    Próximo Sorteio: {new Date(group.date).toLocaleDateString('pt-BR')}
-                                    <span className="ml-auto text-sm font-normal text-muted-foreground bg-white/50 px-2 py-1 rounded-md border border-yellow-100">
+                        <Card key={group.gameId} className="border-border shadow-sm">
+                            <CardHeader className="pb-3 border-b border-border/50 bg-muted/20">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <Clock className="w-5 h-5 text-yellow-500" />
+                                    Próximo Sorteio: <span className="text-foreground">{new Date(group.date).toLocaleDateString('pt-BR')}</span>
+                                    <span className="ml-auto text-sm font-normal text-muted-foreground bg-background px-2 py-1 rounded-md border border-border">
                                         Jogo: {group.gameName}
                                     </span>
                                 </CardTitle>
@@ -244,20 +244,22 @@ export default function SecondChancePage() {
                                     Números concorrendo automaticamente para este jogo.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-4">
                                 {group.numbers.length === 0 ? (
                                     <p className="text-sm text-muted-foreground">Nenhum número gerado ainda.</p>
                                 ) : (
                                     <>
-                                        <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                                        <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar p-1">
                                             {group.numbers.map((num: number) => (
-                                                <Badge key={num} variant="secondary" className="font-mono bg-white border-yellow-200 text-yellow-800 hover:bg-yellow-100">
+                                                <Badge key={num} variant="outline" className="font-mono text-base px-3 py-1 border-yellow-500/30 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors">
                                                     {num.toString().padStart(4, '0')}
                                                 </Badge>
                                             ))}
                                         </div>
-                                        <div className="mt-2 text-xs text-muted-foreground text-right">
-                                            Total: <strong>{group.numbers.length}</strong> números.
+                                        <div className="mt-4 pt-3 border-t border-border flex justify-end">
+                                            <span className="text-xs text-muted-foreground">
+                                                Total: <strong className="text-foreground">{group.numbers.length}</strong> números.
+                                            </span>
                                         </div>
                                     </>
                                 )}
