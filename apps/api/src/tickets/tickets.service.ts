@@ -1397,6 +1397,8 @@ export class TicketsService {
             }
         });
 
+
+        // Note: type field removed as it does not exist on Game model
         if (!ticket) {
             throw new BadRequestException('Bilhete não encontrado.');
         }
