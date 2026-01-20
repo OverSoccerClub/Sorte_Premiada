@@ -616,11 +616,23 @@ export default function SecondChancePage() {
                             <div className="pt-4 border-t border-border mt-2">
                                 <span className="text-xs text-muted-foreground block mb-2">Números Jogados:</span>
                                 <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto p-1 custom-scrollbar">
-                                    {ticketDetails.numbers?.map((num: string, idx: number) => (
-                                        <Badge key={idx} variant="secondary" className="font-mono bg-muted text-foreground border border-border">
-                                            {num}
-                                        </Badge>
-                                    ))}
+                                    {ticketDetails.numbers?.map((num: string, idx: number) => {
+                                        // Auto-format based on game type if unpadded
+                                        let displayNum = num;
+                                        const gType = ticketDetails.game?.type || '';
+                                        if (!num.startsWith('0')) {
+                                            if (gType.includes('MILHAR') || gType.includes('2x1000') || gType === '2x500') displayNum = num.padStart(4, '0');
+                                            else if (gType.includes('CENTENA')) displayNum = num.padStart(3, '0');
+                                            else if (gType.includes('DEZENA')) displayNum = num.padStart(2, '0');
+                                        }
+
+                                        return (
+                                            <Badge key={idx} variant="secondary" className="font-mono bg-muted text-foreground border border-border">
+                                                {displayNum}
+                                            </Badge>
+                                        )
+                                    })}
+
                                 </div>
                             </div>
                         </div>

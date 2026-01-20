@@ -211,7 +211,8 @@ export class TicketsService {
                 }
             }
 
-            data.numbers = [firstNum, ...others].sort((a, b) => a - b);
+            // Pad numbers to 4 digits strings
+            data.numbers = [firstNum, ...others].sort((a, b) => a - b).map(n => n.toString().padStart(4, '0'));
         }
 
         // --- BUSINESS RULE: MAX LIABILITY CHECK (Risk Management) ---
@@ -1392,7 +1393,7 @@ export class TicketsService {
                         company: { select: { companyName: true } }
                     }
                 },
-                game: { select: { name: true } }
+                game: { select: { name: true, type: true } }
             }
         });
 
