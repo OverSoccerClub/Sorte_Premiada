@@ -298,14 +298,18 @@ export default function SecondChancePage() {
                                     <>
                                         <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar p-1">
                                             {group.numbers.map((item: any) => (
-                                                <Badge
+                                                <div
                                                     key={item.ticketId}
                                                     onClick={() => handleTicketClick(item.ticketId)}
-                                                    variant="outline"
-                                                    className="font-mono text-base px-3 py-1 border-yellow-500/30 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors cursor-pointer hover:scale-105 active:scale-95 select-none"
+                                                    className="cursor-pointer transition-transform hover:scale-105 active:scale-95 inline-block"
                                                 >
-                                                    {item.number.toString().padStart(4, '0')}
-                                                </Badge>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="font-mono text-base px-3 py-1 border-yellow-500/30 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors select-none pointer-events-none"
+                                                    >
+                                                        {item.number.toString().padStart(4, '0')}
+                                                    </Badge>
+                                                </div>
                                             ))}
                                         </div>
                                         <div className="mt-4 pt-3 border-t border-border flex justify-end">
