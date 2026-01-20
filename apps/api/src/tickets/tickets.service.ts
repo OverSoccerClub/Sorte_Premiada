@@ -1379,4 +1379,31 @@ export class TicketsService {
             }
         });
     }
+
+    async findOne(id: string, companyId?: string) {
+        const ticket = await this.prisma.client.ticket.findUnique({
+            where: { id },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        username: true,
+                        area: { select: { name: true, city: true } },
+                        company: { select: { name: true } }
+                    }
+                },
+                game: { select: { name: true } }
+            }
+        });
+
+        if (!ticket) {
+            throw new BadRequestException('Bilhete não encontrado.');
+        }
+
+        if (companyId && ticket.companyId !== companyId) {
+            throw new BadRequestException('Acesso negado ao bilhete.');
+        }
+
+        return ticket;
+    }
 }

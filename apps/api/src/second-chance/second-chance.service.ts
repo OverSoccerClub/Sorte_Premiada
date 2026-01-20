@@ -213,6 +213,7 @@ export class SecondChanceService {
                 status: { not: 'CANCELLED' }
             },
             select: {
+                id: true,
                 secondChanceNumber: true,
                 game: {
                     select: { id: true, name: true }
@@ -222,7 +223,7 @@ export class SecondChanceService {
         });
 
         // 3. Group by Game
-        const grouped: Record<string, { gameId: string, gameName: string, date: Date, numbers: Set<number> }> = {};
+        const grouped: Record<string, { gameId: string, gameName: string, date: Date, numbers: any[] }> = {};
 
         for (const t of tickets) {
             if (t.secondChanceNumber === null) continue;
@@ -234,16 +235,25 @@ export class SecondChanceService {
                     gameId: gId,
                     gameName: gName,
                     date: targetDate,
-                    numbers: new Set()
+                    numbers: []
                 };
             }
-            grouped[gId].numbers.add(t.secondChanceNumber);
+            // Store number AND ticketId
+            // Deduplication logic: If multiple tickets have same number (rare but possible), we just pick one?
+            // SecondChance usually allows multiple winners? Or unique? 
+            // If unique per series, then it's fine.
+            // Let's store object { number: 1234, ticketId: '...' }
+            // To avoid duplicates in visualization, check if number exists?
+            const exists = grouped[gId].numbers.find((n: any) => n.number === t.secondChanceNumber);
+            if (!exists) {
+                grouped[gId].numbers.push({ number: t.secondChanceNumber, ticketId: t.id });
+            }
         }
 
         // 4. Format Result
         return Object.values(grouped).map(g => ({
             ...g,
-            numbers: Array.from(g.numbers).sort((a, b) => a - b)
+            numbers: g.numbers.sort((a: any, b: any) => a.number - b.number)
         }));
     }
 }

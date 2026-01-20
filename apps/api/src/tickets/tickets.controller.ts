@@ -84,6 +84,12 @@ export class TicketsController {
         return this.ticketsService.validateTicket(id, req.user.companyId);
     }
 
+    @Get(':id')
+    @UseGuards(JwtAuthGuard)
+    async findOne(@Request() req: any, @Param('id') id: string) {
+        return this.ticketsService.findOne(id, req.user.companyId);
+    }
+
     @Post(':id/redeem')
     @UseGuards(JwtAuthGuard)
     async redeem(@Request() req: any, @Param('id') id: string) {

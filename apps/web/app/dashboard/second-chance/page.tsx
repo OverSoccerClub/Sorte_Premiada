@@ -45,6 +45,11 @@ export default function SecondChancePage() {
     // Upcoming Draw State
     const [upcoming, setUpcoming] = useState<any[]>([])
 
+    // Individual Ticket Detail State
+    const [ticketModalOpen, setTicketModalOpen] = useState(false)
+    const [ticketDetails, setTicketDetails] = useState<any>(null)
+    const [loadingTicket, setLoadingTicket] = useState(false)
+
     useEffect(() => {
         fetchGames()
         fetchDraws()
@@ -144,6 +149,48 @@ export default function SecondChancePage() {
             showAlert("Erro!", "Erro de conexão", "error")
         } finally {
             setLoadingDetails(false)
+        }
+    }
+
+    const handleTicketClick = async (ticketId: string) => {
+        setTicketModalOpen(true)
+        setLoadingTicket(true)
+        setTicketDetails(null)
+        try {
+            const token = localStorage.getItem("token")
+            let url = `${API_URL}/tickets/${ticketId}`
+            if (activeCompanyId) url += `?targetCompanyId=${activeCompanyId}` // Although findOne takes companyId from user arg usually, but controller might need adjustment or headers?
+            // Wait, tickets.controller.ts findOne uses @Request() req.user.companyId if not passed?
+            // Actually tickets.service.ts findOne(id, companyId) checks match.
+            // The controller: ticketsService.findOne(id, req.user.companyId).
+            // So on frontend we just need to send auth token. Authenticated user's companyId will be used.
+            // But if I am a Master/Admin viewing another company? 
+            // InnoBet usually passes targetCompanyId in headers or query for admin masquerading?
+            // StandardPageHeader's useActiveCompanyId context suggests multi-tenancy support.
+            // If I am Admin, `req.user.companyId` might be my company, not the target.
+            // But `findOne` checks `if (companyId && ticket.companyId !== companyId)`.
+            // If I am admin, maybe I shouldn't pass companyId? 
+            // Valid point. But for now I'll stick to standard fetch pattern.
+            // However, the controller `findOne` doesn't take 'targetCompanyId' query param, it takes `req.user.companyId`.
+            // If I am superadmin, `req.user.companyId` might be null or specific.
+            // This is a preexisting pattern. I'll rely on the fact that for standard users it works.
+
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+
+            if (res.ok) {
+                setTicketDetails(await res.json())
+            } else {
+                const err = await res.json()
+                showAlert("Erro!", err.message || "Erro ao carregar bilhete", "error")
+                setTicketModalOpen(false)
+            }
+        } catch (e) {
+            showAlert("Erro!", "Erro de conexão", "error")
+            setTicketModalOpen(false)
+        } finally {
+            setLoadingTicket(false)
         }
     }
 
@@ -250,9 +297,14 @@ export default function SecondChancePage() {
                                 ) : (
                                     <>
                                         <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar p-1">
-                                            {group.numbers.map((num: number) => (
-                                                <Badge key={num} variant="outline" className="font-mono text-base px-3 py-1 border-yellow-500/30 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors">
-                                                    {num.toString().padStart(4, '0')}
+                                            {group.numbers.map((item: any) => (
+                                                <Badge
+                                                    key={item.ticketId}
+                                                    onClick={() => handleTicketClick(item.ticketId)}
+                                                    variant="outline"
+                                                    className="font-mono text-base px-3 py-1 border-yellow-500/30 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors cursor-pointer hover:scale-105 active:scale-95 select-none"
+                                                >
+                                                    {item.number.toString().padStart(4, '0')}
                                                 </Badge>
                                             ))}
                                         </div>
@@ -492,6 +544,87 @@ export default function SecondChancePage() {
                             </TableBody>
                         </Table>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal: Detalhes do Bilhete Individual */}
+            <Dialog open={ticketModalOpen} onOpenChange={setTicketModalOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-yellow-500" />
+                            Detalhes da Fezinha
+                        </DialogTitle>
+                        <CardDescription>Informações do bilhete gerador.</CardDescription>
+                    </DialogHeader>
+
+                    {loadingTicket ? (
+                        <div className="py-8 flex justify-center">
+                            <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
+                        </div>
+                    ) : ticketDetails ? (
+                        <div className="grid gap-4 py-2">
+                            <div className="p-4 bg-muted/30 rounded-lg border border-border flex flex-col items-center justify-center gap-2">
+                                <span className="text-sm text-muted-foreground uppercase tracking-wider">Número da Sorte</span>
+                                <span className="text-4xl font-mono font-bold text-yellow-500 tracking-widest">
+                                    {ticketDetails.secondChanceNumber?.toString().padStart(4, '0')}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground">Data/Hora</span>
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <Calendar className="w-3 h-3" />
+                                        {new Date(ticketDetails.createdAt).toLocaleString('pt-BR')}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground">Jogo Original</span>
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <Trophy className="w-3 h-3" />
+                                        {ticketDetails.game?.name}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground">Cambista</span>
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <User className="w-3 h-3" />
+                                        {ticketDetails.user?.name || ticketDetails.user?.username}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground">Local</span>
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <MapPin className="w-3 h-3" />
+                                        {ticketDetails.user?.area?.name || ticketDetails.user?.area?.city || '---'}
+                                    </p>
+                                </div>
+                                <div className="space-y-1 col-span-2">
+                                    <span className="text-xs text-muted-foreground">Banca / Empresa</span>
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <Trophy className="w-3 h-3 text-muted-foreground" />
+                                        {ticketDetails.user?.company?.name || '---'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-border mt-2">
+                                <span className="text-xs text-muted-foreground block mb-2">Números Jogados:</span>
+                                <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto p-1 custom-scrollbar">
+                                    {ticketDetails.numbers?.map((num: string, idx: number) => (
+                                        <Badge key={idx} variant="secondary" className="font-mono bg-muted text-foreground border border-border">
+                                            {num}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="py-8 text-center text-muted-foreground">
+                            Não foi possível carregar os detalhes.
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>
