@@ -277,11 +277,11 @@ export class DrawsService {
 
             if (matches && Array.isArray(matches) && matches.length > 0) {
                 // Delete existing matches
-                await tx.match.deleteMany({ where: { drawId: id } });
+                await tx.soccerMatch.deleteMany({ where: { drawId: id } });
 
                 // Create new matches
                 // Note: using createMany is more efficient
-                await tx.match.createMany({
+                await tx.soccerMatch.createMany({
                     data: matches.map((m: any) => ({
                         drawId: id,
                         homeTeam: m.homeTeam,
