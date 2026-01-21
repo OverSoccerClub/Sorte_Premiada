@@ -61,6 +61,7 @@ export default function DrawsSettingsPage() {
     // Form State
     const [drawDate, setDrawDate] = useState("")
     const [drawTime, setDrawTime] = useState("")
+    const [drawDescription, setDrawDescription] = useState("")
     const [winningNumbers, setWinningNumbers] = useState("")
     const [matches, setMatches] = useState<any[]>([])
     const [saving, setSaving] = useState(false)
@@ -121,6 +122,7 @@ export default function DrawsSettingsPage() {
             const date = new Date(draw.drawDate)
             setDrawDate(date.toISOString().split('T')[0])
             setDrawTime(date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+            setDrawDescription(draw.description || "")
             setWinningNumbers(draw.numbers ? draw.numbers.join(', ') : "")
 
             // Paipita: Load matches
@@ -140,6 +142,7 @@ export default function DrawsSettingsPage() {
             const today = new Date()
             setDrawDate(today.toISOString().split('T')[0])
             setDrawTime("19:00")
+            setDrawDescription("")
             setWinningNumbers("")
 
             if (isPaipita) {
@@ -167,6 +170,7 @@ export default function DrawsSettingsPage() {
             const payload: any = {
                 gameId: selectedGameId,
                 drawDate: fullDate.toISOString(),
+                description: drawDescription || null,
                 numbers: winningNumbers ? winningNumbers.split(',').map(n => n.trim()) : []
             }
 
@@ -323,9 +327,14 @@ export default function DrawsSettingsPage() {
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <div className="flex items-center gap-1.5 text-foreground font-medium">
-                                                            <Calendar className="w-4 h-4 text-emerald-500" />
-                                                            {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                        <div className="flex flex-col">
+                                                            <div className="flex items-center gap-1.5 text-foreground font-medium">
+                                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                                {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                            </div>
+                                                            {draw.description && (
+                                                                <span className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold ml-5.5">{draw.description}</span>
+                                                            )}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
@@ -398,6 +407,14 @@ export default function DrawsSettingsPage() {
                         <div className="grid gap-2">
                             <label className="text-sm font-medium">Data do Concurso</label>
                             <Input type="date" value={drawDate} onChange={e => setDrawDate(e.target.value)} />
+                        </div>
+                        <div className="grid gap-2">
+                            <label className="text-sm font-medium">Descrição (Opcional)</label>
+                            <Input
+                                placeholder="Ex: Rodada 25 - Brasileirão"
+                                value={drawDescription}
+                                onChange={e => setDrawDescription(e.target.value)}
+                            />
                         </div>
                         <div className="grid gap-2">
                             <label className="text-sm font-medium">Hora Limite (Fechamento)</label>
@@ -513,7 +530,7 @@ export default function DrawsSettingsPage() {
                     <DialogHeader>
                         <DialogTitle>Detalhes do Sorteio</DialogTitle>
                         <CardDescription>
-                            {drawDetails?.draw?.game?.name} - {drawDetails?.draw?.series ? `#${drawDetails.draw.series}` : ''} - {drawDetails?.draw?.drawDate && new Date(drawDetails.draw.drawDate).toLocaleString('pt-BR')}
+                            {drawDetails?.draw?.game?.name} - {drawDetails?.draw?.series ? `#${drawDetails.draw.series}` : ''} - {drawDetails?.draw?.description ? `${drawDetails.draw.description} - ` : ''} {drawDetails?.draw?.drawDate && new Date(drawDetails.draw.drawDate).toLocaleString('pt-BR')}
                         </CardDescription>
                     </DialogHeader>
 
