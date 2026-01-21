@@ -229,6 +229,79 @@ export default function DrawsSettingsPage() {
         }
     }
 
+    const handleOpenImport = () => {
+        setImportModalOpen(true)
+        setImportedFixtures([])
+        setSelectedFixtures([])
+        setImportDate(new Date().toISOString().split('T')[0])
+    }
+
+    const fetchFixtures = async () => {
+        setLoadingFixtures(true)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/football/fixtures?date=${importDate}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                if (data.fixtures) {
+                    setImportedFixtures(data.fixtures)
+                } else if (data.warning) {
+                    showAlert("Atenção", data.warning, "warning")
+                    setImportedFixtures([])
+                }
+            } else {
+                showAlert("Erro", "Erro ao buscar jogos", "error")
+            }
+        } catch (e) { showAlert("Erro", "Erro de conexão", "error") }
+        finally { setLoadingFixtures(false) }
+    }
+
+    const handleImportSelection = () => {
+        const selected = importedFixtures.filter(f => selectedFixtures.includes(f.id.toString()))
+
+        // Map to matches format
+        const newMatches = selected.map((f, i) => ({
+            matchOrder: i + 1,
+            homeTeam: f.homeTeam.name,
+            awayTeam: f.awayTeam.name,
+            matchDate: new Date(f.timestamp * 1000).toISOString().slice(0, 16), // datetime-local format
+            result: null
+        }))
+
+        // Fill remaining slots if < 14 or truncate if > 14
+        const currentMatches = [...newMatches]
+        if (currentMatches.length < 14) {
+            for (let i = currentMatches.length; i < 14; i++) {
+                currentMatches.push({
+                    matchOrder: i + 1,
+                    homeTeam: "",
+                    awayTeam: "",
+                    matchDate: "",
+                    result: ""
+                })
+            }
+        } else if (currentMatches.length > 14) {
+            currentMatches.length = 14
+        }
+
+        // Renumber orders
+        currentMatches.forEach((m, i) => m.matchOrder = i + 1)
+
+        setMatches(currentMatches)
+        setImportModalOpen(false)
+        showAlert("Sucesso", `${selected.length} jogos importados!`, "success")
+    }
+
+    const toggleFixtureSelection = (id: string) => {
+        setSelectedFixtures(prev => {
+            if (prev.includes(id)) return prev.filter(x => x !== id)
+            if (prev.length >= 14) return prev // Max 14
+            return [...prev, id]
+        })
+    }
+
     const handleDelete = async (id: string, drawDate: string) => {
         showAlert(
             "Confirmar Exclusão",
