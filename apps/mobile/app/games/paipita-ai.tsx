@@ -336,26 +336,23 @@ export default function GamePaipitaScreen() {
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAR APOSTA</Text>
 
-                            <View style={tw`bg-white mb-6 shadow-2xl w-full rounded-xl items-center`}>
-                                <TicketDisplay
-                                    data={{
-                                        gameName: "PAIPITA AI",
-                                        numbers: [],
-                                        matches: matches.map(m => ({
-                                            order: m.matchOrder,
-                                            label: `${m.homeTeam} x ${m.awayTeam}`,
-                                            selection: mapSelectionToText(selections[m.matchOrder] || '-')
-                                        })),
-                                        price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                        date: new Date().toLocaleString('pt-BR'),
-                                        ticketId: "PREVIEW",
-                                        companyName: settings.companyName,
-                                        companyLogoUrl: settings.logoUrl
-                                    }}
-                                    mode="preview"
-                                    template={settings.ticketTemplate as 'default' | 'alternative'}
-                                />
-                            </View>
+                            <TicketDisplay
+                                data={{
+                                    gameName: "PAIPITA AI",
+                                    numbers: [],
+                                    matches: matches.map(m => ({
+                                        order: m.matchOrder,
+                                        label: `${m.homeTeam} x ${m.awayTeam}`,
+                                        selection: mapSelectionToText(selections[m.matchOrder] || '-')
+                                    })),
+                                    price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
+                                    date: new Date().toLocaleString('pt-BR'),
+                                    ticketId: "PREVIEW",
+                                    companyName: settings.companyName,
+                                    companyLogoUrl: settings.logoUrl
+                                }}
+                                mode="preview"
+                            />
 
                             <TouchableOpacity
                                 style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
