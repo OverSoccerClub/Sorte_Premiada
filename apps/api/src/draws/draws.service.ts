@@ -234,7 +234,10 @@ export class DrawsService {
 
         return this.prisma.draw.findMany({
             where: { companyId },
-            include: { game: true },
+            include: {
+                game: true,
+                matches: { orderBy: { matchOrder: 'asc' } }
+            },
             orderBy: { drawDate: 'desc' }
         });
     }
@@ -246,7 +249,10 @@ export class DrawsService {
         }
         return this.prisma.draw.findMany({
             where,
-            orderBy: { drawDate: 'desc' }
+            orderBy: { drawDate: 'desc' },
+            include: {
+                matches: { orderBy: { matchOrder: 'asc' } }
+            }
         });
     }
 
