@@ -329,11 +329,14 @@ export default function GamePaipitaScreen() {
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View style={tw`flex-1 bg-black/90 justify-center items-center p-4`}>
-                    <View style={tw`w-full bg-gray-900 rounded-3xl overflow-hidden h-[85%] border border-gray-800`}>
+                    <View style={[tw`w-full bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 flex flex-col`, { maxHeight: '90%' }]}>
+                        {/* Header */}
                         <View style={tw`p-4 border-b border-gray-800`}>
                             <Text style={tw`text-white font-bold text-xl text-center`}>CONFIRMAR APOSTA</Text>
                         </View>
-                        <ScrollView style={tw`flex-1`} contentContainerStyle={tw`p-4`}>
+
+                        {/* Scrollable Content */}
+                        <ScrollView style={tw`flex-1`} contentContainerStyle={tw`p-4`} showsVerticalScrollIndicator={true}>
                             <TicketDisplay
                                 data={{
                                     gameName: "PAIPITA AI",
@@ -350,8 +353,11 @@ export default function GamePaipitaScreen() {
                                     companyLogoUrl: settings.logoUrl
                                 }}
                                 mode="preview"
+                                scale={0.75}
                             />
                         </ScrollView>
+
+                        {/* Fixed Footer Buttons */}
                         <View style={tw`p-4 bg-gray-900 border-t border-gray-800`}>
                             <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
                                 <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
