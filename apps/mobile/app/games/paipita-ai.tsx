@@ -110,9 +110,9 @@ export default function GamePaipitaScreen() {
 
     const mapSelectionToText = (selection: string) => {
         switch (selection) {
-            case '1': return 'Casa Vence';
-            case 'X': return 'Empate';
-            case '2': return 'Fora Vence';
+            case '1': return 'CV'; // Casa Vence
+            case 'X': return 'EM'; // Empate
+            case '2': return 'FV'; // Fora Vence
             default: return selection;
         }
     };
@@ -328,10 +328,12 @@ export default function GamePaipitaScreen() {
             </View>
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-                <View style={tw`flex-1 bg-black/90`}>
-                    <ScrollView contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-32`}>
-                        <View style={tw`w-full max-w-[400px]`}>
-                            <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAR APOSTA</Text>
+                <View style={tw`flex-1 bg-black/90 justify-center items-center p-4`}>
+                    <View style={tw`w-full bg-gray-900 rounded-3xl overflow-hidden max-h-[85%] border border-gray-800`}>
+                        <View style={tw`p-4 border-b border-gray-800`}>
+                            <Text style={tw`text-white font-bold text-xl text-center`}>CONFIRMAR APOSTA</Text>
+                        </View>
+                        <ScrollView style={tw`flex-1`} contentContainerStyle={tw`p-4`}>
                             <TicketDisplay
                                 data={{
                                     gameName: "PAIPITA AI",
@@ -349,15 +351,15 @@ export default function GamePaipitaScreen() {
                                 }}
                                 mode="preview"
                             />
+                        </ScrollView>
+                        <View style={tw`p-4 bg-gray-900 border-t border-gray-800`}>
+                            <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
+                                <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={tw`bg-gray-800 p-4 rounded-2xl items-center`} onPress={() => setModalVisible(false)}>
+                                <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
+                            </TouchableOpacity>
                         </View>
-                    </ScrollView>
-                    <View style={tw`absolute bottom-0 w-full p-4 bg-gray-900 border-t border-gray-800`}>
-                        <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
-                            <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={tw`bg-gray-800 p-4 rounded-2xl items-center`} onPress={() => setModalVisible(false)}>
-                            <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
