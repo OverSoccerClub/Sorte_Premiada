@@ -31,7 +31,7 @@ export default function GamePaipitaScreen() {
 
     // Game State
     const [gameId, setGameId] = useState<string | null>(null);
-    const [gameName, setGameName] = useState<string>("Paipita Ai");
+    const [gameName, setGameName] = useState<string>("Palpita Ai");
     const [isLoadingGame, setIsLoadingGame] = useState(true);
     const [gamePrice, setGamePrice] = useState<number>(2.00);
     const [activeDraw, setActiveDraw] = useState<any>(null);
@@ -56,7 +56,7 @@ export default function GamePaipitaScreen() {
     }, []);
 
     const fetchGameAndDraws = async () => {
-        show("Carregando Paipita Ai...");
+        show("Carregando Palpita Ai...");
         try {
             const API_URL = AppConfig.api.baseUrl;
             const res = await fetch(`${API_URL}/games`, {
@@ -92,7 +92,7 @@ export default function GamePaipitaScreen() {
                         }
                     }
                 } else {
-                    showAlert("Erro", "Jogo Paipita Ai não encontrado.", "error");
+                    showAlert("Erro", "Jogo Palpita Ai não encontrado.", "error");
                 }
             }
         } catch (error) {
@@ -196,7 +196,7 @@ export default function GamePaipitaScreen() {
             }));
 
             const fullTicket: TicketData = {
-                gameName: "PAIPITA AI",
+                gameName: "PALPITA AI",
                 numbers: ticketData.numbers, // unused by matches renderer
                 matches: matchDetails,
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
@@ -281,16 +281,16 @@ export default function GamePaipitaScreen() {
                                 <Text style={tw`text-white font-bold flex-1 text-left text-sm`} numberOfLines={1}>{match.awayTeam}</Text>
                             </View>
 
-                            <View style={tw`flex-row gap-2 mt-2`}>
+                            <View style={tw`flex-row gap-1 mt-2`}>
                                 {[
-                                    { code: '1', label: 'Casa Vence', color: 'emerald' },
-                                    { code: 'X', label: 'Empate', color: 'blue' },
-                                    { code: '2', label: 'Fora Vence', color: 'orange' }
+                                    { code: '1', label: 'CASA', color: 'emerald' },
+                                    { code: 'X', label: 'EMPATE', color: 'blue' },
+                                    { code: '2', label: 'FORA', color: 'orange' }
                                 ].map((opt) => {
                                     const isSelected = selections[match.matchOrder] === opt.code;
                                     let btnColor = 'bg-gray-700/50';
                                     let borderColor = 'border-gray-600';
-                                    let txtColor = 'text-gray-300';
+                                    let txtColor = 'text-gray-400';
 
                                     if (isSelected) {
                                         if (opt.color === 'emerald') {
@@ -313,13 +313,13 @@ export default function GamePaipitaScreen() {
                                     return (
                                         <TouchableOpacity
                                             key={opt.code}
-                                            style={tw`w-full py-3 px-4 rounded-xl items-center border-2 ${btnColor} ${borderColor} ${isSelected ? 'shadow-lg' : ''}`}
+                                            style={tw`flex-1 py-2 px-1 rounded-lg items-center border ${btnColor} ${borderColor} ${isSelected ? 'shadow-sm' : ''}`}
                                             onPress={() => handleSelection(match.matchOrder, opt.code)}
                                             activeOpacity={0.7}
                                         >
-                                            <View style={tw`flex-row items-center justify-center gap-2`}>
-                                                {isSelected && <Ionicons name="trophy" size={16} color="#fbbf24" />}
-                                                <Text style={tw`font-semibold text-xs ${txtColor}`}>{opt.label}</Text>
+                                            <View style={tw`flex-row items-center justify-center gap-1`}>
+                                                {isSelected && <Ionicons name="trophy" size={12} color="#fbbf24" />}
+                                                <Text style={tw`font-bold text-[10px] ${txtColor}`} numberOfLines={1}>{opt.label}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     )
@@ -360,7 +360,7 @@ export default function GamePaipitaScreen() {
                             <View style={tw`mb-4`}>
                                 <TicketDisplay
                                     data={{
-                                        gameName: "PAIPITA AI",
+                                        gameName: "PALPITA AI",
                                         numbers: [],
                                         matches: matches.map(m => ({
                                             order: m.matchOrder,
