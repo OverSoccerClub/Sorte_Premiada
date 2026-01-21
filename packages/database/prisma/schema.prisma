@@ -274,6 +274,7 @@ model Draw {
   areaId    String? // Vinculação por praça
   area      Area?    @relation(fields: [areaId], references: [id])
   matches   SoccerMatch[]
+  description String? // Ex: "Rodada 15 - Brasileirão" ou "Especial Champions League"
   createdAt DateTime @default(now())
 
   @@index([companyId])
