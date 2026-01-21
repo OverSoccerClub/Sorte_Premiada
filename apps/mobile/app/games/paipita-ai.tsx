@@ -328,45 +328,53 @@ export default function GamePaipitaScreen() {
             </View>
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-                <View style={tw`flex-1 bg-black/90 justify-center items-center p-4`}>
-                    <View style={[tw`w-full bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 flex flex-col`, { maxHeight: '90%' }]}>
-                        {/* Header */}
-                        <View style={tw`p-4 border-b border-gray-800`}>
-                            <Text style={tw`text-white font-bold text-xl text-center`}>CONFIRMAR APOSTA</Text>
-                        </View>
+                <View style={tw`flex-1 bg-black/90`}>
+                    <ScrollView
+                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-20`}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View style={tw`w-full max-w-[400px]`}>
+                            <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAR APOSTA</Text>
 
-                        {/* Scrollable Content */}
-                        <ScrollView style={tw`flex-1`} contentContainerStyle={tw`p-4`} showsVerticalScrollIndicator={true}>
-                            <TicketDisplay
-                                data={{
-                                    gameName: "PAIPITA AI",
-                                    numbers: [],
-                                    matches: matches.map(m => ({
-                                        order: m.matchOrder,
-                                        label: `${m.homeTeam} x ${m.awayTeam}`,
-                                        selection: mapSelectionToText(selections[m.matchOrder] || '-')
-                                    })),
-                                    price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                    date: new Date().toLocaleString('pt-BR'),
-                                    ticketId: "PREVIEW",
-                                    companyName: settings.companyName,
-                                    companyLogoUrl: settings.logoUrl
-                                }}
-                                mode="preview"
-                                scale={0.75}
-                            />
-                        </ScrollView>
+                            <View style={tw`bg-white mb-6 shadow-2xl w-full rounded-xl items-center`}>
+                                <TicketDisplay
+                                    data={{
+                                        gameName: "PAIPITA AI",
+                                        numbers: [],
+                                        matches: matches.map(m => ({
+                                            order: m.matchOrder,
+                                            label: `${m.homeTeam} x ${m.awayTeam}`,
+                                            selection: mapSelectionToText(selections[m.matchOrder] || '-')
+                                        })),
+                                        price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
+                                        date: new Date().toLocaleString('pt-BR'),
+                                        ticketId: "PREVIEW",
+                                        companyName: settings.companyName,
+                                        companyLogoUrl: settings.logoUrl
+                                    }}
+                                    mode="preview"
+                                    template={settings.ticketTemplate as 'default' | 'alternative'}
+                                />
+                            </View>
 
-                        {/* Fixed Footer Buttons */}
-                        <View style={tw`p-4 bg-gray-900 border-t border-gray-800`}>
-                            <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
-                                <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
+                            <TouchableOpacity
+                                style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
+                                onPress={handlePrint}
+                            >
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
+                                    <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
+                                </View>
                             </TouchableOpacity>
-                            <TouchableOpacity style={tw`bg-gray-800 p-4 rounded-2xl items-center`} onPress={() => setModalVisible(false)}>
-                                <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
+
+                            <TouchableOpacity
+                                style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95 w-full mb-4`}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={tw`text-gray-400 font-bold uppercase tracking-wide`}>Voltar</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </ScrollView>
                 </View>
             </Modal>
 
