@@ -108,6 +108,15 @@ export default function GamePaipitaScreen() {
         setAlertConfig({ visible: true, title, message, type });
     };
 
+    const mapSelectionToText = (selection: string) => {
+        switch (selection) {
+            case '1': return 'Casa Vence';
+            case 'X': return 'Empate';
+            case '2': return 'Fora Vence';
+            default: return selection;
+        }
+    };
+
     const handleSelection = (matchOrder: number, value: string) => {
         setSelections(prev => ({
             ...prev,
@@ -183,7 +192,7 @@ export default function GamePaipitaScreen() {
             const matchDetails = matches.map(m => ({
                 order: m.matchOrder,
                 label: `${m.homeTeam} x ${m.awayTeam}`,
-                selection: selections[m.matchOrder]
+                selection: mapSelectionToText(selections[m.matchOrder])
             }));
 
             const fullTicket: TicketData = {
@@ -320,7 +329,7 @@ export default function GamePaipitaScreen() {
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View style={tw`flex-1 bg-black/90`}>
-                    <ScrollView contentContainerStyle={tw`flex-grow justify-center items-center p-4`}>
+                    <ScrollView contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-32`}>
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAR APOSTA</Text>
                             <TicketDisplay
@@ -330,7 +339,7 @@ export default function GamePaipitaScreen() {
                                     matches: matches.map(m => ({
                                         order: m.matchOrder,
                                         label: `${m.homeTeam} x ${m.awayTeam}`,
-                                        selection: selections[m.matchOrder] || '-'
+                                        selection: mapSelectionToText(selections[m.matchOrder] || '-')
                                     })),
                                     price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                     date: new Date().toLocaleString('pt-BR'),
@@ -340,14 +349,16 @@ export default function GamePaipitaScreen() {
                                 }}
                                 mode="preview"
                             />
-                            <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 mt-6`} onPress={handlePrint}>
-                                <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={tw`bg-gray-800 p-4 rounded-2xl items-center mb-4`} onPress={() => setModalVisible(false)}>
-                                <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
-                            </TouchableOpacity>
                         </View>
                     </ScrollView>
+                    <View style={tw`absolute bottom-0 w-full p-4 bg-gray-900 border-t border-gray-800`}>
+                        <TouchableOpacity style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3`} onPress={handlePrint}>
+                            <Text style={tw`text-white font-bold text-lg`}>Confirmar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={tw`bg-gray-800 p-4 rounded-2xl items-center`} onPress={() => setModalVisible(false)}>
+                            <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </Modal>
 
