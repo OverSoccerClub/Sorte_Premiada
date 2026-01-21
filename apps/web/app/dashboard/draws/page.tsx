@@ -114,6 +114,8 @@ export default function DrawsSettingsPage() {
             })
             if (res.ok) {
                 const data = await res.json()
+                console.log('[FETCH DRAWS] API Response:', data)
+                console.log('[FETCH DRAWS] First draw matches:', data[0]?.matches)
                 setDraws(data)
             }
         } catch (e) { showAlert("Erro", "Erro ao carregar sorteios", "error") }
@@ -125,6 +127,8 @@ export default function DrawsSettingsPage() {
         const game = games.find(g => g.id === selectedGameId)
         const isPaipita = game?.type === 'PAIPITA_AI'
 
+        console.log('[EDIT DRAW] Opening modal:', { draw, isPaipita, hasMatches: !!draw?.matches, matchesCount: draw?.matches?.length })
+
         if (draw) {
             const date = new Date(draw.drawDate)
             setDrawDate(date.toISOString().split('T')[0])
@@ -133,10 +137,13 @@ export default function DrawsSettingsPage() {
             setWinningNumbers(draw.numbers ? draw.numbers.join(', ') : "")
 
             // Paipita: Load matches
-            if (isPaipita && draw.matches) {
-                setMatches(draw.matches.sort((a: any, b: any) => a.matchOrder - b.matchOrder))
+            if (isPaipita && draw.matches && draw.matches.length > 0) {
+                const sortedMatches = draw.matches.sort((a: any, b: any) => a.matchOrder - b.matchOrder)
+                console.log('[EDIT DRAW] Loading matches:', sortedMatches)
+                setMatches(sortedMatches)
             } else if (isPaipita) {
                 // Should not happen if data integrity is good, but fallback
+                console.warn('[EDIT DRAW] No matches found, creating empty template')
                 setMatches(Array.from({ length: 14 }, (_, i) => ({
                     matchOrder: i + 1,
                     homeTeam: "",
