@@ -1,10 +1,20 @@
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Palette, Activity, Check, X, FileText, BarChart3 } from "lucide-react"
+import { Plus, Pencil, Ticket, Loader2, Settings2, Clock, Shield, DollarSign, Palette, Activity, Check, X, FileText, BarChart3, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { API_URL } from "@/lib/api"
@@ -59,6 +69,37 @@ export default function GamesPage() {
     // Inline Price Edit
     const [editingPriceId, setEditingPriceId] = useState<string | null>(null)
     const [newPrice, setNewPrice] = useState("")
+    const [gameToDelete, setGameToDelete] = useState<Game | null>(null)
+
+    const confirmDelete = (game: Game) => {
+        setGameToDelete(game)
+    }
+
+    const handleDelete = async () => {
+        if (!gameToDelete) return
+
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/games/${gameToDelete.id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (res.ok) {
+                showAlert("Sucesso!", "Jogo excluído com sucesso", "success")
+                setGameToDelete(null)
+                fetchGames()
+            } else {
+                const data = await res.json()
+                showAlert("Erro!", data.message || "Erro ao excluir jogo", "error")
+            }
+        } catch (error) {
+            console.error(error)
+            showAlert("Erro!", "Falha ao excluir jogo", "error")
+        }
+    }
 
     const fetchGames = async () => {
         setIsLoading(true)
@@ -218,6 +259,17 @@ export default function GamesPage() {
                                         <Ticket className="w-6 h-6" />
                                     </div>
                                     <div className="flex items-center gap-2">
+                                        {user?.role === 'MASTER' && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                                                onClick={() => confirmDelete(game)}
+                                                title="Excluir Jogo"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        )}
                                         <Switch
                                             checked={game.isActive}
                                             onCheckedChange={() => toggleActive(game)}
@@ -347,6 +399,26 @@ export default function GamesPage() {
                 game={selectedGame}
                 onSuccess={fetchGames}
             />
+
+            <AlertDialog open={!!gameToDelete} onOpenChange={(open) => !open && setGameToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Jogo</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem certeza que deseja excluir o jogo "{gameToDelete?.name}"?
+                            <br /><br />
+                            <span className="font-bold text-red-600">Atenção:</span> Esta ação não pode ser desfeita.
+                            Se houver bilhetes ou sorteios vinculados, a exclusão pode falhar (prefira desativar o jogo neste caso).
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                            Excluir Definitivamente
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

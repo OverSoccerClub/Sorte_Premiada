@@ -162,4 +162,38 @@ export class GamesService {
 
         return result;
     }
+    async remove(id: string, adminId?: string) {
+        // Obter informações do jogo antes de deletar para log
+        const game = await this.prisma.client.game.findUnique({
+            where: { id }
+        });
+
+        if (!game) return;
+
+        // Implementar Soft Delete (Desativar) ou Hard Delete?
+        // Vamos de Hard Delete para limpeza, mas com cuidado com integridade referencial.
+        // Se houver tickets, pode falhar. Então talvez seja melhor garantir que só delete se não houver tickets.
+        // Ou capturar o erro do Prisma.
+
+        // Por segurança, vamos apenas marcar como deletado se adicionarmos soft delete no futuro.
+        // Por enquanto, tentamos delete. Se falhar por FK, o controller captura.
+
+        const deleted = await this.prisma.client.game.delete({
+            where: { id }
+        });
+
+        if (adminId) {
+            await this.auditLog.log({
+                userId: adminId,
+                action: 'DELETE_GAME',
+                entity: 'Game',
+                entityId: id,
+                oldValue: game,
+                newValue: null
+            });
+        }
+
+        return deleted;
+    }
 }
+

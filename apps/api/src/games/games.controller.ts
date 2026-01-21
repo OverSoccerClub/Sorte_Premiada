@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, Query, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request, Query, ForbiddenException, Delete } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { Role } from '@repo/database';
+import { Role, Prisma } from '@repo/database';
 
 @Controller('games')
 export class GamesController {
@@ -111,4 +111,28 @@ export class GamesController {
             throw e;
         }
     }
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.MASTER) // Apenas MASTER pode deletar
+    async remove(@Param('id') id: string, @Request() req: any) {
+        const game = await this.gamesService.findOne(id);
+        if (!game) {
+            throw new ForbiddenException('Jogo não encontrado');
+        }
+
+        // Validação extra: Apenas MASTER pode deletar jogos
+        if (req.user.role !== 'MASTER') {
+            throw new ForbiddenException('Apenas usuários MASTER podem excluir jogos');
+        }
+
+        try {
+            return await this.gamesService.remove(id, req.user.userId);
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+                throw new ForbiddenException('Não é possível excluir este jogo pois existem registros vinculados (bilhetes, etc). Tente desativá-lo.');
+            }
+            throw error;
+        }
+    }
 }
+
