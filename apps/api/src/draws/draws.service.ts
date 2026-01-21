@@ -66,6 +66,7 @@ export class DrawsService {
                 const createdDraw = await tx.draw.create({
                     data: {
                         ...data,
+                        description: data.description || null,
                         series: updatedSeries.lastSeries,
                         ...(companyId ? { companyId } : {}),
                         matches: (data.matches && Array.isArray(data.matches)) ? {
