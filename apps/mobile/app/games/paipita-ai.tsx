@@ -319,8 +319,11 @@ export default function GamePaipitaScreen() {
                                         >
                                             <View style={tw`flex-row items-center justify-center gap-1`}>
                                                 {isSelected && <Ionicons name="trophy" size={10} color="#fbbf24" />}
-                                                <Text style={tw`font-bold text-[9px] uppercase ${txtColor}`} numberOfLines={1}>
-                                                    {opt.label}
+                                                <Text
+                                                    style={[tw`font-bold uppercase ${txtColor}`, { fontSize: 9 }]}
+                                                    numberOfLines={1}
+                                                >
+                                                    {opt.label || ''}
                                                 </Text>
                                             </View>
                                         </TouchableOpacity>
