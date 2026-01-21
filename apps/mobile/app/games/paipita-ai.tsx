@@ -283,47 +283,43 @@ export default function GamePaipitaScreen() {
 
                             <View style={tw`flex-col gap-2 mt-2`}>
                                 {[
-                                    { code: '1', label: 'Casa Vence', color: 'emerald', icon: 'home' },
-                                    { code: 'X', label: 'Empate', color: 'blue', icon: 'git-compare' },
-                                    { code: '2', label: 'Fora Vence', color: 'orange', icon: 'airplane' }
+                                    { code: '1', label: 'Casa Vence', color: 'emerald' },
+                                    { code: 'X', label: 'Empate', color: 'blue' },
+                                    { code: '2', label: 'Fora Vence', color: 'orange' }
                                 ].map((opt) => {
                                     const isSelected = selections[match.matchOrder] === opt.code;
                                     let btnColor = 'bg-gray-700/50';
                                     let borderColor = 'border-gray-600';
                                     let txtColor = 'text-gray-300';
-                                    let iconColor = '#9ca3af';
 
                                     if (isSelected) {
                                         if (opt.color === 'emerald') {
                                             btnColor = 'bg-emerald-600';
                                             borderColor = 'border-emerald-500';
                                             txtColor = 'text-white';
-                                            iconColor = '#ffffff';
                                         }
                                         if (opt.color === 'blue') {
                                             btnColor = 'bg-blue-600';
                                             borderColor = 'border-blue-500';
                                             txtColor = 'text-white';
-                                            iconColor = '#ffffff';
                                         }
                                         if (opt.color === 'orange') {
                                             btnColor = 'bg-orange-600';
                                             borderColor = 'border-orange-500';
                                             txtColor = 'text-white';
-                                            iconColor = '#ffffff';
                                         }
                                     }
 
                                     return (
                                         <TouchableOpacity
                                             key={opt.code}
-                                            style={tw`w-full py-3.5 px-4 rounded-xl items-center border-2 ${btnColor} ${borderColor} ${isSelected ? 'shadow-lg' : ''}`}
+                                            style={tw`w-full py-3 px-4 rounded-xl items-center border-2 ${btnColor} ${borderColor} ${isSelected ? 'shadow-lg' : ''}`}
                                             onPress={() => handleSelection(match.matchOrder, opt.code)}
                                             activeOpacity={0.7}
                                         >
                                             <View style={tw`flex-row items-center justify-center gap-2`}>
-                                                <Ionicons name={opt.icon as any} size={18} color={iconColor} />
-                                                <Text style={tw`font-bold text-sm ${txtColor} tracking-wide`}>{opt.label.toUpperCase()}</Text>
+                                                {isSelected && <Ionicons name="trophy" size={16} color="#fbbf24" />}
+                                                <Text style={tw`font-semibold text-xs ${txtColor}`}>{opt.label}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     )
@@ -361,23 +357,26 @@ export default function GamePaipitaScreen() {
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAR APOSTA</Text>
 
-                            <TicketDisplay
-                                data={{
-                                    gameName: "PAIPITA AI",
-                                    numbers: [],
-                                    matches: matches.map(m => ({
-                                        order: m.matchOrder,
-                                        label: `${m.homeTeam} x ${m.awayTeam}`,
-                                        selection: mapSelectionToText(selections[m.matchOrder] || '-')
-                                    })),
-                                    price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                    date: new Date().toLocaleString('pt-BR'),
-                                    ticketId: "PREVIEW",
-                                    companyName: settings.companyName,
-                                    companyLogoUrl: settings.logoUrl
-                                }}
-                                mode="preview"
-                            />
+                            <View style={tw`mb-6`}>
+                                <TicketDisplay
+                                    data={{
+                                        gameName: "PAIPITA AI",
+                                        numbers: [],
+                                        matches: matches.map(m => ({
+                                            order: m.matchOrder,
+                                            label: `${m.homeTeam} x ${m.awayTeam}`,
+                                            selection: mapSelectionToText(selections[m.matchOrder] || '-')
+                                        })),
+                                        price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
+                                        date: new Date().toLocaleString('pt-BR'),
+                                        ticketId: "PREVIEW",
+                                        companyName: settings.companyName,
+                                        companyLogoUrl: settings.logoUrl
+                                    }}
+                                    mode="preview"
+                                    scale={0.7}
+                                />
+                            </View>
 
                             <TouchableOpacity
                                 style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
