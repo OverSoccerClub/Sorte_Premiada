@@ -1,7 +1,6 @@
 ﻿{
-    "version": "1.4.89",
-    "build": 205,
-    "apkUrl": "https://www.inforcomputer.com/Atualizacoes/InnoBet/InnoBet.apk",
-    "force": false,
-    "notes": "Atualização Crítica: Correção da geração de ID do dispositivo (Hardware ID único). Requer reativação."
+    "apkUrl":  "InnoBet.apk",
+    "build":  "206",
+    "version":  "1.4.90",
+    "force":  true
 }

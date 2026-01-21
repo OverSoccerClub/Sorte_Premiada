@@ -9,6 +9,8 @@ import { Loader2, Save } from "lucide-react"
 
 import { useActiveCompanyId } from "@/context/use-active-company"
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 interface GameFormDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
@@ -21,6 +23,7 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
     const activeCompanyId = useActiveCompanyId()
     const [name, setName] = useState("")
     const [price, setPrice] = useState("5.00")
+    const [type, setType] = useState("GENERIC")
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -28,9 +31,11 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
             if (gameToEdit) {
                 setName(gameToEdit.name)
                 setPrice(String(gameToEdit.price))
+                setType(gameToEdit.type || "GENERIC")
             } else {
                 setName("")
                 setPrice("5.00")
+                setType("GENERIC")
             }
         }
     }, [open, gameToEdit])
@@ -47,6 +52,7 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
             const payload = {
                 name,
                 price: parseFloat(price),
+                type,
                 targetCompanyId: activeCompanyId,
                 // Default values for new games
                 ...(!gameToEdit && {
@@ -89,6 +95,22 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="type">Tipo de Jogo</Label>
+                        <Select value={type} onValueChange={setType} disabled={!!gameToEdit}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecione o tipo..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="GENERIC">Padrão / Outros</SelectItem>
+                                <SelectItem value="PAIPITA_AI">Paipita Ai (Loteca)</SelectItem>
+                                <SelectItem value="2X1000">2x1000 (Milhar)</SelectItem>
+                                <SelectItem value="LOTERIA_TRADICIONAL">Loteria Tradicional (Bicho)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p className="text-[10px] text-muted-foreground">O tipo define as regras de validação e interface. Não pode ser alterado após criar.</p>
+                    </div>
+
                     <div className="space-y-2">
                         <Label htmlFor="name">Nome do Jogo</Label>
                         <Input
