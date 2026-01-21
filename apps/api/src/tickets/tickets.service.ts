@@ -468,11 +468,22 @@ export class TicketsService {
                 if (drawRecord && drawRecord.matches && drawRecord.matches.length > 0) {
                     const sortedMatches = drawRecord.matches.sort((a: any, b: any) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
                     const firstMatchDate = new Date(sortedMatches[0].matchDate);
+                    const now = new Date();
 
-                    if (new Date() >= firstMatchDate) {
-                        throw new BadRequestException("As apostas encerraram (início da primeira partida).");
+                    console.log(`[PAIPITA_AI] Validação de horário:`, {
+                        now: now.toISOString(),
+                        firstMatchDate: firstMatchDate.toISOString(),
+                        nowTimestamp: now.getTime(),
+                        firstMatchTimestamp: firstMatchDate.getTime(),
+                        diff: firstMatchDate.getTime() - now.getTime(),
+                        diffMinutes: (firstMatchDate.getTime() - now.getTime()) / 1000 / 60
+                    });
+
+                    if (now >= firstMatchDate) {
+                        throw new BadRequestException(`As apostas encerraram. Primeira partida iniciou em ${firstMatchDate.toLocaleString('pt-BR')}.`);
                     }
                 } else {
+                    console.warn(`[PAIPITA_AI] Nenhum jogo encontrado para o concurso ${drawDate}. Permitindo aposta.`);
                     // Se não achar o sorteio específico, pode ser que ainda não criaram.
                     // Mas para Paipita Ai, PRECISA existir para saber os times.
                     // Vamos permitir passar se for apenas simulação, mas ideal bloquear.

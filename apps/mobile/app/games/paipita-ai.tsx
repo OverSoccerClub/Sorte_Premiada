@@ -281,25 +281,50 @@ export default function GamePaipitaScreen() {
                                 <Text style={tw`text-white font-bold flex-1 text-left text-sm`} numberOfLines={1}>{match.awayTeam}</Text>
                             </View>
 
-                            <View style={tw`flex-row gap-2`}>
-                                {['1', 'X', '2'].map((opt) => {
-                                    const isSelected = selections[match.matchOrder] === opt;
-                                    let btnColor = 'bg-gray-700';
-                                    let txtColor = 'text-gray-400';
+                            <View style={tw`flex-col gap-2 mt-2`}>
+                                {[
+                                    { code: '1', label: 'Casa Vence', color: 'emerald', icon: 'home' },
+                                    { code: 'X', label: 'Empate', color: 'blue', icon: 'git-compare' },
+                                    { code: '2', label: 'Fora Vence', color: 'orange', icon: 'airplane' }
+                                ].map((opt) => {
+                                    const isSelected = selections[match.matchOrder] === opt.code;
+                                    let btnColor = 'bg-gray-700/50';
+                                    let borderColor = 'border-gray-600';
+                                    let txtColor = 'text-gray-300';
+                                    let iconColor = '#9ca3af';
 
                                     if (isSelected) {
-                                        if (opt === '1') { btnColor = 'bg-emerald-600'; txtColor = 'text-white'; }
-                                        if (opt === 'X') { btnColor = 'bg-blue-600'; txtColor = 'text-white'; }
-                                        if (opt === '2') { btnColor = 'bg-orange-600'; txtColor = 'text-white'; }
+                                        if (opt.color === 'emerald') {
+                                            btnColor = 'bg-emerald-600';
+                                            borderColor = 'border-emerald-500';
+                                            txtColor = 'text-white';
+                                            iconColor = '#ffffff';
+                                        }
+                                        if (opt.color === 'blue') {
+                                            btnColor = 'bg-blue-600';
+                                            borderColor = 'border-blue-500';
+                                            txtColor = 'text-white';
+                                            iconColor = '#ffffff';
+                                        }
+                                        if (opt.color === 'orange') {
+                                            btnColor = 'bg-orange-600';
+                                            borderColor = 'border-orange-500';
+                                            txtColor = 'text-white';
+                                            iconColor = '#ffffff';
+                                        }
                                     }
 
                                     return (
                                         <TouchableOpacity
-                                            key={opt}
-                                            style={tw`flex-1 py-3 rounded-lg items-center ${btnColor}`}
-                                            onPress={() => handleSelection(match.matchOrder, opt)}
+                                            key={opt.code}
+                                            style={tw`w-full py-3.5 px-4 rounded-xl items-center border-2 ${btnColor} ${borderColor} ${isSelected ? 'shadow-lg' : ''}`}
+                                            onPress={() => handleSelection(match.matchOrder, opt.code)}
+                                            activeOpacity={0.7}
                                         >
-                                            <Text style={tw`font-black ${txtColor}`}>{opt}</Text>
+                                            <View style={tw`flex-row items-center justify-center gap-2`}>
+                                                <Ionicons name={opt.icon as any} size={18} color={iconColor} />
+                                                <Text style={tw`font-bold text-sm ${txtColor} tracking-wide`}>{opt.label.toUpperCase()}</Text>
+                                            </View>
                                         </TouchableOpacity>
                                     )
                                 })}
