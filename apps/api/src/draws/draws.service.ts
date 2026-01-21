@@ -131,7 +131,7 @@ export class DrawsService {
             }
         });
 
-        const gameType = fullDraw.game.type;
+        const gameType = (fullDraw.game as any).type;
         let wonCount = 0;
         let lostCount = 0;
 
@@ -220,7 +220,7 @@ export class DrawsService {
 
             await tx.ticket.update({
                 where: { id: ticket.id },
-                data: { status: newStatus }
+                data: { status: newStatus as any }
             });
         }
     }
