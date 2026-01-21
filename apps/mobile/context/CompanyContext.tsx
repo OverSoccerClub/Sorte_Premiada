@@ -131,9 +131,9 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             clearTimeout(timeoutId);
 
             if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404) {
-                console.warn(`Device token invalid or expired (Status: ${response.status}). clearing activation.`);
+                console.warn(`Device token invalid or expired (Status: ${response.status}). Marking as failed but keeping local activation.`);
                 setVerificationStatus('failed');
-                await clearActivation();
+                // await clearActivation(); // Removed to prevent forced logout on updates/glitches
                 return;
             }
 
