@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag, Ticket } from "lucide-react"
+import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag, Ticket, Download, Search } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
@@ -25,6 +25,13 @@ export default function DrawsSettingsPage() {
     const [loading, setLoading] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [selectedDraw, setSelectedDraw] = useState<any | null>(null)
+
+    // Import Modal State
+    const [importModalOpen, setImportModalOpen] = useState(false)
+    const [importDate, setImportDate] = useState(new Date().toISOString().split('T')[0])
+    const [importedFixtures, setImportedFixtures] = useState<any[]>([])
+    const [loadingFixtures, setLoadingFixtures] = useState(false)
+    const [selectedFixtures, setSelectedFixtures] = useState<string[]>([])
 
     // Details Modal State
     const [detailModalOpen, setDetailModalOpen] = useState(false)
@@ -426,6 +433,10 @@ export default function DrawsSettingsPage() {
                                 <label className="text-sm font-medium flex items-center justify-between">
                                     Lista de Jogos (14 Partidas)
                                     <span className="text-xs font-normal text-muted-foreground">Ordene por horário</span>
+                                    <Button type="button" size="sm" variant="outline" onClick={handleOpenImport} className="h-6 text-xs gap-1 ml-auto border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                                        <Download className="w-3 h-3" />
+                                        Importar da API
+                                    </Button>
                                 </label>
                                 <div className="border rounded-md overflow-hidden max-h-[50vh] overflow-y-auto">
                                     <Table>
@@ -655,6 +666,98 @@ export default function DrawsSettingsPage() {
                             </div>
                         </div>
                     )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
+                <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle>Importar Jogos (API)</DialogTitle>
+                        <CardDescription>Selecione até 14 jogos para preencher a cartela.</CardDescription>
+                    </DialogHeader>
+
+                    <div className="flex items-center gap-2 py-2">
+                        <Input type="date" value={importDate} onChange={e => setImportDate(e.target.value)} className="w-auto" />
+                        <Button onClick={fetchFixtures} disabled={loadingFixtures}>
+                            {loadingFixtures ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                            Buscar Jogos
+                        </Button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto border rounded-md min-h-[300px]">
+                        {loadingFixtures ? (
+                            <div className="flex items-center justify-center h-full">
+                                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                            </div>
+                        ) : importedFixtures.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4 text-center">
+                                <Search className="w-8 h-8 mb-2 opacity-50" />
+                                <p>Nenhum jogo encontrado para esta data ou filtro.</p>
+                                <p className="text-xs">Tente outra data ou verifique se a API Key está configurada.</p>
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[40px]"></TableHead>
+                                        <TableHead>Hora</TableHead>
+                                        <TableHead>Liga</TableHead>
+                                        <TableHead>Mandante</TableHead>
+                                        <TableHead>Visitante</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {importedFixtures.map((fixture) => (
+                                        <TableRow
+                                            key={fixture.id}
+                                            className="cursor-pointer hover:bg-muted/50"
+                                            onClick={() => toggleFixtureSelection(fixture.id.toString())}
+                                        >
+                                            <TableCell>
+                                                <div
+                                                    className={`w-4 h-4 rounded border flex items-center justify-center
+                                                    ${selectedFixtures.includes(fixture.id.toString()) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-input'}
+                                                `}>
+                                                    {selectedFixtures.includes(fixture.id.toString()) && <CheckCircle className="w-3 h-3" />}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="font-mono text-xs">
+                                                {new Date(fixture.timestamp * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </TableCell>
+                                            <TableCell className="text-xs font-medium text-muted-foreground">
+                                                {fixture.league.name}
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    {fixture.homeTeam.logo && <img src={fixture.homeTeam.logo} alt="" className="w-4 h-4 object-contain" />}
+                                                    {fixture.homeTeam.name}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    {fixture.awayTeam.logo && <img src={fixture.awayTeam.logo} alt="" className="w-4 h-4 object-contain" />}
+                                                    {fixture.awayTeam.name}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </div>
+
+                    <DialogFooter className="flex items-center justify-between sm:justify-between">
+                        <div className="text-sm text-muted-foreground">
+                            {selectedFixtures.length} selecionados (Máx 14)
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" onClick={() => setImportModalOpen(false)}>Cancelar</Button>
+                            <Button onClick={handleImportSelection} disabled={selectedFixtures.length === 0} className="bg-emerald-600 hover:bg-emerald-700">
+                                <Download className="w-4 h-4 mr-2" />
+                                Importar {selectedFixtures.length} Jogos
+                            </Button>
+                        </div>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
