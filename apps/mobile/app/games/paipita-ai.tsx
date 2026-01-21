@@ -329,7 +329,7 @@ export default function GamePaipitaScreen() {
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View style={tw`flex-1 bg-black/90 justify-center items-center p-4`}>
-                    <View style={tw`w-full bg-gray-900 rounded-3xl overflow-hidden max-h-[85%] border border-gray-800`}>
+                    <View style={tw`w-full bg-gray-900 rounded-3xl overflow-hidden h-[85%] border border-gray-800`}>
                         <View style={tw`p-4 border-b border-gray-800`}>
                             <Text style={tw`text-white font-bold text-xl text-center`}>CONFIRMAR APOSTA</Text>
                         </View>
