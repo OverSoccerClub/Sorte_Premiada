@@ -281,7 +281,7 @@ export default function GamePaipitaScreen() {
                                 <Text style={tw`text-white font-bold flex-1 text-left text-sm`} numberOfLines={1}>{match.awayTeam}</Text>
                             </View>
 
-                            <View style={tw`flex-col gap-2 mt-2`}>
+                            <View style={tw`flex-row gap-2 mt-2`}>
                                 {[
                                     { code: '1', label: 'Casa Vence', color: 'emerald' },
                                     { code: 'X', label: 'Empate', color: 'blue' },
@@ -355,9 +355,9 @@ export default function GamePaipitaScreen() {
                         showsVerticalScrollIndicator={false}
                     >
                         <View style={tw`w-full max-w-[400px]`}>
-                            <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAR APOSTA</Text>
+                            <Text style={tw`text-white font-bold text-xl mb-2 text-center`}>CONFIRMAR APOSTA</Text>
 
-                            <View style={tw`mb-6`}>
+                            <View style={tw`mb-4`}>
                                 <TicketDisplay
                                     data={{
                                         gameName: "PAIPITA AI",
@@ -374,7 +374,7 @@ export default function GamePaipitaScreen() {
                                         companyLogoUrl: settings.logoUrl
                                     }}
                                     mode="preview"
-                                    scale={0.7}
+                                    scale={0.65}
                                 />
                             </View>
 
