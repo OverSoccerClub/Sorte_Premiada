@@ -260,25 +260,47 @@ export class DrawsService {
         return this.prisma.draw.findUnique({ where: { id } });
     }
 
-    async update(id: string, data: Prisma.DrawUpdateInput, companyId?: string) {
+    async update(id: string, data: any, companyId?: string) {
         // Security Check
         const exists = await this.prisma.draw.findFirst({
             where: { id, ...(companyId ? { companyId } : {}) }
         });
         if (!exists) throw new Error("Sorteio não encontrado ou acesso negado.");
 
-        const updatedDraw = await this.prisma.draw.update({
-            where: { id },
-            data,
+        const { matches, ...drawData } = data;
+
+        return this.prisma.$transaction(async (tx) => {
+            const updatedDraw = await tx.draw.update({
+                where: { id },
+                data: drawData,
+            });
+
+            if (matches && Array.isArray(matches) && matches.length > 0) {
+                // Delete existing matches
+                await tx.match.deleteMany({ where: { drawId: id } });
+
+                // Create new matches
+                // Note: using createMany is more efficient
+                await tx.match.createMany({
+                    data: matches.map((m: any) => ({
+                        drawId: id,
+                        homeTeam: m.homeTeam,
+                        awayTeam: m.awayTeam,
+                        matchDate: new Date(m.matchDate),
+                        matchOrder: Number(m.matchOrder),
+                        result: m.result || null
+                    }))
+                });
+            }
+
+            // Trigger result processing if numbers are present
+            if (updatedDraw.numbers && (updatedDraw.numbers as unknown as string[]).length > 0) {
+                // Re-use transaction client
+                await this.processDrawResults(tx as any, updatedDraw);
+            }
+
+            return updatedDraw;
         });
-
-        // Trigger result processing if numbers are present
-        if (updatedDraw.numbers && (updatedDraw.numbers as unknown as string[]).length > 0) {
-            // Re-use main prisma as tx client
-            await this.processDrawResults(this.prisma, updatedDraw);
-        }
-
-        return updatedDraw;
     }
 
     async remove(id: string, companyId?: string) {
