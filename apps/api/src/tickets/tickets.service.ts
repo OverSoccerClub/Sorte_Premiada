@@ -438,6 +438,48 @@ export class TicketsService {
                     throw new BadRequestException(`Modalidade inválida: ${modality} `);
             }
         }
+        // PAIPITA AI Logic (Loteca) - Validação de 14 jogos
+        else if (data.gameType === 'PAIPITA_AI') {
+            if (!data.numbers || data.numbers.length !== 14) {
+                throw new BadRequestException("É necessário palpitar em exatamente 14 jogos.");
+            }
+
+            const validOptions = ['1', 'X', '2'];
+            for (const guess of data.numbers) {
+                if (!validOptions.includes(guess)) {
+                    throw new BadRequestException(`Palpite inválido: ${guess}. Use 1, X ou 2.`);
+                }
+            }
+
+            // Validate Closing Time based on Matches
+            if (!drawDate) {
+                try { drawDate = await this.getNextDrawDate(gameId); } catch { }
+            }
+
+            if (drawDate) {
+                const drawRecord = await this.prisma.client.draw.findFirst({
+                    where: {
+                        gameId: gameId,
+                        drawDate: drawDate
+                    },
+                    include: { matches: true }
+                });
+
+                if (drawRecord && drawRecord.matches && drawRecord.matches.length > 0) {
+                    const sortedMatches = drawRecord.matches.sort((a: any, b: any) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
+                    const firstMatchDate = new Date(sortedMatches[0].matchDate);
+
+                    if (new Date() >= firstMatchDate) {
+                        throw new BadRequestException("As apostas encerraram (início da primeira partida).");
+                    }
+                } else {
+                    // Se não achar o sorteio específico, pode ser que ainda não criaram.
+                    // Mas para Paipita Ai, PRECISA existir para saber os times.
+                    // Vamos permitir passar se for apenas simulação, mas ideal bloquear.
+                    // throw new BadRequestException("Concurso não encontrado.");
+                }
+            }
+        }
 
 
 

@@ -272,9 +272,28 @@ model Draw {
   series    Int? // Número sequencial do sorteio
   areaId    String? // Vinculação por praça
   area      Area?    @relation(fields: [areaId], references: [id])
+  matches   SoccerMatch[]
   createdAt DateTime @default(now())
 
   @@index([companyId])
+}
+
+model SoccerMatch {
+  id        String   @id @default(uuid())
+  drawId    String
+  draw      Draw     @relation(fields: [drawId], references: [id], onDelete: Cascade)
+  
+  homeTeam  String
+  awayTeam  String
+  matchDate DateTime
+  matchOrder Int // 1 to 14
+  result    String? // "1", "X", "2", "CANCELLED"
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([drawId])
+  @@index([matchDate])
 }
 
 model SecondChanceDraw {

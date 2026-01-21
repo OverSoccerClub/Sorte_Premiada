@@ -175,6 +175,8 @@ export default function Dashboard() {
             router.push("/games/2x1000");
         } else if (gameName === "jb" || gameName.includes("bicho") || gameName.includes("loteria") || gameName.includes("tradicional")) {
             router.push("/games/loteria-tradicional");
+        } else if (game.type === 'PAIPITA_AI' || gameName.includes("paipita")) {
+            router.push("/games/paipita-ai");
         } else {
             // Future games - use placeholder with game name
             router.push({ pathname: "/games/placeholder", params: { title: game.displayName || game.name } });

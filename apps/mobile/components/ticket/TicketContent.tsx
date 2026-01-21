@@ -43,6 +43,12 @@ export interface TicketData {
     alternativeQrHeight?: number;
     qrcodeWidth?: number;
     qrcodeHeight?: number;
+    // Paipita Ai specific
+    matches?: {
+        order: number;
+        label: string; // "Team A x Team B"
+        selection: string; // "1", "X", "2"
+    }[];
 }
 
 interface TicketContentProps {
@@ -153,33 +159,59 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </Text>
             </View>
 
-            {/* Numbers Grid */}
-            <View style={tw`flex-row flex-wrap justify-between mb-0 px-1`}>
-                {Array.from({ length: 4 }).map((_, idx) => {
-                    const num = sortedNumbers[idx];
-                    return (
-                        <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-300 rounded-lg p-2 bg-gray-50`}>
-                            <Text style={tw`font-bold text-[10px] text-gray-500 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
-                            {num !== undefined ? (
-                                <View style={tw`flex-row justify-between w-full px-2 mt-1`}>
-                                    {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                        <View key={i} style={tw`items-center`}>
-                                            <Text style={[tw`text-4xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
-                                            <Text style={[tw`text-[7px] text-gray-600 text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
-                                                {numberToText(parseInt(digit))}
-                                            </Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            ) : (
-                                <View style={tw`flex-row justify-center w-full px-4 items-center`}>
-                                    <Text style={[tw`text-4xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
-                                </View>
-                            )}
+            {/* Special Paipita Match List */}
+            {data.matches ? (
+                <View style={tw`mb-4 px-2`}>
+                    {data.matches.map((match, idx) => (
+                        <View key={idx} style={tw`flex-row items-center border-b border-gray-300 py-1`}>
+                            <View style={tw`w-8 items-center bg-black rounded mr-2`}>
+                                <Text style={tw`text-white font-black text-xs`}>{match.order}</Text>
+                            </View>
+                            <Text style={tw`flex-1 font-bold text-[10px] text-black uppercase flex-wrap mr-2`} numberOfLines={1}>
+                                {match.label}
+                            </Text>
+                            <View style={tw`bg-gray-200 border border-black w-8 h-6 items-center justify-center rounded`}>
+                                <Text style={tw`font-black text-base text-black`}>{match.selection}</Text>
+                            </View>
                         </View>
-                    );
-                })}
-            </View>
+                    ))}
+                </View>
+            ) : (
+                /* Standard Numbers Grid */
+                <View style={tw`flex-row flex-wrap justify-between mb-0 px-1`}>
+                    {Array.from({ length: 4 }).map((_, idx) => {
+                        const num = sortedNumbers[idx];
+                        // Only render boxes if we have numbers or if it's 2x1000 expectation
+                        // If generic numbers array length < 4, this might break UI logic if we force 4.
+                        // Assuming this block is primarily for 2x1000 style.
+                        // If it's pure Loteria Traditional, it renders animals usually?
+                        // Actually 2x1000 uses this. Loteria Tradicional currently might use same generic display?
+                        // Let's check logic: Loteria Tradicional stores numbers in `numbers` array.
+                        // If I just display them in boxes, it works.
+                        return (
+                            <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-300 rounded-lg p-2 bg-gray-50`}>
+                                <Text style={tw`font-bold text-[10px] text-gray-500 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
+                                {num !== undefined ? (
+                                    <View style={tw`flex-row justify-between w-full px-2 mt-1`}>
+                                        {num.toString().padStart(4, '0').split('').map((digit, i) => (
+                                            <View key={i} style={tw`items-center`}>
+                                                <Text style={[tw`text-4xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
+                                                <Text style={[tw`text-[7px] text-gray-600 text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
+                                                    {numberToText(parseInt(digit))}
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <View style={tw`flex-row justify-center w-full px-4 items-center`}>
+                                        <Text style={[tw`text-4xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
+                                    </View>
+                                )}
+                            </View>
+                        );
+                    })}
+                </View>
+            )}
 
             <View style={tw`border-b-2 border-dashed border-black mb-1 mx-2 mt-1`} />
 

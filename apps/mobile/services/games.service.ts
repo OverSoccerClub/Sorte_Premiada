@@ -24,6 +24,7 @@ export interface GameConfig {
     prizeDezena?: number | null;
     prizeMultiplier?: number | null;
     rules?: any;
+    type?: string;
 }
 
 export class GamesService {

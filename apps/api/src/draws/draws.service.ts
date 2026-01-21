@@ -67,7 +67,16 @@ export class DrawsService {
                     data: {
                         ...data,
                         series: updatedSeries.lastSeries,
-                        ...(companyId ? { companyId } : {})
+                        ...(companyId ? { companyId } : {}),
+                        matches: (data.matches && Array.isArray(data.matches)) ? {
+                            create: data.matches.map((m: any) => ({
+                                homeTeam: m.homeTeam,
+                                awayTeam: m.awayTeam,
+                                matchDate: new Date(m.matchDate), // Ensure Date object
+                                matchOrder: Number(m.matchOrder),
+                                result: null // Init result as null
+                            }))
+                        } : undefined
                     }
                 });
 
@@ -83,16 +92,37 @@ export class DrawsService {
                 return createdDraw;
             }
 
-            const createdDraw = await tx.draw.create({ data });
+            const createdDraw = await tx.draw.create({
+                data: {
+                    ...data,
+                    matches: (data.matches && Array.isArray(data.matches)) ? {
+                        create: data.matches.map((m: any) => ({
+                            homeTeam: m.homeTeam,
+                            awayTeam: m.awayTeam,
+                            matchDate: new Date(m.matchDate),
+                            matchOrder: Number(m.matchOrder),
+                            result: null
+                        }))
+                    } : undefined
+                }
+            });
             await this.processDrawResults(tx, createdDraw);
             return createdDraw;
         });
     }
 
     private async processDrawResults(tx: Prisma.TransactionClient, draw: any) {
-        if (!draw.numbers || draw.numbers.length === 0) return;
+        // Fetch full context (Game Type and Matches) to decide logic
+        const fullDraw = await tx.draw.findUnique({
+            where: { id: draw.id },
+            include: {
+                game: true,
+                matches: { orderBy: { matchOrder: 'asc' } }
+            }
+        });
 
-        // Find tickets
+        if (!fullDraw || !fullDraw.game) return;
+
         const tickets = await tx.ticket.findMany({
             where: {
                 gameId: draw.gameId,
@@ -101,66 +131,98 @@ export class DrawsService {
             }
         });
 
-        const drawNumbers = new Set(draw.numbers as string[]);
-
+        const gameType = fullDraw.game.type;
         let wonCount = 0;
         let lostCount = 0;
 
-        for (const ticket of tickets) {
-            const ticketNumbers = (ticket.numbers as unknown as string[]);
+        // PAIPITA AI Logic (Ordered Match Results)
+        if (gameType === 'PAIPITA_AI') {
+            if (!fullDraw.matches || fullDraw.matches.length !== 14) return;
 
-            // "Match Any" Logic (2x1000/JB general rule)
-            // If explicit rules needed per game type, add logic here.
-            // For 2x1000, usually matching "The Thousand" extracted.
-            const hasMatch = ticketNumbers.some(n => drawNumbers.has(n));
-            const newStatus = hasMatch ? 'WON' : 'LOST';
+            // Check if all matches have results
+            const results = fullDraw.matches.map(m => m.result);
+            if (results.some(r => !r)) return; // Not ready
 
-            // Only update if status changed to avoid redundant DB writes & Double Credits.
-            // We must compare with current DB status.
-            if (ticket.status !== newStatus) {
-                // If it becomes WON, we Credit the Cambista (He pays the Punter, so House owes him)
-                if (newStatus === 'WON' && ticket.status !== 'WON') {
-                    const prizeValue = Number(ticket.possiblePrize || 0);
-                    if (prizeValue > 0) {
-                        await tx.transaction.create({
-                            data: {
-                                userId: ticket.userId,
-                                amount: prizeValue,
-                                type: 'CREDIT', // We credit the Cambista
-                                description: `Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
-                            }
-                        });
-                    }
-                    wonCount++;
-                }
+            for (const ticket of tickets) {
+                const guesses = ticket.numbers as string[];
+                if (!guesses || guesses.length !== 14) continue;
 
-                // If it WAS WON and now LOST (Correction), we Debit back.
-                if (ticket.status === 'WON' && newStatus === 'LOST') {
-                    const prizeValue = Number(ticket.possiblePrize || 0);
-                    if (prizeValue > 0) {
-                        await tx.transaction.create({
-                            data: {
-                                userId: ticket.userId,
-                                amount: prizeValue,
-                                type: 'DEBIT', // Reversal
-                                description: `Estorno Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
-                            }
-                        });
-                    }
-                    lostCount++;
-                }
+                let hits = 0;
+                guesses.forEach((g, i) => {
+                    if (g === results[i]) hits++;
+                });
 
-                if (newStatus === 'LOST' && ticket.status !== 'WON') {
-                    lostCount++;
-                }
+                // Win Condition: 13 or 14 hits
+                const hasMatch = hits >= 13;
 
-                await tx.ticket.update({
-                    where: { id: ticket.id },
-                    data: { status: newStatus }
+                /* 
+                   TODO: Prize Calculation for Loteca is usually Parimutuel (Rateio).
+                   Currently relying on ticket.possiblePrize which might be 0 if not set.
+                   If Fixed Odds info is added later, it works automatically.
+                */
+
+                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', () => {
+                    if (hasMatch) wonCount++; else lostCount++;
                 });
             }
         }
-        console.log(`[ProcessResults] Draw ${draw.id} Re-calculed: ${wonCount} Won, ${lostCount} Lost.`);
+        // Existing Logic (2x1000 / JB - Match Any)
+        else {
+            if (!draw.numbers || draw.numbers.length === 0) return;
+            const drawNumbers = new Set(draw.numbers as string[]);
+
+            for (const ticket of tickets) {
+                const ticketNumbers = (ticket.numbers as unknown as string[]);
+                const hasMatch = ticketNumbers.some(n => drawNumbers.has(n));
+
+                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', () => {
+                    if (hasMatch) wonCount++; else lostCount++;
+                });
+            }
+        }
+
+        console.log(`[ProcessResults] Draw ${draw.id} (${gameType}) Processed: ${wonCount} Won, ${lostCount} Lost.`);
+    }
+
+    private async updateTicketStatus(tx: Prisma.TransactionClient, ticket: any, newStatus: string, callback?: () => void) {
+        if (ticket.status !== newStatus) {
+            // Credit Logic
+            if (newStatus === 'WON' && ticket.status !== 'WON') {
+                const prizeValue = Number(ticket.possiblePrize || 0);
+                if (prizeValue > 0) {
+                    await tx.transaction.create({
+                        data: {
+                            userId: ticket.userId,
+                            amount: prizeValue,
+                            type: 'CREDIT',
+                            description: `Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
+                        }
+                    });
+                }
+            }
+
+            // Debit Logic (Reversal)
+            if (ticket.status === 'WON' && newStatus === 'LOST') {
+                const prizeValue = Number(ticket.possiblePrize || 0);
+                if (prizeValue > 0) {
+                    await tx.transaction.create({
+                        data: {
+                            userId: ticket.userId,
+                            amount: prizeValue,
+                            type: 'DEBIT',
+                            description: `Estorno Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
+                        }
+                    });
+                }
+            }
+
+            if (callback) callback();
+
+            await tx.ticket.update({
+                where: { id: ticket.id },
+                data: { status: newStatus }
+            });
+        }
     }
 
     async findAll(companyId?: string) {

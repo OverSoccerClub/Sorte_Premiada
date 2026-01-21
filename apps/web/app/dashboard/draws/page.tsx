@@ -62,6 +62,7 @@ export default function DrawsSettingsPage() {
     const [drawDate, setDrawDate] = useState("")
     const [drawTime, setDrawTime] = useState("")
     const [winningNumbers, setWinningNumbers] = useState("")
+    const [matches, setMatches] = useState<any[]>([])
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
@@ -103,22 +104,55 @@ export default function DrawsSettingsPage() {
             const res = await fetch(`${API_URL}/draws?gameId=${gameId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
-            if (res.ok) setDraws(await res.json())
+            if (res.ok) {
+                const data = await res.json()
+                setDraws(data)
+            }
         } catch (e) { showAlert("Erro", "Erro ao carregar sorteios", "error") }
         finally { setLoading(false) }
     }
 
     const handleOpenModal = (draw: any | null = null) => {
         setSelectedDraw(draw)
+        const game = games.find(g => g.id === selectedGameId)
+        const isPaipita = game?.type === 'PAIPITA_AI'
+
         if (draw) {
             const date = new Date(draw.drawDate)
             setDrawDate(date.toISOString().split('T')[0])
             setDrawTime(date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
             setWinningNumbers(draw.numbers ? draw.numbers.join(', ') : "")
+
+            // Paipita: Load matches
+            if (isPaipita && draw.matches) {
+                setMatches(draw.matches.sort((a: any, b: any) => a.matchOrder - b.matchOrder))
+            } else if (isPaipita) {
+                // Should not happen if data integrity is good, but fallback
+                setMatches(Array.from({ length: 14 }, (_, i) => ({
+                    matchOrder: i + 1,
+                    homeTeam: "",
+                    awayTeam: "",
+                    matchDate: date.toISOString().slice(0, 16),
+                    result: ""
+                })))
+            }
         } else {
-            setDrawDate(new Date().toISOString().split('T')[0])
+            const today = new Date()
+            setDrawDate(today.toISOString().split('T')[0])
             setDrawTime("19:00")
             setWinningNumbers("")
+
+            if (isPaipita) {
+                setMatches(Array.from({ length: 14 }, (_, i) => ({
+                    matchOrder: i + 1,
+                    homeTeam: "",
+                    awayTeam: "",
+                    matchDate: `${today.toISOString().split('T')[0]}T16:00`,
+                    result: ""
+                })))
+            } else {
+                setMatches([])
+            }
         }
         setModalOpen(true)
     }
@@ -128,11 +162,29 @@ export default function DrawsSettingsPage() {
         try {
             const token = localStorage.getItem("token")
             const fullDate = new Date(`${drawDate}T${drawTime}:00`)
+            const game = games.find(g => g.id === selectedGameId)
 
-            const payload = {
+            const payload: any = {
                 gameId: selectedGameId,
                 drawDate: fullDate.toISOString(),
                 numbers: winningNumbers ? winningNumbers.split(',').map(n => n.trim()) : []
+            }
+
+            if (game?.type === 'PAIPITA_AI') {
+                if (matches.length !== 14 || matches.some(m => !m.homeTeam || !m.awayTeam || !m.matchDate)) {
+                    showAlert("Erro", "Preencha todos os 14 jogos corretamente.", "error")
+                    setSaving(false)
+                    return
+                }
+                payload.matches = matches.map(m => ({
+                    homeTeam: m.homeTeam,
+                    awayTeam: m.awayTeam,
+                    matchDate: new Date(m.matchDate).toISOString(),
+                    matchOrder: m.matchOrder,
+                    result: m.result || null // Send result if editing
+                }))
+                // Paipita uses matches, numbers might be derived results?
+                // For now keep numbers empty or sync with results? Matches are source of truth.
             }
 
             let url = `${API_URL}/draws`
@@ -344,22 +396,107 @@ export default function DrawsSettingsPage() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <label className="text-sm font-medium">Data</label>
+                            <label className="text-sm font-medium">Data do Concurso</label>
                             <Input type="date" value={drawDate} onChange={e => setDrawDate(e.target.value)} />
                         </div>
                         <div className="grid gap-2">
-                            <label className="text-sm font-medium">Hora</label>
+                            <label className="text-sm font-medium">Hora Limite (Fechamento)</label>
                             <Input type="time" value={drawTime} onChange={e => setDrawTime(e.target.value)} />
                         </div>
-                        <div className="grid gap-2">
-                            <label className="text-sm font-medium">Números Sorteados (separar por vírgula)</label>
-                            <Input
-                                placeholder="Ex: 5, 10, 15 ou Deixe em branco se for agendamento"
-                                value={winningNumbers}
-                                onChange={e => setWinningNumbers(e.target.value)}
-                            />
-                            <p className="text-xs text-muted-foreground">Deixe em branco se o sorteio ainda não ocorreu.</p>
-                        </div>
+
+                        {games.find(g => g.id === selectedGameId)?.type === 'PAIPITA_AI' ? (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium flex items-center justify-between">
+                                    Lista de Jogos (14 Partidas)
+                                    <span className="text-xs font-normal text-muted-foreground">Ordene por horário</span>
+                                </label>
+                                <div className="border rounded-md overflow-hidden max-h-[50vh] overflow-y-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                                <TableHead className="w-[40px] text-center">#</TableHead>
+                                                <TableHead>Mandante vs Visitante</TableHead>
+                                                <TableHead className="w-[140px]">Data/Hora</TableHead>
+                                                <TableHead className="w-[80px]">Resultado</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {matches.map((match, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell className="text-center font-bold px-2">{index + 1}</TableCell>
+                                                    <TableCell className="p-2">
+                                                        <div className="flex flex-col gap-1">
+                                                            <Input
+                                                                placeholder="Time da Casa"
+                                                                className="h-7 text-xs"
+                                                                value={match.homeTeam}
+                                                                onChange={e => {
+                                                                    const newMatches = [...matches];
+                                                                    newMatches[index].homeTeam = e.target.value;
+                                                                    setMatches(newMatches);
+                                                                }}
+                                                            />
+                                                            <Input
+                                                                placeholder="Visitante"
+                                                                className="h-7 text-xs"
+                                                                value={match.awayTeam}
+                                                                onChange={e => {
+                                                                    const newMatches = [...matches];
+                                                                    newMatches[index].awayTeam = e.target.value;
+                                                                    setMatches(newMatches);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="p-2">
+                                                        <Input
+                                                            type="datetime-local"
+                                                            className="h-8 text-xs px-1"
+                                                            value={match.matchDate}
+                                                            onChange={e => {
+                                                                const newMatches = [...matches];
+                                                                newMatches[index].matchDate = e.target.value;
+                                                                setMatches(newMatches);
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="p-2">
+                                                        <Select
+                                                            value={match.result || ""}
+                                                            onValueChange={val => {
+                                                                const newMatches = [...matches];
+                                                                newMatches[index].result = val;
+                                                                setMatches(newMatches);
+                                                            }}
+                                                        >
+                                                            <SelectTrigger className="h-8 text-xs">
+                                                                <SelectValue placeholder="-" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="1">Casa (1)</SelectItem>
+                                                                <SelectItem value="X">Empate (X)</SelectItem>
+                                                                <SelectItem value="2">Fora (2)</SelectItem>
+                                                                <SelectItem value="CANCELLED">Canc.</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid gap-2">
+                                <label className="text-sm font-medium">Números Sorteados (separar por vírgula)</label>
+                                <Input
+                                    placeholder="Ex: 5, 10, 15 ou Deixe em branco se for agendamento"
+                                    value={winningNumbers}
+                                    onChange={e => setWinningNumbers(e.target.value)}
+                                />
+                                <p className="text-xs text-muted-foreground">Deixe em branco se o sorteio ainda não ocorreu.</p>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>

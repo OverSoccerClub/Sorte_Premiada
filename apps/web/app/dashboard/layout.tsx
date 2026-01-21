@@ -94,6 +94,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {
             title: "Vendas & Operação",
             items: [
+                { icon: Trophy, label: "Paipita Ai (Apostar)", href: "/dashboard/games/paipita-ai" },
                 { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
                 { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
                 { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
