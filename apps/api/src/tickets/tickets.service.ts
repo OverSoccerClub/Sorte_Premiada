@@ -468,19 +468,22 @@ export class TicketsService {
                 if (drawRecord && drawRecord.matches && drawRecord.matches.length > 0) {
                     const sortedMatches = drawRecord.matches.sort((a: any, b: any) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
                     const firstMatchDate = new Date(sortedMatches[0].matchDate);
-                    const now = new Date();
 
-                    console.log(`[PAIPITA_AI] Validação de horário:`, {
-                        now: now.toISOString(),
-                        firstMatchDate: firstMatchDate.toISOString(),
-                        nowTimestamp: now.getTime(),
-                        firstMatchTimestamp: firstMatchDate.getTime(),
-                        diff: firstMatchDate.getTime() - now.getTime(),
-                        diffMinutes: (firstMatchDate.getTime() - now.getTime()) / 1000 / 60
+                    // Convert to Brazil timezone (UTC-3)
+                    const nowBrazil = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+                    const firstMatchBrazil = new Date(firstMatchDate.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+
+                    console.log(`[PAIPITA_AI] Validação de horário (Horário do Brasil):`, {
+                        nowBrazil: nowBrazil.toISOString(),
+                        nowBrazilLocal: nowBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                        firstMatchBrazil: firstMatchBrazil.toISOString(),
+                        firstMatchBrazilLocal: firstMatchBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                        diff: firstMatchBrazil.getTime() - nowBrazil.getTime(),
+                        diffMinutes: (firstMatchBrazil.getTime() - nowBrazil.getTime()) / 1000 / 60
                     });
 
-                    if (now >= firstMatchDate) {
-                        throw new BadRequestException(`As apostas encerraram. Primeira partida iniciou em ${firstMatchDate.toLocaleString('pt-BR')}.`);
+                    if (nowBrazil >= firstMatchBrazil) {
+                        throw new BadRequestException(`As apostas encerraram. Primeira partida iniciou em ${firstMatchBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}.`);
                     }
                 } else {
                     console.warn(`[PAIPITA_AI] Nenhum jogo encontrado para o concurso ${drawDate}. Permitindo aposta.`);
