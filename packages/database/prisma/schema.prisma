@@ -211,6 +211,7 @@ model Game {
   company   Company? @relation(fields: [companyId], references: [id])
 
   name String
+  type String @default("GENERIC") // GENERIC, PAIPITA_AI, 2X1000, LOTERIA_TRADICIONAL
 
   // Display Configuration (for dynamic mobile rendering)
   isActive    Boolean @default(true) // Ativar/desativar exibição do jogo

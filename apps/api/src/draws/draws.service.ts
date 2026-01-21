@@ -131,7 +131,7 @@ export class DrawsService {
             }
         });
 
-        const gameType = (fullDraw.game as any).type;
+        const gameType = fullDraw.game.type;
         let wonCount = 0;
         let lostCount = 0;
 
