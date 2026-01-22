@@ -454,8 +454,8 @@ export default function LoteriaTradicionalScreen() {
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
-                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-20`}
-                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={tw`items-center p-4 pb-20`}
+                        showsVerticalScrollIndicator={true}
                     >
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center`}>CONFIRMAÇÃO</Text>

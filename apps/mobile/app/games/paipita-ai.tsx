@@ -24,7 +24,7 @@ export default function GamePaipitaScreen() {
     const router = useRouter();
     const { token, user } = useAuth();
     const { show, hide } = useLoading();
-    const { printerType } = usePrinter();
+    const { printerType, connectedPrinter } = usePrinter();
     const { settings: companySettings } = useCompany();
     const { settings } = useSettings();
     const printViewShotRef = useRef<ViewShot>(null);
@@ -53,6 +53,15 @@ export default function GamePaipitaScreen() {
 
     useEffect(() => {
         fetchGameAndDraws();
+
+        // Check printer status on enter
+        const timer = setTimeout(() => {
+            if (printerType === 'BLE' && !connectedPrinter) {
+                showAlert("Impressora", "Impressora não detectada. Verifique a conexão.", "warning");
+            }
+        }, 1500);
+
+        return () => clearTimeout(timer);
     }, []);
 
     const fetchGameAndDraws = async () => {
@@ -129,6 +138,10 @@ export default function GamePaipitaScreen() {
             showAlert("Impressora", "Configure a impressora antes de vender.", "warning");
             return;
         }
+        if (printerType === 'BLE' && !connectedPrinter) {
+            showAlert("Impressora", "Impressora desconectada. Verifique a conexão.", "warning");
+            return;
+        }
         if (Object.keys(selections).length !== 14) {
             showAlert("Atenção", `Você precisa palpitar em todos os 14 jogos. Faltam ${14 - Object.keys(selections).length}.`, "warning");
             return;
@@ -138,6 +151,10 @@ export default function GamePaipitaScreen() {
     };
 
     const handlePrint = async () => {
+        if (printerType === 'BLE' && !connectedPrinter) {
+            showAlert("Impressora", "Impressora desconectada. Conecte novamente.", "error");
+            return;
+        }
         if (!gameId || !activeDraw) return;
         setModalVisible(false);
         show("Enviando Aposta...");
@@ -262,7 +279,8 @@ export default function GamePaipitaScreen() {
                 <View style={tw`w-10`} />
             </View>
 
-            <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative'} />
+            {/* Force default template for Palpita Ai, ignoring global settings which might be 'alternative' */}
+            <TicketPrintManager ref={printViewShotRef} data={lastTicket} template="default" />
 
             {!isLoadingGame && activeDraw && matches.length > 0 ? (
                 <ScrollView style={tw`flex-1 px-2`} contentContainerStyle={tw`pb-20 pt-4`}>
@@ -348,21 +366,22 @@ export default function GamePaipitaScreen() {
                     disabled={!activeDraw || Object.keys(selections).length !== 14}
                 >
                     <Text style={tw`text-white font-bold text-xl uppercase tracking-wide`}>
-                        Apostar - {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice)}
+                        GERAR APOSTA
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-                <View style={tw`flex-1 bg-black/90`}>
-                    <ScrollView
-                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-20`}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        <View style={tw`w-full max-w-[400px]`}>
-                            <Text style={tw`text-white font-bold text-xl mb-2 text-center`}>CONFIRMAR APOSTA</Text>
 
-                            <View style={tw`mb-4`}>
+
+            {modalVisible && (
+                <View style={[tw`absolute inset-0 z-50 bg-black/90`, { paddingTop: Device.osName === 'Android' ? 30 : 0 }]}>
+                    <View style={tw`flex-1 relative`}>
+                        <ScrollView
+                            contentContainerStyle={tw`items-center p-4 pt-4 pb-40`}
+                            showsVerticalScrollIndicator={true}
+                        >
+                            <View style={tw`w-full max-w-[400px] items-center`}>
+                                <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAR APOSTA</Text>
                                 <TicketDisplay
                                     data={{
                                         gameName: "PALPITA AI",
@@ -379,30 +398,37 @@ export default function GamePaipitaScreen() {
                                         companyLogoUrl: settings.logoUrl
                                     }}
                                     mode="preview"
-                                    scale={0.65}
+                                    scale={0.8}
                                 />
                             </View>
+                        </ScrollView>
 
-                            <TouchableOpacity
-                                style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
-                                onPress={handlePrint}
-                            >
-                                <View style={tw`flex-row items-center`}>
-                                    <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
-                                    <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
-                                </View>
-                            </TouchableOpacity>
+                        {/* Fixed Footer Buttons */}
+                        <View style={tw`absolute bottom-0 w-full bg-gray-900 border-t border-gray-800 pb-4 pt-4 px-4 shadow-2xl`}>
+                            <View style={tw`flex-row gap-3 w-full max-w-[400px] mx-auto`}>
+                                <TouchableOpacity
+                                    style={tw`flex-1 bg-gray-800 p-4 rounded-xl items-center active:scale-95 border border-gray-700`}
+                                    onPress={() => setModalVisible(false)}
+                                >
+                                    <Text style={tw`text-gray-400 font-bold uppercase tracking-wide`}>Voltar</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95 w-full mb-4`}
-                                onPress={() => setModalVisible(false)}
-                            >
-                                <Text style={tw`text-gray-400 font-bold uppercase tracking-wide`}>Voltar</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={tw`flex-1 bg-emerald-600 p-4 rounded-xl items-center shadow-lg shadow-emerald-600/20 active:scale-95`}
+                                    onPress={handlePrint}
+                                >
+                                    <View style={tw`flex-row items-center`}>
+                                        <Ionicons name="print" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            {/* Add bottom padding for safe area */}
+                            <View style={{ height: Device.osName === 'iOS' ? 20 : 0 }} />
                         </View>
-                    </ScrollView>
+                    </View>
                 </View>
-            </Modal>
+            )}
 
             <ReceiptModal
                 visible={receiptVisible}
@@ -411,6 +437,7 @@ export default function GamePaipitaScreen() {
                 ticketData={lastTicket}
                 autoPrint={false}
                 isReprint={false}
+                template="default"
             />
 
             <CustomAlert

@@ -116,12 +116,12 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     return (
         <View style={tw`bg-white w-[384px] p-1`}>
             {/* Header Clean & Professional */}
-            <View style={tw`items-center mb-4 w-full pt-4 pb-2 border-b-2 border-dashed border-black mx-2`}>
+            <View style={tw`items-center mb-1 w-full pt-1 pb-1 border-b-2 border-dashed border-black mx-2`}>
                 {/* Logo Centralizado e Maior */}
                 {shouldShowLogo ? (
                     <Image
                         source={{ uri: data.companyLogoUrl }}
-                        style={{ width: 160, height: 85, resizeMode: 'contain', marginBottom: 6 }}
+                        style={{ width: 140, height: 70, resizeMode: 'contain', marginBottom: 2 }}
                         onError={() => {
                             console.warn('[TicketContent] Failed to load company logo, using fallback icon');
                             setLogoError(true);
@@ -276,8 +276,8 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             {/* Palpita Ai Legend */}
             {data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0) ? (
                 <View style={tw`mb-2 px-2 items-center`}>
-                    <Text style={tw`text-[9px] font-bold text-black text-center uppercase`}>
-                        CASA VENCE: CV - EMPATE: EM - FORA VENCE: FV
+                    <Text style={tw`text-[12px] font-black text-black text-center uppercase`}>
+                        CV: CASA VENCE - EM: EMPATE - FV: FORA VENCE
                     </Text>
                     <View style={tw`mt-1 w-full border-t border-dashed border-gray-400`} />
                 </View>
@@ -357,20 +357,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
             {/* Barcode and QR */}
             {(data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0)) ? (
-                <View style={tw`flex-row justify-between items-center mb-4 mt-2 px-2 border-t-2 border-dashed border-black pt-2`}>
-                    <View style={tw`flex-1 mr-2`}>
-                        <Text style={tw`text-black font-bold text-[10px] uppercase mb-1`}>
-                            Acesse o site para conferir o resultado:
+                <View style={tw`flex-row justify-between items-center mb-1 mt-1 px-2 border-t border-dashed border-gray-400 pt-2 w-full`}>
+                    <View style={tw`flex-1 mr-2 justify-center`}>
+                        <Text style={tw`text-black text-[10px] mb-0.5 text-left font-bold`}>
+                            Acesse o site para conferir o resultado
                         </Text>
-                        <Text style={tw`text-black font-black text-xs`}>
+                        <Text style={tw`text-black font-bold text-[15px] text-left leading-tight`}>
                             www.palpita_ai.com.br
                         </Text>
                     </View>
-                    <View style={tw`items-center justify-center bg-white p-1`}>
-                        <QRCode
-                            value={`https://www.palpita_ai.com.br/sorteio/${displayTicketId}`}
-                            size={90}
-                        />
+                    <View style={[
+                        tw`items-center`,
+                        {
+                            transform: [
+                                { scaleY: (isCapture ? 0.38 : 1) },
+                                { scaleX: (isCapture ? 1.35 : 1) }
+                            ],
+                        },
+                        {
+                            marginTop: -(140 * (1 - (isCapture ? 0.38 : 1)) / 2),
+                            marginBottom: -(140 * (1 - (isCapture ? 0.38 : 1)) / 2)
+                        }
+                    ]}>
+                        <View style={tw`border-[3px] border-black p-2 bg-white rounded-lg`}>
+                            <QRCode
+                                value={`https://www.palpita_ai.com.br/sorteio/${displayTicketId}`}
+                                size={140}
+                            />
+                        </View>
                     </View>
                 </View>
             ) : (

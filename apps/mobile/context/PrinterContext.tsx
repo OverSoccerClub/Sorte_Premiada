@@ -1,19 +1,24 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { Alert, Platform, PermissionsAndroid, AppState } from 'react-native';
 import { BLEPrinter } from 'react-native-thermal-receipt-printer-image-qr';
 import { PrinterType } from '../services/printing.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type ConnectionStatus = 'connected' | 'disconnected' | 'connecting';
 
 interface PrinterContextType {
     connectedPrinter: any;
     isScanning: boolean;
     printers: any[];
     printerType: PrinterType;
+    connectionStatus: ConnectionStatus;
     setPrinterType: (type: PrinterType) => void;
     scanPrinters: () => Promise<void>;
     connectPrinter: (printer: any) => Promise<void>;
     disconnectPrinter: () => void;
     isPosDevice: (printer: any) => boolean;
+    checkConnection: () => Promise<boolean>;
+    reconnectPrinter: () => Promise<boolean>;
 }
 
 const PrinterContext = createContext<PrinterContextType>({} as PrinterContextType);
@@ -28,6 +33,9 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
     const [connectedPrinter, setConnectedPrinter] = useState<any>(null);
     const [isScanning, setIsScanning] = useState(false);
     const [printerType, setPrinterType] = useState<PrinterType>('BLE');
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
+    const keepAliveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const appStateRef = useRef<string>(AppState.currentState);
 
     useEffect(() => {
         const init = async () => {
@@ -63,29 +71,46 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
         };
 
         init();
+
+        // Monitor app state changes
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
+            subscription.remove();
+            if (keepAliveIntervalRef.current) {
+                clearInterval(keepAliveIntervalRef.current);
+            }
+        };
     }, []);
+
+    const handleAppStateChange = async (nextAppState: string) => {
+        if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+            // App has come to the foreground, check connection
+            console.log('[PrinterContext] App came to foreground, checking connection...');
+            if (connectedPrinter && printerType === 'BLE') {
+                await checkAndReconnect();
+            }
+        }
+        appStateRef.current = nextAppState;
+    };
 
     const loadSavedPrinter = async () => {
         try {
-            const savedType = await AsyncStorage.getItem(PRINTER_TYPE_KEY);
+            // User requested explicit/mandatory Bluetooth default
+            setPrinterType('BLE');
+            await AsyncStorage.setItem(PRINTER_TYPE_KEY, 'BLE');
+
             const savedMac = await AsyncStorage.getItem(PRINTER_STORAGE_KEY);
 
-            if (savedType) {
-                setPrinterType(savedType as PrinterType);
-            }
-
-            if (savedType === 'BLE' && savedMac) {
-                console.log("Found saved printer, attempting auto-connect:", savedMac);
-                // We need to Connect directly. BLEPrinter supports connecting by address even without scanning first usually,
-                // but sometimes scanning is needed to discover services.
-                // Let's try connecting directly first.
+            if (savedMac) {
+                console.log("Found saved BLE printer, attempting auto-connect:", savedMac);
                 try {
-                    await connectPrinter({ inner_mac_address: savedMac, device_name: "Saved Printer" }, false); // False = don't save again
+                    // Tenta conectar diretamente
+                    await connectPrinter({ inner_mac_address: savedMac, device_name: "Saved Printer" }, false);
                     console.log("Auto-connected to saved printer");
                 } catch (e) {
-                    console.log("Auto-connect failed, trying scan first...");
-                    // If fails, maybe scan first?
-                    // For now, let's leave it. If auto-connect fails, user sees disconnected state.
+                    console.log("Auto-connect failed (printer might be off or out of range)");
+                    // Não limpar o savedMac, para tentar novamente depois
                 }
             }
         } catch (error) {
@@ -148,18 +173,104 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
         return knownNames.some(n => name.includes(n));
     };
 
+    const checkConnection = async (): Promise<boolean> => {
+        if (printerType !== 'BLE' || !connectedPrinter) {
+            return false;
+        }
+
+        try {
+            // Try a simple command to verify connection
+            await BLEPrinter.printText("");
+            return true;
+        } catch (error) {
+            console.warn('[PrinterContext] Connection check failed:', error);
+            return false;
+        }
+    };
+
+    const reconnectPrinter = async (): Promise<boolean> => {
+        if (!connectedPrinter || printerType !== 'BLE') {
+            return false;
+        }
+
+        try {
+            console.log('[PrinterContext] Attempting to reconnect printer...');
+            setConnectionStatus('connecting');
+
+            const mac = connectedPrinter.inner_mac_address || connectedPrinter.mac_address;
+            await BLEPrinter.connectPrinter(mac);
+
+            setConnectionStatus('connected');
+            console.log('[PrinterContext] ✅ Reconnected successfully');
+            return true;
+        } catch (error) {
+            console.error('[PrinterContext] ❌ Reconnection failed:', error);
+            setConnectionStatus('disconnected');
+            return false;
+        }
+    };
+
+    const checkAndReconnect = async () => {
+        const isConnected = await checkConnection();
+
+        if (!isConnected) {
+            console.log('[PrinterContext] Connection lost, attempting reconnect...');
+            await reconnectPrinter();
+        } else {
+            console.log('[PrinterContext] Connection is healthy');
+        }
+    };
+
+    const startKeepAlive = () => {
+        // Clear any existing interval
+        if (keepAliveIntervalRef.current) {
+            clearInterval(keepAliveIntervalRef.current);
+        }
+
+        // Start keep-alive ping every 30 seconds
+        keepAliveIntervalRef.current = setInterval(async () => {
+            try {
+                await BLEPrinter.printText("");
+                console.log('[PrinterContext] Keep-alive ping sent');
+            } catch (error) {
+                console.warn('[PrinterContext] Keep-alive failed, connection may be lost');
+                setConnectionStatus('disconnected');
+                await checkAndReconnect();
+            }
+        }, 30000); // 30 seconds
+
+        console.log('[PrinterContext] Keep-alive started (30s interval)');
+    };
+
+    const stopKeepAlive = () => {
+        if (keepAliveIntervalRef.current) {
+            clearInterval(keepAliveIntervalRef.current);
+            keepAliveIntervalRef.current = null;
+            console.log('[PrinterContext] Keep-alive stopped');
+        }
+    };
+
     const connectPrinter = async (printer: any, save = true) => {
         try {
+            setConnectionStatus('connecting');
             const mac = printer.inner_mac_address || printer.mac_address;
             await BLEPrinter.connectPrinter(mac);
             setConnectedPrinter(printer);
+            setConnectionStatus('connected');
 
             if (save) {
                 await AsyncStorage.setItem(PRINTER_STORAGE_KEY, mac);
             }
-            // Alert removed here. Caller must handle success feedback.
+
+            // Keep-alive removed as it causes paper waste
+            // if (printerType === 'BLE') {
+            //     startKeepAlive();
+            // }
+
+            console.log('[PrinterContext] ✅ Printer connected successfully');
         } catch (error) {
-            console.error("Connection error:", error);
+            console.error('[PrinterContext] ❌ Connection error:', error);
+            setConnectionStatus('disconnected');
             throw error; // Rethrow to let UI handle alert
         }
     };
@@ -167,15 +278,21 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
     const disconnectPrinter = async () => {
         if (connectedPrinter) {
             try {
+                // Stop keep-alive first
+                stopKeepAlive();
+
                 await BLEPrinter.closeConn();
                 setConnectedPrinter(null);
+                setConnectionStatus('disconnected');
+
+                console.log('[PrinterContext] Printer disconnected');
                 // Optionally clear saved printer? The user requested "so I don't have to choose again".
                 // If they explicitly disconnect, maybe they want to choose another one.
                 // But typically "persistence" means "remember my last choice".
                 // I will NOT clear AsyncStorage here, so if they accidentally disconnect or restart, it remembers.
                 // To "Forget", they would need to connect to a different one.
             } catch (error) {
-                console.error("Disconnect error:", error);
+                console.error('[PrinterContext] Disconnect error:', error);
             }
         }
     };
@@ -186,11 +303,14 @@ export const PrinterProvider = ({ children }: { children: React.ReactNode }) => 
             isScanning,
             printers,
             printerType,
+            connectionStatus,
             setPrinterType: updatePrinterType,
             scanPrinters,
             connectPrinter,
             disconnectPrinter,
-            isPosDevice
+            isPosDevice,
+            checkConnection,
+            reconnectPrinter
         }}>
             {children}
         </PrinterContext.Provider>

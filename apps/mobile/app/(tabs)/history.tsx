@@ -144,63 +144,83 @@ export default function HistoryScreen() {
         setEndDate(undefined);
     };
 
-    const renderTicket = ({ item }: { item: Ticket }) => (
-        <View style={tw`w-[90%] max-w-[400px] bg-surface p-4 rounded-2xl mb-3 border border-gray-800 shadow-sm`}>
-            <View style={tw`flex-row justify-between items-start mb-3`}>
-                <View style={tw`flex-row items-center`}>
-                    <View style={tw`w-10 h-10 rounded-full bg-gray-800 justify-center items-center mr-3 border border-gray-700`}>
-                        <MaterialCommunityIcons name="ticket-outline" size={20} color="#50C878" />
-                    </View>
-                    <View>
-                        <Text style={tw`text-white font-bold text-base`}>{item.gameType || "Jogo"}</Text>
-                        <Text style={tw`text-gray-500 text-xs`}>{item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}</Text>
-                    </View>
-                </View>
-                <View style={tw`px-3 py-1 rounded-full border ${getStatusColor(item.status).split(' ').slice(1).join(' ')}`}>
-                    <Text style={tw`text-xs font-bold ${getStatusColor(item.status).split(' ')[0]}`}>
-                        {getStatusLabel(item.status)}
-                    </Text>
-                </View>
-            </View>
+    const renderTicket = ({ item }: { item: Ticket }) => {
+        const isPalpitaAi = item.gameType === 'PAIPITA_AI' || item.gameType === 'PALPITA AI';
+        const gameDisplayName = isPalpitaAi ? "Palpita Ai" : (item.gameType || "Jogo");
 
-            <View style={tw`bg-background p-3 rounded-xl border border-gray-800 mb-3`}>
-                <Text style={tw`text-gray-400 text-xs mb-1 uppercase tracking-wider`}>Números</Text>
-                <View style={tw`flex-row flex-wrap gap-2`}>
-                    {(item.numbers || []).sort((a, b) => a - b).map((num, idx) => {
-                        const is2x1000 = item.gameType === '2x1000';
-                        return (
-                            <Text key={idx} style={tw`text-white font-mono font-bold`}>
-                                {num.toString().padStart(is2x1000 ? 4 : 2, '0')}
-                            </Text>
-                        );
-                    })}
+        return (
+            <View style={tw`w-[90%] max-w-[400px] bg-surface p-4 rounded-2xl mb-3 border border-gray-800 shadow-sm`}>
+                <View style={tw`flex-row justify-between items-start mb-3`}>
+                    <View style={tw`flex-row items-center`}>
+                        <View style={tw`w-10 h-10 rounded-full bg-gray-800 justify-center items-center mr-3 border border-gray-700`}>
+                            <MaterialCommunityIcons name="ticket-outline" size={20} color="#50C878" />
+                        </View>
+                        <View>
+                            <Text style={tw`text-white font-bold text-base`}>{gameDisplayName}</Text>
+                            <Text style={tw`text-gray-500 text-xs`}>{item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}</Text>
+                        </View>
+                    </View>
+                    <View style={tw`px-3 py-1 rounded-full border ${getStatusColor(item.status).split(' ').slice(1).join(' ')}`}>
+                        <Text style={tw`text-xs font-bold ${getStatusColor(item.status).split(' ')[0]}`}>
+                            {getStatusLabel(item.status)}
+                        </Text>
+                    </View>
                 </View>
-            </View>
 
-            <View style={tw`flex-row justify-between items-center`}>
-                <View style={tw`flex-row items-center`}>
-                    {(item.status === 'PENDING' || item.status === 'CANCEL_REQUESTED') && (
+                <View style={tw`bg-background p-3 rounded-xl border border-gray-800 mb-3`}>
+                    <Text style={tw`text-gray-400 text-xs mb-1 uppercase tracking-wider`}>{isPalpitaAi ? "Palpites" : "Números"}</Text>
+                    <View style={tw`flex-row flex-wrap gap-2`}>
+                        {isPalpitaAi ? (
+                            (item.numbers || []).map((num, idx) => {
+                                let label = num.toString();
+                                if (label === '1') label = 'CV';
+                                if (label === 'X') label = 'EM';
+                                if (label === '2') label = 'FV';
+                                return (
+                                    <View key={idx} style={tw`bg-gray-800 rounded px-2 py-1 mr-1 mb-1 border border-gray-700`}>
+                                        <Text style={tw`text-gray-400 text-[10px] mr-1`}>{idx + 1}:</Text>
+                                        <Text style={tw`text-white font-bold text-xs`}>{label}</Text>
+                                    </View>
+                                )
+                            })
+                        ) : (
+                            (item.numbers || []).sort((a, b) => a - b).map((num, idx) => {
+                                const is2x1000 = item.gameType === '2x1000';
+                                return (
+                                    <Text key={idx} style={tw`text-white font-mono font-bold`}>
+                                        {num.toString().padStart(is2x1000 ? 4 : 2, '0')}
+                                    </Text>
+                                );
+                            })
+                        )}
+                    </View>
+                </View>
+
+                <View style={tw`flex-row justify-between items-center`}>
+                    <View style={tw`flex-row items-center`}>
+                        {(item.status === 'PENDING' || item.status === 'CANCEL_REQUESTED') && (
+                            <TouchableOpacity
+                                style={tw`bg-red-500/10 p-2 rounded-lg border border-red-500/20 flex-row items-center active:bg-red-500/20 mr-2`}
+                                onPress={() => handleCancelRequest(item)}
+                            >
+                                <Ionicons name="close-circle-outline" size={20} color="#ef4444" style={tw`mr-1`} />
+                                <Text style={tw`text-red-500 font-bold text-xs uppercase`}>
+                                    {item.status === 'CANCEL_REQUESTED' ? 'Aguardando' : 'Cancelar'}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                         <TouchableOpacity
-                            style={tw`bg-red-500/10 p-2 rounded-lg border border-red-500/20 flex-row items-center active:bg-red-500/20 mr-2`}
-                            onPress={() => handleCancelRequest(item)}
+                            style={tw`bg-gray-800 p-2 rounded-lg border border-gray-700 flex-row items-center active:bg-gray-700`}
+                            onPress={() => handleOpenReprint(item)}
                         >
-                            <Ionicons name="close-circle-outline" size={20} color="#ef4444" style={tw`mr-1`} />
-                            <Text style={tw`text-red-500 font-bold text-xs uppercase`}>
-                                {item.status === 'CANCEL_REQUESTED' ? 'Aguardando' : 'Cancelar'}
-                            </Text>
+                            <Ionicons name="print-outline" size={20} color="#94a3b8" style={tw`mr-1`} />
+                            <Text style={tw`text-gray-300 font-bold text-xs uppercase`}>Reimprimir</Text>
                         </TouchableOpacity>
-                    )}
-                    <TouchableOpacity
-                        style={tw`bg-gray-800 p-2 rounded-lg border border-gray-700 flex-row items-center active:bg-gray-700`}
-                        onPress={() => handleOpenReprint(item)}
-                    >
-                        <Ionicons name="print-outline" size={20} color="#94a3b8" style={tw`mr-1`} />
-                        <Text style={tw`text-gray-300 font-bold text-xs uppercase`}>Reimprimir</Text>
-                    </TouchableOpacity>
+                    </View>
                 </View>
             </View>
-        </View>
-    );
+        );
+    };
 
     const handleCancelRequest = async (ticket: Ticket) => {
         if (ticket.status === 'CANCEL_REQUESTED') {
@@ -370,8 +390,9 @@ export default function HistoryScreen() {
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
                 isReprint={true}
+                template={selectedTicket && (selectedTicket.gameType === 'PAIPITA_AI' || selectedTicket.gameType === 'PALPITA AI' || (selectedTicket as any).game?.type === 'PAIPITA_AI') ? "default" : undefined}
                 ticketData={selectedTicket ? ({
-                    gameName: selectedTicket.gameType,
+                    gameName: selectedTicket.gameType === 'PAIPITA_AI' ? 'Palpita Ai' : selectedTicket.gameType,
                     numbers: (selectedTicket.numbers || []).map(String),
                     price: `R$ ${Number(selectedTicket.amount).toFixed(2).replace('.', ',')}`,
                     ticketId: selectedTicket.id,
@@ -392,6 +413,19 @@ export default function HistoryScreen() {
                         centena: selectedTicket.game.prizeCentena ? `R$ ${Number(selectedTicket.game.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                         dezena: selectedTicket.game.prizeDezena ? `R$ ${Number(selectedTicket.game.prizeDezena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                     } : undefined,
+                    // Construct matches for Palpita Ai Reprint
+                    matches: (selectedTicket.gameType === 'PAIPITA_AI' || selectedTicket.gameType === 'PALPITA AI' || (selectedTicket as any).game?.type === 'PAIPITA_AI') ?
+                        (selectedTicket.numbers || []).map((num, index) => {
+                            let sel = num.toString();
+                            if (sel === '1') sel = 'CV';
+                            if (sel === 'X') sel = 'EM';
+                            if (sel === '2') sel = 'FV';
+                            return {
+                                order: index + 1,
+                                label: `JOGO ${index + 1}`,
+                                selection: sel
+                            };
+                        }) : undefined,
                     // Inject Settings for Alternative Layout
                     companyName: companySettings.companyName,
                     companyLogoUrl: companySettings.logoUrl,

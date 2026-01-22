@@ -728,8 +728,8 @@ export default function Game2x1000Screen() {
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleBackFromModal}>
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
-                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 pb-20`}
-                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={tw`items-center p-4 pb-20`}
+                        showsVerticalScrollIndicator={true}
                     >
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAÇÃO</Text>

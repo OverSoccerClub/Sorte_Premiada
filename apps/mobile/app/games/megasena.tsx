@@ -414,8 +414,8 @@ export default function MegaSenaScreen() {
             >
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
-                        contentContainerStyle={tw`flex-grow justify-center items-center p-4 py-10 pb-20`}
-                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={tw`items-center p-4 py-10 pb-20`}
+                        showsVerticalScrollIndicator={true}
                     >
                         <View style={tw`w-[90%] max-w-[400px] items-center`}>
                             <Text style={tw`text-white font-bold text-lg mb-6 uppercase tracking-widest text-center`}>Confira sua Aposta</Text>

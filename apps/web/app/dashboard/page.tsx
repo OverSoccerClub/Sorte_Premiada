@@ -514,12 +514,33 @@ export default function DashboardPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
                                                     <Ticket className="w-3 h-3" />
-                                                    {sale.numbers
-                                                        .map(n => parseInt(n)) // Convert to number for sorting
-                                                        .sort((a, b) => a - b) // Sort numbers ascending
-                                                        .map(n => n.toString().padStart(4, '0')) // Pad with zeros
-                                                        .join(' - ')
-                                                    }
+                                                    {(sale.gameName?.toUpperCase().includes('PALPITA') || sale.gameName?.toUpperCase().includes('PAIPITA')) ? (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {sale.numbers.map((n, i) => {
+                                                                let label = n;
+                                                                if (n === '1') label = 'CV';
+                                                                else if (n === '2') label = 'FV';
+                                                                else if (n === 'X' || String(n).toLowerCase() === 'nan' || n === '0NaN') label = 'EM';
+
+                                                                // Handle potential 'NaN' from previous saves if any
+                                                                if (label === '0001') label = 'CV';
+                                                                if (label === '0002') label = 'FV';
+
+                                                                return (
+                                                                    <span key={i} className="whitespace-nowrap">
+                                                                        <span className="text-emerald-600 font-bold">JG{i + 1}:</span> {label}
+                                                                        {i < sale.numbers.length - 1 ? ' - ' : ''}
+                                                                    </span>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    ) : (
+                                                        sale.numbers
+                                                            .map(n => parseInt(n)) // Convert to number for sorting
+                                                            .sort((a, b) => a - b) // Sort numbers ascending
+                                                            .map(n => n.toString().padStart(4, '0')) // Pad with zeros
+                                                            .join(' - ')
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">

@@ -216,7 +216,8 @@ export class TicketsService {
         }
 
         // --- BUSINESS RULE: MAX LIABILITY CHECK (Risk Management) ---
-        if (drawDate && data.numbers && data.numbers.length > 0) {
+        // Skip for PAIPITA_AI (Logic is Jackpot/Accumulator, not per-number liability)
+        if (drawDate && data.numbers && data.numbers.length > 0 && data.gameType !== 'PAIPITA_AI' && data.gameType !== 'PALPITA AI') {
             // We must ensure that for EACH number picked, the total potential payout (including this new bet) does not exceed maxLiability.
             // currentLiability = Sum of (betPerNumber * multiplier) for all tickets having this number in this draw.
 

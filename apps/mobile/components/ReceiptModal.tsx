@@ -21,9 +21,10 @@ interface ReceiptModalProps {
     onPrint?: (imageUri?: string) => Promise<void>; // Kept for backward compat if needed, but we'll use hook
     autoPrint?: boolean;
     isReprint?: boolean;
+    template?: 'default' | 'alternative';
 }
 
-export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false }: ReceiptModalProps) {
+export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false, template }: ReceiptModalProps) {
     const captureRef = useRef<ViewShot>(null);
     const printRef = useRef<ViewShot>(null);
     const { user } = useAuth();
@@ -116,7 +117,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                                     data={fullTicketData}
                                     mode="preview"
                                     scale={0.80}
-                                    template={appSettings.ticketTemplate}
+                                    template={template || appSettings.ticketTemplate}
                                 />
                             </ViewShot>
                         </View>
@@ -171,7 +172,7 @@ export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprin
                 </SafeAreaView>
 
 
-                <TicketPrintManager ref={printRef} data={fullTicketData} template={appSettings.ticketTemplate} />
+                <TicketPrintManager ref={printRef} data={fullTicketData} template={template || appSettings.ticketTemplate} />
             </View>
         </Modal>
     );

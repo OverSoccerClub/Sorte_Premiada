@@ -27,6 +27,50 @@ const formatDrawDate = (dateStr: string | undefined) => {
 };
 
 import { TicketData } from '../components/ticket/TicketContent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Helper function to check if printer is connected
+const checkPrinterConnection = async (): Promise<boolean> => {
+  try {
+    // Try a simple command to verify connection
+    await BLEPrinter.printText("");
+    return true;
+  } catch (error) {
+    console.warn('[PrintingService] Connection check failed:', error);
+    return false;
+  }
+};
+
+// Helper function to attempt reconnection
+const attemptReconnection = async (): Promise<boolean> => {
+  try {
+    const savedMac = await AsyncStorage.getItem('@printer_mac_address');
+    if (!savedMac) {
+      console.warn('[PrintingService] No saved printer MAC address');
+      return false;
+    }
+
+    console.log('[PrintingService] Attempting to reconnect to printer...');
+    await BLEPrinter.connectPrinter(savedMac);
+    console.log('[PrintingService] ✅ Reconnected successfully');
+    return true;
+  } catch (error) {
+    console.error('[PrintingService] ❌ Reconnection failed:', error);
+    return false;
+  }
+};
+
+// Helper function to ensure connection before printing
+const ensureConnection = async (): Promise<boolean> => {
+  const isConnected = await checkPrinterConnection();
+
+  if (!isConnected) {
+    console.log('[PrintingService] Printer not connected, attempting reconnect...');
+    return await attemptReconnection();
+  }
+
+  return true;
+};
 
 export const printTicket = async (
   data: TicketData,
@@ -45,6 +89,17 @@ export const printTicket = async (
 
   try {
     console.log(`Printing ticket: ${ticketId}, Game: ${gameName}, Type: ${printerType}, Image: ${!!imageUri}`);
+
+    // For BLE printers, ensure connection before printing
+    if (printerType === 'BLE') {
+      console.log('[printTicket] Checking printer connection...');
+      const isConnected = await ensureConnection();
+
+      if (!isConnected) {
+        throw new Error('Impressora desconectada. Por favor, reconecte nas configurações.');
+      }
+      console.log('[printTicket] ✅ Printer connection verified');
+    }
 
     // If Image URI is provided and Type is BLE, try printing image first
     // Note: Image capture already includes the watermarks if present on screen
