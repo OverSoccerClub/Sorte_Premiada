@@ -411,8 +411,17 @@ export class ReportsService {
             _sum: { amount: true }
         });
 
+        // Mapeamento de gameType para nomes amigáveis
+        const gameTypeMap: Record<string, string> = {
+            'PAIPITA_AI': 'Palpita Ai',
+            'PALPITA_AI': 'Palpita Ai',
+            '2X1000': '2x1000',
+            'LOTERIA_TRADICIONAL': 'Loteria Tradicional',
+            'GENERIC': 'Genérico'
+        };
+
         const revenueByGame = revenueByGameRaw.map(rg => ({
-            game: rg.gameType,
+            game: gameTypeMap[rg.gameType] || rg.gameType,
             amount: Number(rg._sum.amount || 0)
         })).sort((a, b) => b.amount - a.amount);
 
@@ -535,9 +544,20 @@ export class ReportsService {
                     _sum: { amount: true }
                 });
 
+                // Mapeamento de gameType para nomes amigáveis
+                const gameTypeMap: Record<string, string> = {
+                    'PAIPITA_AI': 'Palpita Ai',
+                    'PALPITA_AI': 'Palpita Ai',
+                    '2X1000': '2x1000',
+                    'LOTERIA_TRADICIONAL': 'Loteria Tradicional',
+                    'GENERIC': 'Genérico'
+                };
+
+                const displayName = sale.game?.name || gameTypeMap[sale.gameType] || sale.gameType;
+
                 return {
                     ...sale,
-                    gameName: sale.game?.name || sale.gameType,
+                    gameName: displayName,
                     cambistaDailyTotal: Number(cambistaDailyTotal._sum.amount || 0)
                 };
             })
