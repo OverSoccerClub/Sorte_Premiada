@@ -500,70 +500,86 @@ export default function AreasPage() {
 
             {/* Modal de Configuração de Regras por Área */}
             <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
-                <DialogContent className="sm:max-w-[700px] bg-popover border-border">
-                    <DialogHeader>
+                <DialogContent className="sm:max-w-[900px] bg-popover border-border p-0 overflow-hidden">
+                    <DialogHeader className="p-6 pb-2">
                         <DialogTitle className="flex items-center gap-2 text-foreground">
-                            <Settings2 className="w-5 h-5 text-emerald-500" />
-                            Regras de Negócio: {selectedArea?.name} ({selectedArea?.city})
+                            <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                <Settings2 className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span>Regras de Negócio</span>
+                                <span className="text-sm font-normal text-muted-foreground">{selectedArea?.name} ({selectedArea?.city})</span>
+                            </div>
                         </DialogTitle>
-                        <DialogDescription className="text-muted-foreground">
-                            Configure overrides de comissão e prêmio para esta praça específica.
-                            Deixe em branco para usar o padrão global do jogo.
+                        <DialogDescription className="text-muted-foreground pt-1">
+                            Configure os overrides de comissão e prêmio. Campos vazios usarão o padrão global.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
-                        {games.map((game) => (
-                            <Card key={game.id} className="border-border/60 bg-muted/10">
-                                <CardHeader className="py-3 px-4 flex-row justify-between items-center space-y-0 bg-muted/20">
-                                    <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                                        {game.name}
-                                    </CardTitle>
-                                    <Badge variant="outline" className="text-[10px] uppercase font-normal text-muted-foreground">
-                                        Global: {game.commissionRate}% | {game.prizeMultiplier}x
-                                    </Badge>
-                                </CardHeader>
-                                <CardContent className="p-4 grid grid-cols-3 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-medium text-muted-foreground">Comissão (%)</label>
-                                        <Input
-                                            placeholder={`Padrão: ${game.commissionRate}%`}
-                                            value={areaConfigs[game.id]?.commissionRate ?? ""}
-                                            onChange={(e) => handleUpdateConfig(game.id, "commissionRate", e.target.value)}
-                                            className="h-8 text-sm"
-                                        />
+                    <div className="p-6 pt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {games.map((game) => (
+                                <div key={game.id} className="rounded-lg border border-border bg-card shadow-sm hover:border-emerald-500/30 transition-colors group">
+                                    <div className="flex items-center justify-between p-3 border-b border-border/50 bg-muted/20">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                            <span className="font-semibold text-sm">{game.name}</span>
+                                        </div>
+                                        <Badge variant="secondary" className="text-[10px] h-5 bg-background border-border/50 text-muted-foreground">
+                                            Global: {game.commissionRate}% | {game.prizeMultiplier}x
+                                        </Badge>
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-medium text-muted-foreground">Mult. Prêmio (x)</label>
-                                        <Input
-                                            placeholder={`Padrão: ${game.prizeMultiplier}x`}
-                                            value={areaConfigs[game.id]?.prizeMultiplier ?? ""}
-                                            onChange={(e) => handleUpdateConfig(game.id, "prizeMultiplier", e.target.value)}
-                                            className="h-8 text-sm"
-                                        />
+
+                                    <div className="p-3 grid grid-cols-3 gap-3">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase font-bold text-muted-foreground">Comissão</label>
+                                            <div className="relative">
+                                                <Input
+                                                    placeholder={`${game.commissionRate}`}
+                                                    value={areaConfigs[game.id]?.commissionRate ?? ""}
+                                                    onChange={(e) => handleUpdateConfig(game.id, "commissionRate", e.target.value)}
+                                                    className="h-8 text-sm pr-6 focus-visible:ring-emerald-500/30"
+                                                />
+                                                <span className="absolute right-2 top-2 text-[10px] text-muted-foreground font-medium">%</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase font-bold text-muted-foreground">Prêmio</label>
+                                            <div className="relative">
+                                                <Input
+                                                    placeholder={`${game.prizeMultiplier}`}
+                                                    value={areaConfigs[game.id]?.prizeMultiplier ?? ""}
+                                                    onChange={(e) => handleUpdateConfig(game.id, "prizeMultiplier", e.target.value)}
+                                                    className="h-8 text-sm pr-5 focus-visible:ring-emerald-500/30"
+                                                />
+                                                <span className="absolute right-2 top-2 text-[10px] text-muted-foreground font-medium">x</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase font-bold text-muted-foreground">Risco Máx</label>
+                                            <div className="relative">
+                                                <span className="absolute left-2 top-2 text-[10px] text-muted-foreground font-medium">R$</span>
+                                                <Input
+                                                    placeholder={`${game.maxLiability}`}
+                                                    value={areaConfigs[game.id]?.maxLiability ?? ""}
+                                                    onChange={(e) => handleUpdateConfig(game.id, "maxLiability", e.target.value)}
+                                                    className="h-8 text-sm pl-6 focus-visible:ring-emerald-500/30"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-medium text-muted-foreground">Risco Máx (R$)</label>
-                                        <Input
-                                            placeholder={`Padrão: R$ ${game.maxLiability}`}
-                                            value={areaConfigs[game.id]?.maxLiability ?? ""}
-                                            onChange={(e) => handleUpdateConfig(game.id, "maxLiability", e.target.value)}
-                                            className="h-8 text-sm"
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    <DialogFooter className="mt-6">
-                        <Button variant="outline" onClick={() => setIsConfigOpen(false)} className="border-border">
+                    <DialogFooter className="p-6 pt-0 bg-transparent">
+                        <Button variant="ghost" onClick={() => setIsConfigOpen(false)} className="text-muted-foreground hover:text-foreground">
                             Cancelar
                         </Button>
-                        <Button onClick={saveAreaConfigs} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button onClick={saveAreaConfigs} className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[150px] shadow-lg shadow-emerald-500/20">
                             <Save className="mr-2 h-4 w-4" />
-                            Salvar Regras da Praça
+                            Salvar Regras
                         </Button>
                     </DialogFooter>
                 </DialogContent>

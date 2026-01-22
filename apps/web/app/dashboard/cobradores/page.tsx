@@ -536,7 +536,7 @@ export default function CobradoresPage() {
                                                 <TableCell className="font-medium">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase ring-1 ring-emerald-500/20">
-                                                            {user.username.substring(0, 2)}
+                                                            {(user.name || user.username).split(" ").slice(0, 2).map(n => n[0]).join("")}
                                                         </div>
                                                         <div>
                                                             <div className="font-bold text-foreground flex items-center gap-1.5 text-sm">
