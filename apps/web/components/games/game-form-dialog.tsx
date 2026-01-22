@@ -103,7 +103,7 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="GENERIC">Padrão / Outros</SelectItem>
-                                <SelectItem value="PAIPITA_AI">Paipita Ai (Loteca)</SelectItem>
+                                <SelectItem value="PAIPITA_AI">Palpita Ai (Loteca)</SelectItem>
                                 <SelectItem value="2X1000">2x1000 (Milhar)</SelectItem>
                                 <SelectItem value="LOTERIA_TRADICIONAL">Loteria Tradicional (Bicho)</SelectItem>
                             </SelectContent>

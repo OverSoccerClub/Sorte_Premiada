@@ -136,7 +136,7 @@ export class DrawsService {
         let wonCount = 0;
         let lostCount = 0;
 
-        // PAIPITA AI Logic (Ordered Match Results)
+        // PALPITA AI Logic (Ordered Match Results)
         if (gameType === 'PAIPITA_AI') {
             if (!fullDraw.matches || fullDraw.matches.length !== 14) return;
 

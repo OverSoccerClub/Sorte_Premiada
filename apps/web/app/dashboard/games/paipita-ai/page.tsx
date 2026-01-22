@@ -138,7 +138,7 @@ export default function PaipitaAiBettingPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[50vh] text-muted-foreground">
                 <AlertCircle className="w-10 h-10 mb-2" />
-                <p>Jogo Paipita Ai não encontrado.</p>
+                <p>Jogo Palpita Ai não encontrado.</p>
             </div>
         )
     }
@@ -158,7 +158,7 @@ export default function PaipitaAiBettingPage() {
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
                         <Trophy className="w-8 h-8 text-yellow-500" />
-                        Paipita Ai
+                        Palpita Ai
                     </h2>
                     <p className="text-muted-foreground">Faça seus 14 palpites e concorra!</p>
                 </div>

@@ -43,7 +43,7 @@ export interface TicketData {
     alternativeQrHeight?: number;
     qrcodeWidth?: number;
     qrcodeHeight?: number;
-    // Paipita Ai specific
+    // Palpita Ai specific
     matches?: {
         order: number;
         label: string; // "Team A x Team B"
@@ -146,7 +146,8 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 )}
 
                 {/* Nome do Jogo e Data */}
-                <View style={tw`w-full items-center mt-2 bg-black py-1`}>
+                <View style={tw`w-full flex-row justify-center items-center mt-2 bg-black py-1`}>
+                    <MaterialCommunityIcons name="soccer" size={20} color="white" style={tw`mr-2`} />
                     <Text style={tw`text-white font-black text-lg uppercase`}>
                         {data.gameName}
                     </Text>
@@ -159,22 +160,48 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </Text>
             </View>
 
-            {/* Special Paipita Match List */}
+            {/* Special Palpita Match List - Loteca Style */}
             {data.matches ? (
                 <View style={tw`mb-4 px-2`}>
-                    {data.matches.map((match, idx) => (
-                        <View key={idx} style={tw`flex-row items-center border-b border-gray-300 py-1`}>
-                            <View style={tw`w-8 items-center bg-black rounded mr-2`}>
-                                <Text style={tw`text-white font-black text-xs`}>{match.order}</Text>
+                    {data.matches.map((match, idx) => {
+                        // Split match label into Home and Away teams
+                        // Expected format: "HOME x AWAY" or just "HOME" (reprint fallback)
+                        const parts = match.label.split(/ [xX] /);
+                        const homeTeam = parts[0] || match.label;
+                        const awayTeam = parts[1] || '';
+
+                        // Format selection: CV -> | CV |
+                        // If it's 1/X/2, map to CV/EM/FV for consistency if needed, 
+                        // but usually it comes as CV/EM/FV from frontend logic or 1/X/2.
+                        // Based on history.tsx, it might come as CV/EM/FV.
+                        const selection = match.selection;
+
+                        return (
+                            <View key={idx} style={tw`flex-row items-center border-b border-gray-300 border-dashed py-0.5`}>
+                                {/* Index Column */}
+                                <Text style={tw`w-6 text-xs font-bold text-gray-500`}>
+                                    {match.order.toString().padStart(2, '0')}
+                                </Text>
+
+                                {/* Home Team (Right Aligned) */}
+                                <Text style={tw`flex-1 text-right text-[10px] font-bold text-black uppercase pr-1`} numberOfLines={1}>
+                                    {homeTeam}
+                                </Text>
+
+                                {/* Selection (Center) */}
+                                <View style={tw`mx-1`}>
+                                    <Text style={tw`font-black text-sm text-black`}>
+                                        | {selection} |
+                                    </Text>
+                                </View>
+
+                                {/* Away Team (Left Aligned) */}
+                                <Text style={tw`flex-1 text-left text-[10px] font-bold text-black uppercase pl-1`} numberOfLines={1}>
+                                    {awayTeam}
+                                </Text>
                             </View>
-                            <Text style={tw`flex-1 font-bold text-[10px] text-black uppercase flex-wrap mr-2`} numberOfLines={1}>
-                                {match.label}
-                            </Text>
-                            <View style={tw`bg-gray-200 border border-black w-8 h-6 items-center justify-center rounded`}>
-                                <Text style={tw`font-black text-base text-black`}>{match.selection}</Text>
-                            </View>
-                        </View>
-                    ))}
+                        );
+                    })}
                 </View>
             ) : (
                 /* Standard Numbers Grid */
@@ -218,7 +245,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             {/* Prompt Message (Incentivo) */}
             <View style={tw`mb-3 px-4`}>
                 <Text style={tw`text-center font-black text-[12px] text-black uppercase leading-tight`}>
-                    {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:"}
+                    {data.promptMessage || ((data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0)) ? "BOA SORTE!" : "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:")}
                 </Text>
             </View>
 
@@ -245,6 +272,16 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             ) : null}
 
 
+
+            {/* Palpita Ai Legend */}
+            {data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0) ? (
+                <View style={tw`mb-2 px-2 items-center`}>
+                    <Text style={tw`text-[9px] font-bold text-black text-center uppercase`}>
+                        CASA VENCE: CV - EMPATE: EM - FORA VENCE: FV
+                    </Text>
+                    <View style={tw`mt-1 w-full border-t border-dashed border-gray-400`} />
+                </View>
+            ) : null}
 
             {/* Second Chance */}
             {data.secondChanceNumber !== undefined && data.secondChanceNumber !== null && (
@@ -319,36 +356,55 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
             </View>
 
             {/* Barcode and QR */}
-            <View style={tw`items-center mb-4`}>
-                <View style={tw`overflow-hidden items-center justify-center mb-2`}>
-                    <Barcode
-                        value={data.ticketId || '000000000000'}
-                        width={370}
-                        height={45} // Reduced by 50%
-                    />
-                    <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
-                        <Text style={tw`font-black text-4xl text-white tracking-[3px]`}>{displayTicketId}</Text>
+            {(data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0)) ? (
+                <View style={tw`flex-row justify-between items-center mb-4 mt-2 px-2 border-t-2 border-dashed border-black pt-2`}>
+                    <View style={tw`flex-1 mr-2`}>
+                        <Text style={tw`text-black font-bold text-[10px] uppercase mb-1`}>
+                            Acesse o site para conferir o resultado:
+                        </Text>
+                        <Text style={tw`text-black font-black text-xs`}>
+                            www.palpita_ai.com.br
+                        </Text>
                     </View>
-                </View>
-
-                <View style={[
-                    tw`items-center justify-center w-full mt-2`,
-                    {
-                        transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.425 : 1) }],
-                    },
-                    (!!data.qrcodeHeight || isCapture) && {
-                        marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2),
-                        marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2)
-                    }
-                ]}>
-                    <View style={tw`border-[3px] border-black p-1 bg-white`}>
+                    <View style={tw`items-center justify-center bg-white p-1`}>
                         <QRCode
-                            value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                            size={Number(data.qrcodeWidth) || 240}
+                            value={`https://www.palpita_ai.com.br/sorteio/${displayTicketId}`}
+                            size={90}
                         />
                     </View>
                 </View>
-            </View>
+            ) : (
+                <View style={tw`items-center mb-4`}>
+                    <View style={tw`overflow-hidden items-center justify-center mb-2`}>
+                        <Barcode
+                            value={data.ticketId || '000000000000'}
+                            width={370}
+                            height={45} // Reduced by 50%
+                        />
+                        <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
+                            <Text style={tw`font-black text-4xl text-white tracking-[3px]`}>{displayTicketId}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[
+                        tw`items-center justify-center w-full mt-2`,
+                        {
+                            transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.425 : 1) }],
+                        },
+                        (!!data.qrcodeHeight || isCapture) && {
+                            marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2),
+                            marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2)
+                        }
+                    ]}>
+                        <View style={tw`border-[3px] border-black p-1 bg-white`}>
+                            <QRCode
+                                value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
+                                size={Number(data.qrcodeWidth) || 240}
+                            />
+                        </View>
+                    </View>
+                </View>
+            )}
 
             {/* OVERLAY WATERMARK (Rendered last to be on top) */}
             {

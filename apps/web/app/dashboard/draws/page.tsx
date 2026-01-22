@@ -136,7 +136,7 @@ export default function DrawsSettingsPage() {
             setDrawDescription(draw.description || "")
             setWinningNumbers(draw.numbers ? draw.numbers.join(', ') : "")
 
-            // Paipita: Load matches
+            // Palpita: Load matches
             if (isPaipita && draw.matches && draw.matches.length > 0) {
                 const sortedMatches = draw.matches.sort((a: any, b: any) => a.matchOrder - b.matchOrder)
                 console.log('[EDIT DRAW] Loading matches:', sortedMatches)
@@ -201,7 +201,7 @@ export default function DrawsSettingsPage() {
                     matchOrder: m.matchOrder,
                     result: m.result || null // Send result if editing
                 }))
-                // Paipita uses matches, numbers might be derived results?
+                // Palpita uses matches, numbers might be derived results?
                 // For now keep numbers empty or sync with results? Matches are source of truth.
             }
 

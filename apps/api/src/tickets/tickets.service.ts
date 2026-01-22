@@ -438,7 +438,7 @@ export class TicketsService {
                     throw new BadRequestException(`Modalidade inválida: ${modality} `);
             }
         }
-        // PAIPITA AI Logic (Loteca) - Validação de 14 jogos
+        // PALPITA AI Logic (Loteca) - Validação de 14 jogos
         else if (data.gameType === 'PAIPITA_AI') {
             if (!data.numbers || data.numbers.length !== 14) {
                 throw new BadRequestException("É necessário palpitar em exatamente 14 jogos.");
@@ -488,7 +488,7 @@ export class TicketsService {
                 } else {
                     console.warn(`[PAIPITA_AI] Nenhum jogo encontrado para o concurso ${drawDate}. Permitindo aposta.`);
                     // Se não achar o sorteio específico, pode ser que ainda não criaram.
-                    // Mas para Paipita Ai, PRECISA existir para saber os times.
+                    // Mas para Palpita Ai, PRECISA existir para saber os times.
                     // Vamos permitir passar se for apenas simulação, mas ideal bloquear.
                     // throw new BadRequestException("Concurso não encontrado.");
                 }
