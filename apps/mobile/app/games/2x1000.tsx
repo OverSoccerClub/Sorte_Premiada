@@ -47,6 +47,13 @@ export default function Game2x1000Screen() {
         dezena?: string;
     } | null>(null);
 
+    // Second Chance State
+    const [secondChanceConfig, setSecondChanceConfig] = useState<{
+        enabled: boolean;
+        label: string;
+        prize: string;
+    }>({ enabled: false, label: "FEZINHA EXTRA", prize: "R$ 5.000,00" });
+
     // Selection State
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [manualInput, setManualInput] = useState("");
@@ -106,6 +113,18 @@ export default function Game2x1000Screen() {
                             centena: fmt(game.prizeCentena),
                             dezena: fmt(game.prizeDezena)
                         });
+                    }
+
+                    // Store Second Chance Config
+                    if (game.secondChanceEnabled) {
+                        const fmt = (val: any) => val ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val)) : undefined;
+                        setSecondChanceConfig({
+                            enabled: true,
+                            label: game.secondChanceLabel || "FEZINHA EXTRA",
+                            prize: fmt(game.secondChancePrize) || "R$ 5.000,00"
+                        });
+                    } else {
+                        setSecondChanceConfig(prev => ({ ...prev, enabled: false }));
                     }
 
                     // Buscar o sorteio ativo para pegar a série
@@ -447,7 +466,8 @@ export default function Game2x1000Screen() {
                     const dateStr = result.toLocaleDateString('pt-BR');
                     return `${dayName}, ${dateStr} - ${timeStr}`;
                 })(),
-                secondChanceLabel: ticketData.secondChanceLabel,
+                secondChanceLabel: secondChanceConfig.enabled ? secondChanceConfig.label : undefined,
+                secondChancePrize: secondChanceConfig.enabled ? secondChanceConfig.prize : undefined,
                 promptMessage: "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS", // 2x1000 might not have gameConfig loaded in this scope?
                 mainMatchMessage: "ACERTANDO TODOS OS NÚMEROS NA ORDEM",
                 companyName: settings.companyName,

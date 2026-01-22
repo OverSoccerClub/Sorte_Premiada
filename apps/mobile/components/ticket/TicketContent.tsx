@@ -31,6 +31,7 @@ export interface TicketData {
     };
     status?: string;
     secondChanceStatus?: string;
+    secondChancePrize?: string;
     // Company Branding
     companyName?: string;
     companyLogoUrl?: string;
@@ -63,7 +64,7 @@ const numberToText = (num: number): string => {
 
 export const TicketContent = ({ data, isCapture = false }: TicketContentProps) => {
     const [logoError, setLogoError] = useState(false);
-    const sortedNumbers = [...data.numbers].sort((a, b) => a - b);
+    const sortedNumbers = [...data.numbers].sort((a, b) => Number(a) - Number(b));
     const scDigits = data.secondChanceNumber ? data.secondChanceNumber.toString().split('').map(Number) : [];
 
     const displayTicketId = data.hash || data.ticketId.substring(0, 8);

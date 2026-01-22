@@ -230,7 +230,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
 
                     {/* Extra Prize Info */}
                     <Text style={tw`text-center font-bold text-[12px] text-black mb-0.5 px-2`}>
-                        PRÊMIO DA FEZINHA EXTRA - R$ 5.000,00
+                        {data.secondChancePrize ? `PRÊMIO DA ${data.secondChanceLabel || 'FEZINHA EXTRA'} - ${data.secondChancePrize}` : `PRÊMIO DA ${data.secondChanceLabel || 'FEZINHA EXTRA'} - R$ 5.000,00`}
                     </Text>
                     <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
                         {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
