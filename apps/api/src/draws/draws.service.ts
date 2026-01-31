@@ -329,16 +329,27 @@ export class DrawsService {
         const minus3h = new Date(exactDate.getTime() - 3 * 60 * 60 * 1000);
         const plus3h = new Date(exactDate.getTime() + 3 * 60 * 60 * 1000);
 
+        // Build where clause for tickets
+        const ticketWhere: any = {
+            gameId: draw.gameId,
+            OR: [
+                { drawDate: exactDate },
+                // LEGACY FIX: Handle potential timezone differences in older records (UTC-3 vs UTC)
+                { drawDate: minus3h },
+                { drawDate: plus3h }
+            ]
+        };
+
+        // CRITICAL: Filter by area if draw is linked to a specific location
+        // This ensures proper series/location isolation
+        if (draw.areaId) {
+            ticketWhere.user = {
+                areaId: draw.areaId
+            };
+        }
+
         const tickets = await this.prisma.ticket.findMany({
-            where: {
-                gameId: draw.gameId,
-                OR: [
-                    { drawDate: exactDate },
-                    // LEGACY FIX: Handle potential timezone differences in older records (UTC-3 vs UTC)
-                    { drawDate: minus3h },
-                    { drawDate: plus3h }
-                ]
-            },
+            where: ticketWhere,
             include: {
                 user: {
                     include: {

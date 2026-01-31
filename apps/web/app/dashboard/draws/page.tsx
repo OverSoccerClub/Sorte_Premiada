@@ -39,6 +39,12 @@ export default function DrawsSettingsPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [detailLimit, setDetailLimit] = useState<number | "all">(5)
 
+    // Details Modal Filters
+    const [filterHash, setFilterHash] = useState("")
+    const [filterNumber, setFilterNumber] = useState("")
+    const [filterSeller, setFilterSeller] = useState("")
+    const [filterStatus, setFilterStatus] = useState<string>("ALL")
+
     // Main Table Pagination State
     const [mainPage, setMainPage] = useState(1)
     const [mainLimit, setMainLimit] = useState<number | "all">(10)
@@ -47,6 +53,11 @@ export default function DrawsSettingsPage() {
         setDetailModalOpen(true)
         setDrawDetails(null)
         setCurrentPage(1)
+        // Reset filters
+        setFilterHash("")
+        setFilterNumber("")
+        setFilterSeller("")
+        setFilterStatus("ALL")
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/draws/${drawId}/details`, {
@@ -165,7 +176,7 @@ export default function DrawsSettingsPage() {
                     homeTeam: "",
                     awayTeam: "",
                     matchDate: `${today.toISOString().split('T')[0]}T16:00`,
-                    result: ""
+                    result: null
                 })))
             } else {
                 setMatches([])
@@ -286,7 +297,7 @@ export default function DrawsSettingsPage() {
                     homeTeam: "",
                     awayTeam: "",
                     matchDate: "",
-                    result: ""
+                    result: null
                 })
             }
         } else if (currentMatches.length > 14) {
@@ -617,7 +628,7 @@ export default function DrawsSettingsPage() {
             </Dialog>
 
             <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="w-full max-w-[95vw] lg:max-w-[1400px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Detalhes do Sorteio</DialogTitle>
                         <CardDescription>
@@ -678,6 +689,53 @@ export default function DrawsSettingsPage() {
                                     <Ticket className="w-5 h-5 text-emerald-500" />
                                     Bilhetes Participantes
                                 </h3>
+
+                                {/* Filters */}
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                                    <div>
+                                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Hash</label>
+                                        <Input
+                                            placeholder="Filtrar por hash..."
+                                            value={filterHash}
+                                            onChange={(e) => setFilterHash(e.target.value)}
+                                            className="h-9 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Números</label>
+                                        <Input
+                                            placeholder="Ex: 1234, 5678..."
+                                            value={filterNumber}
+                                            onChange={(e) => setFilterNumber(e.target.value)}
+                                            className="h-9 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Cambista</label>
+                                        <Input
+                                            placeholder="Nome do cambista..."
+                                            value={filterSeller}
+                                            onChange={(e) => setFilterSeller(e.target.value)}
+                                            className="h-9 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Status</label>
+                                        <Select value={filterStatus} onValueChange={setFilterStatus}>
+                                            <SelectTrigger className="h-9 text-sm">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="ALL">Todos</SelectItem>
+                                                <SelectItem value="PENDING">Pendente</SelectItem>
+                                                <SelectItem value="WON">Premiado</SelectItem>
+                                                <SelectItem value="LOST">Não Premiado</SelectItem>
+                                                <SelectItem value="CANCELLED">Cancelado</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
                                 <div className="border rounded-md overflow-hidden">
                                     <Table>
                                         <TableHeader>
@@ -691,7 +749,37 @@ export default function DrawsSettingsPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {(() => {
-                                                const paginatedTickets = detailLimit === "all" ? drawDetails.tickets : drawDetails.tickets.slice((currentPage - 1) * detailLimit, currentPage * detailLimit);
+                                                // Apply filters
+                                                let filteredTickets = drawDetails.tickets.filter((t: any) => {
+                                                    // Filter by hash
+                                                    if (filterHash && !t.hash?.toLowerCase().includes(filterHash.toLowerCase())) {
+                                                        return false;
+                                                    }
+                                                    // Filter by number
+                                                    if (filterNumber) {
+                                                        const searchNumbers = filterNumber.split(',').map(n => n.trim()).filter(n => n);
+                                                        const hasMatch = searchNumbers.some(searchNum =>
+                                                            t.numbers.some((ticketNum: string) =>
+                                                                ticketNum.padStart(4, '0').includes(searchNum.padStart(4, '0'))
+                                                            )
+                                                        );
+                                                        if (!hasMatch) return false;
+                                                    }
+                                                    // Filter by seller
+                                                    if (filterSeller) {
+                                                        const sellerName = (t.user?.name || t.user?.username || '').toLowerCase();
+                                                        if (!sellerName.includes(filterSeller.toLowerCase())) {
+                                                            return false;
+                                                        }
+                                                    }
+                                                    // Filter by status
+                                                    if (filterStatus !== "ALL" && t.status !== filterStatus) {
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                });
+
+                                                const paginatedTickets = detailLimit === "all" ? filteredTickets : filteredTickets.slice((currentPage - 1) * detailLimit, currentPage * detailLimit);
 
                                                 return (
                                                     <>
@@ -708,34 +796,36 @@ export default function DrawsSettingsPage() {
                                                                     </div>
                                                                 </TableCell>
                                                                 <TableCell className="font-mono text-xs max-w-[150px] break-words">
-                                                                    {t.numbers.join(', ')}
+                                                                    {t.numbers.map((n: string) => n.padStart(4, '0')).join(', ')}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <Badge variant={t.status === 'WON' ? 'default' : t.status === 'PENDING' ? 'outline' : 'secondary'} className={t.status === 'WON' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}>
-                                                                        {t.status === 'WON' ? 'PREMIADO' : t.status}
+                                                                        {t.status === 'WON' ? 'PREMIADO' : t.status === 'PENDING' ? 'PENDENTE' : t.status === 'CANCELLED' ? 'CANCELADO' : t.status === 'LOST' ? 'NÃO PREMIADO' : t.status}
                                                                     </Badge>
                                                                 </TableCell>
                                                             </TableRow>
                                                         ))}
-                                                        {drawDetails.tickets.length === 0 && (
+                                                        {filteredTickets.length === 0 && (
                                                             <TableRow>
-                                                                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">Nenhum bilhete encontrado para este sorteio.</TableCell>
+                                                                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                                                                    {drawDetails.tickets.length === 0 ? 'Nenhum bilhete encontrado para este sorteio.' : 'Nenhum bilhete corresponde aos filtros aplicados.'}
+                                                                </TableCell>
                                                             </TableRow>
                                                         )}
 
                                                         <StandardPagination
                                                             currentPage={currentPage}
-                                                            totalPages={detailLimit === "all" ? 1 : Math.ceil(drawDetails.tickets.length / detailLimit)}
+                                                            totalPages={detailLimit === "all" ? 1 : Math.ceil(filteredTickets.length / detailLimit)}
                                                             limit={detailLimit}
                                                             onPageChange={setCurrentPage}
                                                             onLimitChange={(l) => {
                                                                 setDetailLimit(l)
                                                                 setCurrentPage(1)
                                                             }}
-                                                            totalItems={drawDetails.tickets.length}
+                                                            totalItems={filteredTickets.length}
                                                         />
                                                     </>
                                                 )
