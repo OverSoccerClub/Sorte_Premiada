@@ -55,6 +55,40 @@ export default function LoginScreen() {
     };
 
     const handleLogin = async () => {
+        // Security Guard: Check device verification status
+        if (verificationStatus === 'failed') {
+            showAlert("Dispositivo Inválido", "Este dispositivo não está validado ou foi bloqueado. Tente reativar.", "error");
+            return;
+        }
+
+        if (verificationStatus === 'checking') {
+            showAlert("Aguarde", "Verificando status do dispositivo...", "info");
+            return;
+        }
+
+        // Warning for Offline Mode
+        if (verificationStatus === 'offline') {
+            setAlertConfig({
+                visible: true,
+                title: "Modo Offline",
+                message: "Não foi possível verificar o status deste dispositivo no servidor. O acesso pode ser bloqueado se o dispositivo tiver sido desativado.\n\nDeseja arriscar o login offline?",
+                type: "warning",
+                showCancel: true,
+                confirmText: "Tentar Login",
+                cancelText: "Cancelar",
+                useAppIcon: true,
+                onConfirm: async () => {
+                    await performLogin();
+                }
+            });
+            return;
+        }
+
+        // Normal flow (Verified)
+        await performLogin();
+    };
+
+    const performLogin = async () => {
         if (!username || !password) {
             showAlert("Campos Obrigatórios", "Por favor, preencha usuário e senha.", "warning");
             return;

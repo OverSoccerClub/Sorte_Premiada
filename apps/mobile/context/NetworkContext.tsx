@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 
 interface NetworkContextType {
     isConnected: boolean;
@@ -17,13 +17,14 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         // Verificar estado inicial
-        NetInfo.fetch().then(state => {
+        NetInfo.fetch().then((state: NetInfoState) => {
             setIsConnected(state.isConnected ?? false);
             setIsInternetReachable(state.isInternetReachable ?? false);
         });
 
+
         // Monitorar mudanças de conexão
-        const unsubscribe = NetInfo.addEventListener(state => {
+        const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
             setIsConnected(state.isConnected ?? false);
             setIsInternetReachable(state.isInternetReachable ?? false);
 
@@ -33,6 +34,7 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
                 type: state.type
             });
         });
+
 
         return () => unsubscribe();
     }, []);
