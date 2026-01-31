@@ -152,19 +152,12 @@ export class DevicesService {
                 data: updateData,
             });
         } else {
-            // Só criar novo registro se realmente não existe
-            console.log(`[Heartbeat] Creating new device record for ${data.deviceId}`);
-            return this.prisma.posTerminal.create({
-                data: {
-                    deviceId: data.deviceId,
-                    status: data.status || 'ONLINE',
-                    lastSeenAt: new Date(),
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    currentUser: connectUser,
-                    lastUser: connectUser
-                },
-            });
+            // SECURITY: Device must be activated before sending heartbeats
+            // Auto-creation bypasses activation flow and creates security holes
+            console.warn(`[Heartbeat] BLOCKED: Device ${data.deviceId} not found. Must be activated first.`);
+            throw new UnauthorizedException(
+                'Dispositivo não encontrado. Por favor, ative este dispositivo usando um código de ativação.'
+            );
         }
     }
 
@@ -369,6 +362,7 @@ export class DevicesService {
                 name: data.name,
                 description: data.description,
                 activationCode,
+                activationCodeExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
                 companyId,
                 status: 'OFFLINE',
                 isActive: false // Inativo até ser ativado
@@ -422,8 +416,25 @@ export class DevicesService {
             throw new NotFoundException('Código de ativação inválido');
         }
 
+        // VALIDAÇÃO DE EXPIRAÇÃO
+        if (device.activationCodeExpiresAt && device.activationCodeExpiresAt < new Date()) {
+            throw new BadRequestException(
+                'Este código de ativação expirou. Solicite um novo código ao administrador.'
+            );
+        }
+
+        // REATIVAÇÃO: Permitir se for o mesmo dispositivo físico
         if (device.activatedAt) {
-            throw new BadRequestException('Este código já foi utilizado');
+            // Permitir reativação se for o mesmo dispositivo físico
+            if (device.deviceId !== deviceId && !device.deviceId.startsWith('pending-')) {
+                throw new BadRequestException(
+                    'Este código já foi utilizado em outro dispositivo. ' +
+                    'Entre em contato com o suporte para gerar um novo código.'
+                );
+            }
+
+            // Reativação do mesmo dispositivo - apenas atualizar token
+            console.log(`[Device Activation] Reactivating same device: ${deviceId}`);
         }
 
         if (!device.company) {
@@ -439,12 +450,11 @@ export class DevicesService {
         if (conflictingDevice && conflictingDevice.id !== device.id) {
             // Cenário 1: O dispositivo conflitante já está ATIVADO
             if (conflictingDevice.activatedAt) {
-                // Se for de outra empresa -> Erro
+                // Se for de outra empresa -> Erro genérico (não expor nome da empresa)
                 if (conflictingDevice.companyId !== device.companyId) {
-                    const conflictCompany = await this.prisma.company.findUnique({ where: { id: conflictingDevice.companyId! } });
                     throw new ForbiddenException(
-                        `Este dispositivo já está vinculado à empresa "${conflictCompany?.companyName || 'Outra Empresa'}". ` +
-                        `Entre em contato com o suporte para liberação.`
+                        'Este dispositivo já está vinculado a outra empresa. ' +
+                        'Entre em contato com o suporte para liberação.'
                     );
                 }
 

@@ -117,7 +117,10 @@ export class DevicesController {
     async activateDevice(
         @Body() body: { activationCode: string; deviceId: string }
     ) {
-        this.logger.log(`POST /devices/activate - Code: ${body.activationCode}, DeviceId: ${body.deviceId}`);
+        // Mascarar informações sensíveis nos logs
+        const maskedCode = body.activationCode ? `${body.activationCode.substring(0, 5)}***` : 'N/A';
+        const maskedDeviceId = body.deviceId ? `${body.deviceId.substring(0, 8)}***` : 'N/A';
+        this.logger.log(`POST /devices/activate - Code: ${maskedCode}, DeviceId: ${maskedDeviceId}`);
 
         return this.devicesService.activateDevice(body.activationCode, body.deviceId);
     }

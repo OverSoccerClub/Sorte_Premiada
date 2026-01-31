@@ -605,6 +605,7 @@ model PosTerminal {
   name           String? // Nome do dispositivo (ex: "POS Loja Centro")
   description    String? // Descrição opcional
   activationCode String?   @unique // Código de ativação (ex: "AP-2024-ABC123")
+  activationCodeExpiresAt DateTime? // Data de expiração do código (30 dias após geração)
   deviceToken    String?   @unique // JWT para autenticação do dispositivo
   activatedAt    DateTime? // Data/hora de ativação
   isActive       Boolean   @default(true) // Controle de ativação/desativação remota

@@ -131,9 +131,17 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             clearTimeout(timeoutId);
 
             if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404) {
-                console.warn(`Device token invalid or expired (Status: ${response.status}). Marking as failed but keeping local activation.`);
+                console.warn(`Device token invalid or expired (Status: ${response.status}).`);
+
+                // Security: If device is specifically Forbidden (403) or Not Found (404), or Unauthorized (401),
+                // we MUST de-activate to allow re-activation given the device was deleted/banned on server.
+                if (response.status === 403 || response.status === 404 || response.status === 401) {
+                    console.warn("Deactivating device due to server rejection.");
+                    await clearActivation();
+                    return;
+                }
+
                 setVerificationStatus('failed');
-                // await clearActivation(); // Removed to prevent forced logout on updates/glitches
                 return;
             }
 
@@ -155,7 +163,7 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             if (deviceToken) {
                 setVerificationStatus('offline');
             } else {
-                setVerificationStatus('failed');
+                setVerificationStatus('failed'); // Should not happen if check above passes
             }
         } finally {
             setIsLoading(false);
@@ -172,9 +180,22 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
                 const iosId = await Application.getIosIdForVendorAsync();
                 deviceId = iosId || 'IOS-NO-ID';
             }
-            // Fallback para dev/test se necessário, mas evitar osBuildId que repete por versão
+            // Fallback aprimorado: usar combinação de identificadores para criar ID estável
             if (deviceId === 'unknown-device' || deviceId.includes('NO-ID')) {
-                deviceId = Device.modelId || 'unknown-device-' + Math.random().toString(36).substring(7);
+                console.warn('[Device Activation] Primary device ID unavailable, using fallback strategy');
+
+                // Combinar múltiplos identificadores para criar um ID mais único e estável
+                const brand = (Device.brand || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const model = (Device.modelName || Device.modelId || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const osVersion = (Device.osVersion || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const manufacturer = (Device.manufacturer || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+
+                // Criar hash baseado em múltiplos fatores (mais estável que random)
+                const combined = `${manufacturer}-${brand}-${model}-${osVersion}`;
+                deviceId = `FALLBACK-${combined.substring(0, 50)}`;
+
+                console.warn('[Device Activation] Using fallback device ID:', deviceId);
+                console.warn('[Device Activation] Device Info:', { brand, model, osVersion, manufacturer });
             }
 
             const response = await fetch(`${AppConfig.api.baseUrl}/devices/activate`, {
