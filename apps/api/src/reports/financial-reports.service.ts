@@ -9,10 +9,10 @@ export class FinancialReportsService {
     constructor(private prisma: PrismaService) { }
 
     async getDashboardMetrics() {
-        // Total Recebido (Vida inteira ou Ano atual?) - Vamos fazer total e mês atual
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
+        // Fixed: Use local timezone (Brazil) instead of setDate which can cause timezone issues
+        // This prevents the bug where 21:08 BRT (Jan 31) becomes Feb 1
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 
         const [
             totalRevenue,

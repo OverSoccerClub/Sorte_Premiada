@@ -67,17 +67,18 @@ export const TicketsService = {
             }
 
             if (filters?.startDate) {
-                // Set to start of day in Brazil (00:00 BRT = 03:00 UTC)
-                // We use the Local Date selected by user to extract Y/M/D
+                // Start of day in Brazil (00:00 BRT)
+                // Fixed: Use local timezone instead of UTC
                 const local = new Date(filters.startDate);
-                const start = new Date(Date.UTC(local.getFullYear(), local.getMonth(), local.getDate(), 3, 0, 0, 0));
+                const start = new Date(local.getFullYear(), local.getMonth(), local.getDate(), 0, 0, 0, 0);
                 url += `startDate=${start.toISOString()}&`;
             }
 
             if (filters?.endDate) {
-                // Set to end of day in Brazil (23:59:59.999 BRT = 02:59:59.999 UTC Next Day)
+                // End of day in Brazil (23:59:59.999 BRT)
+                // Fixed: Use local timezone instead of UTC
                 const local = new Date(filters.endDate);
-                const end = new Date(Date.UTC(local.getFullYear(), local.getMonth(), local.getDate(), 26, 59, 59, 999));
+                const end = new Date(local.getFullYear(), local.getMonth(), local.getDate(), 23, 59, 59, 999);
                 url += `endDate=${end.toISOString()}&`;
             }
 
