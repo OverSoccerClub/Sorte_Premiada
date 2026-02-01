@@ -33,11 +33,16 @@ import {
 
 export default function TwoXOneThousandReportPage() {
     const { showAlert } = useAlert()
+    // Fix: Use Brazil timezone for initial dates
+    const getBrazilToday = () => {
+        return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    }
+
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [gameId, setGameId] = useState<string | null>(null)
-    const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState<string>(getBrazilToday())
+    const [endDate, setEndDate] = useState<string>(getBrazilToday())
     const [cambistas, setCambistas] = useState<any[]>([])
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
     const [totals, setTotals] = useState({ count: 0, amount: 0 })
@@ -85,11 +90,10 @@ export default function TwoXOneThousandReportPage() {
         try {
             const token = localStorage.getItem("token")
 
-            const start = new Date(startDate)
-            start.setUTCHours(0, 0, 0, 0)
-
-            const end = new Date(endDate)
-            end.setUTCHours(23, 59, 59, 999)
+            // Fix: Construct dates using explicit Brazil offset (-03:00)
+            // This ensures we query 00:00 BRT to 23:59 BRT
+            const start = new Date(`${startDate}T00:00:00-03:00`)
+            const end = new Date(`${endDate}T23:59:59.999-03:00`)
 
             let url = `${API_URL}/tickets?gameId=${gameId}&startDate=${start.toISOString()}&endDate=${end.toISOString()}`
 
