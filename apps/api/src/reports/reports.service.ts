@@ -320,8 +320,9 @@ export class ReportsService {
         const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
 
-        const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 0, 0, 0));
-        startOfMonth.setHours(0, 0, 0, 0); // Extra precaution for local queries if needed
+        // Fix: Use local timezone (Brazil) instead of UTC to calculate start of month
+        // This prevents the bug where 21:08 BRT (Jan 31) becomes 00:08 UTC (Feb 1)
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 
         // Filtro de empresa para MASTER users
         const companyFilter = companyId ? { companyId } : {};
