@@ -5,6 +5,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@repo/database';
 import type { Response } from 'express';
+import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -50,12 +51,16 @@ export class ReportsController {
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
         const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
-        // Ensure full day coverage if only date string is passed
-        const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);
 
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
+        // Fix: Use Brazil Time utils to prevent Invalid Date and timezone bugs
+        // Check if dates are valid, otherwise fallback to undefined (which defaults to "Today" in utils)
+        const isValidDate = (d: string) => d && !isNaN(Date.parse(d));
+
+        const safeStart = isValidDate(startDate) ? startDate : undefined;
+        const safeEnd = isValidDate(endDate) ? endDate : undefined;
+
+        const start = getBrazilStartOfDay(safeStart);
+        const end = getBrazilEndOfDay(safeEnd);
 
         return this.reportsService.getSalesByArea(start, end, companyId, req.user.userId);
     }
