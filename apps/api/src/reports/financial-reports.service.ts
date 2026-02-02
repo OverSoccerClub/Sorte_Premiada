@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentStatus } from '@prisma/client';
+import { getBrazilTime, dayjs, toBrazilTime } from '../utils/date.util';
+import 'dayjs/locale/pt-br'; // Import locale if needed, though formatting might handled differently
 
 @Injectable()
 export class FinancialReportsService {
@@ -9,10 +11,10 @@ export class FinancialReportsService {
     constructor(private prisma: PrismaService) { }
 
     async getDashboardMetrics() {
-        // Fixed: Use local timezone (Brazil) instead of setDate which can cause timezone issues
-        // This prevents the bug where 21:08 BRT (Jan 31) becomes Feb 1
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        // Fixed: Use strict Brazil Time
+        const now = getBrazilTime();
+        // Start of month in Brazil Time converted to UTC Date for Prisma
+        const startOfMonth = now.startOf('month').toDate();
 
         const [
             totalRevenue,
@@ -60,8 +62,10 @@ export class FinancialReportsService {
     }
 
     async getMonthlyRevenueChart(year: number) {
-        const startOfYear = new Date(year, 0, 1);
-        const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+        // Construct start and end of year in Brazil Time
+        // stored as UTC in DB, but we want the range that represents that year in Brazil
+        const startOfYear = dayjs.tz(`${year}-01-01`, 'America/Sao_Paulo').startOf('year').toDate();
+        const endOfYear = dayjs.tz(`${year}-12-31`, 'America/Sao_Paulo').endOf('year').toDate();
 
         const payments = await this.prisma.payment.findMany({
             where: {
@@ -81,13 +85,16 @@ export class FinancialReportsService {
         const monthlyData = new Array(12).fill(0);
         payments.forEach(p => {
             if (p.paidAt) {
-                const month = p.paidAt.getMonth();
+                // Convert back to Brazil time to extract the correct month
+                // otherwise 21:00 on Jan 31st might count as February in UTC
+                const month = toBrazilTime(p.paidAt).month();
                 monthlyData[month] += Number(p.amount);
             }
         });
 
+        // Use dayjs to generate month names in PT-BR
         return monthlyData.map((amount, index) => ({
-            name: new Date(year, index).toLocaleString('pt-BR', { month: 'short' }),
+            name: dayjs().month(index).locale('pt-br').format('MMM'), // Requires locale setup or simple array
             total: amount
         }));
     }
