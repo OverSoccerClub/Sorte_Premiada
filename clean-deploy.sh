@@ -1,16 +1,23 @@
-#!/bin/bash
+#!/bin/sh
 # 🧹 Script de Limpeza de Cache e Rebuild Seguro
-# Uso: bash clean-deploy.sh
+# Uso: sh clean-deploy.sh
 
 set -e
 
 echo "🚀 Iniciando Protocolo de Limpeza de Servidor..."
 echo "================================================"
 
-# 1. Parar serviços atuais (opcional, mas recomendado para limpeza profunda)
+# Verificação de Ambiente
+if ! command -v docker >/dev/null 2>&1; then
+    echo "❌ ERRO CRÍTICO: Comando 'docker' não encontrado!"
+    echo "⚠️  Você provavelmente está rodando este script DENTRO do container (pasta /app)."
+    echo "💡 Este script precisa ser rodado no SERVIDOR (HOST) via SSH, ou use o botão de 'Rebuild' no painel do EasyPanel."
+    exit 1
+fi
+
+# 1. Parar serviços atuais
 echo "🛑 Parando containers (se existirem)..."
-# Tenta parar pelo docker-compose ou comando docker comum
-if command -v docker-compose &> /dev/null; then
+if command -v docker-compose >/dev/null 2>&1; then
     docker-compose down --remove-orphans || true
 else
     docker compose down --remove-orphans || true
@@ -18,9 +25,6 @@ fi
 
 # 2. Limpeza Profunda do Docker
 echo "🧹 Executando Docker System Prune (Isso remove caches antigos)..."
-# Remove containers parados, redes não usadas e IMAGENS PENDENTES (dangling)
-# O flag -a removeria todas as imagens não usadas (mais agressivo, mas mais seguro para o seu caso)
-# Adicionamos -f para não pedir confirmação interativa
 docker system prune -a -f
 
 echo "✅ Cache do Docker limpo."
@@ -37,7 +41,7 @@ fi
 
 # 4. Rebuild com flag --no-cache
 echo "🔨 Iniciando Rebuild Forçado (No Cache)..."
-if command -v docker-compose &> /dev/null; then
+if command -v docker-compose >/dev/null 2>&1; then
     docker-compose build --no-cache
     docker-compose up -d --force-recreate
 else
