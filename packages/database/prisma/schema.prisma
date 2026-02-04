@@ -149,7 +149,7 @@ model User {
   state        String?
   zipCode      String?
   phone        String?
-  neighborhood String?
+  addressNeighborhood String?
   number       String?
   complement   String?
   cpf          String?
