@@ -348,6 +348,7 @@ export default function AreasPage() {
             if (res.ok) {
                 setNewNeighborhoodName("")
                 fetchNeighborhoods(selectedArea.id)
+                fetchAreas() // Refresh areas list to update count
                 showAlert("Sucesso", "Bairro adicionado.", "success")
             } else {
                 const err = await res.json()
@@ -368,6 +369,7 @@ export default function AreasPage() {
             })
             if (res.ok) {
                 fetchNeighborhoods(selectedArea.id)
+                fetchAreas() // Refresh areas list to update count
             }
         } catch (e) {
             showAlert("Erro", "Erro ao remover bairro.", "error")
