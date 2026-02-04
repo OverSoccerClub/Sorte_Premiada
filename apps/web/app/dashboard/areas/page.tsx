@@ -361,19 +361,33 @@ export default function AreasPage() {
 
     const handleDeleteNeighborhood = async (id: string) => {
         if (!selectedArea) return
-        try {
-            const token = localStorage.getItem("token")
-            const res = await fetch(`${API_URL}/neighborhoods/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (res.ok) {
-                fetchNeighborhoods(selectedArea.id)
-                fetchAreas() // Refresh areas list to update count
-            }
-        } catch (e) {
-            showAlert("Erro", "Erro ao remover bairro.", "error")
-        }
+
+        showAlert(
+            "Remover Bairro",
+            "Tem certeza que deseja remover este bairro?",
+            "warning",
+            true, // show cancel
+            async () => {
+                try {
+                    const token = localStorage.getItem("token")
+                    const res = await fetch(`${API_URL}/neighborhoods/${id}`, {
+                        method: "DELETE",
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                    if (res.ok) {
+                        fetchNeighborhoods(selectedArea.id)
+                        fetchAreas() // Refresh areas list to update count
+                        showAlert("Removido", "Bairro removido com sucesso.", "success")
+                    } else {
+                        showAlert("Erro", "Erro ao remover bairro.", "error")
+                    }
+                } catch (e) {
+                    showAlert("Erro", "Erro ao remover bairro.", "error")
+                }
+            },
+            "Sim, Remover",
+            "Cancelar"
+        )
     }
 
     return (
