@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Search, FileText, Download, Filter, Ticket as TicketIcon, DollarSign, Calendar, MapPin } from "lucide-react"
+import { getBrazilToday, dateStringToStartOfDay, dateStringToEndOfDay } from '@/lib/date-utils'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -52,8 +53,8 @@ export default function RelatoriosPage() {
     // Filters
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
     const [selectedGame, setSelectedGame] = useState<string>("all")
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(getBrazilToday())
+    const [endDate, setEndDate] = useState(getBrazilToday())
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState<number | "all">(20)
     const [totalPages, setTotalPages] = useState(1)
@@ -113,8 +114,8 @@ export default function RelatoriosPage() {
         try {
             const token = localStorage.getItem("token")
 
-            const startStr = new Date(startDate + 'T00:00:00').toISOString()
-            const endStr = new Date(endDate + 'T23:59:59').toISOString()
+            const startStr = dateStringToStartOfDay(startDate)
+            const endStr = dateStringToEndOfDay(endDate)
 
             let url = `${API_URL}/reports/sales-by-date?startDate=${startStr}&endDate=${endStr}&page=${resetPage ? 1 : page}&limit=${limit}`
             if (activeCompanyId) url += `&targetCompanyId=${activeCompanyId}`

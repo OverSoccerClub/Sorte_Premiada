@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
+import { formatBrazilDate, getBrazilNowDate } from "../../lib/date-utils";
 
 const { height } = Dimensions.get("window");
 import { usePrinter } from "../../context/PrinterContext";
@@ -160,8 +161,8 @@ export default function FinanceScreen() {
 
         const printed = await printDailyReport({
             ...summary,
-            date: new Date(),
-            companyLogoUrl: company.companyLogoUrl
+            date: getBrazilNowDate(),
+            companyLogoUrl: company.logoUrl
         }, printerType, imageUri);
 
         if (printed) showAlert("Sucesso", "Enviado para impressora.", "success");
@@ -363,7 +364,7 @@ export default function FinanceScreen() {
                             <View key={t.id} style={tw`bg-surface p-4 rounded-xl border border-gray-800 mb-2 flex-row justify-between items-center shadow-sm`}>
                                 <View>
                                     <Text style={tw`text-white font-bold`}>{t.description || "Movimentação"}</Text>
-                                    <Text style={tw`text-gray-500 text-xs`}>{t.createdAt ? new Date(t.createdAt).toLocaleTimeString() : "-"}</Text>
+                                    <Text style={tw`text-gray-500 text-xs`}>{t.createdAt ? formatBrazilDate(t.createdAt, { timeStyle: 'medium' }) : "-"}</Text>
                                 </View>
                                 <Text style={tw`font-bold ${t.type === 'CREDIT' ? 'text-blue-400' : 'text-red-400'}`}>
                                     {t.type === 'CREDIT' ? '+' : '-'} {formatCurrency(t.amount)}
@@ -463,7 +464,7 @@ export default function FinanceScreen() {
                                         <Text style={tw`text-white font-bold`}>{formatCurrency(ticket.amount)}</Text>
                                     </View>
                                     <Text style={tw`text-gray-400 text-xs mb-2`}>
-                                        {new Date(ticket.createdAt).toLocaleTimeString()} - ID: {ticket.id.split('-')[0]}
+                                        {formatBrazilDate(ticket.createdAt, { timeStyle: 'medium' })} - ID: {ticket.id.split('-')[0]}
                                     </Text>
                                     <View style={tw`flex-row flex-wrap gap-1`}>
                                         {ticket.numbers.map((num, i) => (
@@ -507,10 +508,10 @@ export default function FinanceScreen() {
                                 >
                                     <ReportPreview
                                         data={summary}
-                                        date={new Date()}
+                                        date={getBrazilNowDate() as any}
                                         isCapture={true}
                                         companyName={company.companyName}
-                                        companyLogoUrl={company.companyLogoUrl}
+                                        companyLogoUrl={company.logoUrl}
                                     />
                                 </ViewShot>
                             )}

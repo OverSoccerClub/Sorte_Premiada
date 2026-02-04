@@ -4,6 +4,7 @@ import tw from '../../lib/tailwind';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { Barcode } from '../Barcode';
+import { formatBrazilDate } from '../../lib/date-utils';
 
 export interface TicketData {
     gameName: string;
@@ -89,29 +90,9 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     };
 
     // Helper to format Draw Date as per requirement: DD/MM/YY ÀS HH:MM
-    // Enforces Brazil Time (UTC-3) regardless of device timezone
+    // Enforces Brazil Time (UTC-3) using date-utils
     const formatDrawDate = (dateStr: string | undefined) => {
-        if (!dateStr) return "";
-
-        try {
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr; // parsing failed, return original
-
-            // Shift UTC time by -3 hours to get Brazil components via getUTC* methods
-            // (Standard Brazil Time is UTC-3)
-            const brazilTime = new Date(date.getTime() - 3 * 60 * 60 * 1000);
-
-            const day = brazilTime.getUTCDate().toString().padStart(2, '0');
-            const month = (brazilTime.getUTCMonth() + 1).toString().padStart(2, '0');
-            const year = brazilTime.getUTCFullYear().toString();
-            const shortYear = year.substring(2);
-            const hours = brazilTime.getUTCHours().toString().padStart(2, '0');
-            const minutes = brazilTime.getUTCMinutes().toString().padStart(2, '0');
-
-            return `${day}/${month}/${shortYear} ÀS ${hours}:${minutes}`;
-        } catch (e) {
-            return dateStr;
-        }
+        return formatBrazilDate(dateStr, { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' ÀS ');
     };
 
     return (

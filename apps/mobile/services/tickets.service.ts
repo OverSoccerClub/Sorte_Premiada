@@ -1,5 +1,6 @@
 import { AppConfig } from "../constants/AppConfig";
 import { ApiClient } from "./api.client";
+import { getBrazilStartOfDay, getBrazilEndOfDay } from "../lib/date-utils";
 
 /**
  * Tickets Service (Mobile)
@@ -67,18 +68,25 @@ export const TicketsService = {
             }
 
             if (filters?.startDate) {
-                // Start of day in Brazil (00:00 BRT)
-                // Fixed: Use local timezone instead of UTC
-                const local = new Date(filters.startDate);
-                const start = new Date(local.getFullYear(), local.getMonth(), local.getDate(), 0, 0, 0, 0);
+                // Ensure we respect the user's selected CALENDAR date (local) translated to Brazil Midnight
+                const d = new Date(filters.startDate);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+
+                const start = getBrazilStartOfDay(dateStr);
                 url += `startDate=${start.toISOString()}&`;
             }
 
             if (filters?.endDate) {
-                // End of day in Brazil (23:59:59.999 BRT)
-                // Fixed: Use local timezone instead of UTC
-                const local = new Date(filters.endDate);
-                const end = new Date(local.getFullYear(), local.getMonth(), local.getDate(), 23, 59, 59, 999);
+                const d = new Date(filters.endDate);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+
+                const end = getBrazilEndOfDay(dateStr);
                 url += `endDate=${end.toISOString()}&`;
             }
 

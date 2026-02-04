@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, TicketStatus } from '@repo/database';
-import { toBrazilTime, dayjs } from '../utils/date.util';
+import { toBrazilTime, getBrazilTime, getBrazilStartOfDay, getBrazilEndOfDay, dayjs } from '../utils/date.util';
 
 @Injectable()
 export class SecondChanceService {
@@ -194,10 +194,8 @@ export class SecondChanceService {
         }
 
         const targetDate = nextDrawTicket.secondChanceDrawDate;
-        const startOfTargetDate = new Date(targetDate);
-        startOfTargetDate.setHours(0, 0, 0, 0);
-        const endOfTargetDate = new Date(targetDate);
-        endOfTargetDate.setHours(23, 59, 59, 999);
+        const startOfTargetDate = getBrazilStartOfDay(targetDate);
+        const endOfTargetDate = getBrazilEndOfDay(targetDate);
 
         // 2. Fetch Tickets for that date, grouping/selecting relevant info
         // We'll fetch raw tickets to group in JS or use groupBy (distinct) logic.

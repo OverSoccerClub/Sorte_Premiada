@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionType } from '@prisma/client';
 import { objectsToCsv } from './csv.util';
-import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
+import { getBrazilStartOfDay, getBrazilEndOfDay, getBrazilTime, getBrazilNow, toBrazilTime, dayjs } from '../utils/date.util';
 
 @Injectable()
 export class ReportsService {
@@ -316,13 +316,9 @@ export class ReportsService {
 
     async getDashboardStats(requestingUserId?: string, companyId?: string) {
         const areaFilter = await this.getAreaFilter(requestingUserId);
-        const now = new Date();
-        const startOfDay = new Date(now);
-        startOfDay.setHours(0, 0, 0, 0);
-
-        // Fix: Use local timezone (Brazil) instead of UTC to calculate start of month
-        // This prevents the bug where 21:08 BRT (Jan 31) becomes 00:08 UTC (Feb 1)
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        const nowBrazil = getBrazilTime();
+        const startOfDay = getBrazilStartOfDay();
+        const startOfMonth = nowBrazil.startOf('month').toDate();
 
         // Filtro de empresa para MASTER users
         const companyFilter = companyId ? { companyId } : {};
@@ -339,7 +335,7 @@ export class ReportsService {
         });
 
         // Active Cambistas (Sold a ticket in the last 30 minutes)
-        const thirtyMinsAgo = new Date(now.getTime() - 30 * 60 * 1000);
+        const thirtyMinsAgo = nowBrazil.subtract(30, 'minute').toDate();
 
         const activeCambistasCount = await this.prisma.ticket.groupBy({
             by: ['userId'],
@@ -355,19 +351,16 @@ export class ReportsService {
         // Chart Data (Last 7 days)
         const chartData = [];
         for (let i = 6; i >= 0; i--) {
-            const date = new Date(now);
-            date.setDate(date.getDate() - i);
-            date.setHours(0, 0, 0, 0);
-
-            const nextDate = new Date(date);
-            nextDate.setDate(date.getDate() + 1);
+            const dayBrazil = nowBrazil.subtract(i, 'day');
+            const startOfDayBrazil = dayBrazil.startOf('day').toDate();
+            const endOfDayBrazil = dayBrazil.endOf('day').toDate();
 
             const dailySales = await this.prisma.ticket.aggregate({
                 _sum: { amount: true },
                 where: {
                     createdAt: {
-                        gte: date,
-                        lt: nextDate
+                        gte: startOfDayBrazil,
+                        lte: endOfDayBrazil
                     },
                     status: { not: 'CANCELLED' },
                     ...(areaFilter.areaId ? { user: { areaId: areaFilter.areaId } } : {}),
@@ -376,7 +369,7 @@ export class ReportsService {
             });
 
             chartData.push({
-                date: date.toISOString(),
+                date: startOfDayBrazil.toISOString(),
                 amount: Number(dailySales._sum.amount || 0)
             });
         }
@@ -441,7 +434,7 @@ export class ReportsService {
         for (let i = 0; i < 24; i++) hourlyMap.set(i, 0);
 
         todaysTickets.forEach(t => {
-            const hour = new Date(t.createdAt).getHours();
+            const hour = toBrazilTime(t.createdAt).hour();
             hourlyMap.set(hour, (hourlyMap.get(hour) || 0) + Number(t.amount));
         });
 
@@ -763,7 +756,7 @@ export class ReportsService {
 
         if (startDate || endDate) {
             const gte = startDate ? startDate : new Date(0);
-            const lte = endDate ? endDate : new Date();
+            const lte = endDate ? endDate : getBrazilNow();
             where.createdAt = { gte, lte };
         }
 
@@ -783,8 +776,7 @@ export class ReportsService {
     }
 
     async getActiveUsers(days: number = 30, companyId?: string) {
-        const since = new Date();
-        since.setDate(since.getDate() - days);
+        const since = getBrazilTime().subtract(days, 'day').toDate();
 
         const where: any = { createdAt: { gte: since }, status: { not: 'CANCELLED' } };
         if (companyId) where.companyId = companyId;

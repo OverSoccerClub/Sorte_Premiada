@@ -1,19 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { API_URL } from "@/lib/api"
+import { useEffect, useState } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { Calendar, Ticket, Trophy, Users, Loader2, Plus, Edit, Trash2, Eye, Download, User, MapPin, Hash, DollarSign, Clock } from "lucide-react"
+import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useAlert } from "@/context/alert-context"
-import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Trophy, Trash2, Eye, Plus, User, MapPin, Hash, DollarSign, Clock } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
-import { useActiveCompanyId } from "@/context/use-active-company"
 
 export default function SecondChancePage() {
     const activeCompanyId = useActiveCompanyId()
@@ -33,7 +37,7 @@ export default function SecondChancePage() {
 
     // Form State
     const [selectedGameId, setSelectedGameId] = useState("")
-    const [drawDate, setDrawDate] = useState(new Date().toISOString().split('T')[0])
+    const [drawDate, setDrawDate] = useState(getBrazilToday())
     const [winningNumber, setWinningNumber] = useState("")
     const [prizeAmount, setPrizeAmount] = useState("")
     const [saving, setSaving] = useState(false)

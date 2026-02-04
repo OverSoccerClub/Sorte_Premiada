@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
-import { getBrazilStartOfDay, getBrazilEndOfDay, getBrazilTime, dayjs } from '../utils/date.util';
+import { getBrazilStartOfDay, getBrazilEndOfDay, getBrazilTime, toBrazilTime, dayjs } from '../utils/date.util';
 
 enum DailyCloseStatus {
     PENDING = 'PENDING',
@@ -484,8 +484,7 @@ export class FinanceService {
         const limitHours = user?.accountabilityLimitHours ?? 24; // Default 24h
 
         // Find the specific cutoff time. If the oldest un-closed transaction is OLDER than this, we block.
-        const cutoffTime = new Date();
-        cutoffTime.setHours(cutoffTime.getHours() - limitHours);
+        const cutoffTime = getBrazilTime().subtract(limitHours, 'hour').toDate();
 
         // We need to find the oldest transaction that is NOT part of a verified daily close.
         // Simplified approach: Look for any transaction created before cutoffTime that is PENDING or NOT in a close?
@@ -544,8 +543,7 @@ export class FinanceService {
         if (oldestItemDate) {
             // We have open items. Check if the oldest one is too old.
             if (oldestItemDate < cutoffTime) {
-                const limitDate = new Date(oldestItemDate);
-                limitDate.setHours(limitDate.getHours() + limitHours);
+                const limitDate = toBrazilTime(oldestItemDate).add(limitHours, 'hour').toDate();
 
                 throw new BadRequestException(`Bloqueio por falta de prestação de contas. Suas vendas iniciaram em ${oldestItemDate.toLocaleString('pt-BR')} e o limite de ${limitHours}h expirou em ${limitDate.toLocaleString('pt-BR')}. Feche o caixa imediatamente.`);
             }
@@ -654,8 +652,7 @@ export class FinanceService {
         }
 
         const now = new Date();
-        const limitDate = new Date(oldestOpenTransaction.createdAt);
-        limitDate.setHours(limitDate.getHours() + limitHours);
+        const limitDate = toBrazilTime(oldestOpenTransaction.createdAt).add(limitHours, 'hour').toDate();
 
         const diffMs = limitDate.getTime() - now.getTime();
         const hoursRemaining = diffMs / (1000 * 60 * 60);

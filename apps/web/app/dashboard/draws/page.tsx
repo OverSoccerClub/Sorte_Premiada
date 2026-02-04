@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,6 +16,7 @@ import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, Squ
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
 import { useAlert } from "@/context/alert-context"
 
 export default function DrawsSettingsPage() {
@@ -28,7 +31,7 @@ export default function DrawsSettingsPage() {
 
     // Import Modal State
     const [importModalOpen, setImportModalOpen] = useState(false)
-    const [importDate, setImportDate] = useState(new Date().toISOString().split('T')[0])
+    const [importDate, setImportDate] = useState(getBrazilToday())
     const [importedFixtures, setImportedFixtures] = useState<any[]>([])
     const [loadingFixtures, setLoadingFixtures] = useState(false)
     const [selectedFixtures, setSelectedFixtures] = useState<string[]>([])
@@ -251,7 +254,7 @@ export default function DrawsSettingsPage() {
         setImportModalOpen(true)
         setImportedFixtures([])
         setSelectedFixtures([])
-        setImportDate(new Date().toISOString().split('T')[0])
+        setImportDate(getBrazilToday())
     }
 
     const fetchFixtures = async () => {

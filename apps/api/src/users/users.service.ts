@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FinanceService } from '../finance/finance.service';
 import { User, Prisma } from '@prisma/client';
 import { AuditLogService } from '../audit/audit-log.service';
+import { getBrazilTime, getBrazilNow, getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
 
 @Injectable()
 export class UsersService {
@@ -25,26 +26,26 @@ export class UsersService {
 
     async create(data: Prisma.UserCreateInput): Promise<User> {
         if (data.role === 'COBRADOR') {
-            const now = new Date();
+            const now = getBrazilNow();
             // Generate credentials if not provided (or force them for dynamic behavior)
             // Ideally we force them unless it's a manual override which we support via data
 
             if (!data.username) {
                 data.username = this.generateMatricula();
-                data.usernameExpiresAt = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48h
+                data.usernameExpiresAt = getBrazilTime().add(48, 'hour').toDate(); // 48h
             }
             // Ensure expiry is set if username is set manually?
             // Let's assume if creating a cobrador, we set initial expiry.
             if (!data.usernameExpiresAt) {
-                data.usernameExpiresAt = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+                data.usernameExpiresAt = getBrazilTime().add(48, 'hour').toDate();
             }
 
             if (!data.securityPin) {
                 data.securityPin = this.generatePin();
-                data.securityPinExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h
+                data.securityPinExpiresAt = getBrazilTime().add(24, 'hour').toDate(); // 24h
             }
             if (!data.securityPinExpiresAt) {
-                data.securityPinExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                data.securityPinExpiresAt = getBrazilTime().add(24, 'hour').toDate();
             }
         }
 
@@ -83,7 +84,7 @@ export class UsersService {
         });
 
         // Check for expiry and rotate if needed (only for COBRADORES)
-        const now = new Date();
+        const now = getBrazilNow();
         const results = users.map(async (user: User) => {
             let userToReturn = { ...user } as any;
 
@@ -94,14 +95,14 @@ export class UsersService {
                 // Check Username (Matricula) Expiry (48h)
                 if (!user.usernameExpiresAt || user.usernameExpiresAt < now) {
                     updateData.username = this.generateMatricula();
-                    updateData.usernameExpiresAt = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+                    updateData.usernameExpiresAt = getBrazilTime().add(48, 'hour').toDate();
                     needsUpdate = true;
                 }
 
                 // Check PIN Expiry (24h)
                 if (!user.securityPinExpiresAt || user.securityPinExpiresAt < now) {
                     updateData.securityPin = this.generatePin();
-                    updateData.securityPinExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                    updateData.securityPinExpiresAt = getBrazilTime().add(24, 'hour').toDate();
                     needsUpdate = true;
                 }
 
@@ -120,10 +121,8 @@ export class UsersService {
                 userToReturn.accountability = await this.financeService.getAccountabilityInfo(user.id);
 
                 // Add current day cashier status
-                const startOfDay = new Date();
-                startOfDay.setHours(0, 0, 0, 0);
-                const endOfDay = new Date();
-                endOfDay.setHours(23, 59, 59, 999);
+                const startOfDay = getBrazilStartOfDay();
+                const endOfDay = getBrazilEndOfDay();
 
                 const dailyClose = await this.prisma.client.dailyClose.findFirst({
                     where: {

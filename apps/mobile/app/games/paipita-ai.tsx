@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import * as Device from 'expo-device';
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
+import { formatBrazilDate, getBrazilNowDate } from "../../lib/date-utils";
 import { useAuth } from "../../context/AuthContext";
 import { useLoading } from "../../context/LoadingContext";
 import { usePrinter } from "../../context/PrinterContext";
@@ -219,7 +220,7 @@ export default function GamePaipitaScreen() {
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
-                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
+                date: formatBrazilDate(ticketData.createdAt, { dateStyle: 'short', timeStyle: 'medium' }),
                 drawDate: ticketData.drawDate,
                 ticketNumber: ticketData.ticketNumber,
                 terminalId: ticketData.deviceName || "Terminal",
@@ -392,7 +393,7 @@ export default function GamePaipitaScreen() {
                                             selection: mapSelectionToText(selections[m.matchOrder] || '-')
                                         })),
                                         price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                        date: new Date().toLocaleString('pt-BR'),
+                                        date: formatBrazilDate(getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
                                         ticketId: "PREVIEW",
                                         companyName: settings.companyName,
                                         companyLogoUrl: settings.logoUrl

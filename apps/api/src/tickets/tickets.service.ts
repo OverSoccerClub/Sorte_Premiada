@@ -5,7 +5,7 @@ import { SecurityService } from '../security/security.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { RedisService } from '../redis/redis.service';
 import { Prisma } from '@prisma/client';
-import { getBrazilTime, dayjs } from '../utils/date.util';
+import { getBrazilTime, getBrazilNow, toBrazilTime, dayjs } from '../utils/date.util';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -467,24 +467,23 @@ export class TicketsService {
                 });
 
                 if (drawRecord && drawRecord.matches && drawRecord.matches.length > 0) {
-                    const sortedMatches = drawRecord.matches.sort((a: any, b: any) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
-                    const firstMatchDate = new Date(sortedMatches[0].matchDate);
+                    const sortedMatches = drawRecord.matches.sort((a: any, b: any) => toBrazilTime(a.matchDate).valueOf() - toBrazilTime(b.matchDate).valueOf());
+                    const firstMatchDate = toBrazilTime(sortedMatches[0].matchDate);
 
-                    // Convert to Brazil timezone (UTC-3)
-                    const nowBrazil = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-                    const firstMatchBrazil = new Date(firstMatchDate.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+                    // Use Brazil timezone for validation
+                    const nowBrazil = getBrazilTime();
 
                     console.log(`[PAIPITA_AI] Validação de horário (Horário do Brasil):`, {
                         nowBrazil: nowBrazil.toISOString(),
-                        nowBrazilLocal: nowBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
-                        firstMatchBrazil: firstMatchBrazil.toISOString(),
-                        firstMatchBrazilLocal: firstMatchBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
-                        diff: firstMatchBrazil.getTime() - nowBrazil.getTime(),
-                        diffMinutes: (firstMatchBrazil.getTime() - nowBrazil.getTime()) / 1000 / 60
+                        nowBrazilLocal: nowBrazil.format('DD/MM/YYYY HH:mm:ss'),
+                        firstMatchBrazil: firstMatchDate.toISOString(),
+                        firstMatchBrazilLocal: firstMatchDate.format('DD/MM/YYYY HH:mm:ss'),
+                        diff: firstMatchDate.diff(nowBrazil, 'millisecond'),
+                        diffMinutes: firstMatchDate.diff(nowBrazil, 'minute')
                     });
 
-                    if (nowBrazil >= firstMatchBrazil) {
-                        throw new BadRequestException(`As apostas encerraram. Primeira partida iniciou em ${firstMatchBrazil.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}.`);
+                    if (nowBrazil.isAfter(firstMatchDate) || nowBrazil.isSame(firstMatchDate)) {
+                        throw new BadRequestException(`As apostas encerraram. Primeira partida iniciou em ${firstMatchDate.format('DD/MM/YYYY HH:mm:ss')}.`);
                     }
                 } else {
                     console.warn(`[PAIPITA_AI] Nenhum jogo encontrado para o concurso ${drawDate}. Permitindo aposta.`);
@@ -586,7 +585,7 @@ export class TicketsService {
 
             // Anti-Fraud: Late Bet Check
             if (createData.drawDate) {
-                const now = new Date();
+                const now = getBrazilNow();
                 const lateCheck = await this.securityService.checkLateBet(
                     createData.hash, // Use the short hash as ref
                     createData.drawDate,
@@ -1045,7 +1044,7 @@ export class TicketsService {
             where: {
                 status: 'PENDING',
                 drawDate: {
-                    lt: new Date()
+                    lt: getBrazilNow()
                 }
             },
             data: {
@@ -1073,8 +1072,8 @@ export class TicketsService {
 
             if (filters.startDate || filters.endDate) {
                 where.createdAt = {};
-                if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
-                if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
+                if (filters.startDate) where.createdAt.gte = toBrazilTime(filters.startDate).toDate();
+                if (filters.endDate) where.createdAt.lte = toBrazilTime(filters.endDate).toDate();
             }
         }
         return this.prisma.client.ticket.findMany({
@@ -1139,8 +1138,8 @@ export class TicketsService {
         }
 
         // Check if draw has happened
-        const now = new Date();
-        const drawDate = ticket.drawDate ? new Date(ticket.drawDate) : new Date();
+        const now = getBrazilNow();
+        const drawDate = ticket.drawDate ? toBrazilTime(ticket.drawDate).toDate() : getBrazilNow();
         const isPastDraw = now > drawDate;
 
         let status = 'PENDING';

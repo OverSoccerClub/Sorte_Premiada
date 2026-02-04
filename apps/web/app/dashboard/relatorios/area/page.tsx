@@ -2,14 +2,17 @@
 
 import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { useAlert } from "@/context/alert-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, MapPin, Search, ChevronDown, ChevronRight, BarChart, Users, DollarSign, Filter, Calendar } from "lucide-react"
+import { MapPin, TrendingUp, DollarSign, Users, Loader2, Calendar, Search, ChevronDown, ChevronRight, BarChart, Filter } from "lucide-react"
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
 
 interface CambistaStats {
     id: string
@@ -33,8 +36,8 @@ export default function AreaReportPage() {
     const activeCompanyId = useActiveCompanyId()
     const [areas, setAreas] = useState<AreaStats[]>([])
     const [loading, setLoading] = useState(false)
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(getBrazilToday())
+    const [endDate, setEndDate] = useState(getBrazilToday())
     const { showAlert } = useAlert()
     const [expandedAreaId, setExpandedAreaId] = useState<string | null>(null)
 

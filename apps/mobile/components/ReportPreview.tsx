@@ -3,6 +3,7 @@ import { View, Text, Image } from "react-native";
 import tw from "../lib/tailwind";
 import { Ionicons } from "@expo/vector-icons";
 import { FinanceSummary } from "../services/finance.service";
+import { formatBrazilDate, getBrazilNowDate } from "../lib/date-utils";
 
 interface ReportPreviewProps {
     data: FinanceSummary;
@@ -13,7 +14,7 @@ interface ReportPreviewProps {
 }
 
 export function ReportPreview({ data, date, isCapture = false, companyName = "Sorte Premiada", companyLogoUrl }: ReportPreviewProps) {
-    const formatDate = (date: Date) => date.toLocaleString('pt-BR');
+    const formatDate = (date: Date) => formatBrazilDate(date, { dateStyle: 'short', timeStyle: 'medium' });
     const formatCurrency = (val: number | string) => {
         const num = typeof val === 'string' ? parseFloat(val) : val;
         return `R$ ${num.toFixed(2).replace('.', ',')}`;
@@ -104,7 +105,7 @@ export function ReportPreview({ data, date, isCapture = false, companyName = "So
             {/* Footer */}
             <View style={tw`items-center mt-4 mb-4`}>
                 <Text style={tw`text-[10px] text-black text-center uppercase`}>
-                    Relatório gerado em {new Date().toLocaleTimeString()}
+                    Relatório gerado em {formatBrazilDate(getBrazilNowDate(), { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </Text>
                 <Text style={tw`text-[10px] text-black text-center font-bold mt-1`}>
                     Boa Sorte!

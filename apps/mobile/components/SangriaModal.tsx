@@ -11,6 +11,7 @@ import { SangriaReceipt } from './SangriaReceipt';
 import tw from '../lib/tailwind';
 import { useCompany } from '../context/CompanyContext';
 import { CustomAlert, AlertType } from './CustomAlert';
+import { formatBrazilDate, getBrazilNowDate } from '../lib/date-utils';
 
 interface Cobrador {
     id: string;
@@ -168,7 +169,7 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
             if (result.success) {
                 // Set Data for ViewShot to render
                 const rData = {
-                    date: new Date().toLocaleString('pt-BR'),
+                    date: formatBrazilDate(new Date(), { dateStyle: 'short', timeStyle: 'medium' }),
                     amount: `R$ ${val.toFixed(2).replace('.', ',')}`,
                     cambistaName: user?.name || user?.username || "Cambista",
                     cobradorName: selectedCobrador?.name || selectedCobrador?.username || "Cobrador",
@@ -186,13 +187,13 @@ export function SangriaModal({ visible, onClose, onSuccess }: SangriaModalProps)
                     }
 
                     await printSangriaReceipt({
-                        date: new Date(),
+                        date: getBrazilNowDate(),
                         amount: val,
                         cambistaName: rData.cambistaName,
                         cobradorName: rData.cobradorName,
                         transactionId: rData.id,
                         companyName: settings.companyName,
-                        companyLogoUrl: settings.companyLogoUrl
+                        companyLogoUrl: settings.logoUrl
                     }, printerType, imageUri);
 
                     showAlert("Sucesso", "Sangria realizada e registrada!", "success", () => {

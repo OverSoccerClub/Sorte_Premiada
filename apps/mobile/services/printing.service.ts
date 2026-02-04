@@ -11,8 +11,10 @@ const formatCurrency = (value: string | number) => {
   return `R$ ${num.toFixed(2).replace('.', ',')}`;
 };
 
-const formatDate = (date: Date) => {
-  return date.toLocaleString('pt-BR');
+import { formatBrazilDate } from '../lib/date-utils';
+
+const formatDate = (date: Date | string) => {
+  return formatBrazilDate(date, { dateStyle: 'short', timeStyle: 'medium' });
 };
 
 const formatDrawDate = (dateStr: string | undefined) => {
@@ -154,7 +156,7 @@ export const printTicket = async (
 
     // Format numbers
     const numbersStr = numbers
-      .sort((a, b) => a - b)
+      .sort((a, b) => Number(a) - Number(b))
       .map(n => n.toString().padStart(padLength, '0'))
       .join('  ');
 
@@ -334,7 +336,7 @@ export const printTicket = async (
     const sorteioInfo = `EXTRAÇÃO: ${formatDrawDate(data.drawDate || dateStr)}${areaStr}`;
     receipt += sorteioInfo + "\n\n";
 
-    const sortedNumbers = numbers.sort((a, b) => a - b);
+    const sortedNumbers = numbers.sort((a, b) => Number(a) - Number(b));
     const formattedNumbers = sortedNumbers.map(n => n.toString().padStart(padLength, '0'));
 
     for (let i = 0; i < formattedNumbers.length; i += 2) {
@@ -408,7 +410,7 @@ export const formatDailyReport = (
     companyLogoUrl?: string;
   }
 ) => {
-  const formatDate = (date: Date) => date.toLocaleString('pt-BR');
+  const formatDate = (date: Date | string) => formatBrazilDate(date, { dateStyle: 'short', timeStyle: 'medium' });
   const formatCurrency = (val: number) => `R$ ${Number(val).toFixed(2).replace('.', ',')}`;
 
   const dateStr = formatDate(new Date(data.date));
@@ -508,7 +510,7 @@ export const printDailyReport = async (
             <br/>
             <h1>${data.companyName || 'SORTE PREMIADA'}</h1>
             <h3>RELATÓRIO DIÁRIO</h3>
-            <div class="center">${data.date.toLocaleString('pt-BR')}</div>
+            <div class="center">${formatBrazilDate(data.date, { dateStyle: 'short', timeStyle: 'medium' })}</div>
             <div class="dashed"></div>
             
             <div class="flex item"><span>VENDAS:</span> <span>${Number(data.totalSales).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>
@@ -619,7 +621,7 @@ export const printSangriaReceipt = async (
   printerType: PrinterType = 'BLE',
   imageUri?: string
 ) => {
-  const formatDate = (date: Date) => date.toLocaleString('pt-BR');
+  const formatDate = (date: Date | string) => formatBrazilDate(date, { dateStyle: 'short', timeStyle: 'medium' });
   const formatCurrency = (val: number) => `R$ ${Number(val).toFixed(2).replace('.', ',')}`;
 
   const dateStr = formatDate(new Date(data.date));

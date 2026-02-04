@@ -2,10 +2,13 @@
 
 import { API_URL } from "@/lib/api"
 import { useEffect, useState, useMemo } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { AlertTriangle, TrendingDown, TrendingUp, BarChart3, Filter, Calendar, Activity, ShieldAlert, BadgeInfo } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAlert } from "@/context/alert-context"
+import { getBrazilToday } from '@/lib/date-utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -29,7 +32,7 @@ export default function RiskPage() {
     const activeCompanyId = useActiveCompanyId()
     const [games, setGames] = useState<Game[]>([])
     const [selectedGame, setSelectedGame] = useState<string>("")
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+    const [selectedDate, setSelectedDate] = useState<string>(getBrazilToday())
     const [report, setReport] = useState<LiabilityItem[]>([])
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)

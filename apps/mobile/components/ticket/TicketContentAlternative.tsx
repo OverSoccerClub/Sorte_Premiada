@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { Barcode } from '../Barcode';
 import { TicketData } from './TicketContent';
+import { formatBrazilDate } from '../../lib/date-utils';
 
 interface TicketContentAlternativeProps {
     data: TicketData;
@@ -55,31 +56,7 @@ export const TicketContentAlternative: React.FC<TicketContentAlternativeProps> =
     };
 
     const formatDrawDateHeader = () => {
-        if (!data.drawDate) return "";
-
-        try {
-            // Handle both string and Date object
-            const dateInput = typeof data.drawDate === 'string' ? new Date(data.drawDate) : data.drawDate;
-            const date = typeof dateInput === 'object' ? dateInput : new Date(dateInput);
-
-            // Check if date is valid
-            if (isNaN(date.getTime())) {
-                return "";
-            }
-
-            // Enforce Brazil Time (UTC-3)
-            const brazilTime = new Date(date.getTime() - 3 * 60 * 60 * 1000);
-
-            const day = brazilTime.getUTCDate().toString().padStart(2, '0');
-            const month = (brazilTime.getUTCMonth() + 1).toString().padStart(2, '0');
-            const year = brazilTime.getUTCFullYear();
-            const hours = brazilTime.getUTCHours().toString().padStart(2, '0');
-            const minutes = brazilTime.getUTCMinutes().toString().padStart(2, '0');
-            return `${day}/${month}/${year} - ${hours}:${minutes}`;
-        } catch (error) {
-            console.error('Error formatting draw date:', error);
-            return "";
-        }
+        return formatBrazilDate(data.drawDate, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' - ');
     };
 
     // Format second chance date

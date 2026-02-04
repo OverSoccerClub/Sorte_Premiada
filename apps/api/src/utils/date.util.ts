@@ -61,4 +61,12 @@ export function getBrazilEndOfDay(date?: Date | string): Date {
     return d.endOf('day').toDate();
 }
 
+/**
+ * Helper to get current date/time as a native Date object in Brazil timezone
+ * This is a convenience function equivalent to getBrazilTime().toDate()
+ */
+export function getBrazilNow(): Date {
+    return getBrazilTime().toDate();
+}
+
 export { dayjs };

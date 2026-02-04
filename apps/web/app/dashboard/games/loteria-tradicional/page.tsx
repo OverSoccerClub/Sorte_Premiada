@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,15 +10,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAlert } from "@/context/alert-context"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Search, Filter, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, Tag, LayoutDashboard } from "lucide-react"
+import { Loader2, Calendar, Search, Filter, Ticket, Clock, User, Hash, Banknote, CheckCircle, AlertCircle, PlayCircle, Tag, LayoutDashboard, Trophy, Users, Plus, Edit, Trash2, Eye, Download } from "lucide-react"
+import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
 
 export default function LoteriaTradicionalReportPage() {
     const { showAlert } = useAlert()
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [gameId, setGameId] = useState<string | null>(null)
-    const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState<string>(getBrazilToday())
+    const [endDate, setEndDate] = useState<string>(getBrazilToday())
     const [cambistas, setCambistas] = useState<any[]>([])
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
     const [totals, setTotals] = useState({ count: 0, amount: 0 })

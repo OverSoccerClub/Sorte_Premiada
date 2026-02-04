@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import * as Device from 'expo-device';
 import { Ionicons } from "@expo/vector-icons";
 import tw from "../../lib/tailwind";
+import { formatBrazilDate, getBrazilNowDate, isBrazilToday, getBrazilToday } from "../../lib/date-utils";
 import { useAuth } from "../../context/AuthContext";
 import { useLoading } from "../../context/LoadingContext";
 import { usePrinter } from "../../context/PrinterContext";
@@ -133,7 +134,7 @@ export default function Game2x1000Screen() {
                     });
                     if (drawsRes.ok) {
                         const draws = await drawsRes.json();
-                        const nextDraw = draws.find((d: any) => new Date(d.drawDate) > new Date());
+                        const nextDraw = draws.find((d: any) => d.drawDate > getBrazilToday()); // Simplified comparison for ISO strings or use date utils if needed
                         if (nextDraw && nextDraw.series) {
                             setDrawSeries(nextDraw.series);
                         }
@@ -432,7 +433,7 @@ export default function Game2x1000Screen() {
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
-                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
+                date: formatBrazilDate(ticketData.createdAt, { dateStyle: 'short', timeStyle: 'medium' }),
                 drawDate: ticketData.drawDate, // Pass raw string for component to format
                 series: ticketData.series,
                 ticketNumber: ticketData.ticketNumber,
@@ -449,7 +450,7 @@ export default function Game2x1000Screen() {
                     // Ideally fetch from game config if 2x1000 has dynamic config loaded. 
                     // 2x1000 usually has hardcoded rules or fetched via game settings.
                     // Assuming standard behavior:
-                    const now = new Date();
+                    const now = getBrazilNowDate();
                     const [hours, minutes] = timeStr.split(':').map(Number);
                     const result = new Date(now);
                     result.setHours(hours, minutes, 0, 0);
@@ -761,7 +762,7 @@ export default function Game2x1000Screen() {
                                         numbers: selectedNumbers.map(String),
                                         price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                                         series: drawSeries?.toString(),
-                                        date: new Date().toLocaleString('pt-BR'),
+                                        date: formatBrazilDate(getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
                                         ticketId: "PREVIEW",
                                         prizes: gamePrizes || undefined,
                                         companyName: settings.companyName,

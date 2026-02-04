@@ -6,6 +6,7 @@ import tw from "../../lib/tailwind";
 import { useAuth } from "../../context/AuthContext";
 import { useCompany } from "../../context/CompanyContext"; // Added
 import { useSettings } from "../../context/SettingsContext"; // Added
+import { formatBrazilDate } from "../../lib/date-utils";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CustomAlert, AlertType } from "../../components/CustomAlert";
 import { TicketsService, Ticket } from "../../services/tickets.service";
@@ -157,7 +158,7 @@ export default function HistoryScreen() {
                         </View>
                         <View>
                             <Text style={tw`text-white font-bold text-base`}>{gameDisplayName}</Text>
-                            <Text style={tw`text-gray-500 text-xs`}>{item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}</Text>
+                            <Text style={tw`text-gray-500 text-xs`}>{item.createdAt ? formatBrazilDate(item.createdAt, { dateStyle: 'short', timeStyle: 'medium' }) : "-"}</Text>
                         </View>
                     </View>
                     <View style={tw`px-3 py-1 rounded-full border ${getStatusColor(item.status).split(' ').slice(1).join(' ')}`}>
@@ -397,12 +398,12 @@ export default function HistoryScreen() {
                     price: `R$ ${Number(selectedTicket.amount).toFixed(2).replace('.', ',')}`,
                     ticketId: selectedTicket.id,
                     hash: selectedTicket.hash,
-                    date: new Date(selectedTicket.createdAt).toLocaleString(),
+                    date: formatBrazilDate(selectedTicket.createdAt, { dateStyle: 'short', timeStyle: 'medium' }),
                     drawDate: selectedTicket.drawDate, // Pass raw string for component to format
                     series: selectedTicket.series?.toString(),
                     possiblePrize: selectedTicket.possiblePrize ? `R$ ${Number(selectedTicket.possiblePrize).toFixed(2).replace('.', ',')}` : undefined,
                     secondChanceNumber: selectedTicket.secondChanceNumber,
-                    secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? new Date(selectedTicket.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                    secondChanceDrawDate: selectedTicket.secondChanceDrawDate ? formatBrazilDate(selectedTicket.secondChanceDrawDate, { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                     secondChanceLabel: selectedTicket.game?.secondChanceLabel || "SEGUNDA CHANCE",
                     secondChanceStatus: selectedTicket.secondChanceStatus,
                     status: selectedTicket.status,

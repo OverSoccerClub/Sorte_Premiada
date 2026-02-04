@@ -4,7 +4,11 @@ import { API_URL } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Search, FileText, Download, Filter, ArrowUpCircle, ArrowDownCircle, Wallet, Calendar, AlertCircle, ClipboardCheck, DollarSign, CheckCircle, Clock, Printer } from "lucide-react"
+import { Calendar, CheckCircle2, XCircle, Clock, Loader2, User, DollarSign, TrendingUp, TrendingDown, Wallet, ClipboardCheck, Filter, AlertCircle, Printer, ArrowUpCircle, ArrowDownCircle, FileText, Download } from "lucide-react"
+
+import { useAlert } from "@/context/alert-context"
+import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -13,8 +17,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useAlert } from "@/context/alert-context"
-import { useActiveCompanyId } from "@/context/use-active-company"
 
 interface Transaction {
     id: string
@@ -45,7 +47,7 @@ export default function CashConferencePage() {
 
     // Filters
     const [selectedCambista, setSelectedCambista] = useState<string>("")
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+    const [date, setDate] = useState(getBrazilToday())
 
     useEffect(() => {
         fetchCambistas()
@@ -293,7 +295,7 @@ export default function CashConferencePage() {
                             )}
                             {summary.status === 'VERIFIED' && (
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 gap-1.5">
-                                    <CheckCircle className="w-4 h-4" />
+                                    <CheckCircle2 className="w-4 h-4" />
                                     FECHADO / CONFERIDO E LIBERADO
                                 </span>
                             )}
@@ -313,7 +315,7 @@ export default function CashConferencePage() {
                                     onClick={handleCloseCashier}
                                     className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-900/20 flex-1 md:flex-none"
                                 >
-                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    <CheckCircle2 className="mr-2 h-4 w-4" />
                                     {summary.status === 'PENDING' ? 'Conferir e Liberar Caixa' : 'Fechar Caixa e Liberar'}
                                 </Button>
                             )}

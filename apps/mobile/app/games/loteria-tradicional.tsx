@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Device from "expo-device";
 import tw from "../../lib/tailwind";
+import { formatBrazilDate, getBrazilNowDate } from "../../lib/date-utils";
 import { useAuth } from "../../context/AuthContext";
 import { useLoading } from "../../context/LoadingContext";
 import { usePrinter } from "../../context/PrinterContext";
@@ -258,8 +259,8 @@ export default function LoteriaTradicionalScreen() {
                 status: ticketData.status,
                 secondChanceNumber: ticketData.secondChanceNumber,
                 secondChanceLabel: gameConfig?.secondChanceLabel || ticketData.secondChanceLabel,
-                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                date: formatBrazilDate(ticketData.createdAt, { dateStyle: 'short', timeStyle: 'medium' }),
+                drawDate: ticketData.drawDate ? formatBrazilDate(ticketData.drawDate, { dateStyle: 'short', timeStyle: 'medium' }) : undefined,
                 prizes: gameConfig ? {
                     milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
                     centena: gameConfig.prizeCentena ? `R$ ${Number(gameConfig.prizeCentena).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
@@ -464,7 +465,7 @@ export default function LoteriaTradicionalScreen() {
                                     gameName: `LT - ${modality}`,
                                     numbers: selectedNumbers.map(String),
                                     price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                    date: new Date().toLocaleString('pt-BR'),
+                                    date: formatBrazilDate(getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
                                     ticketId: "PREVIEW",
                                     prizes: gameConfig ? {
                                         milhar: gameConfig.prizeMilhar ? `R$ ${Number(gameConfig.prizeMilhar).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,

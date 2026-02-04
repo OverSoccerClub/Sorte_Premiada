@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Download, CalendarCheck, Search, Filter, Eye, ArrowUpCircle, ArrowDownCircle, CheckCircle2, Clock, AlertTriangle, Printer, Calendar } from "lucide-react"
 import { useActiveCompanyId } from "@/context/use-active-company"
+import { getBrazilToday } from '@/lib/date-utils'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -24,8 +25,8 @@ export default function DailyClosesPage() {
     const [loading, setLoading] = useState(false)
 
     // Filters
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(getBrazilToday())
+    const [endDate, setEndDate] = useState(getBrazilToday())
     const [selectedCambista, setSelectedCambista] = useState<string>("all")
     const [selectedStatus, setSelectedStatus] = useState<string>("all")
 

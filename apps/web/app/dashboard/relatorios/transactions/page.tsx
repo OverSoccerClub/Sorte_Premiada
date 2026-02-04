@@ -15,6 +15,7 @@ import { ptBR } from "date-fns/locale"
 import { useAlert } from "@/context/alert-context"
 import { useActiveCompanyId } from "@/context/use-active-company"
 import { StandardPageHeader } from "@/components/standard-page-header"
+import { getBrazilToday, dateStringToStartOfDay, dateStringToEndOfDay } from '@/lib/date-utils'
 
 export default function TransactionsDetailedPage() {
     const activeCompanyId = useActiveCompanyId()
@@ -27,8 +28,8 @@ export default function TransactionsDetailedPage() {
     const [selectedUser, setSelectedUser] = useState("all")
     const [selectedCategory, setSelectedCategory] = useState("all")
     const [selectedType, setSelectedType] = useState("all")
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(getBrazilToday())
+    const [endDate, setEndDate] = useState(getBrazilToday())
 
     const fetchUsers = async () => {
         try {
@@ -53,8 +54,8 @@ export default function TransactionsDetailedPage() {
         try {
             const token = localStorage.getItem("token")
             const queryParams = new URLSearchParams({
-                startDate: new Date(startDate + 'T00:00:00').toISOString(),
-                endDate: new Date(endDate + 'T23:59:59').toISOString(),
+                startDate: dateStringToStartOfDay(startDate),
+                endDate: dateStringToEndOfDay(endDate),
             })
 
             if (selectedUser !== "all") queryParams.append('userId', selectedUser)

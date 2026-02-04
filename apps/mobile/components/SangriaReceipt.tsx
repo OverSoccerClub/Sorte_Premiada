@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import tw from "../lib/tailwind";
 import { Ionicons } from "@expo/vector-icons";
+import { formatBrazilDate, getBrazilNowDate } from "../lib/date-utils";
 
 interface SangriaReceiptProps {
     amount: string;
@@ -19,7 +20,7 @@ export function SangriaReceipt({
     amount,
     cambistaName,
     cobradorName,
-    date = new Date().toLocaleString(),
+    date = formatBrazilDate(/* @ts-ignore */ getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
     id = "TEST-ID",
     copyName,
     signerLabel,

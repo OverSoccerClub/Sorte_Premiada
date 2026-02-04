@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Device from "expo-device";
 import tw from "../../lib/tailwind";
+import { formatBrazilDate, getBrazilNowDate } from "../../lib/date-utils";
 import { useAuth } from "../../context/AuthContext";
 import { useLoading } from "../../context/LoadingContext";
 import { usePrinter } from "../../context/PrinterContext";
@@ -265,11 +266,11 @@ export default function MegaSenaScreen() {
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
                 hash: ticketData.hash,
-                date: new Date(ticketData.createdAt).toLocaleString('pt-BR'),
-                drawDate: ticketData.drawDate ? new Date(ticketData.drawDate).toLocaleString('pt-BR') : undefined,
+                date: formatBrazilDate(ticketData.createdAt, { dateStyle: 'short', timeStyle: 'medium' }),
+                drawDate: ticketData.drawDate ? formatBrazilDate(ticketData.drawDate, { dateStyle: 'short', timeStyle: 'medium' }) : undefined,
                 series: ticketData.series,
                 secondChanceNumber: ticketData.secondChanceNumber,
-                secondChanceDrawDate: ticketData.secondChanceDrawDate ? new Date(ticketData.secondChanceDrawDate).toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
+                secondChanceDrawDate: ticketData.secondChanceDrawDate ? formatBrazilDate(ticketData.secondChanceDrawDate, { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : undefined,
                 secondChanceLabel: "SEGUNDA CHANCE",
                 status: ticketData.status,
                 companyName: settings.companyName,
@@ -427,7 +428,7 @@ export default function MegaSenaScreen() {
                                             gameName: "Mega Sena",
                                             numbers: selectedNumbers.map(String),
                                             price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
-                                            date: new Date().toLocaleString('pt-BR'),
+                                            date: formatBrazilDate(getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
                                             ticketId: "PREVIEW",
                                             companyName: settings.companyName,
                                             companyLogoUrl: settings.logoUrl,

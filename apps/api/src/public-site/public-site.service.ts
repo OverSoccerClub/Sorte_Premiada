@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { toBrazilTime } from '../utils/date.util';
+import { toBrazilTime, getBrazilNow } from '../utils/date.util';
 
 @Injectable()
 export class PublicSiteService {
@@ -17,7 +17,7 @@ export class PublicSiteService {
             where: {
                 companyId,
                 drawDate: {
-                    lte: new Date() // Apenas sorteios passados
+                    lte: getBrazilNow() // Apenas sorteios passados
                 },
                 numbers: {
                     isEmpty: false // Apenas sorteios com números sorteados
@@ -64,7 +64,7 @@ export class PublicSiteService {
             where: {
                 companyId,
                 drawDate: {
-                    gt: new Date() // Apenas sorteios futuros
+                    gt: getBrazilNow() // Apenas sorteios futuros
                 }
             },
             include: {

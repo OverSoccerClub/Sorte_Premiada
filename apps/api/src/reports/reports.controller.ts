@@ -1,6 +1,7 @@
 import { Controller, Get, UseGuards, Query, Res, Request } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { toBrazilTime, getBrazilNow } from '../utils/date.util';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@repo/database';
@@ -32,8 +33,8 @@ export class ReportsController {
     ) {
         const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         return this.reportsService.getSalesByDate(
-            new Date(startDate),
-            new Date(endDate),
+            toBrazilTime(startDate).toDate(),
+            toBrazilTime(endDate).toDate(),
             companyId,
             cambistaId,
             gameId,
@@ -80,7 +81,7 @@ export class ReportsController {
     ) {
         const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
         // Finance summary is specific to a user, so we check that user's validity or assume current context
-        return this.reportsService.getFinanceSummary(cambistaId, date ? new Date(date) : new Date(), companyId, req.user.userId);
+        return this.reportsService.getFinanceSummary(cambistaId, date ? toBrazilTime(date).toDate() : getBrazilNow(), companyId, req.user.userId);
     }
 
     @Get('daily-closes')
@@ -93,7 +94,7 @@ export class ReportsController {
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
         const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
-        return this.reportsService.getDailyCloses(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, status, req.user.userId, companyId);
+        return this.reportsService.getDailyCloses(startDate ? toBrazilTime(startDate).toDate() : undefined, endDate ? toBrazilTime(endDate).toDate() : undefined, userId, status, req.user.userId, companyId);
     }
 
     @Get('pending-closes')
@@ -112,7 +113,7 @@ export class ReportsController {
         @Query('targetCompanyId') targetCompanyId?: string,
     ) {
         const companyId = (req.user.role === 'MASTER' && targetCompanyId) ? targetCompanyId : req.user.companyId;
-        const csv = await this.reportsService.exportTransactionsCsv(startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, userId, req.user.userId, companyId);
+        const csv = await this.reportsService.exportTransactionsCsv(startDate ? toBrazilTime(startDate).toDate() : undefined, endDate ? toBrazilTime(endDate).toDate() : undefined, userId, req.user.userId, companyId);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="transactions_${Date.now()}.csv"`);
         res.send(csv);

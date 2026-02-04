@@ -2,7 +2,7 @@
     "expo": {
         "name": "InnoBet",
         "slug": "innobet",
-        "version": "1.5.26",
+        "version": "1.5.27",
         "runtimeVersion": {
             "policy": "appVersion"
         },
