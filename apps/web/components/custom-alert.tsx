@@ -82,7 +82,7 @@ export function CustomAlert({
     }
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 font-sans">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 font-sans">
             {/* Backdrop with blur */}
             <div
                 className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${animate ? 'opacity-100' : 'opacity-0'}`}
@@ -122,6 +122,7 @@ export function CustomAlert({
                 <div className="w-full flex gap-3">
                     {showCancel && (
                         <button
+                            type="button"
                             onClick={onClose}
                             className="
                                 flex-1 py-3.5 rounded-xl border border-white/10 
@@ -134,6 +135,7 @@ export function CustomAlert({
                         </button>
                     )}
                     <button
+                        type="button"
                         onClick={handleConfirm}
                         className={`
                             flex-1 py-3.5 rounded-xl 
