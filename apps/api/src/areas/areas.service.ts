@@ -26,7 +26,10 @@ export class AreasService {
             where,
             include: {
                 _count: {
-                    select: { users: true },
+                    select: {
+                        users: true,
+                        neighborhoods: true
+                    },
                 },
                 company: true,
             },

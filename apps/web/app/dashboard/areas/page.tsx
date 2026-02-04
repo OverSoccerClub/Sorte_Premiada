@@ -42,6 +42,7 @@ interface Area {
     }
     _count?: {
         users: number
+        neighborhoods?: number
     }
 }
 
@@ -744,6 +745,7 @@ export default function AreasPage() {
                                         <TableHead>Área</TableHead>
                                         <TableHead>Série Atual</TableHead>
                                         <TableHead>Cambistas</TableHead>
+                                        <TableHead>Bairros</TableHead>
                                         <TableHead className="text-right">Ações</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -793,6 +795,16 @@ export default function AreasPage() {
                                                         {area._count?.users || 0} Vinculados
                                                     </span>
                                                 </TableCell>
+                                                <TableCell>
+                                                    <div
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200 cursor-pointer hover:bg-indigo-200 transition-colors"
+                                                        onClick={() => handleOpenNeighborhoods(area)}
+                                                        title="Gerenciar Bairros"
+                                                    >
+                                                        <Map className="w-3.5 h-3.5" />
+                                                        {area._count?.neighborhoods || 0} Bairros
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Button
@@ -804,15 +816,6 @@ export default function AreasPage() {
                                                         >
                                                             <RefreshCw className="h-4 w-4" />
                                                             <span className="sr-only">Girar Série</span>
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 px-2 text-indigo-600 border-indigo-500/30 hover:bg-indigo-50"
-                                                            onClick={() => handleOpenNeighborhoods(area)}
-                                                        >
-                                                            <Map className="w-4 h-4 mr-1.5" />
-                                                            Bairros
                                                         </Button>
                                                         <Button
                                                             variant="outline"
