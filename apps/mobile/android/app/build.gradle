@@ -92,8 +92,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 242
-        versionName "1.5.26"
-        multiDexEnabled true
+        versionName "1.5.27"
     }
     signingConfigs {
         debug {

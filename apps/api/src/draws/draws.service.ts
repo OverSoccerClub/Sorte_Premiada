@@ -63,6 +63,25 @@ export class DrawsService {
                     data: { lastSeries: { increment: 1 } }
                 });
 
+                // ✅ NOVO: Se o sorteio é de uma Praça, incrementar a currentSeries da Praça
+                // Requisito: "o sistema deve incrementar para a serie 0002 apos cada sorteio"
+                if (areaId) {
+                    const area = await tx.area.findUnique({ where: { id: areaId } });
+                    if (area) {
+                        const nextSeries = (parseInt(area.currentSeries) + 1).toString().padStart(4, '0');
+                        await tx.area.update({
+                            where: { id: areaId },
+                            data: {
+                                currentSeries: nextSeries,
+                                ticketsInSeries: 0 // Reseta o contador de bilhetes vendidos dessa nova série?
+                                // Se a série é "Lote de Vendas", faz sentido zerar.
+                                // Se o requisito diz "Apos cada sorteio", entende-se que a série velha fechou.
+                            }
+                        });
+                        console.log(`[DrawsService] Area ${areaId} series rotated to ${nextSeries}`);
+                    }
+                }
+
                 const createdDraw = await tx.draw.create({
                     data: {
                         ...data,

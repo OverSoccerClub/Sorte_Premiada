@@ -30,6 +30,8 @@ const formSchema = z.object({
     }),
     canResetActivation: z.boolean().default(false),
     isActive: z.boolean().default(true),
+    areaId: z.string().optional(),
+    neighborhoodId: z.string().optional(),
 })
 
 export default function UsersPage() {
@@ -43,6 +45,40 @@ export default function UsersPage() {
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState<number | "all">(10)
     const { showAlert } = useAlert()
+    const [areas, setAreas] = useState<any[]>([])
+    const [neighborhoods, setNeighborhoods] = useState<any[]>([])
+
+    const fetchAreas = async () => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/areas${activeCompanyId ? `?targetCompanyId=${activeCompanyId}` : ''}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                setAreas(await res.json())
+            }
+        } catch (e) {
+            console.error("Failed to fetch areas")
+        }
+    }
+
+    const fetchNeighborhoods = async (areaId: string) => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/neighborhoods?areaId=${areaId}${activeCompanyId ? `&targetCompanyId=${activeCompanyId}` : ''}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                setNeighborhoods(await res.json())
+            }
+        } catch (e) {
+            console.error("Failed to fetch neighborhoods")
+        }
+    }
+
+    useEffect(() => {
+        fetchAreas()
+    }, [activeCompanyId])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -54,8 +90,20 @@ export default function UsersPage() {
             role: "SUPERVISOR",
             canResetActivation: false,
             isActive: true,
+            areaId: "",
+            neighborhoodId: "",
         },
     })
+
+    // Watch areaId to fetch neighborhoods
+    const selectedAreaId = form.watch("areaId")
+    useEffect(() => {
+        if (selectedAreaId) {
+            fetchNeighborhoods(selectedAreaId)
+        } else {
+            setNeighborhoods([])
+        }
+    }, [selectedAreaId])
 
     const fetchUsers = async () => {
         try {
@@ -101,7 +149,13 @@ export default function UsersPage() {
                 role: user.role,
                 canResetActivation: user.canResetActivation ?? false,
                 isActive: user.isActive ?? true,
+                areaId: user.areaId || "",
+                neighborhoodId: user.neighborhoodId || "",
             })
+            // Fetch neighborhoods immediately for edit
+            if (user.areaId) {
+                fetchNeighborhoods(user.areaId)
+            }
         } else {
             setEditingId(null)
             form.reset({
@@ -112,6 +166,8 @@ export default function UsersPage() {
                 role: "SUPERVISOR",
                 canResetActivation: false,
                 isActive: true,
+                areaId: "",
+                neighborhoodId: "",
             })
         }
         setIsDialogOpen(true)
@@ -375,6 +431,59 @@ export default function UsersPage() {
                                                                     Master (Global)
                                                                 </SelectItem>
                                                             )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="areaId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Praça (Opcional)</FormLabel>
+                                                    <Select onValueChange={(val) => {
+                                                        field.onChange(val)
+                                                        form.setValue("neighborhoodId", "") // Reset neighborhood on area change
+                                                    }} value={field.value || ""}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                <SelectValue placeholder="Selecione a praça" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {areas.map((area) => (
+                                                                <SelectItem key={area.id} value={area.id}>
+                                                                    {area.name} ({area.city})
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="neighborhoodId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-foreground">Bairro (Opcional)</FormLabel>
+                                                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedAreaId}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                <SelectValue placeholder="Selecione o bairro" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {neighborhoods.map((n) => (
+                                                                <SelectItem key={n.id} value={n.id}>
+                                                                    {n.name}
+                                                                </SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />

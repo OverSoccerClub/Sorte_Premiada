@@ -30,6 +30,7 @@ import { PublicSiteModule } from './public-site/public-site.module';
 
 
 import { BugsModule } from './bugs/bugs.module';
+import { NeighborhoodsModule } from './neighborhoods/neighborhoods.module';
 import { APP_GUARD } from '@nestjs/core';
 import { LicenseGuard } from './licensing/license.guard';
 
@@ -65,6 +66,7 @@ import { LicenseGuard } from './licensing/license.guard';
     LicensingModule, // Sistema de licenciamento
     BugsModule, // Sistema de rastreamento de bugs
     PublicSiteModule, // Endpoints públicos para o site de marketing
+    NeighborhoodsModule,
   ],
   controllers: [AppController],
   providers: [

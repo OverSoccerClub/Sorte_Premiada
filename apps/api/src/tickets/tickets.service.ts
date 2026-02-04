@@ -181,7 +181,7 @@ export class TicketsService {
 
         // Determine Draw Date Logic (Shared)
         try {
-            drawDate = await this.getNextDrawDate(gameId);
+            drawDate = await this.getNextDrawDate(gameId, user?.areaId);
         } catch (e) {
             console.warn(`[TicketsService] Could not calculate next draw date: ${e} `);
         }
@@ -498,7 +498,7 @@ export class TicketsService {
 
 
         if (!drawDate) {
-            try { drawDate = await this.getNextDrawDate(gameId); } catch { }
+            try { drawDate = await this.getNextDrawDate(gameId, user?.areaId); } catch { }
         }
 
         // Fetch Device Name from POS Terminal (if deviceId/token provided)
@@ -689,15 +689,30 @@ export class TicketsService {
         return result;
     }
 
-    private async getNextDrawDate(gameId: string): Promise<Date> {
+    private async getNextDrawDate(gameId: string, areaId?: string | null): Promise<Date> {
         const game = await this.prisma.client.game.findUnique({
             where: { id: gameId },
             select: { extractionTimes: true }
         });
 
-        const extractionTimes = game?.extractionTimes && game.extractionTimes.length > 0
-            ? game.extractionTimes
-            : ['12:00', '19:00']; // default fallback
+        let extractionTimes = game?.extractionTimes || [];
+
+        // Check if Area has custom extraction times override
+        if (areaId) {
+            const areaConfig = await this.prisma.client.areaConfig.findUnique({
+                where: { areaId_gameId: { areaId, gameId } },
+                select: { extractionTimes: true }
+            });
+
+            if (areaConfig && areaConfig.extractionTimes && areaConfig.extractionTimes.length > 0) {
+                extractionTimes = areaConfig.extractionTimes;
+                console.log(`[TicketsService] Using Area ${areaId} extraction times: ${extractionTimes.join(', ')}`);
+            }
+        }
+
+        if (!extractionTimes || extractionTimes.length === 0) {
+            extractionTimes = ['12:00', '19:00']; // default fallback
+        }
 
         // Helper: Create Brazil-based date from "HH:MM", handling day boundaries
         const createBrazilDrawDate = (timeStr: string, baseBrazilDate: dayjs.Dayjs) => {

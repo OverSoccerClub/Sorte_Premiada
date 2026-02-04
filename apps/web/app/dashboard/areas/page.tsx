@@ -58,6 +58,7 @@ interface AreaConfig {
     commissionRate?: string | number
     prizeMultiplier?: string | number
     maxLiability?: string | number
+    extractionTimes?: string[]
 }
 
 export default function AreasPage() {
@@ -170,12 +171,12 @@ export default function AreasPage() {
         }
     }
 
-    const handleUpdateConfig = (gameId: string, field: string, value: string) => {
+    const handleUpdateConfig = (gameId: string, field: string, value: string | string[]) => {
         setAreaConfigs(prev => ({
             ...prev,
             [gameId]: {
                 ...(prev[gameId] || { gameId }),
-                [field]: value === "" ? undefined : value
+                [field]: (value === "" || (Array.isArray(value) && value.length === 0)) ? undefined : value
             }
         }))
     }
@@ -299,6 +300,77 @@ export default function AreasPage() {
             "Sim, Girar Série",
             "Cancelar"
         )
+    }
+
+    // Neighborhoods Logic
+    const [isNeighborhoodsOpen, setIsNeighborhoodsOpen] = useState(false)
+    const [currentNeighborhoods, setCurrentNeighborhoods] = useState<any[]>([])
+    const [newNeighborhoodName, setNewNeighborhoodName] = useState("")
+
+    const handleOpenNeighborhoods = async (area: Area) => {
+        setSelectedArea(area)
+        setIsNeighborhoodsOpen(true)
+        fetchNeighborhoods(area.id)
+    }
+
+    const fetchNeighborhoods = async (areaId: string) => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/neighborhoods?areaId=${areaId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setCurrentNeighborhoods(data)
+            }
+        } catch (error) {
+            console.error("Failed to fetch neighborhoods")
+        }
+    }
+
+    const handleAddNeighborhood = async () => {
+        if (!newNeighborhoodName.trim() || !selectedArea) return
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/neighborhoods`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: newNeighborhoodName,
+                    areaId: selectedArea.id
+                })
+            })
+
+            if (res.ok) {
+                setNewNeighborhoodName("")
+                fetchNeighborhoods(selectedArea.id)
+                showAlert("Sucesso", "Bairro adicionado.", "success")
+            } else {
+                const err = await res.json()
+                showAlert("Erro", err.message || "Erro ao adicionar bairro.", "error")
+            }
+        } catch (e) {
+            showAlert("Erro", "Erro de conexão.", "error")
+        }
+    }
+
+    const handleDeleteNeighborhood = async (id: string) => {
+        if (!selectedArea) return
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/neighborhoods/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                fetchNeighborhoods(selectedArea.id)
+            }
+        } catch (e) {
+            showAlert("Erro", "Erro ao remover bairro.", "error")
+        }
     }
 
     return (
@@ -568,6 +640,27 @@ export default function AreasPage() {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="px-3 pb-3 border-t border-border/30 pt-2">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                                                Horários de Sorteio <span className="text-[9px] text-muted-foreground font-normal normal-case">(Ex: 12:00, 19:00)</span>
+                                            </label>
+                                            <Input
+                                                placeholder="Use global ou insira: 10:00, 14:00..."
+                                                value={Array.isArray(areaConfigs[game.id]?.extractionTimes) ? (areaConfigs[game.id]?.extractionTimes as string[]).join(", ") : ""}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    // Convert string to array by splitting comma
+                                                    const times = val.split(',').map(t => t.trim()).filter(t => t);
+                                                    // Pass as string array or undefined if empty to revert to global? 
+                                                    // Actually UI needs to handle string display, logic handles array.
+                                                    // But handleUpdateConfig expects string usually? No, let's cast.
+                                                    handleUpdateConfig(game.id, "extractionTimes", times as any);
+                                                }}
+                                                className="h-8 text-sm focus-visible:ring-emerald-500/30"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -582,6 +675,56 @@ export default function AreasPage() {
                             Salvar Regras
                         </Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal de Bairros */}
+            <Dialog open={isNeighborhoodsOpen} onOpenChange={setIsNeighborhoodsOpen}>
+                <DialogContent className="sm:max-w-[500px] bg-popover border-border">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-foreground">
+                            <Map className="w-5 h-5 text-indigo-500" />
+                            Gestão de Bairros
+                        </DialogTitle>
+                        <DialogDescription>
+                            Gerencie os bairros da praça <strong>{selectedArea?.name}</strong>.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="flex gap-2">
+                            <Input
+                                placeholder="Nome do Bairro"
+                                value={newNeighborhoodName}
+                                onChange={(e) => setNewNeighborhoodName(e.target.value)}
+                                className="bg-muted/50 text-sm"
+                            />
+                            <Button onClick={handleAddNeighborhood} size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                                <Plus className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        <div className="border border-border rounded-md max-h-[300px] overflow-y-auto">
+                            {currentNeighborhoods.length === 0 ? (
+                                <div className="p-4 text-center text-sm text-muted-foreground">Nenhum bairro cadastrado.</div>
+                            ) : (
+                                <Table>
+                                    <TableBody>
+                                        {currentNeighborhoods.map((n: any) => (
+                                            <TableRow key={n.id}>
+                                                <TableCell className="py-2 font-medium text-sm">{n.name}</TableCell>
+                                                <TableCell className="py-2 text-right">
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700" onClick={() => handleDeleteNeighborhood(n.id)}>
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
 
@@ -665,6 +808,15 @@ export default function AreasPage() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
+                                                            className="h-8 px-2 text-indigo-600 border-indigo-500/30 hover:bg-indigo-50"
+                                                            onClick={() => handleOpenNeighborhoods(area)}
+                                                        >
+                                                            <Map className="w-4 h-4 mr-1.5" />
+                                                            Bairros
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
                                                             className="h-8 px-2 text-emerald-600 border-emerald-500/30 hover:bg-emerald-50"
                                                             onClick={() => handleOpenConfig(area)}
                                                         >
@@ -719,6 +871,6 @@ export default function AreasPage() {
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </div >
     )
 }
