@@ -740,6 +740,7 @@ export default function DrawsSettingsPage() {
                             <TableHeader>
                                 <TableRow className="hover:bg-muted/50 bg-muted/20 border-b border-border/60">
                                     <TableHead className="pl-6">Série</TableHead>
+                                    <TableHead>Praça</TableHead>
                                     <TableHead>Data / Hora</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Números Sorteados</TableHead>
@@ -754,7 +755,7 @@ export default function DrawsSettingsPage() {
 
                                     if (loading) return (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="h-24 text-center">
+                                            <TableCell colSpan={6} className="h-24 text-center">
                                                 <Loader2 className="h-6 w-6 animate-spin mx-auto text-emerald-500" />
                                             </TableCell>
                                         </TableRow>
@@ -762,7 +763,7 @@ export default function DrawsSettingsPage() {
 
                                     if (totalItems === 0) return (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                            <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                                                 Nenhum sorteio encontrado. Agende um novo sorteio.
                                             </TableCell>
                                         </TableRow>
@@ -777,13 +778,17 @@ export default function DrawsSettingsPage() {
                                                             <Badge variant="outline" className="font-mono bg-background w-fit">
                                                                 #{draw.series?.toString().padStart(4, '0') || '---'}
                                                             </Badge>
-                                                            {draw.area && (
-                                                                <div className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-sm w-fit">
-                                                                    <MapPin className="w-3 h-3 text-emerald-500" />
-                                                                    {draw.area.name}
-                                                                </div>
-                                                            )}
                                                         </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {draw.area ? (
+                                                            <div className="flex items-center gap-1 text-sm text-foreground">
+                                                                <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                                                                {draw.area.name}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-xs">-</span>
+                                                        )}
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex flex-col">

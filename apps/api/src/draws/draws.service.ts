@@ -296,6 +296,7 @@ export class DrawsService {
             where: { companyId },
             include: {
                 game: true,
+                area: true,
                 matches: { orderBy: { matchOrder: 'asc' } }
             },
             orderBy: { drawDate: 'desc' }
@@ -311,6 +312,7 @@ export class DrawsService {
             where,
             orderBy: { drawDate: 'desc' },
             include: {
+                area: true,
                 matches: { orderBy: { matchOrder: 'asc' } }
             }
         });

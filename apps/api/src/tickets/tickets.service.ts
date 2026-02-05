@@ -1146,7 +1146,8 @@ export class TicketsService {
                 game: true,
                 area: true // Added to show area name in history
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            take: 100
         });
     }
 
