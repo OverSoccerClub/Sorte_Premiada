@@ -99,11 +99,21 @@ async function fetchResults() {
     }
 
     const data = await response.json();
-    resultsData = data;
-    displayResults(data);
+
+    // Check if data has changed to avoid blinking
+    const newDataJson = JSON.stringify(data);
+    const currentDataJson = JSON.stringify(resultsData);
+
+    if (newDataJson !== currentDataJson) {
+      resultsData = data;
+      displayResults(data);
+    }
   } catch (error) {
     console.error('Erro ao buscar resultados:', error);
-    showError('resultsGrid', 'Não foi possível carregar os resultados. Verifique se a API está rodando.');
+    // Silent fail on auto-refresh to avoid interrupting user experience if it was working
+    if (resultsData.length === 0) {
+      showError('resultsTrack', 'Não foi possível carregar os resultados.');
+    }
   }
 }
 
