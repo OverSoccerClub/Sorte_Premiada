@@ -42,6 +42,8 @@ export default function DrawsSettingsPage() {
     const [loadingDetails, setLoadingDetails] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [detailLimit, setDetailLimit] = useState<number | "all">(10) // Changed to 10 for better perf
+    const [mainPage, setMainPage] = useState(1)
+    const [mainLimit, setMainLimit] = useState<number | "all">(10)
 
     // Details Modal Filters
     const [filterHash, setFilterHash] = useState("")
@@ -366,9 +368,9 @@ export default function DrawsSettingsPage() {
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge className={`text-[10px] ${t.status === 'WON' ? 'bg-yellow-500 hover:bg-yellow-600' :
-                                                                    t.status === 'LOST' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' :
-                                                                        t.status === 'CANCELLED' ? 'bg-red-100 text-red-600 hover:bg-red-200' :
-                                                                            'bg-emerald-500 hover:bg-emerald-600'
+                                                                t.status === 'LOST' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' :
+                                                                    t.status === 'CANCELLED' ? 'bg-red-100 text-red-600 hover:bg-red-200' :
+                                                                        'bg-emerald-500 hover:bg-emerald-600'
                                                                 }`}>
                                                                 {t.status === 'WON' ? 'PREMIADO' :
                                                                     t.status === 'LOST' ? 'NÃO PREMIADO' :
