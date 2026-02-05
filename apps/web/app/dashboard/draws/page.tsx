@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { API_URL } from "@/lib/api"
-import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag, Ticket, Download, Search } from "lucide-react"
+import { Loader2, Calendar, Trophy, Trash2, Clock, CheckCircle, AlertCircle, SquarePen, Eye, ChevronLeft, ChevronRight, Plus, Filter, Tag, Ticket, Download, Search, MapPin } from "lucide-react"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
@@ -25,6 +25,7 @@ export default function DrawsSettingsPage() {
     const [games, setGames] = useState<any[]>([])
     const [selectedGameId, setSelectedGameId] = useState<string>("")
     const [draws, setDraws] = useState<any[]>([])
+    const [areas, setAreas] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [selectedDraw, setSelectedDraw] = useState<any | null>(null)
@@ -411,10 +412,12 @@ export default function DrawsSettingsPage() {
     const [drawDescription, setDrawDescription] = useState("")
     const [winningNumbers, setWinningNumbers] = useState("")
     const [matches, setMatches] = useState<any[]>([])
+    const [selectedAreaId, setSelectedAreaId] = useState<string>("global") // "global" means null (no area)
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         fetchGames()
+        fetchAreas()
     }, [activeCompanyId])
 
     useEffect(() => {
@@ -443,6 +446,22 @@ export default function DrawsSettingsPage() {
                 }
             }
         } catch (e) { showAlert("Erro", "Erro ao carregar jogos", "error") }
+    }
+
+    const fetchAreas = async () => {
+        try {
+            const token = localStorage.getItem("token")
+            const queryParams = new URLSearchParams()
+            if (activeCompanyId) queryParams.append('targetCompanyId', activeCompanyId)
+
+            const res = await fetch(`${API_URL}/areas?${queryParams.toString()}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setAreas(data)
+            }
+        } catch (e) { console.error("Error fetching areas", e) }
     }
 
     const fetchDraws = async (gameId: string) => {
@@ -475,6 +494,7 @@ export default function DrawsSettingsPage() {
             setDrawTime(date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
             setDrawDescription(draw.description || "")
             setWinningNumbers(draw.numbers ? draw.numbers.join(', ') : "")
+            setSelectedAreaId(draw.areaId || "global")
 
             // Palpita: Load matches
             if (isPaipita && draw.matches && draw.matches.length > 0) {
@@ -498,6 +518,7 @@ export default function DrawsSettingsPage() {
             setDrawTime("19:00")
             setDrawDescription("")
             setWinningNumbers("")
+            setSelectedAreaId("global")
 
             if (isPaipita) {
                 setMatches(Array.from({ length: 14 }, (_, i) => ({
@@ -525,7 +546,8 @@ export default function DrawsSettingsPage() {
                 gameId: selectedGameId,
                 drawDate: fullDate.toISOString(),
                 description: drawDescription || null,
-                numbers: winningNumbers ? winningNumbers.split(',').map(n => n.trim()) : []
+                numbers: winningNumbers ? winningNumbers.split(',').map(n => n.trim()) : [],
+                areaId: selectedAreaId === "global" ? null : selectedAreaId
             }
 
             if (game?.type === 'PAIPITA_AI') {
@@ -749,9 +771,17 @@ export default function DrawsSettingsPage() {
                                             {paginatedDraws.map(draw => (
                                                 <TableRow key={draw.id} className="hover:bg-muted/50 transition-colors">
                                                     <TableCell className="pl-6">
-                                                        <Badge variant="outline" className="font-mono bg-background">
-                                                            #{draw.series?.toString().padStart(4, '0') || '---'}
-                                                        </Badge>
+                                                        <div className="flex flex-col gap-1">
+                                                            <Badge variant="outline" className="font-mono bg-background w-fit">
+                                                                #{draw.series?.toString().padStart(4, '0') || '---'}
+                                                            </Badge>
+                                                            {draw.area && (
+                                                                <div className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-sm w-fit">
+                                                                    <MapPin className="w-3 h-3 text-emerald-500" />
+                                                                    {draw.area.name}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex flex-col">
@@ -760,7 +790,7 @@ export default function DrawsSettingsPage() {
                                                                 {new Date(draw.drawDate).toLocaleString('pt-BR')}
                                                             </div>
                                                             {draw.description && (
-                                                                <span className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold ml-5.5">{draw.description}</span>
+                                                                <span className="text-[10px] text-muted-foreground uppercase tracking-wide font-bold ml-5.5 text-emerald-600">{draw.description}</span>
                                                             )}
                                                         </div>
                                                     </TableCell>

@@ -196,7 +196,9 @@ export class TicketsService {
                     const duplicate = await this.prisma.client.ticket.findFirst({
                         where: {
                             gameId: game.id,
-                            areaId: user.areaId,
+                            user: {
+                                areaId: user.areaId
+                            },
                             series: currentSeriesInt,
                             drawDate: drawDate,
                             numbers: { has: num.toString() },
