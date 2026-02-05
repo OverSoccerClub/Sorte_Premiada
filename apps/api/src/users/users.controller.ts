@@ -172,7 +172,7 @@ export class UsersController {
     @Patch(':id')
     @UseGuards(RolesGuard)
     @Roles('ADMIN', 'MASTER')
-    async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput, @Request() req: any) {
+    async update(@Param('id') id: string, @Body() updateUserDto: any, @Request() req: any) {
         // Buscar usuário para validar companyId
         const user = await this.usersService.findById(id);
 
@@ -185,10 +185,26 @@ export class UsersController {
             throw new ForbiddenException('Acesso negado a este usuário');
         }
 
+        // Extrair areaId e campos que não devem ir no restDto
+        const { areaId, companyId: _cid, company: _c, ...restDto } = updateUserDto;
+
+        // Limpeza extra
+        delete (restDto as any).companyId;
+        delete (restDto as any).company;
+        delete (restDto as any).areaId;
+
+        const data: Prisma.UserUpdateInput = { ...restDto };
+
         if (updateUserDto.password && typeof updateUserDto.password === 'string') {
-            updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+            data.password = await bcrypt.hash(updateUserDto.password, 10);
         }
-        return this.usersService.update(id, updateUserDto, req.user.userId);
+
+        // Se tiver areaId, conectar à área (ou trocar)
+        if (areaId) {
+            data.area = { connect: { id: areaId } };
+        }
+
+        return this.usersService.update(id, data, req.user.userId);
     }
 
     @Delete(':id')

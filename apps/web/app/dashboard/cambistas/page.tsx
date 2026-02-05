@@ -41,6 +41,7 @@ const formSchema = z.object({
     zipCode: z.string().optional(),
     phone: z.string().optional(),
     neighborhood: z.string().optional(),
+    addressNeighborhood: z.string().optional(),
     number: z.string().optional(),
     complement: z.string().optional(),
     cpf: z.string().optional(),
@@ -238,7 +239,7 @@ export default function CambistasPage() {
                 state: cambista.state || "",
                 zipCode: cambista.zipCode || "",
                 phone: cambista.phone || "",
-                neighborhood: cambista.neighborhood || "",
+                addressNeighborhood: cambista.addressNeighborhood || "",
                 number: cambista.number || "",
                 complement: cambista.complement || "",
                 cpf: cambista.cpf || "",
@@ -266,7 +267,7 @@ export default function CambistasPage() {
                 state: "",
                 zipCode: "",
                 phone: "",
-                neighborhood: "",
+                addressNeighborhood: "",
                 number: "",
                 complement: "",
                 cpf: "",
@@ -695,7 +696,7 @@ export default function CambistasPage() {
                                             <div className="md:col-span-5">
                                                 <FormField
                                                     control={form.control}
-                                                    name="neighborhood"
+                                                    name="addressNeighborhood"
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="text-foreground">Bairro</FormLabel>
