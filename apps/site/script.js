@@ -87,7 +87,12 @@ async function fetchResults() {
   // showLoading('resultsTrack'); // Optional: show loading in track if desired, but might jump. 
   // Given we have a carousel, maybe just let it load? 
   // Original had loading. Let's keep it but target the track.
-  showLoading('resultsTrack');
+  // showLoading('resultsTrack'); // DISABLED TO PREVENT BLINKING ON REFRESH
+  // Only show loading on initial load if track is empty?
+  const track = document.getElementById('resultsTrack');
+  if (track && track.children.length === 0) {
+    showLoading('resultsTrack');
+  }
 
   try {
     const response = await fetch(

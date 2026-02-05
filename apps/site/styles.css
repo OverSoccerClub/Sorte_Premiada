@@ -828,10 +828,10 @@ p {
 }
 
 .carousel-track {
-  display: flex;
-  flex-direction: row;
+  display: flex !important;
+  flex-direction: row !important;
   /* Explicitly set row */
-  flex-wrap: nowrap;
+  flex-wrap: nowrap !important;
   /* Explicitly prevent wrapping */
   transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   gap: var(--spacing-lg);
