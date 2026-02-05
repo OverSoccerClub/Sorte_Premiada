@@ -1,7 +1,6 @@
 ﻿{
     "apkUrl": "InnoBet.apk",
-    "build": 245,
-    "version": "1.5.30",
-    "force": true,
-    "notes": "Fix API_URL scope error and Prisma areaId validation"
+    "build": "246",
+    "version": "1.5.31",
+    "force": true
 }

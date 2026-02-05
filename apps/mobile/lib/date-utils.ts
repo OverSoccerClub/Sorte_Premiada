@@ -84,6 +84,9 @@ export const getBrazilStartOfDay = (date?: Date | string): Date => {
     }).format(dateObj);
 
     // Retorna meia-noite nesse dia no fuso BRT (-03:00)
+    // Se passarmos apenas a data YYYY-MM-DD, o construtor Date(string) em alguns ambientes
+    // assume UTC, o que no Brasil (-3) resulta nas 21:00 do dia anterior.
+    // Explicitamos o fuso -03:00 para garantir consistência.
     return new Date(`${brazilDateStr}T00:00:00.000-03:00`);
 };
 

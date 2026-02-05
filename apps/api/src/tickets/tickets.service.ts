@@ -1131,18 +1131,21 @@ export class TicketsService {
         const where: Prisma.TicketWhereInput = { userId, companyId };
 
         if (filters) {
-            if (filters.status) where.status = filters.status as any;
-            if (filters.gameType) where.gameType = filters.gameType;
+            if (filters.status && filters.status !== 'ALL') where.status = filters.status as any;
+            if (filters.gameType && filters.gameType !== 'ALL') where.gameType = filters.gameType;
             if (filters.startDate || filters.endDate) {
                 where.createdAt = {};
-                if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
-                if (filters.endDate) where.createdAt.lte = new Date(filters.endDate);
+                if (filters.startDate) where.createdAt.gte = toBrazilTime(filters.startDate).toDate();
+                if (filters.endDate) where.createdAt.lte = toBrazilTime(filters.endDate).toDate();
             }
         }
 
         return this.prisma.client.ticket.findMany({
             where,
-            include: { game: true },
+            include: {
+                game: true,
+                area: true // Added to show area name in history
+            },
             orderBy: { createdAt: 'desc' }
         });
     }

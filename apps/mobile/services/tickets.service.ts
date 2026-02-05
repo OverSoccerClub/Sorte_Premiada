@@ -68,25 +68,12 @@ export const TicketsService = {
             }
 
             if (filters?.startDate) {
-                // Ensure we respect the user's selected CALENDAR date (local) translated to Brazil Midnight
-                const d = new Date(filters.startDate);
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const dateStr = `${year}-${month}-${day}`;
-
-                const start = getBrazilStartOfDay(dateStr);
+                const start = getBrazilStartOfDay(filters.startDate);
                 url += `startDate=${start.toISOString()}&`;
             }
 
             if (filters?.endDate) {
-                const d = new Date(filters.endDate);
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const dateStr = `${year}-${month}-${day}`;
-
-                const end = getBrazilEndOfDay(dateStr);
+                const end = getBrazilEndOfDay(filters.endDate);
                 url += `endDate=${end.toISOString()}&`;
             }
 
