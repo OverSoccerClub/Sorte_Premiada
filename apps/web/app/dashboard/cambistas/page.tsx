@@ -44,6 +44,7 @@ const formSchema = z.object({
     number: z.string().optional(),
     complement: z.string().optional(),
     cpf: z.string().optional(),
+    commissionGoalType: z.enum(["CURRENCY", "TICKET_COUNT"]).default("CURRENCY"),
 })
 
 interface Area {
@@ -241,6 +242,7 @@ export default function CambistasPage() {
                 number: cambista.number || "",
                 complement: cambista.complement || "",
                 cpf: cambista.cpf || "",
+                commissionGoalType: cambista.commissionGoalType || "CURRENCY",
             })
         } else {
             setEditingId(null)
@@ -268,6 +270,7 @@ export default function CambistasPage() {
                 number: "",
                 complement: "",
                 cpf: "",
+                commissionGoalType: "CURRENCY",
             })
         }
         setShowPassword(false)
@@ -829,14 +832,42 @@ export default function CambistasPage() {
                                             <div className="md:col-span-3 lg:col-span-2">
                                                 <FormField
                                                     control={form.control}
+                                                    name="commissionGoalType"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground text-xs uppercase font-bold text-muted-foreground">Tipo de Meta</FormLabel>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                <FormControl>
+                                                                    <SelectTrigger className="pl-8 bg-muted/50 border-input h-9 text-xs">
+                                                                        {field.value === 'CURRENCY' ? <DollarSign className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" /> : <FileText className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />}
+                                                                        <SelectValue placeholder="Selecione" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    <SelectItem value="CURRENCY">Valor (R$)</SelectItem>
+                                                                    <SelectItem value="TICKET_COUNT">Qtd. Bilhetes</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div className="md:col-span-3 lg:col-span-2">
+                                                <FormField
+                                                    control={form.control}
                                                     name="minSalesThreshold"
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="text-foreground text-xs uppercase font-bold text-muted-foreground">Meta Mín.</FormLabel>
                                                             <FormControl>
                                                                 <div className="relative">
-                                                                    <DollarSign className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                                                                    <Input type="number" step="0.01" className="pl-8 bg-muted/50 border-input h-9 text-xs" {...field} />
+                                                                    {form.watch("commissionGoalType") === 'TICKET_COUNT' ?
+                                                                        <FileText className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" /> :
+                                                                        <DollarSign className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                                    }
+                                                                    <Input type="number" step={form.watch("commissionGoalType") === 'TICKET_COUNT' ? "1" : "0.01"} className="pl-8 bg-muted/50 border-input h-9 text-xs" {...field} />
                                                                 </div>
                                                             </FormControl>
                                                             <FormMessage />

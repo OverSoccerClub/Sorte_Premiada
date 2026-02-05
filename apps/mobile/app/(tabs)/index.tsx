@@ -23,9 +23,10 @@ export default function Dashboard() {
     const { user, token } = useAuth();
     const [isDayClosed, setIsDayClosed] = useState(false);
     const [salesGoalInfo, setSalesGoalInfo] = useState<{
-        minSalesThreshold: number;
-        totalSales: number;
+        threshold: number;
+        current: number;
         remaining: number;
+        type: 'CURRENCY' | 'TICKET_COUNT';
     } | null>(null);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [dismissedIds, setDismissedIds] = useState<string[]>([]);
@@ -112,13 +113,22 @@ export default function Dashboard() {
                 setIsDayClosed(summary.isClosed);
 
                 // Sales Goal Monitoring
+                const goalType = summary.commissionGoalType || 'CURRENCY';
                 const threshold = summary.minSalesThreshold || 200;
-                const currentSales = summary.totalSales || 0;
-                if (currentSales < threshold) {
+
+                let current = 0;
+                if (goalType === 'TICKET_COUNT') {
+                    current = summary.totalTickets || 0;
+                } else {
+                    current = summary.totalSales || 0;
+                }
+
+                if (current < threshold) {
                     setSalesGoalInfo({
-                        minSalesThreshold: threshold,
-                        totalSales: currentSales,
-                        remaining: threshold - currentSales
+                        threshold: threshold,
+                        current: current,
+                        remaining: threshold - current,
+                        type: goalType
                     });
                 } else {
                     setSalesGoalInfo(null);
@@ -231,7 +241,7 @@ export default function Dashboard() {
                         <View
                             style={[
                                 tw`h-full bg-emerald-500 rounded-full`,
-                                { width: `${Math.min((salesGoalInfo.totalSales / salesGoalInfo.minSalesThreshold) * 100, 100)}%` }
+                                { width: `${Math.min((salesGoalInfo.current / salesGoalInfo.threshold) * 100, 100)}%` }
                             ]}
                         />
                     </View>
@@ -239,15 +249,21 @@ export default function Dashboard() {
                     <View style={tw`flex-row justify-between items-center`}>
                         <View style={tw`items-center`}>
                             <Text style={tw`text-gray-400 text-xs`}>Vendas Atuais</Text>
-                            <Text style={tw`text-white font-bold`}>R$ {salesGoalInfo.totalSales.toFixed(2)}</Text>
+                            <Text style={tw`text-white font-bold`}>
+                                {salesGoalInfo.type === 'CURRENCY' ? `R$ ${salesGoalInfo.current.toFixed(2)}` : `${salesGoalInfo.current} Bilhetes`}
+                            </Text>
                         </View>
                         <View style={tw`items-center px-3`}>
                             <Text style={tw`text-emerald-400 text-xs`}>Faltam</Text>
-                            <Text style={tw`text-emerald-400 font-bold text-lg`}>R$ {salesGoalInfo.remaining.toFixed(2)}</Text>
+                            <Text style={tw`text-emerald-400 font-bold text-lg`}>
+                                {salesGoalInfo.type === 'CURRENCY' ? `R$ ${salesGoalInfo.remaining.toFixed(2)}` : `${salesGoalInfo.remaining} Un`}
+                            </Text>
                         </View>
                         <View style={tw`items-center`}>
                             <Text style={tw`text-gray-400 text-xs`}>Meta</Text>
-                            <Text style={tw`text-white font-bold`}>R$ {salesGoalInfo.minSalesThreshold.toFixed(2)}</Text>
+                            <Text style={tw`text-white font-bold`}>
+                                {salesGoalInfo.type === 'CURRENCY' ? `R$ ${salesGoalInfo.threshold.toFixed(2)}` : `${salesGoalInfo.threshold} Un`}
+                            </Text>
                         </View>
                     </View>
                 </View>

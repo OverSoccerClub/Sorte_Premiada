@@ -42,6 +42,8 @@ export interface FinanceSummary {
     totalCommission: number;
     netBalance: number;
     minSalesThreshold: number;
+    commissionGoalType?: 'CURRENCY' | 'TICKET_COUNT';
+    totalTickets?: number;
 }
 
 export const FinanceService = {

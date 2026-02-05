@@ -157,6 +157,7 @@ model User {
   // New Commission Rules
   minSalesThreshold Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
   fixedCommission   Decimal? @default(40.00) // Ganho fixo se não atingir a meta (R$)
+  commissionGoalType GoalType @default(CURRENCY) // Tipo da meta: valor ou quantidade
 
   // Corporate Maturity
   auditLogs AuditLog[] @relation("UserAuditLogs")
@@ -399,6 +400,11 @@ model AuditLog {
   @@index([createdAt])
   @@index([entity, entityId])
   @@index([companyId])
+}
+
+enum GoalType {
+  CURRENCY
+  TICKET_COUNT
 }
 
 enum Role {

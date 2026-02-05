@@ -102,19 +102,29 @@ export class FinanceService {
                 salesLimit: true,
                 limitOverrideExpiresAt: true,
                 minSalesThreshold: true,
-                fixedCommission: true
+                fixedCommission: true,
+                commissionGoalType: true // Fetch Goal Type
             }
         });
 
         // Apply Commission Logic based on minSalesThreshold
         const minThreshold = user?.minSalesThreshold ? Number(user.minSalesThreshold) : 200;
         const fixedComm = user?.fixedCommission ? Number(user.fixedCommission) : 40;
+        const goalType = user?.commissionGoalType || 'CURRENCY';
 
-        // If sales < threshold: use fixed commission
-        // If sales >= threshold: use percentage-based commission (sum of commissionValue)
-        const totalCommission = totalSales >= minThreshold
-            ? totalCommissionFromTickets  // Percentage-based commission
-            : fixedComm;                  // Fixed commission
+        // Check Eligibility
+        let isEligible = false;
+        if (goalType === 'TICKET_COUNT') {
+            isEligible = tickets.length >= minThreshold;
+        } else {
+            isEligible = totalSales >= minThreshold;
+        }
+
+        // If eligible: use percentage-based commission (sum of commissionValue)
+        // Else: use fixed commission
+        const totalCommission = isEligible
+            ? totalCommissionFromTickets
+            : fixedComm;
 
         // Per user request: Tickets Sales count as Credits
         const totalCredits = manualCredits + totalSales;
@@ -123,10 +133,6 @@ export class FinanceService {
         const finalBalance = totalCredits - totalDebits;
 
         // Net Payable (What the user owes the house)
-        // = Cash in Hand - Commission
-        // (Assuming Prizes Paid are already in totalDebits if paid manually, or if we subtract prizes... 
-        //  If prize paid via app validation flow later, we might deduct here strictly. 
-        //  For now, standard flow: Balance - Commission)
         const netBalance = finalBalance - totalCommission;
 
         // Combine Transactions and Tickets for the list
@@ -151,12 +157,14 @@ export class FinanceService {
             salesLimit: user?.salesLimit ? Number(user.salesLimit) : null,
             limitOverrideExpiresAt: user?.limitOverrideExpiresAt,
             totalSales,
-            totalCommission, // New field in summary
+            totalTickets: tickets.length, // Include Ticket Count
+            totalCommission,
             totalCredits,
             totalDebits,
             finalBalance,
-            netBalance, // New field in summary
-            minSalesThreshold: user?.minSalesThreshold ? Number(user.minSalesThreshold) : 200,
+            netBalance,
+            minSalesThreshold: minThreshold,
+            commissionGoalType: goalType, // Return Goal Type
             transactions: allTransactions,
             tickets: tickets.map(t => ({
                 id: t.id,
