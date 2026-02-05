@@ -10,9 +10,15 @@ export class AreasConfigController {
     constructor(private readonly areasConfigService: AreasConfigService) { }
 
     @Get('area/:areaId')
-    @Roles('ADMIN')
+    @Roles('ADMIN', 'MASTER')
     findByArea(@Param('areaId') areaId: string) {
         return this.areasConfigService.findByArea(areaId);
+    }
+
+    @Get('game/:gameId')
+    @Roles('ADMIN', 'MASTER')
+    findByGame(@Param('gameId') gameId: string) {
+        return this.areasConfigService.findByGame(gameId);
     }
 
     @Post()

@@ -16,12 +16,30 @@ export class AreasConfigService {
         });
     }
 
+    async findByGame(gameId: string) {
+        return this.prisma.areaConfig.findMany({
+            where: { gameId },
+            include: {
+                area: {
+                    select: {
+                        id: true,
+                        name: true,
+                        state: true,
+                        city: true,
+                        currentSeries: true
+                    }
+                }
+            }
+        });
+    }
+
     async upsert(data: {
         areaId: string;
         gameId: string;
         commissionRate?: number;
         prizeMultiplier?: number;
         maxLiability?: number;
+        extractionTimes?: string[];
     }, adminId?: string) {
         const { areaId, gameId, ...overrides } = data;
 
