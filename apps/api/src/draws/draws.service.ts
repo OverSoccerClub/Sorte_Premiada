@@ -191,31 +191,41 @@ export class DrawsService {
             if (!draw.numbers || draw.numbers.length === 0) return;
             const drawNumbers = draw.numbers as string[];
 
+            // Pre-fetch prize values (fallback to defaults if not set)
+            // Assuming fullDraw.game has these fields based on schema check
+            // Fallback values updated to match user config (1000/30/10)
+            const prizeMilhar = Number(fullDraw.game.prizeMilhar || 1000);
+            const prizeCentena = Number(fullDraw.game.prizeCentena || 30);
+            const prizeDezena = Number(fullDraw.game.prizeDezena || 10);
+
             for (const ticket of tickets) {
                 const ticketNumbers = (ticket.numbers as unknown as string[]);
-                let hasMatch = false;
-
-                // Logic: Check if ANY ticket number matches ANY draw number by suffix (4, 3, or 2 digits)
-                // If it matches, it's a WIN.
-                // Note: This simplistic logic assumes 'possiblePrize' covers any win, or is adjusted elsewhere.
-                // Currently we just mark as WON.
+                let bestMatch = 0; // 0=None, 2=Dezena, 3=Centena, 4=Milhar
 
                 check_loop:
                 for (const myNum of ticketNumbers) {
                     for (const winNum of drawNumbers) {
-                        if (
-                            myNum === winNum || // Milhar (Exact)
-                            (myNum.endsWith(winNum.slice(-3)) && winNum.length >= 3) || // Centena
-                            (myNum.endsWith(winNum.slice(-2)) && winNum.length >= 2)    // Dezena
-                        ) {
-                            hasMatch = true;
-                            break check_loop;
+                        if (myNum === winNum) {
+                            bestMatch = 4;
+                            break check_loop; // Stop at highest prize
+                        } else if (myNum.endsWith(winNum.slice(-3)) && winNum.length >= 3) {
+                            bestMatch = Math.max(bestMatch, 3);
+                        } else if (myNum.endsWith(winNum.slice(-2)) && winNum.length >= 2) {
+                            bestMatch = Math.max(bestMatch, 2);
                         }
                     }
                 }
 
-                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', 0, () => {
-                    if (hasMatch) wonCount++; else lostCount++;
+                // Determine Prize Value
+                let wonAmount = 0;
+                if (bestMatch === 4) wonAmount = prizeMilhar;
+                else if (bestMatch === 3) wonAmount = prizeCentena;
+                else if (bestMatch === 2) wonAmount = prizeDezena;
+
+                const isWin = bestMatch > 0;
+
+                await this.updateTicketStatus(tx, ticket, isWin ? 'WON' : 'LOST', wonAmount, () => {
+                    if (isWin) wonCount++; else lostCount++;
                 });
             }
         }
