@@ -1096,7 +1096,8 @@ export class TicketsService {
     }
 
     async findAll(filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string; gameId?: string; companyId?: string }) {
-        await this.updateExpiredTickets();
+        // Run specific update in background (fire-and-forget) to avoid blocking read
+        this.updateExpiredTickets().catch(err => console.error("Background updateExpiredTickets failed", err));
 
         // ✅ CRÍTICO: companyId é OBRIGATÓRIO para isolamento de dados
         if (!filters?.companyId) {
@@ -1126,7 +1127,8 @@ export class TicketsService {
     }
 
     async findByUser(userId: string, companyId: string, filters?: { status?: string; startDate?: string; endDate?: string; gameType?: string }) {
-        await this.updateExpiredTickets();
+        // Run specific update in background (fire-and-forget) to avoid blocking read
+        this.updateExpiredTickets().catch(err => console.error("Background updateExpiredTickets failed", err));
 
         const where: Prisma.TicketWhereInput = { userId, companyId };
 
