@@ -39,6 +39,8 @@ export default function DrawsSettingsPage() {
 
     // Details Modal State
     const [detailModalOpen, setDetailModalOpen] = useState(false)
+    const [ticketModalOpen, setTicketModalOpen] = useState(false) // New State
+    const [selectedTicket, setSelectedTicket] = useState<any>(null) // New State
     const [drawDetails, setDrawDetails] = useState<any>(null)
     const [loadingDetails, setLoadingDetails] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
@@ -1160,7 +1162,16 @@ export default function DrawsSettingsPage() {
                                                 return (
                                                     <>
                                                         {paginatedTickets.map((t: any) => (
-                                                            <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'hover:bg-muted/50'}>
+                                                            <TableRow
+                                                                key={t.id}
+                                                                className={`cursor-pointer ${t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'hover:bg-muted/50'}`}
+                                                                onClick={() => {
+                                                                    if (t.status === 'WON') {
+                                                                        setSelectedTicket(t);
+                                                                        setTicketModalOpen(true);
+                                                                    }
+                                                                }}
+                                                            >
                                                                 <TableCell className="font-mono text-xs pl-4">
                                                                     <div className="font-bold">{t.id.slice(0, 8)}...</div>
                                                                     <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
@@ -1310,6 +1321,48 @@ export default function DrawsSettingsPage() {
                                 Importar {selectedFixtures.length} Jogos
                             </Button>
                         </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={ticketModalOpen} onOpenChange={setTicketModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Ticket className="w-5 h-5 text-emerald-500" />
+                            Detalhes do Bilhete Premiado
+                        </DialogTitle>
+                        <CardDescription>
+                            {selectedTicket?.hash && `Hash: ${selectedTicket.hash}`}
+                        </CardDescription>
+                    </DialogHeader>
+                    {selectedTicket && (
+                        <div className="space-y-4 py-4">
+                            <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-dashed">
+                                <span className="text-sm font-medium text-muted-foreground uppercase mb-1">Números Jogados</span>
+                                <div className="text-2xl font-mono font-bold tracking-widest text-foreground">
+                                    {selectedTicket.numbers.map((n: string) => n.padStart(4, '0')).join(' - ')}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center justify-center">
+                                    <span className="text-xs font-bold text-blue-600 uppercase mb-1">Tipo de Prêmio</span>
+                                    <Badge variant="secondary" className="bg-blue-200 text-blue-800 hover:bg-blue-300">
+                                        {selectedTicket.prizeType || 'Não Calculado'}
+                                    </Badge>
+                                </div>
+                                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg flex flex-col items-center justify-center">
+                                    <span className="text-xs font-bold text-emerald-600 uppercase mb-1">Valor do Prêmio</span>
+                                    <span className="text-lg font-bold text-emerald-700">
+                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(selectedTicket.possiblePrize || 0))}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <Button onClick={() => setTicketModalOpen(false)} className="w-full">Fechar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

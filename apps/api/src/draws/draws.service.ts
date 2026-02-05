@@ -186,14 +186,33 @@ export class DrawsService {
                 });
             }
         }
-        // Existing Logic (2x1000 / JB - Match Any)
+        // Existing Logic (2x1000 / JB - Suffix Match)
         else {
             if (!draw.numbers || draw.numbers.length === 0) return;
-            const drawNumbers = new Set(draw.numbers as string[]);
+            const drawNumbers = draw.numbers as string[];
 
             for (const ticket of tickets) {
                 const ticketNumbers = (ticket.numbers as unknown as string[]);
-                const hasMatch = ticketNumbers.some(n => drawNumbers.has(n));
+                let hasMatch = false;
+
+                // Logic: Check if ANY ticket number matches ANY draw number by suffix (4, 3, or 2 digits)
+                // If it matches, it's a WIN.
+                // Note: This simplistic logic assumes 'possiblePrize' covers any win, or is adjusted elsewhere.
+                // Currently we just mark as WON.
+
+                check_loop:
+                for (const myNum of ticketNumbers) {
+                    for (const winNum of drawNumbers) {
+                        if (
+                            myNum === winNum || // Milhar (Exact)
+                            (myNum.endsWith(winNum.slice(-3)) && winNum.length >= 3) || // Centena
+                            (myNum.endsWith(winNum.slice(-2)) && winNum.length >= 2)    // Dezena
+                        ) {
+                            hasMatch = true;
+                            break check_loop;
+                        }
+                    }
+                }
 
                 await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', () => {
                     if (hasMatch) wonCount++; else lostCount++;
