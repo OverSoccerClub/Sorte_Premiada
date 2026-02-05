@@ -180,8 +180,8 @@ export class DrawsService {
                    Currently relying on ticket.possiblePrize which might be 0 if not set.
                    If Fixed Odds info is added later, it works automatically.
                 */
-
-                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', () => {
+                // Adding 0 as prizeAmount to use existing ticket.possiblePrize or logic
+                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', 0, () => {
                     if (hasMatch) wonCount++; else lostCount++;
                 });
             }
@@ -214,7 +214,7 @@ export class DrawsService {
                     }
                 }
 
-                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', () => {
+                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', 0, () => {
                     if (hasMatch) wonCount++; else lostCount++;
                 });
             }
@@ -223,16 +223,18 @@ export class DrawsService {
         console.log(`[ProcessResults] Draw ${draw.id} (${gameType}) Processed: ${wonCount} Won, ${lostCount} Lost.`);
     }
 
-    private async updateTicketStatus(tx: Prisma.TransactionClient, ticket: any, newStatus: string, callback?: () => void) {
+    private async updateTicketStatus(tx: Prisma.TransactionClient, ticket: any, newStatus: string, prizeAmount: number = 0, callback?: () => void) {
         if (ticket.status !== newStatus) {
             // Credit Logic
             if (newStatus === 'WON' && ticket.status !== 'WON') {
-                const prizeValue = Number(ticket.possiblePrize || 0);
-                if (prizeValue > 0) {
+                // Use calculated prizeAmount instead of ticket.possiblePrize
+                const finalPrize = prizeAmount > 0 ? prizeAmount : Number(ticket.possiblePrize || 0);
+
+                if (finalPrize > 0) {
                     await tx.transaction.create({
                         data: {
                             userId: ticket.userId,
-                            amount: prizeValue,
+                            amount: finalPrize,
                             type: 'CREDIT',
                             description: `Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
                         }
@@ -240,14 +242,16 @@ export class DrawsService {
                 }
             }
 
-            // Debit Logic (Reversal)
+            // Debit Logic (Reversal) - If status changes back from WON to LOST (re-calc)
             if (ticket.status === 'WON' && newStatus === 'LOST') {
-                const prizeValue = Number(ticket.possiblePrize || 0);
-                if (prizeValue > 0) {
+                // Reversal should match what was paid. This is tricky without tracking exact payout id.
+                // Assuming reversal of currently stored prize value.
+                const reversalAmount = Number(ticket.possiblePrize || 0);
+                if (reversalAmount > 0) {
                     await tx.transaction.create({
                         data: {
                             userId: ticket.userId,
-                            amount: prizeValue,
+                            amount: reversalAmount,
                             type: 'DEBIT',
                             description: `Estorno Prêmio Bilhete ${ticket.hash?.substring(0, 8) ?? 'ID'}`
                         }
@@ -257,9 +261,17 @@ export class DrawsService {
 
             if (callback) callback();
 
+            // Update Ticket with Status AND final Prize Amount if Won
             await tx.ticket.update({
                 where: { id: ticket.id },
-                data: { status: newStatus as any }
+                data: {
+                    status: newStatus as any,
+                    possiblePrize: newStatus === 'WON' ? prizeAmount : ticket.possiblePrize
+                    // Update possiblePrize to reflect actual won amount for display/consistency
+                    // If LOST, keep original potential? Or zero? 
+                    // Usually keep original potential for record of "what could have been" or just keep as is.
+                    // But for WON, we overwrite with actual WON amount.
+                }
             });
         }
     }

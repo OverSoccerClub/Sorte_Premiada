@@ -1067,6 +1067,67 @@ export default function DrawsSettingsPage() {
                                     Bilhetes Participantes
                                 </h3>
 
+                                {/* Prize Breakdown Stats */}
+                                {(() => {
+                                    // Calculate Stats on the fly
+                                    const stats = { milhar: 0, centena: 0, dezena: 0 };
+                                    const drawNumbers = (drawDetails.draw.numbers || []) as string[];
+
+                                    const getMatchLevel = (ticketNumbers: string[]) => {
+                                        let bestMatch = 0;
+                                        for (const myNum of ticketNumbers) {
+                                            for (const winNum of drawNumbers) {
+                                                const myStr = String(myNum);
+                                                const winStr = String(winNum);
+                                                if (myStr === winStr) bestMatch = Math.max(bestMatch, 4);
+                                                else if (myStr.endsWith(winStr.slice(-3)) && winStr.length >= 3) bestMatch = Math.max(bestMatch, 3);
+                                                else if (myStr.endsWith(winStr.slice(-2)) && winStr.length >= 2) bestMatch = Math.max(bestMatch, 2);
+                                            }
+                                        }
+                                        return bestMatch;
+                                    };
+
+                                    if (drawDetails.tickets) {
+                                        drawDetails.tickets.forEach((t: any) => {
+                                            if (t.status === 'WON') {
+                                                const level = getMatchLevel(t.numbers);
+                                                if (level === 4) stats.milhar++;
+                                                else if (level === 3) stats.centena++;
+                                                else if (level === 2) stats.dezena++;
+
+                                                // Attach computed type for table use (hacky but works in this scoped render)
+                                                t.computedPrizeType = level === 4 ? 'MILHAR' : level === 3 ? 'CENTENA' : level === 2 ? 'DEZENA' : 'OUTRO';
+                                            }
+                                        });
+                                    }
+
+                                    return (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                            <div className="p-3 bg-purple-50 border border-purple-100 rounded-lg flex flex-col items-center shadow-sm">
+                                                <span className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1">Milhar</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-2xl font-bold text-purple-700">{stats.milhar}</span>
+                                                    <span className="text-[10px] text-purple-400 font-medium">ganhadores</span>
+                                                </div>
+                                            </div>
+                                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center shadow-sm">
+                                                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Centena</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-2xl font-bold text-blue-700">{stats.centena}</span>
+                                                    <span className="text-[10px] text-blue-400 font-medium">ganhadores</span>
+                                                </div>
+                                            </div>
+                                            <div className="p-3 bg-orange-50 border border-orange-100 rounded-lg flex flex-col items-center shadow-sm">
+                                                <span className="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Dezena</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-2xl font-bold text-orange-700">{stats.dezena}</span>
+                                                    <span className="text-[10px] text-orange-400 font-medium">ganhadores</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
                                 {/* Filters */}
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                                     <div>
@@ -1186,9 +1247,12 @@ export default function DrawsSettingsPage() {
                                                                     {t.numbers.map((n: string) => n.padStart(4, '0')).join(', ')}
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    {t.prizeType ? (
-                                                                        <Badge variant="secondary" className="text-[10px] bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
-                                                                            {t.prizeType}
+                                                                    {t.status === 'WON' ? (
+                                                                        <Badge variant="secondary" className={`text-[10px] border ${t.computedPrizeType === 'MILHAR' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                                                                            t.computedPrizeType === 'CENTENA' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                                                'bg-orange-100 text-orange-700 border-orange-200'
+                                                                            }`}>
+                                                                            {t.computedPrizeType || 'PREMIADO'}
                                                                         </Badge>
                                                                     ) : '-'}
                                                                 </TableCell>
@@ -1340,7 +1404,7 @@ export default function DrawsSettingsPage() {
                         <div className="space-y-4 py-4">
                             <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-dashed">
                                 <span className="text-sm font-medium text-muted-foreground uppercase mb-1">Números Jogados</span>
-                                <div className="text-2xl font-mono font-bold tracking-widest text-foreground">
+                                <div className="text-xl font-mono font-bold tracking-widest text-foreground">
                                     {selectedTicket.numbers.map((n: string) => n.padStart(4, '0')).join(' - ')}
                                 </div>
                             </div>
@@ -1349,7 +1413,7 @@ export default function DrawsSettingsPage() {
                                 <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center justify-center">
                                     <span className="text-xs font-bold text-blue-600 uppercase mb-1">Tipo de Prêmio</span>
                                     <Badge variant="secondary" className="bg-blue-200 text-blue-800 hover:bg-blue-300">
-                                        {selectedTicket.prizeType || 'Não Calculado'}
+                                        {(selectedTicket as any).computedPrizeType || 'PREMIADO'}
                                     </Badge>
                                 </div>
                                 <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg flex flex-col items-center justify-center">
