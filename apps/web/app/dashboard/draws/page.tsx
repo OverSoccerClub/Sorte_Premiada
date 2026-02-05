@@ -39,21 +39,20 @@ export default function DrawsSettingsPage() {
     // Details Modal State
     const [detailModalOpen, setDetailModalOpen] = useState(false)
     const [drawDetails, setDrawDetails] = useState<any>(null)
+    const [loadingDetails, setLoadingDetails] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
-    const [detailLimit, setDetailLimit] = useState<number | "all">(5)
+    const [detailLimit, setDetailLimit] = useState<number | "all">(10) // Changed to 10 for better perf
 
     // Details Modal Filters
     const [filterHash, setFilterHash] = useState("")
     const [filterNumber, setFilterNumber] = useState("")
     const [filterSeller, setFilterSeller] = useState("")
     const [filterStatus, setFilterStatus] = useState<string>("ALL")
-
-    // Main Table Pagination State
-    const [mainPage, setMainPage] = useState(1)
-    const [mainLimit, setMainLimit] = useState<number | "all">(10)
+    const [filterPrizeType, setFilterPrizeType] = useState<string>("ALL")
 
     const handleOpenDetails = async (drawId: string) => {
         setDetailModalOpen(true)
+        setLoadingDetails(true)
         setDrawDetails(null)
         setCurrentPage(1)
         // Reset filters
@@ -61,6 +60,8 @@ export default function DrawsSettingsPage() {
         setFilterNumber("")
         setFilterSeller("")
         setFilterStatus("ALL")
+        setFilterPrizeType("ALL")
+
         try {
             const token = localStorage.getItem("token")
             const res = await fetch(`${API_URL}/draws/${drawId}/details`, {
@@ -68,6 +69,46 @@ export default function DrawsSettingsPage() {
             })
             if (res.ok) {
                 const data = await res.json()
+
+                // Pre-process tickets to identify Prize Type
+                // Logic based on matching suffix with Winning Numbers
+                const drawNumbers = data.draw.numbers || [];
+
+                data.ticketsWithPrize = data.tickets.map((t: any) => {
+                    let prizeType = null;
+                    if (t.status === 'WON') {
+                        // Infer prize type
+                        const myNumbers = t.numbers || [];
+                        let bestMatch = 0;
+
+                        // Check each bet number against winning numbers
+                        for (const myNum of myNumbers) {
+                            for (const winNum of drawNumbers) {
+                                if (myNum === winNum) {
+                                    bestMatch = Math.max(bestMatch, 4); // Milhar
+                                } else if (myNum.endsWith(winNum.slice(-3)) && winNum.length >= 3) {
+                                    bestMatch = Math.max(bestMatch, 3); // Centena
+                                } else if (myNum.endsWith(winNum.slice(-2)) && winNum.length >= 2) {
+                                    bestMatch = Math.max(bestMatch, 2); // Dezena
+                                }
+                            }
+                        }
+
+                        if (bestMatch === 4) prizeType = 'MILHAR';
+                        else if (bestMatch === 3) prizeType = 'CENTENA';
+                        else if (bestMatch === 2) prizeType = 'DEZENA';
+                        else prizeType = 'OUTROS'; // Fallback
+                    }
+                    return { ...t, prizeType };
+                });
+
+                // Calculate Stats
+                data.prizeStats = {
+                    milhar: data.ticketsWithPrize.filter((t: any) => t.prizeType === 'MILHAR').length,
+                    centena: data.ticketsWithPrize.filter((t: any) => t.prizeType === 'CENTENA').length,
+                    dezena: data.ticketsWithPrize.filter((t: any) => t.prizeType === 'DEZENA').length
+                };
+
                 setDrawDetails(data)
             } else {
                 showAlert("Erro", "Erro ao carregar detalhes", "error")
@@ -76,8 +117,291 @@ export default function DrawsSettingsPage() {
         } catch (error) {
             showAlert("Erro", "Erro de conexão", "error")
             setDetailModalOpen(false)
+        } finally {
+            setLoadingDetails(false)
         }
     }
+
+    // ... (rest of code unrelated to details modal)
+
+    // Skipping unchanged parts...
+
+    <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
+        <DialogContent className="w-full max-w-[95vw] lg:max-w-[1400px] max-h-[90vh] overflow-y-auto flex flex-col">
+            <DialogHeader>
+                <DialogTitle>Detalhes do Sorteio</DialogTitle>
+                <CardDescription>
+                    {drawDetails?.draw?.game?.name} - {drawDetails?.draw?.series ? `#${drawDetails.draw.series}` : ''}
+                    {drawDetails?.draw?.drawDate && ` - ${new Date(drawDetails.draw.drawDate).toLocaleString('pt-BR')}`}
+                </CardDescription>
+            </DialogHeader>
+
+            {loadingDetails ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+                    <div className="text-center">
+                        <p className="font-semibold text-lg">Carregando Informações do Sorteio...</p>
+                        <p className="text-sm text-muted-foreground">Isso pode levar alguns segundos dependendo da quantidade de bilhetes.</p>
+                    </div>
+                </div>
+            ) : drawDetails && (
+                <div className="space-y-6">
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                        <Card className="bg-emerald-500/10 border-emerald-500/20 shadow-sm border col-span-2">
+                            <CardHeader className="pb-2 p-4">
+                                <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-2">
+                                    <Tag className="w-4 h-4" /> Total Arrecadado
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-2xl font-bold text-foreground">
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(drawDetails.stats.totalSales)}
+                                </div>
+                                <p className="text-xs text-muted-foreground">{drawDetails.stats.ticketCount} apostas</p>
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-yellow-500/10 border-yellow-500/20 shadow-sm border col-span-2">
+                            <CardHeader className="pb-2 p-4">
+                                <CardTitle className="text-sm font-medium text-yellow-600 flex items-center gap-2">
+                                    <Trophy className="w-4 h-4" /> Prêmios Totais
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-2xl font-bold text-foreground">
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(drawDetails.stats.totalPrizes)}
+                                </div>
+                                <p className="text-xs text-muted-foreground">{drawDetails.stats.winningCount} vencedores</p>
+                            </CardContent>
+                        </Card>
+
+                        {/* Prize Breakdown Cards */}
+                        <Card className="bg-blue-500/10 border-blue-500/20 shadow-sm border col-span-2 lg:col-span-2">
+                            <CardHeader className="pb-2 p-4">
+                                <CardTitle className="text-sm font-medium text-blue-600">Breakdown</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0 grid grid-cols-3 gap-2 text-center">
+                                <div>
+                                    <div className="text-lg font-bold">{drawDetails.prizeStats?.milhar || 0}</div>
+                                    <div className="text-[10px] uppercase text-muted-foreground">Milhar</div>
+                                </div>
+                                <div>
+                                    <div className="text-lg font-bold">{drawDetails.prizeStats?.centena || 0}</div>
+                                    <div className="text-[10px] uppercase text-muted-foreground">Centena</div>
+                                </div>
+                                <div>
+                                    <div className="text-lg font-bold">{drawDetails.prizeStats?.dezena || 0}</div>
+                                    <div className="text-[10px] uppercase text-muted-foreground">Dezena</div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <Card className="bg-slate-50 border-slate-200">
+                        <CardContent className="flex items-center justify-between p-4">
+                            <span className="font-semibold text-slate-700">Números Sorteados:</span>
+                            <div className="text-lg font-mono font-bold tracking-widest text-slate-900 bg-white px-4 py-1 rounded border border-slate-300 shadow-sm">
+                                {drawDetails.draw.numbers && drawDetails.draw.numbers.length > 0 ? (drawDetails.draw.numbers as number[]).join(' - ') : 'Não realizado'}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Tickets List */}
+                    <div>
+                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <Ticket className="w-5 h-5 text-emerald-500" />
+                            Bilhetes Participantes
+                        </h3>
+
+                        {/* Filters */}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+                            <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">Hash</label>
+                                <Input
+                                    placeholder="Filtrar por hash..."
+                                    value={filterHash}
+                                    onChange={(e) => setFilterHash(e.target.value)}
+                                    className="h-9 text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">Números</label>
+                                <Input
+                                    placeholder="Ex: 1234..."
+                                    value={filterNumber}
+                                    onChange={(e) => setFilterNumber(e.target.value)}
+                                    className="h-9 text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">Cambista</label>
+                                <Input
+                                    placeholder="Nome..."
+                                    value={filterSeller}
+                                    onChange={(e) => setFilterSeller(e.target.value)}
+                                    className="h-9 text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">Status</label>
+                                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                                    <SelectTrigger className="h-9 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="ALL">Todos</SelectItem>
+                                        <SelectItem value="PENDING">Pendente</SelectItem>
+                                        <SelectItem value="WON">Premiado (Todos)</SelectItem>
+                                        <SelectItem value="LOST">Perdedor</SelectItem>
+                                        <SelectItem value="CANCELLED">Cancelado</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">Tipo de Prêmio</label>
+                                <Select value={filterPrizeType} onValueChange={setFilterPrizeType}>
+                                    <SelectTrigger className="h-9 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="ALL">Qualquer</SelectItem>
+                                        <SelectItem value="MILHAR">Milhar</SelectItem>
+                                        <SelectItem value="CENTENA">Centena</SelectItem>
+                                        <SelectItem value="DEZENA">Dezena</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="border rounded-md overflow-hidden bg-background">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-muted/30">
+                                        <TableHead className="pl-4">Bilhete / Hash</TableHead>
+                                        <TableHead>Cambista / Área</TableHead>
+                                        <TableHead>Números</TableHead>
+                                        <TableHead>Tipo</TableHead>
+                                        <TableHead>Valor</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {(() => {
+                                        // Apply filters using ticketsWithPrize
+                                        let filteredTickets = drawDetails.ticketsWithPrize.filter((t: any) => {
+                                            // Filter by hash
+                                            if (filterHash && !t.hash?.toLowerCase().includes(filterHash.toLowerCase())) return false;
+
+                                            // Filter by number
+                                            if (filterNumber) {
+                                                const searchNumbers = filterNumber.split(',').map(n => n.trim()).filter(n => n);
+                                                const hasMatch = searchNumbers.some(searchNum =>
+                                                    t.numbers.some((ticketNum: string) =>
+                                                        ticketNum.toString().includes(searchNum)
+                                                    )
+                                                );
+                                                if (!hasMatch) return false;
+                                            }
+
+                                            // Filter by seller
+                                            if (filterSeller) {
+                                                const sellerName = (t.user?.name || t.user?.username || '').toLowerCase();
+                                                if (!sellerName.includes(filterSeller.toLowerCase())) return false;
+                                            }
+
+                                            // Filter by status
+                                            if (filterStatus !== "ALL" && t.status !== filterStatus) return false;
+
+                                            // Filter by Prize Type
+                                            if (filterPrizeType !== "ALL" && t.prizeType !== filterPrizeType) return false;
+
+                                            return true;
+                                        });
+
+                                        const paginatedTickets = detailLimit === "all" ? filteredTickets : filteredTickets.slice((currentPage - 1) * detailLimit, currentPage * detailLimit);
+
+                                        if (filteredTickets.length === 0) {
+                                            return (
+                                                <TableRow>
+                                                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                                        Nenhum bilhete encontrado com estes filtros.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        }
+
+                                        return (
+                                            <>
+                                                {paginatedTickets.map((t: any) => (
+                                                    <TableRow key={t.id} className={t.status === 'WON' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'hover:bg-muted/50'}>
+                                                        <TableCell className="font-mono text-xs pl-4">
+                                                            <div className="font-bold">{t.id.slice(0, 8)}...</div>
+                                                            <div className="text-[10px] text-muted-foreground">{t.hash || '-'}</div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="font-medium text-sm">{t.user?.name || t.user?.username}</div>
+                                                            <div className="text-xs text-muted-foreground">
+                                                                {t.user?.area?.name ? `${t.user.area.name} - ${t.user.area.city}/${t.user.area.state}` : 'Sem Área'}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                                                {t.numbers.map((n: string, i: number) => (
+                                                                    <Badge key={i} variant="outline" className={`font-mono text-[10px] ${t.status === 'WON' && drawDetails.draw.numbers?.includes(n) ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : ''}`}>
+                                                                        {n}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {t.prizeType ? (
+                                                                <Badge variant="secondary" className="text-[10px] bg-blue-100 text-blue-700">
+                                                                    {t.prizeType}
+                                                                </Badge>
+                                                            ) : '-'}
+                                                        </TableCell>
+                                                        <TableCell className="text-sm">
+                                                            <div>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}</div>
+                                                            {t.status === 'WON' && <div className="text-[10px] text-green-600 font-bold">+{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.possiblePrize))}</div>}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge className={`text-[10px] ${t.status === 'WON' ? 'bg-yellow-500 hover:bg-yellow-600' :
+                                                                    t.status === 'LOST' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' :
+                                                                        t.status === 'CANCELLED' ? 'bg-red-100 text-red-600 hover:bg-red-200' :
+                                                                            'bg-emerald-500 hover:bg-emerald-600'
+                                                                }`}>
+                                                                {t.status === 'WON' ? 'PREMIADO' :
+                                                                    t.status === 'LOST' ? 'NÃO PREMIADO' :
+                                                                        t.status === 'CANCELLED' ? 'CANCELADO' : 'PENDENTE'}
+                                                            </Badge>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </>
+                                        );
+                                    })()}
+                                </TableBody>
+                            </Table>
+
+                            {/* Pagination */}
+                            {drawDetails?.ticketsWithPrize.length > 0 && (
+                                <div className="border-t p-2">
+                                    <StandardPagination
+                                        currentPage={currentPage}
+                                        totalPages={detailLimit === "all" ? 1 : Math.ceil(drawDetails.ticketsWithPrize.length / detailLimit)}
+                                        limit={detailLimit}
+                                        onPageChange={setCurrentPage}
+                                        onLimitChange={setDetailLimit}
+                                        totalItems={drawDetails.ticketsWithPrize.length}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </DialogContent>
+    </Dialog>
 
     // Form State
     const [drawDate, setDrawDate] = useState("")
