@@ -58,8 +58,18 @@
         <p>Confira os números sorteados mais recentes</p>
       </div>
 
-      <div class="results-grid" id="resultsGrid">
-        <!-- Results will be dynamically loaded here -->
+      <div class="carousel-container">
+        <button class="carousel-control prev" id="prevBtn" aria-label="Sorteio anterior">❮</button>
+        <div class="carousel-track-container">
+          <div class="carousel-track" id="resultsTrack">
+            <!-- Results will be dynamically loaded here -->
+          </div>
+        </div>
+        <button class="carousel-control next" id="nextBtn" aria-label="Próximo sorteio">❯</button>
+      </div>
+
+      <div class="carousel-indicators" id="carouselIndicators">
+        <!-- Indicators will be dynamically loaded here -->
       </div>
     </div>
   </section>

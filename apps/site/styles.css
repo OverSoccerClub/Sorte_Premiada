@@ -809,3 +809,143 @@ p {
     transform: translateY(0);
   }
 }
+
+/* ============================================
+   CAROUSEL STYLES
+   ============================================ */
+.carousel-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+  perspective: 1000px;
+}
+
+.carousel-track-container {
+  overflow: hidden;
+  padding: var(--spacing-md) 0;
+  /* Add ample padding for hover effects */
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  gap: var(--spacing-lg);
+  /* Use gap for spacing between slides */
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  /* Default to 1 slide visible */
+  min-width: 0;
+  /* Fix flexbox overflow issues */
+  display: flex;
+  justify-content: center;
+  transition: all 0.5s ease;
+  opacity: 0.5;
+  transform: scale(0.9);
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 2;
+}
+
+.result-card {
+  width: 100%;
+  max-width: 400px;
+  /* Maintain card max-width */
+  margin: 0 auto;
+}
+
+/* Carousel Controls */
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--gradient-gold);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-gold);
+}
+
+.carousel-control:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+.carousel-control.prev {
+  left: 0;
+}
+
+.carousel-control.next {
+  right: 0;
+}
+
+/* Indicators */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.carousel-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.carousel-indicator.active {
+  background: var(--color-accent-gold);
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .carousel-slide {
+    flex: 0 0 50%;
+    /* 2 slides on tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-slide {
+    flex: 0 0 33.333%;
+    /* 3 slides on desktop */
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .carousel-container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .carousel-track {
+    gap: var(--spacing-md);
+  }
+  
+  .carousel-control {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+  }
+}
