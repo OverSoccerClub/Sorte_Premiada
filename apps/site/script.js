@@ -130,6 +130,7 @@ async function fetchSecondChanceResults() {
 
 function displaySecondChanceResults(results) {
   const container = document.getElementById('secondChanceGrid');
+  if (!container) return;
   container.innerHTML = '';
 
   if (!results || results.length === 0) {
