@@ -896,7 +896,7 @@ export default function CambistasPage() {
                                                 />
                                             </div>
 
-                                            <div className="md:col-span-3 lg:col-span-2">
+                                            <div className="md:col-span-4 lg:col-span-2">
                                                 <FormField
                                                     control={form.control}
                                                     name="accountabilityLimitHours"
@@ -915,12 +915,12 @@ export default function CambistasPage() {
                                                 />
                                             </div>
 
-                                            <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="md:col-span-4 lg:col-span-5">
                                                 <FormField
                                                     control={form.control}
                                                     name="canCancelTickets"
                                                     render={({ field }) => (
-                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-lg border p-2 bg-muted/30">
+                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-lg border p-2 bg-muted/30 h-10 mt-6 transition-all hover:bg-muted/40">
                                                             <FormControl>
                                                                 <Switch
                                                                     checked={field.value}
@@ -928,19 +928,21 @@ export default function CambistasPage() {
                                                                 />
                                                             </FormControl>
                                                             <div className="space-y-0.5">
-                                                                <FormLabel className="text-xs font-medium text-foreground">
+                                                                <FormLabel className="text-xs font-medium text-foreground cursor-pointer">
                                                                     Permitir Cancelar Bilhetes
                                                                 </FormLabel>
                                                             </div>
                                                         </FormItem>
                                                     )}
                                                 />
+                                            </div>
 
+                                            <div className="md:col-span-4 lg:col-span-5">
                                                 <FormField
                                                     control={form.control}
                                                     name="canResetActivation"
                                                     render={({ field }) => (
-                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-lg border p-2 bg-muted/30">
+                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-lg border p-2 bg-muted/30 h-10 mt-6 transition-all hover:bg-muted/40">
                                                             <FormControl>
                                                                 <Switch
                                                                     checked={field.value}
@@ -948,8 +950,8 @@ export default function CambistasPage() {
                                                                 />
                                                             </FormControl>
                                                             <div className="space-y-0.5">
-                                                                <FormLabel className="text-xs font-medium text-foreground">
-                                                                    Permitir Resetar Ativação do Dispositivo
+                                                                <FormLabel className="text-xs font-medium text-foreground cursor-pointer">
+                                                                    Permitir Resetar Ativação
                                                                 </FormLabel>
                                                             </div>
                                                         </FormItem>
