@@ -200,7 +200,7 @@ export class TicketsService {
                             series: currentSeriesInt,
                             drawDate: drawDate,
                             numbers: { has: num.toString() },
-                            status: { notIn: ['CANCELLED', 'REJECTED'] }
+                            status: { notIn: ['CANCELLED'] }
                         }
                     });
 

@@ -360,7 +360,6 @@ export default function Game2x1000Screen() {
         show("Salvando Aposta...");
 
         try {
-            const API_URL = AppConfig.api.baseUrl;
             const payload = {
                 gameType: "2x1000",
                 numbers: selectedNumbers, // Always use selected numbers (explicit)
