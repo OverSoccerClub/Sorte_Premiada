@@ -1118,6 +1118,7 @@ export default function DrawsSettingsPage() {
                                                 <TableHead className="pl-4">Bilhete / Hash</TableHead>
                                                 <TableHead>Cambista / Área</TableHead>
                                                 <TableHead>Números</TableHead>
+                                                <TableHead>Tipo</TableHead>
                                                 <TableHead>Valor</TableHead>
                                                 <TableHead>Status</TableHead>
                                             </TableRow>
@@ -1125,7 +1126,7 @@ export default function DrawsSettingsPage() {
                                         <TableBody>
                                             {(() => {
                                                 // Apply filters
-                                                let filteredTickets = drawDetails.tickets.filter((t: any) => {
+                                                let filteredTickets = (drawDetails.ticketsWithPrize || drawDetails.tickets).filter((t: any) => {
                                                     // Filter by hash
                                                     if (filterHash && !t.hash?.toLowerCase().includes(filterHash.toLowerCase())) {
                                                         return false;
@@ -1172,6 +1173,13 @@ export default function DrawsSettingsPage() {
                                                                 </TableCell>
                                                                 <TableCell className="font-mono text-xs max-w-[150px] break-words">
                                                                     {t.numbers.map((n: string) => n.padStart(4, '0')).join(', ')}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {t.prizeType ? (
+                                                                        <Badge variant="secondary" className="text-[10px] bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+                                                                            {t.prizeType}
+                                                                        </Badge>
+                                                                    ) : '-'}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
