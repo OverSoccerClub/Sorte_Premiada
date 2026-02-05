@@ -877,6 +877,22 @@ export default function DrawsSettingsPage() {
                             <label className="text-sm font-medium">Hora Limite (Fechamento)</label>
                             <Input type="time" value={drawTime} onChange={e => setDrawTime(e.target.value)} />
                         </div>
+                        <div className="grid gap-2">
+                            <label className="text-sm font-medium">Praça / Região</label>
+                            <Select value={selectedAreaId} onValueChange={setSelectedAreaId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="global">Todas (Global)</SelectItem>
+                                    {areas.map(area => (
+                                        <SelectItem key={area.id} value={area.id}>
+                                            {area.name} - {area.city}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
                         {games.find(g => g.id === selectedGameId)?.type === 'PAIPITA_AI' ? (
                             <div className="space-y-2">
