@@ -184,6 +184,31 @@ export class TicketsService {
             drawDate = await this.getNextDrawDate(gameId, user?.areaId);
         } catch (e) {
             console.warn(`[TicketsService] Could not calculate next draw date: ${e} `);
+            // If strict mode for 2x1000, maybe fail here? 
+        }
+
+        // --- BUSINESS RULE: EXCLUSIVE NUMBER CHECK (No Duplicates per Area/Series/Draw) ---
+        // Requirement: "se na praça... da serie... foi vendido o numero... fica bloqueado"
+        if (drawDate && (game.name.includes('2x1000') || data.gameType === '2x1000')) {
+            if (user?.areaId && seriesNumber) {
+                const currentSeriesInt = parseInt(seriesNumber);
+                for (const num of (data.numbers || [])) {
+                    const duplicate = await this.prisma.client.ticket.findFirst({
+                        where: {
+                            gameId: game.id,
+                            areaId: user.areaId,
+                            series: currentSeriesInt,
+                            drawDate: drawDate,
+                            numbers: { has: num.toString() },
+                            status: { notIn: ['CANCELLED', 'REJECTED'] }
+                        }
+                    });
+
+                    if (duplicate) {
+                        throw new BadRequestException(`O número ${num} já foi vendido para a praça ${user.area?.name || ''}, série ${seriesNumber} no sorteio de ${dayjs(drawDate).format('DD/MM HH:mm')}. Escolha outro número.`);
+                    }
+                }
+            }
         }
 
         // --- BUSINESS RULE 2: RESTRICTED MODE (Auto-Sequence) ---
