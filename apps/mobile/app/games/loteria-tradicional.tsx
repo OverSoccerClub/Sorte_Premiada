@@ -52,6 +52,7 @@ const ANIMALS = [
 ];
 
 type Modality = "GRUPO" | "DEZENA" | "CENTENA" | "MILHAR";
+const API_URL = AppConfig.api.baseUrl;
 
 export default function LoteriaTradicionalScreen() {
     const router = useRouter();
@@ -94,7 +95,6 @@ export default function LoteriaTradicionalScreen() {
     const fetchGameId = async () => {
         setIsLoadingGame(true);
         try {
-            const API_URL = AppConfig.api.baseUrl;
             const res = await fetch(`${API_URL}/games`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -200,7 +200,6 @@ export default function LoteriaTradicionalScreen() {
         show("Salvando Aposta...");
 
         try {
-            const API_URL = AppConfig.api.baseUrl;
             const payload = {
                 gameType: `LT-${modality}`,
                 numbers: selectedNumbers,

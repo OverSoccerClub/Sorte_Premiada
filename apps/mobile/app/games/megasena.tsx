@@ -75,6 +75,7 @@ const NumberBall = ({ num, isSelected, onToggle }: { num: number, isSelected: bo
         </TouchableOpacity>
     );
 };
+const API_URL = AppConfig.api.baseUrl;
 
 export default function MegaSenaScreen() {
     const router = useRouter();
@@ -173,7 +174,6 @@ export default function MegaSenaScreen() {
     useEffect(() => {
         const fetchGameDetails = async () => {
             try {
-                const API_URL = AppConfig.api.baseUrl;
                 const res = await fetch(`${API_URL}/games`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -212,7 +212,6 @@ export default function MegaSenaScreen() {
         show("Processando Aposta...");
 
         try {
-            const API_URL = AppConfig.api.baseUrl;
 
             const res = await fetch(`${API_URL}/tickets`, {
                 method: 'POST',

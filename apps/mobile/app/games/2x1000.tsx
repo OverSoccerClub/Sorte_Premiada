@@ -23,6 +23,7 @@ import { useCompany } from "../../context/CompanyContext";
 import { useSettings } from "../../context/SettingsContext";
 import { GamesService } from "../../services/games.service";
 
+const API_URL = AppConfig.api.baseUrl;
 
 export default function Game2x1000Screen() {
     const router = useRouter();
@@ -86,7 +87,6 @@ export default function Game2x1000Screen() {
     const fetchGameId = async () => {
         show("Carregando o jogo, aguarde um momento.");
         try {
-            const API_URL = AppConfig.api.baseUrl;
             const res = await fetch(`${API_URL}/games`, {
                 headers: { Authorization: `Bearer ${token}` }
             });

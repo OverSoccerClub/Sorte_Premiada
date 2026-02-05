@@ -20,6 +20,7 @@ import { TicketData } from "../../components/ticket/TicketContent";
 import { AppConfig } from "../../constants/AppConfig";
 import { useCompany } from "../../context/CompanyContext";
 import { useSettings } from "../../context/SettingsContext";
+const API_URL = AppConfig.api.baseUrl;
 
 export default function GamePaipitaScreen() {
     const router = useRouter();
@@ -68,7 +69,6 @@ export default function GamePaipitaScreen() {
     const fetchGameAndDraws = async () => {
         show("Carregando Palpita Ai...");
         try {
-            const API_URL = AppConfig.api.baseUrl;
             const res = await fetch(`${API_URL}/games`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -161,7 +161,6 @@ export default function GamePaipitaScreen() {
         show("Enviando Aposta...");
 
         try {
-            const API_URL = AppConfig.api.baseUrl;
             // Build ordered numbers array
             const numbers = [];
             for (let i = 1; i <= 14; i++) {
