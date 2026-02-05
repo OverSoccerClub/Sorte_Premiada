@@ -61,8 +61,9 @@ function formatCurrency(value) {
 
 function showError(elementId, message) {
   const element = document.getElementById(elementId);
+  if (!element) return;
   element.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: var(--spacing-xl);">
+        <div style="width: 100%; text-align: center; padding: var(--spacing-xl);">
             <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">${message}</p>
             <button onclick="location.reload()" class="cta-button">Tentar Novamente</button>
         </div>
@@ -71,8 +72,9 @@ function showError(elementId, message) {
 
 function showLoading(elementId) {
   const element = document.getElementById(elementId);
+  if (!element) return;
   element.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: var(--spacing-xl);">
+        <div style="width: 100%; text-align: center; padding: var(--spacing-xl);">
             <p style="color: var(--color-accent-gold); font-size: var(--font-size-lg);">Carregando...</p>
         </div>
     `;
@@ -82,7 +84,10 @@ function showLoading(elementId) {
 // FETCH RESULTS FROM API
 // ============================================
 async function fetchResults() {
-  showLoading('resultsGrid');
+  // showLoading('resultsTrack'); // Optional: show loading in track if desired, but might jump. 
+  // Given we have a carousel, maybe just let it load? 
+  // Original had loading. Let's keep it but target the track.
+  showLoading('resultsTrack');
 
   try {
     const response = await fetch(
