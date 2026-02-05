@@ -202,7 +202,10 @@ function displayResults(results) {
 
     card.innerHTML = `
             <div class="result-header">
-                <span class="result-game">${result.game}</span>
+                <div>
+                   <span class="result-game">${result.game}</span>
+                   ${result.companyInitials ? `<span class="result-company">${result.companyInitials}</span>` : ''}
+                </div>
                 <span class="result-date">${result.date}</span>
             </div>
             <div class="result-numbers">

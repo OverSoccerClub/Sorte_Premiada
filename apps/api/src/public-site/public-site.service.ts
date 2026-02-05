@@ -33,6 +33,11 @@ export class PublicSiteService {
                         prizeCentena: true,
                         prizeDezena: true
                     }
+                },
+                company: {
+                    select: {
+                        companyName: true
+                    }
                 }
             },
             orderBy: {
@@ -49,8 +54,19 @@ export class PublicSiteService {
             date: this.formatDate(draw.drawDate),
             numbers: draw.numbers,
             prize: draw.game.prizeMilhar?.toString() || '5000.00',
-            series: draw.series
+            series: draw.series,
+            companyInitials: this.getInitials(draw.company?.companyName)
         }));
+    }
+
+    private getInitials(name?: string): string {
+        if (!name) return '';
+        return name
+            .split(' ')
+            .filter(part => part.length > 2) // Ignora preposições curtas (de, da, etc.)
+            .map(part => part[0].toUpperCase())
+            .join('')
+            .slice(0, 3); // Limita a 3 letras
     }
 
     /**
