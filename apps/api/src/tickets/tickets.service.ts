@@ -1146,7 +1146,9 @@ export class TicketsService {
             where,
             include: {
                 game: true,
-                area: true // Added to show area name in history
+                user: {
+                    include: { area: true }
+                }
             },
             orderBy: { createdAt: 'desc' },
             take: 100
