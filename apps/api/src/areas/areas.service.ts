@@ -77,9 +77,63 @@ export class AreasService {
         });
         if (!exists) throw new Error("Praça não encontrada ou acesso negado.");
 
-        // Optional: Check if area has users before deleting?
-        return this.prisma.area.delete({
-            where: { id },
+        // Check if area has users or other dependencies
+        // We will perform a cascading soft-delete/detach where applicable
+
+        return this.prisma.$transaction(async (tx) => {
+            // 1. Detach Users (set areaId = null)
+            await tx.user.updateMany({
+                where: { areaId: id },
+                data: { areaId: null }
+            });
+
+            // 2. Detach PosTerminals
+            await tx.posTerminal.updateMany({
+                where: { areaId: id },
+                data: { areaId: null }
+            });
+
+            // 3. Detach Draws
+            await tx.draw.updateMany({
+                where: { areaId: id },
+                data: { areaId: null }
+            });
+
+            // 4. Detach ExtractionSeries
+            await tx.extractionSeries.updateMany({
+                where: { areaId: id },
+                data: { areaId: null }
+            });
+
+            // 5. Delete AreaConfigs (Cascade Delete)
+            await tx.areaConfig.deleteMany({
+                where: { areaId: id }
+            });
+
+            // 6. Handle Neighborhoods
+            // First detach users from neighborhoods of this area
+            const neighborhoods = await tx.neighborhood.findMany({
+                where: { areaId: id },
+                select: { id: true }
+            });
+
+            if (neighborhoods.length > 0) {
+                const neighborhoodIds = neighborhoods.map(n => n.id);
+                await tx.user.updateMany({
+                    where: { neighborhoodId: { in: neighborhoodIds } },
+                    data: { neighborhoodId: null }
+                });
+
+                // Then delete neighborhoods
+                await tx.neighborhood.deleteMany({
+                    where: { areaId: id }
+                });
+            }
+
+            // 7. Finally Delete the Area
+            return tx.area.delete({
+                where: { id },
+            });
         });
     }
 
