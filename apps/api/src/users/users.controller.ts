@@ -305,13 +305,15 @@ export class UsersController {
             throw new ForbiddenException('Acesso negado a este usuário');
         }
 
-        // Extrair areaId e campos que não devem ir no restDto
-        const { areaId, companyId: _cid, company: _c, ...restDto } = updateUserDto;
+        // Extrair areaId, neighborhoodId e campos que não devem ir no restDto
+        const { areaId, neighborhoodId, companyId: _cid, company: _c, ...restDto } = updateUserDto;
 
         // Limpeza extra
         delete (restDto as any).companyId;
         delete (restDto as any).company;
         delete (restDto as any).areaId;
+        delete (restDto as any).neighborhoodId;
+
         // Impedir alteração de username se não for MASTER (opcional, mas seguro)
         if (req.user.role !== 'MASTER') {
             delete (restDto as any).username;
@@ -326,6 +328,13 @@ export class UsersController {
         // Se tiver areaId, conectar à área (ou trocar)
         if (areaId) {
             data.area = { connect: { id: areaId } };
+        }
+
+        // Tratamento de Neighborhood (Bairro)
+        if (neighborhoodId && typeof neighborhoodId === 'string' && neighborhoodId.length > 0) {
+            data.neighborhood = { connect: { id: neighborhoodId } };
+        } else if (neighborhoodId === '' || neighborhoodId === null) {
+            data.neighborhood = { disconnect: true };
         }
 
         // Atualizar lastModifiedBy (removido para correção de build)
