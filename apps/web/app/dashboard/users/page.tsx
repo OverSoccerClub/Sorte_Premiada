@@ -379,7 +379,7 @@ export default function UsersPage() {
                                     Novo Usuário
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[700px] bg-popover border-border max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="sm:max-w-5xl bg-popover border-border max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center gap-2 text-foreground">
                                         {editingId ? (
@@ -589,33 +589,35 @@ export default function UsersPage() {
                                                         <p className="text-sm text-muted-foreground">
                                                             Selecione as permissões que este usuário terá no sistema:
                                                         </p>
-                                                        {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
-                                                            <div key={groupName} className="space-y-3">
-                                                                <h4 className="text-sm font-semibold text-foreground">{groupName}</h4>
-                                                                <div className="space-y-2 pl-4">
-                                                                    {permissions.map((permission) => (
-                                                                        <div key={permission} className="flex items-center space-x-2">
-                                                                            <Checkbox
-                                                                                id={permission}
-                                                                                checked={userPermissions[permission] || false}
-                                                                                onCheckedChange={(checked) => {
-                                                                                    setUserPermissions({
-                                                                                        ...userPermissions,
-                                                                                        [permission]: checked as boolean
-                                                                                    })
-                                                                                }}
-                                                                            />
-                                                                            <label
-                                                                                htmlFor={permission}
-                                                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                                                            >
-                                                                                {PERMISSION_LABELS[permission]}
-                                                                            </label>
-                                                                        </div>
-                                                                    ))}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                            {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
+                                                                <div key={groupName} className="space-y-3 bg-muted/20 p-3 rounded-lg border border-border/50 h-fit">
+                                                                    <h4 className="text-sm font-semibold text-emerald-500 uppercase tracking-wide border-b border-border/50 pb-2">{groupName}</h4>
+                                                                    <div className="space-y-2">
+                                                                        {permissions.map((permission) => (
+                                                                            <div key={permission} className="flex items-center space-x-2">
+                                                                                <Checkbox
+                                                                                    id={permission}
+                                                                                    checked={userPermissions[permission] || false}
+                                                                                    onCheckedChange={(checked) => {
+                                                                                        setUserPermissions({
+                                                                                            ...userPermissions,
+                                                                                            [permission]: checked as boolean
+                                                                                        })
+                                                                                    }}
+                                                                                />
+                                                                                <label
+                                                                                    htmlFor={permission}
+                                                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                                                                >
+                                                                                    {PERMISSION_LABELS[permission]}
+                                                                                </label>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </TabsContent>
                                             )}
