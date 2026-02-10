@@ -9,8 +9,7 @@ import type { Response } from 'express';
 import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
 
 @Controller('reports')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN, Role.COBRADOR, 'MASTER')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ReportsController {
     constructor(private readonly reportsService: ReportsService) { }
 

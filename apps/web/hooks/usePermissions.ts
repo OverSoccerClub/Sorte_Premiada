@@ -10,7 +10,7 @@ export function usePermissions() {
     const hasPermission = (permission: string): boolean => {
         if (!user) return false;
         if (user.role === 'MASTER') return true;
-        return (user as any).permissions?.[permission] === true;
+        return user.permissions?.[permission] === true;
     };
 
     /**
@@ -19,7 +19,7 @@ export function usePermissions() {
     const hasAnyPermission = (permissions: string[]): boolean => {
         if (!user) return false;
         if (user.role === 'MASTER') return true;
-        return permissions.some(p => (user as any).permissions?.[p] === true);
+        return permissions.some(p => user.permissions?.[p] === true);
     };
 
     /**
@@ -28,7 +28,7 @@ export function usePermissions() {
     const hasAllPermissions = (permissions: string[]): boolean => {
         if (!user) return false;
         if (user.role === 'MASTER') return true;
-        return permissions.every(p => (user as any).permissions?.[p] === true);
+        return permissions.every(p => user.permissions?.[p] === true);
     };
 
     /**
@@ -40,11 +40,11 @@ export function usePermissions() {
 
         switch (role) {
             case 'CAMBISTA':
-                return (user as any).permissions?.['CREATE_CAMBISTA'] === true;
+                return user.permissions?.['CREATE_CAMBISTA'] === true;
             case 'COBRADOR':
-                return (user as any).permissions?.['CREATE_COBRADOR'] === true;
+                return user.permissions?.['CREATE_COBRADOR'] === true;
             case 'ADMIN':
-                return (user as any).permissions?.['CREATE_ADMIN'] === true;
+                return user.permissions?.['CREATE_ADMIN'] === true;
             default:
                 return false;
         }
@@ -59,11 +59,11 @@ export function usePermissions() {
 
         switch (role) {
             case 'CAMBISTA':
-                return (user as any).permissions?.['EDIT_CAMBISTA'] === true;
+                return user.permissions?.['EDIT_CAMBISTA'] === true;
             case 'COBRADOR':
-                return (user as any).permissions?.['EDIT_COBRADOR'] === true;
+                return user.permissions?.['EDIT_COBRADOR'] === true;
             case 'ADMIN':
-                return (user as any).permissions?.['EDIT_ADMIN'] === true;
+                return user.permissions?.['EDIT_ADMIN'] === true;
             default:
                 return false;
         }
@@ -78,11 +78,11 @@ export function usePermissions() {
 
         switch (role) {
             case 'CAMBISTA':
-                return (user as any).permissions?.['DELETE_CAMBISTA'] === true;
+                return user.permissions?.['DELETE_CAMBISTA'] === true;
             case 'COBRADOR':
-                return (user as any).permissions?.['DELETE_COBRADOR'] === true;
+                return user.permissions?.['DELETE_COBRADOR'] === true;
             case 'ADMIN':
-                return (user as any).permissions?.['DELETE_ADMIN'] === true;
+                return user.permissions?.['DELETE_ADMIN'] === true;
             default:
                 return false;
         }

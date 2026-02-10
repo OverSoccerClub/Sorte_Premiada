@@ -11,6 +11,7 @@ interface User {
     email?: string
     role: string
     companyId?: string // Multi-tenant: ID da empresa do usuário
+    permissions?: Record<string, boolean>
 }
 
 interface AuthContextProps {
