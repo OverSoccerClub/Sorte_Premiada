@@ -28,7 +28,7 @@ export class TicketsService {
         // Validate Sales Eligibility (Limit & Previous Box Status)
         await this.financeService.validateSalesEligibility(userId, Number(data.amount || 0));
 
-        console.log("DEBUG CREATE TICKET:", JSON.stringify(data, null, 2));
+        // Ticket creation data validated
 
         const gameId = data.game?.connect?.id;
         if (!gameId) {
@@ -42,13 +42,7 @@ export class TicketsService {
 
         if (!game) throw new Error("Game not found");
 
-        // DEBUG: Log Segunda Chance configuration
-        console.log(`[DEBUG] Game ${game.id} Segunda Chance Config:`, {
-            secondChanceEnabled: game.secondChanceEnabled,
-            secondChanceRangeStart: game.secondChanceRangeStart,
-            secondChanceRangeEnd: game.secondChanceRangeEnd,
-            secondChanceLabel: (game as any).secondChanceLabel
-        });
+        // Segunda Chance configuration loaded
 
         const rules = (game.rules as any) || {};
 
@@ -189,26 +183,30 @@ export class TicketsService {
 
         // --- BUSINESS RULE: EXCLUSIVE NUMBER CHECK (No Duplicates per Area/Series/Draw) ---
         // Requirement: "se na praça... da serie... foi vendido o numero... fica bloqueado"
-        if (drawDate && (game.name.includes('2x1000') || data.gameType === '2x1000')) {
+        if (drawDate && data.gameType === '2x1000') {
             if (user?.areaId && seriesNumber) {
                 const currentSeriesInt = parseInt(seriesNumber);
-                for (const num of (data.numbers || [])) {
-                    const duplicate = await this.prisma.client.ticket.findFirst({
-                        where: {
-                            gameId: game.id,
-                            user: {
-                                areaId: user.areaId
-                            },
-                            series: currentSeriesInt,
-                            drawDate: drawDate,
-                            numbers: { has: num.toString() },
-                            status: { notIn: ['CANCELLED'] }
-                        }
-                    });
+                const numbersToCheck = (data.numbers || []).map(String);
 
-                    if (duplicate) {
-                        throw new BadRequestException(`O número ${num} já foi vendido para a praça ${user.area?.name || ''}, série ${seriesNumber} no sorteio de ${dayjs(drawDate).format('DD/MM HH:mm')}. Escolha outro número.`);
-                    }
+                // Optimized: Single query instead of N queries (one per number)
+                const duplicates = await this.prisma.client.ticket.findMany({
+                    where: {
+                        gameId: game.id,
+                        user: { areaId: user.areaId },
+                        series: currentSeriesInt,
+                        drawDate: drawDate,
+                        numbers: { hasSome: numbersToCheck },
+                        status: { notIn: ['CANCELLED'] }
+                    },
+                    select: { numbers: true }
+                });
+
+                if (duplicates.length > 0) {
+                    const soldNumbers = duplicates.flatMap((t: { numbers: string[] }) => t.numbers);
+                    const conflicts = numbersToCheck.filter((n: string) => soldNumbers.includes(n));
+                    throw new BadRequestException(
+                        `Números já vendidos na praça ${user.area?.name || ''}, série ${seriesNumber}: ${conflicts.join(', ')}`
+                    );
                 }
             }
         }
@@ -608,7 +606,7 @@ export class TicketsService {
                 }
             }
 
-            console.log("DEBUG PRISMA DATA (With Financials):", JSON.stringify(createData, null, 2));
+            // Ticket data prepared for creation
 
             // Anti-Fraud: Late Bet Check
             if (createData.drawDate) {

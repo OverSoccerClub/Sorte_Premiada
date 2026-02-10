@@ -1,17 +1,17 @@
 import { Controller, Get, Post, Body, Param, UseGuards, Request, Query, ForbiddenException, Delete } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PermissionsGuard } from '../auth/permissions.guard';
+import { RequirePermissions } from '../auth/permissions.decorator';
 import { Role, Prisma } from '@repo/database';
 
 @Controller('games')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class GamesController {
     constructor(private readonly gamesService: GamesService) { }
 
     @Post()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MASTER)
+    @RequirePermissions('CREATE_GAME')
     async create(@Body() createGameDto: any, @Request() req: any) {
         let companyId = req.user.companyId;
 
@@ -27,7 +27,7 @@ export class GamesController {
     }
 
     @Get()
-    @UseGuards(JwtAuthGuard)
+    @RequirePermissions('VIEW_GAMES')
     async findAll(
         @Query('activeOnly') activeOnly?: string,
         @Query('slug') slug?: string,
@@ -71,7 +71,7 @@ export class GamesController {
     }
 
     @Get(':id')
-    @UseGuards(JwtAuthGuard)
+    @RequirePermissions('VIEW_GAMES')
     async findOne(@Param('id') id: string, @Request() req: any) {
         const game = await this.gamesService.findOne(id);
 
@@ -88,8 +88,7 @@ export class GamesController {
     }
 
     @Post(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MASTER)
+    @RequirePermissions('EDIT_GAME')
     async update(@Param('id') id: string, @Body() updateGameDto: any, @Request() req: any) {
         try {
             // Buscar jogo para validar companyId
@@ -112,8 +111,7 @@ export class GamesController {
         }
     }
     @Delete(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.MASTER) // Apenas MASTER pode deletar
+    @RequirePermissions('DELETE_GAME')
     async remove(@Param('id') id: string, @Request() req: any) {
         const game = await this.gamesService.findOne(id);
         if (!game) {

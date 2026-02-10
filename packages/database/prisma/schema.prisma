@@ -142,6 +142,9 @@ model User {
   canCancelTickets         Boolean           @default(false) // Permissão para o cambista cancelar bilhetes
   canResetActivation       Boolean           @default(false) // Permissão para o cambista resetar a ativação do dispositivo
   commissionRate           Decimal?          @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
+  
+  // Custom Permissions (Granular Access Control)
+  permissions              Json?             @default("{}") // Armazena flags de permissão (ex: { "MANAGE_GAMES": true })
 
   // Dados Cadastrais Completos
   address      String?
@@ -379,6 +382,7 @@ model Ticket {
 
   @@index([drawDate, gameId])
   @@index([drawDate, gameId, ticketNumber])
+  @@index([gameId, series, drawDate]) // Optimized index for 2x1000 number blocking queries
   @@index([companyId])
 }
 

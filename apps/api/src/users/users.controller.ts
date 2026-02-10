@@ -4,12 +4,22 @@ import { Prisma } from '@repo/database';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { PermissionsGuard } from '../auth/permissions.guard';
+import { RequirePermissions } from '../auth/permissions.decorator';
 import * as bcrypt from 'bcrypt';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
+
+    /**
+     * Helper: Verifica se usuário tem permissão específica
+     */
+    private hasPermission(user: any, permission: string): boolean {
+        if (user.role === 'MASTER') return true;
+        return user.permissions?.[permission] === true;
+    }
 
     @Patch('push-token')
     @UseGuards(JwtAuthGuard)
@@ -32,9 +42,19 @@ export class UsersController {
     }
 
     @Post()
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'MASTER')
     async create(@Body() createUserDto: any, @Request() req: any, @Query('targetCompanyId') targetCompanyId?: string) {
+        const role = createUserDto.role;
+
+        // Validar permissão baseada no tipo de usuário
+        if (role === 'CAMBISTA' && !this.hasPermission(req.user, 'CREATE_CAMBISTA')) {
+            throw new ForbiddenException('Você não tem permissão para criar cambistas');
+        }
+        if (role === 'COBRADOR' && !this.hasPermission(req.user, 'CREATE_COBRADOR')) {
+            throw new ForbiddenException('Você não tem permissão para criar cobradores');
+        }
+        if (role === 'ADMIN' && !this.hasPermission(req.user, 'CREATE_ADMIN')) {
+            throw new ForbiddenException('Você não tem permissão para criar administradores');
+        }
         // Determinar o companyId correto
         let companyId = req.user.companyId;
         if (req.user.role === 'MASTER' && targetCompanyId) {
@@ -129,8 +149,7 @@ export class UsersController {
     }
 
     @Get()
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'COBRADOR', 'MASTER')
+    @RequirePermissions('MANAGE_USERS')
     async findAll(
         @Request() req: any,
         @Query('username') username?: string,
@@ -152,8 +171,7 @@ export class UsersController {
     }
 
     @Get(':id')
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'MASTER')
+    @RequirePermissions('MANAGE_USERS')
     async findOne(@Param('id') id: string, @Request() req: any) {
         const user = await this.usersService.findById(id);
 
@@ -170,14 +188,23 @@ export class UsersController {
     }
 
     @Patch(':id')
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'MASTER')
     async update(@Param('id') id: string, @Body() updateUserDto: any, @Request() req: any) {
-        // Buscar usuário para validar companyId
+        // Buscar usuário para validar companyId e permissões
         const user = await this.usersService.findById(id);
 
         if (!user) {
             throw new ForbiddenException('Usuário não encontrado');
+        }
+
+        // Validar permissão baseada no tipo de usuário
+        if (user.role === 'CAMBISTA' && !this.hasPermission(req.user, 'EDIT_CAMBISTA')) {
+            throw new ForbiddenException('Você não tem permissão para editar cambistas');
+        }
+        if (user.role === 'COBRADOR' && !this.hasPermission(req.user, 'EDIT_COBRADOR')) {
+            throw new ForbiddenException('Você não tem permissão para editar cobradores');
+        }
+        if (user.role === 'ADMIN' && !this.hasPermission(req.user, 'EDIT_ADMIN')) {
+            throw new ForbiddenException('Você não tem permissão para editar administradores');
         }
 
         // Validar que o usuário pertence à empresa do admin
@@ -208,19 +235,28 @@ export class UsersController {
     }
 
     @Delete(':id')
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'MASTER')
     async remove(
         @Param('id') id: string,
         @Request() req: any,
         @Query('force') force?: string
     ) {
         console.log(`[UsersController] Remove called for ID: ${id}, Force: ${force}, Role: ${req.user.role}`);
-        // Buscar usuário para validar companyId
+        // Buscar usuário para validar companyId e permissões
         const user = await this.usersService.findById(id);
 
         if (!user) {
             throw new ForbiddenException('Usuário não encontrado');
+        }
+
+        // Validar permissão baseada no tipo de usuário
+        if (user.role === 'CAMBISTA' && !this.hasPermission(req.user, 'DELETE_CAMBISTA')) {
+            throw new ForbiddenException('Você não tem permissão para excluir cambistas');
+        }
+        if (user.role === 'COBRADOR' && !this.hasPermission(req.user, 'DELETE_COBRADOR')) {
+            throw new ForbiddenException('Você não tem permissão para excluir cobradores');
+        }
+        if (user.role === 'ADMIN' && !this.hasPermission(req.user, 'DELETE_ADMIN')) {
+            throw new ForbiddenException('Você não tem permissão para excluir administradores');
         }
 
         // Validar que o usuário pertence à empresa do admin
@@ -239,8 +275,7 @@ export class UsersController {
     }
 
     @Patch(':id/limit')
-    @UseGuards(RolesGuard)
-    @Roles('ADMIN', 'MASTER')
+    @RequirePermissions('EDIT_USER_LIMITS')
     async updateLimit(@Param('id') id: string, @Body() body: { salesLimit?: number, limitOverrideExpiresAt?: Date | string, accountabilityLimitHours?: number }, @Request() req: any) {
         // Buscar usuário para validar companyId
         const user = await this.usersService.findById(id);

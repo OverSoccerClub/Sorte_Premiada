@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards, Query, Res, Request } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/permissions.guard';
+import { RequirePermissions } from '../auth/permissions.decorator';
 import { toBrazilTime, getBrazilNow } from '../utils/date.util';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
 import { Role } from '@repo/database';
 import type { Response } from 'express';
 import { getBrazilStartOfDay, getBrazilEndOfDay } from '../utils/date.util';
