@@ -171,6 +171,13 @@ export class UsersService {
         return updatedUser;
     }
 
+    async updatePermissionsByRole(role: string, permissions: any) {
+        return this.prisma.client.user.updateMany({
+            where: { role: role as any },
+            data: { permissions }
+        });
+    }
+
     async remove(id: string, force: boolean = false): Promise<User> {
         if (force) {
             // Hard Delete with Cascade (MASTER Only via Controller)
