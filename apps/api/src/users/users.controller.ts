@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@repo/database';
+import { Prisma, Role } from '@repo/database';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 import { RolesGuard } from '../auth/roles.guard';
@@ -80,11 +80,11 @@ export class UsersController {
         };
 
         const rolesToSync = [
-            { role: 'ADMIN', permissions: DEFAULT_PERMISSIONS.ADMIN },
-            { role: 'GERENTE', permissions: DEFAULT_PERMISSIONS.GERENTE },
-            { role: 'SUPERVISOR', permissions: DEFAULT_PERMISSIONS.SUPERVISOR },
-            { role: 'COBRADOR', permissions: DEFAULT_PERMISSIONS.COBRADOR },
-            { role: 'CAMBISTA', permissions: DEFAULT_PERMISSIONS.CAMBISTA }
+            { role: Role.ADMIN, permissions: DEFAULT_PERMISSIONS.ADMIN },
+            { role: Role.GERENTE, permissions: DEFAULT_PERMISSIONS.GERENTE },
+            { role: Role.SUPERVISOR, permissions: DEFAULT_PERMISSIONS.SUPERVISOR },
+            { role: Role.COBRADOR, permissions: DEFAULT_PERMISSIONS.COBRADOR },
+            { role: Role.CAMBISTA, permissions: DEFAULT_PERMISSIONS.CAMBISTA }
         ];
 
         let updatedCount = 0;
@@ -95,7 +95,7 @@ export class UsersController {
             for (const roleDef of rolesToSync) {
                 console.log(`[UsersController] Syncing role: ${roleDef.role}`);
                 const result = await this.prisma.client.user.updateMany({
-                    where: { role: roleDef.role as any },
+                    where: { role: roleDef.role },
                     data: { permissions: roleDef.permissions }
                 });
                 updatedCount += result.count;
