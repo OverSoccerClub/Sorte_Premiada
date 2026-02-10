@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, ForbiddenException, ConflictException } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { PrismaService } from '../prisma/prisma.service'; // Fixed import
 import { Prisma } from '@repo/database';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -8,10 +9,105 @@ import { PermissionsGuard } from '../auth/permissions.guard';
 import { RequirePermissions } from '../auth/permissions.decorator';
 import * as bcrypt from 'bcrypt';
 
+import { PrismaService } from '../prisma/prisma.service'; // Add import
+
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly prisma: PrismaService // Inject PrismaService
+    ) { }
+
+    // ... (rest of methods)
+
+    @Post('sync-permissions')
+    @UseGuards(JwtAuthGuard)
+    async syncPermissions(@Request() req: any) {
+        if (req.user.role !== 'MASTER') {
+            throw new ForbiddenException('Apenas MASTER pode sincronizar permissões.');
+        }
+
+        const PERMISSIONS = {
+            MANAGE_USERS: 'MANAGE_USERS',
+            CREATE_CAMBISTA: 'CREATE_CAMBISTA', EDIT_CAMBISTA: 'EDIT_CAMBISTA', DELETE_CAMBISTA: 'DELETE_CAMBISTA',
+            CREATE_COBRADOR: 'CREATE_COBRADOR', EDIT_COBRADOR: 'EDIT_COBRADOR', DELETE_COBRADOR: 'DELETE_COBRADOR',
+            CREATE_ADMIN: 'CREATE_ADMIN', EDIT_ADMIN: 'EDIT_ADMIN', DELETE_ADMIN: 'DELETE_ADMIN',
+            EDIT_USER_LIMITS: 'EDIT_USER_LIMITS',
+            VIEW_GAMES: 'VIEW_GAMES', CREATE_GAME: 'CREATE_GAME', EDIT_GAME: 'EDIT_GAME', DELETE_GAME: 'DELETE_GAME',
+            VIEW_DRAWS: 'VIEW_DRAWS', CREATE_DRAW: 'CREATE_DRAW', EDIT_DRAW: 'EDIT_DRAW', DELETE_DRAW: 'DELETE_DRAW',
+            VIEW_AREAS: 'VIEW_AREAS', CREATE_AREA: 'CREATE_AREA', EDIT_AREA: 'EDIT_AREA', DELETE_AREA: 'DELETE_AREA',
+            VIEW_SALES_REPORT: 'VIEW_SALES_REPORT', VIEW_FINANCIAL_REPORT: 'VIEW_FINANCIAL_REPORT',
+            VIEW_ANALYTICS: 'VIEW_ANALYTICS', EXPORT_REPORTS: 'EXPORT_REPORTS', VIEW_AUDIT_LOGS: 'VIEW_AUDIT_LOGS',
+            VIEW_FINANCIALS: 'VIEW_FINANCIALS', MANAGE_PAYMENTS: 'MANAGE_PAYMENTS', VIEW_COMMISSIONS: 'VIEW_COMMISSIONS',
+            EDIT_COMMISSIONS: 'EDIT_COMMISSIONS', MANAGE_DAILY_CLOSE: 'MANAGE_DAILY_CLOSE',
+            VIEW_TICKETS: 'VIEW_TICKETS', CANCEL_TICKET: 'CANCEL_TICKET', VALIDATE_TICKET: 'VALIDATE_TICKET', EDIT_TICKET: 'EDIT_TICKET',
+            MANAGE_SETTINGS: 'MANAGE_SETTINGS', MANAGE_COMPANY: 'MANAGE_COMPANY', MANAGE_DEVICES: 'MANAGE_DEVICES',
+            VIEW_LOGS: 'VIEW_LOGS', MANAGE_ANNOUNCEMENTS: 'MANAGE_ANNOUNCEMENTS'
+        };
+
+        const DEFAULT_PERMISSIONS = {
+            ADMIN: {
+                [PERMISSIONS.MANAGE_USERS]: true,
+                [PERMISSIONS.CREATE_CAMBISTA]: true, [PERMISSIONS.EDIT_CAMBISTA]: true, [PERMISSIONS.DELETE_CAMBISTA]: true,
+                [PERMISSIONS.CREATE_COBRADOR]: true, [PERMISSIONS.EDIT_COBRADOR]: true, [PERMISSIONS.DELETE_COBRADOR]: true,
+                [PERMISSIONS.EDIT_USER_LIMITS]: true, [PERMISSIONS.VIEW_GAMES]: true, [PERMISSIONS.VIEW_DRAWS]: true,
+                [PERMISSIONS.VIEW_AREAS]: true, [PERMISSIONS.CREATE_AREA]: true, [PERMISSIONS.EDIT_AREA]: true, [PERMISSIONS.DELETE_AREA]: true,
+                [PERMISSIONS.VIEW_SALES_REPORT]: true, [PERMISSIONS.VIEW_ANALYTICS]: true, [PERMISSIONS.EXPORT_REPORTS]: true,
+                [PERMISSIONS.VIEW_FINANCIALS]: true, [PERMISSIONS.MANAGE_PAYMENTS]: true, [PERMISSIONS.VIEW_COMMISSIONS]: true,
+                [PERMISSIONS.MANAGE_DAILY_CLOSE]: true, [PERMISSIONS.VIEW_TICKETS]: true, [PERMISSIONS.CANCEL_TICKET]: true,
+                [PERMISSIONS.VALIDATE_TICKET]: true, [PERMISSIONS.MANAGE_DEVICES]: true,
+            },
+            GERENTE: {
+                [PERMISSIONS.MANAGE_USERS]: true, [PERMISSIONS.CREATE_CAMBISTA]: true, [PERMISSIONS.EDIT_CAMBISTA]: true,
+                [PERMISSIONS.EDIT_USER_LIMITS]: true, [PERMISSIONS.VIEW_GAMES]: true, [PERMISSIONS.VIEW_DRAWS]: true,
+                [PERMISSIONS.VIEW_AREAS]: true, [PERMISSIONS.VIEW_SALES_REPORT]: true, [PERMISSIONS.VIEW_ANALYTICS]: true,
+                [PERMISSIONS.VIEW_FINANCIALS]: true, [PERMISSIONS.MANAGE_PAYMENTS]: true, [PERMISSIONS.MANAGE_DAILY_CLOSE]: true,
+                [PERMISSIONS.VIEW_TICKETS]: true, [PERMISSIONS.CANCEL_TICKET]: true, [PERMISSIONS.VALIDATE_TICKET]: true,
+            },
+            SUPERVISOR: {
+                [PERMISSIONS.MANAGE_USERS]: true, [PERMISSIONS.VIEW_SALES_REPORT]: true,
+                [PERMISSIONS.VIEW_TICKETS]: true, [PERMISSIONS.VALIDATE_TICKET]: true,
+            },
+            COBRADOR: {
+                [PERMISSIONS.MANAGE_USERS]: true, [PERMISSIONS.CREATE_CAMBISTA]: true, [PERMISSIONS.EDIT_CAMBISTA]: true,
+                [PERMISSIONS.VIEW_FINANCIALS]: true, [PERMISSIONS.MANAGE_PAYMENTS]: true, [PERMISSIONS.MANAGE_DAILY_CLOSE]: true,
+                [PERMISSIONS.VIEW_SALES_REPORT]: true,
+            },
+            CAMBISTA: {
+                [PERMISSIONS.VIEW_GAMES]: true, [PERMISSIONS.VIEW_DRAWS]: true,
+                [PERMISSIONS.VIEW_TICKETS]: true, [PERMISSIONS.VALIDATE_TICKET]: true,
+            }
+        };
+
+        const rolesToSync = [
+            { role: 'ADMIN', permissions: DEFAULT_PERMISSIONS.ADMIN },
+            { role: 'GERENTE', permissions: DEFAULT_PERMISSIONS.GERENTE },
+            { role: 'SUPERVISOR', permissions: DEFAULT_PERMISSIONS.SUPERVISOR },
+            { role: 'COBRADOR', permissions: DEFAULT_PERMISSIONS.COBRADOR },
+            { role: 'CAMBISTA', permissions: DEFAULT_PERMISSIONS.CAMBISTA }
+        ];
+
+        let updatedCount = 0;
+
+        try {
+            console.log('[UsersController] Starting permissions sync (Direct Prisma Mode)...');
+
+            for (const roleDef of rolesToSync) {
+                console.log(`[UsersController] Syncing role: ${roleDef.role}`);
+                const result = await this.prisma.client.user.updateMany({
+                    where: { role: roleDef.role as any },
+                    data: { permissions: roleDef.permissions }
+                });
+                updatedCount += result.count;
+            }
+        } catch (error) {
+            console.error('[UsersController] Error syncing permissions:', error);
+            throw new BadRequestException(`Erro ao sincronizar permissões: ${error.message}`);
+        }
+
+        return { message: 'Permissões sincronizadas com sucesso (Modo Direto)', updated: updatedCount };
+    }
 
     /**
      * Helper: Verifica se usuário tem permissão específica
