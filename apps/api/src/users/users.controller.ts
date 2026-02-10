@@ -313,6 +313,7 @@ export class UsersController {
         delete (restDto as any).company;
         delete (restDto as any).areaId;
         delete (restDto as any).neighborhoodId;
+        delete (restDto as any).neighborhood; // FIX: Prevent Prisma relation error if sent as string
 
         // Impedir alteração de username se não for MASTER (opcional, mas seguro)
         if (req.user.role !== 'MASTER') {
