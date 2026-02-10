@@ -365,12 +365,26 @@ export class UsersController {
 
         let updatedCount = 0;
 
-        for (const roleDef of rolesToSync) {
-            // @ts-ignore
-            const result = await this.usersService.updatePermissionsByRole(roleDef.role, roleDef.permissions);
-            updatedCount += result.count;
+        try {
+            console.log('[UsersController] Starting permissions sync...');
+
+            // Verificação de segurança se o método existe (debug)
+            if (typeof this.usersService.updatePermissionsByRole !== 'function') {
+                console.error('[CRITICAL] this.usersService.updatePermissionsByRole IS NOT A FUNCTION. Service version mismatch?');
+                throw new Error('Serviço de usuários desatualizado. Aguarde o deploy finalizar.');
+            }
+
+            for (const roleDef of rolesToSync) {
+                console.log(`[UsersController] Syncing role: ${roleDef.role}`);
+                // @ts-ignore
+                const result = await this.usersService.updatePermissionsByRole(roleDef.role, roleDef.permissions);
+                updatedCount += result.count;
+            }
+        } catch (error) {
+            console.error('[UsersController] Error syncing permissions:', error);
+            throw error; // Propagate to global filter or handle gracefully
         }
 
-        return { message: 'Permissões sincronizadas com sucesso', updated: updatedCount };
+        return { message: 'Permissões sincronizadas com sucesso', updated: updatedCount, server_time: new Date().toISOString() };
     }
 }

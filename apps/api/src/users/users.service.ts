@@ -172,6 +172,7 @@ export class UsersService {
     }
 
     async updatePermissionsByRole(role: string, permissions: any) {
+        console.log(`[UsersService] updatePermissionsByRole called for role: ${role}`);
         return this.prisma.client.user.updateMany({
             where: { role: role as any },
             data: { permissions }
