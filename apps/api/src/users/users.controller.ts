@@ -81,8 +81,6 @@ export class UsersController {
 
         const rolesToSync = [
             { role: Role.ADMIN, permissions: DEFAULT_PERMISSIONS.ADMIN },
-            { role: Role.GERENTE, permissions: DEFAULT_PERMISSIONS.GERENTE },
-            { role: Role.SUPERVISOR, permissions: DEFAULT_PERMISSIONS.SUPERVISOR },
             { role: Role.COBRADOR, permissions: DEFAULT_PERMISSIONS.COBRADOR },
             { role: Role.CAMBISTA, permissions: DEFAULT_PERMISSIONS.CAMBISTA }
         ];
