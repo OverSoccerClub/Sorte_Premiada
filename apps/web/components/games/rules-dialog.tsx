@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useAuth } from "@/context/auth-context"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,10 +18,12 @@ interface RulesDialogProps {
 }
 
 export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialogProps) {
+    const { user } = useAuth()
     const { showAlert } = useAlert()
     const [rulesValues, setRulesValues] = useState({
         globalCheck: false,
         restrictedMode: false,
+        blockSingleSelection: false,
         maxLiability: "5000",
         prizeMultiplier: "1000",
         ticketNumberingMode: "RANDOM",
@@ -44,6 +47,7 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
             setRulesValues({
                 globalCheck: !!currentRules.globalCheck,
                 restrictedMode: !!currentRules.restrictedMode,
+                blockSingleSelection: !!currentRules.blockSingleSelection,
                 maxLiability: game.maxLiability ? String(game.maxLiability) : "5000",
                 prizeMultiplier: game.prizeMultiplier ? String(game.prizeMultiplier) : "1000",
                 ticketNumberingMode: game.ticketNumberingMode || "RANDOM",
@@ -71,7 +75,8 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
             const updatedRules = {
                 ...(game.rules || {}),
                 globalCheck: rulesValues.globalCheck,
-                restrictedMode: rulesValues.restrictedMode
+                restrictedMode: rulesValues.restrictedMode,
+                blockSingleSelection: rulesValues.blockSingleSelection
             }
 
             const payload = {
@@ -150,6 +155,21 @@ export function RulesDialog({ open, onOpenChange, game, onSuccess }: RulesDialog
                             <Switch
                                 checked={rulesValues.restrictedMode}
                                 onCheckedChange={(checked) => setRulesValues({ ...rulesValues, restrictedMode: checked })}
+                                className="scale-90 data-[state=checked]:bg-emerald-600"
+                            />
+                        </div>
+
+                        <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-card">
+                            <div className="space-y-0.5">
+                                <Label className="text-sm font-semibold">Bloquear Aposta Unitária</Label>
+                                <p className="text-[10px] text-muted-foreground leading-tight">
+                                    Força a seleção manual de 4 milhares.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={rulesValues.blockSingleSelection}
+                                onCheckedChange={(checked) => setRulesValues({ ...rulesValues, blockSingleSelection: checked })}
+                                disabled={user?.role !== 'MASTER'}
                                 className="scale-90 data-[state=checked]:bg-emerald-600"
                             />
                         </div>

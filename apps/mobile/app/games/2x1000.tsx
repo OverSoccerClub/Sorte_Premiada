@@ -43,6 +43,7 @@ export default function Game2x1000Screen() {
     const [isLoadingSold, setIsLoadingSold] = useState(false);
     const [drawSeries, setDrawSeries] = useState<number | undefined>(undefined);
     const [isRestrictedMode, setIsRestrictedMode] = useState(false);
+    const [blockSingleSelection, setBlockSingleSelection] = useState(false);
     const [gamePrizes, setGamePrizes] = useState<{
         milhar?: string;
         centena?: string;
@@ -103,6 +104,9 @@ export default function Game2x1000Screen() {
                     setGameName(game.name);
                     if (game.rules?.restrictedMode) {
                         setIsRestrictedMode(true);
+                    }
+                    if (game.rules?.blockSingleSelection) {
+                        setBlockSingleSelection(true);
                     }
                     if (game.price) setGamePrice(Number(game.price));
 
@@ -288,7 +292,13 @@ export default function Game2x1000Screen() {
             // Validation Logic
             if (isRestrictedMode) {
                 // In restricted mode, we allow 1 (auto-complete) OR 4 (full manual)
+                // UNLESS blockSingleSelection is active
                 if (selectedNumbers.length === 1) {
+                    if (blockSingleSelection) {
+                        showAlert("Ação Bloqueada", "A opção de selecionar apenas 1 milhar está desabilitada para este jogo. Por favor, selecione as 4 milhares manualmente.", "warning");
+                        return;
+                    }
+
                     // +3 Auto Logic: "Totalmente Diferentes" (Totally Different)
                     // Generate 3 random numbers that do NOT share the same centenary (last 3 digits)
                     // as the user's selection OR each other.
