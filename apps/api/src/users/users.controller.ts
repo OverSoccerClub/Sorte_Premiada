@@ -328,8 +328,8 @@ export class UsersController {
             data.area = { connect: { id: areaId } };
         }
 
-        // Atualizar lastModifiedBy
-        data.lastModifiedBy = req.user.userId;
+        // Atualizar lastModifiedBy (removido para correção de build)
+        // data.lastModifiedBy = req.user.userId;
 
         console.log(`[UsersController] Direct Update for ID: ${id}`);
         return this.prisma.client.user.update({
