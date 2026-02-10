@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, Clock, ShieldAlert, ShieldCheck, Ban, CheckCircle2, AlertTriangle, Bell, BellOff, DollarSign, Percent, Info, Eye, EyeOff, Phone, FileText } from "lucide-react"
 import { useAlert } from "@/context/alert-context"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 
@@ -46,6 +47,13 @@ const formSchema = z.object({
     complement: z.string().optional(),
     cpf: z.string().optional(),
     commissionGoalType: z.enum(["CURRENCY", "TICKET_COUNT"]).default("CURRENCY"),
+    permissions: z.object({
+        VIEW_GAMES: z.boolean().default(true),
+        VIEW_DRAWS: z.boolean().default(true),
+        VIEW_TICKETS: z.boolean().default(true),
+        VALIDATE_TICKET: z.boolean().default(true),
+        CANCEL_TICKET: z.boolean().default(false),
+    }).optional(),
 })
 
 interface Area {
@@ -244,6 +252,13 @@ export default function CambistasPage() {
                 complement: cambista.complement || "",
                 cpf: cambista.cpf || "",
                 commissionGoalType: cambista.commissionGoalType || "CURRENCY",
+                permissions: cambista.permissions || {
+                    VIEW_GAMES: true,
+                    VIEW_DRAWS: true,
+                    VIEW_TICKETS: true,
+                    VALIDATE_TICKET: true,
+                    CANCEL_TICKET: false
+                },
             })
         } else {
             setEditingId(null)
@@ -272,6 +287,13 @@ export default function CambistasPage() {
                 complement: "",
                 cpf: "",
                 commissionGoalType: "CURRENCY",
+                permissions: {
+                    VIEW_GAMES: true,
+                    VIEW_DRAWS: true,
+                    VIEW_TICKETS: true,
+                    VALIDATE_TICKET: true,
+                    CANCEL_TICKET: false
+                },
             })
         }
         setShowPassword(false)
@@ -502,6 +524,66 @@ export default function CambistasPage() {
                                             <h3 className="text-sm font-semibold mb-3 text-emerald-600 flex items-center gap-2">
                                                 <User className="w-4 h-4" /> Dados Pessoais e Acesso
                                             </h3>
+                                        </div>
+
+                                        {/* --- PERMISSÕES RÁPIDAS (ACCESSO) --- */}
+                                        <div className="md:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 p-3 bg-muted/20 rounded-lg border border-border/50">
+                                            <FormField
+                                                control={form.control}
+                                                name="permissions.VIEW_GAMES"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                        </FormControl>
+                                                        <div className="space-y-0.5 leading-none">
+                                                            <FormLabel className="text-xs font-medium cursor-pointer">Ver Jogos</FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="permissions.VIEW_DRAWS"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                        </FormControl>
+                                                        <div className="space-y-0.5 leading-none">
+                                                            <FormLabel className="text-xs font-medium cursor-pointer">Ver Resultados</FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="permissions.VIEW_TICKETS"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                        </FormControl>
+                                                        <div className="space-y-0.5 leading-none">
+                                                            <FormLabel className="text-xs font-medium cursor-pointer">Ver Bilhetes</FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="permissions.VALIDATE_TICKET"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                        </FormControl>
+                                                        <div className="space-y-0.5 leading-none">
+                                                            <FormLabel className="text-xs font-medium cursor-pointer">Validar Prêmios</FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
 
                                         <div className="md:col-span-5">
