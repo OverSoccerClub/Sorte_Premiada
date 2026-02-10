@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Filter, Loader2, Trash2, Users, UserPlus, Save, User, Mail, Lock, AtSign, MapPin, SquarePen, ShieldAlert, ShieldCheck, Ban, CheckCircle2, Shield } from "lucide-react"
@@ -19,6 +21,7 @@ import { StandardPageHeader } from "@/components/standard-page-header"
 import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
 import { useAuth } from "@/context/auth-context"
+import { PERMISSIONS, PERMISSION_LABELS, PERMISSION_GROUPS } from "@/lib/permissions"
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres." }),
@@ -32,6 +35,7 @@ const formSchema = z.object({
     isActive: z.boolean().default(true),
     areaId: z.string().optional(),
     neighborhoodId: z.string().optional(),
+    permissions: z.record(z.boolean()).optional(),
 })
 
 export default function UsersPage() {
@@ -47,6 +51,7 @@ export default function UsersPage() {
     const { showAlert } = useAlert()
     const [areas, setAreas] = useState<any[]>([])
     const [neighborhoods, setNeighborhoods] = useState<any[]>([])
+    const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({})
 
     const fetchAreas = async () => {
         try {
@@ -134,6 +139,25 @@ export default function UsersPage() {
         }
     }
 
+    const handleSyncPermissions = async () => {
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/users/sync-permissions`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json();
+                showAlert("Sucesso", `Permissões sincronizadas! ${data.updated} usuários atualizados.`, "success");
+                fetchUsers();
+            } else {
+                showAlert("Erro", "Falha ao sincronizar permissões.", "error");
+            }
+        } catch (e) {
+            showAlert("Erro", "Erro de conexão ao sincronizar permissões.", "error");
+        }
+    }
+
     useEffect(() => {
         fetchUsers()
     }, [activeCompanyId])
@@ -141,6 +165,8 @@ export default function UsersPage() {
     const handleOpenDialog = (user?: any) => {
         if (user) {
             setEditingId(user.id)
+            const permissions = user.permissions || {}
+            setUserPermissions(permissions)
             form.reset({
                 name: user.name || "",
                 username: user.username,
@@ -151,6 +177,7 @@ export default function UsersPage() {
                 isActive: user.isActive ?? true,
                 areaId: user.areaId || "",
                 neighborhoodId: user.neighborhoodId || "",
+                permissions: permissions,
             })
             // Fetch neighborhoods immediately for edit
             if (user.areaId) {
@@ -158,6 +185,7 @@ export default function UsersPage() {
             }
         } else {
             setEditingId(null)
+            setUserPermissions({})
             form.reset({
                 name: "",
                 username: "",
@@ -168,6 +196,7 @@ export default function UsersPage() {
                 isActive: true,
                 areaId: "",
                 neighborhoodId: "",
+                permissions: {},
             })
         }
         setIsDialogOpen(true)
@@ -183,7 +212,7 @@ export default function UsersPage() {
             const method = editingId ? "PATCH" : "POST"
 
             // Remove password if empty on edit to avoid overwriting with empty string
-            const bodyData: any = { ...values }
+            const bodyData: any = { ...values, permissions: userPermissions }
             if (editingId && !values.password) {
                 delete bodyData.password
             }
@@ -309,6 +338,20 @@ export default function UsersPage() {
                     refreshing={loading}
                 >
                     <div className="flex flex-wrap items-center gap-3">
+                        {/* Botão de Emergência para Permissões */}
+                        {user?.role === 'MASTER' && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleSyncPermissions}
+                                className="h-9 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
+                                title="Restaurar permissões padrão de todos os usuários"
+                            >
+                                <ShieldCheck className="mr-2 h-4 w-4" />
+                                Restaurar Permissões
+                            </Button>
+                        )}
+
                         <div className="relative w-full sm:w-64">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -336,7 +379,7 @@ export default function UsersPage() {
                                     Novo Usuário
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px] bg-popover border-border">
+                            <DialogContent className="sm:max-w-[700px] bg-popover border-border max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center gap-2 text-foreground">
                                         {editingId ? (
@@ -361,176 +404,222 @@ export default function UsersPage() {
                                 </DialogHeader>
                                 <Form {...form}>
                                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="name"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Nome Completo</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input placeholder="Nome do usuário" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="username"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input placeholder="usuario.admin" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input placeholder="email@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="role"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                                <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                <SelectValue placeholder="Selecione o nível" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="ADMIN">Administrador (ADMIN)</SelectItem>
-                                                            <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                                                            <SelectItem value="GERENTE">Gerente</SelectItem>
-                                                            {user?.role === 'MASTER' && (
-                                                                <SelectItem value="MASTER" className="text-emerald-600 font-bold">
-                                                                    Master (Global)
-                                                                </SelectItem>
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="areaId"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Praça (Opcional)</FormLabel>
-                                                    <Select onValueChange={(val) => {
-                                                        field.onChange(val)
-                                                        form.setValue("neighborhoodId", "") // Reset neighborhood on area change
-                                                    }} value={field.value || ""}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                <SelectValue placeholder="Selecione a praça" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {areas.map((area) => (
-                                                                <SelectItem key={area.id} value={area.id}>
-                                                                    {area.name} ({area.city})
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="neighborhoodId"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground">Bairro (Opcional)</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedAreaId}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                <SelectValue placeholder="Selecione o bairro" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {neighborhoods.map((n) => (
-                                                                <SelectItem key={n.id} value={n.id}>
-                                                                    {n.name}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="canResetActivation"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-3 shadow-sm bg-muted/20">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel className="text-foreground text-xs font-bold flex items-center gap-1.5 uppercase">
-                                                            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                                                            Resetar Ativação
-                                                        </FormLabel>
-                                                        <p className="text-[10px] text-muted-foreground">O usuário poderá remover a ativação do app.</p>
+                                        <Tabs defaultValue="dados" className="w-full">
+                                            <TabsList className="grid w-full grid-cols-2">
+                                                <TabsTrigger value="dados">Dados Básicos</TabsTrigger>
+                                                {user?.role === 'MASTER' && (
+                                                    <TabsTrigger value="acessos">Acessos</TabsTrigger>
+                                                )}
+                                            </TabsList>
+                                            <TabsContent value="dados" className="space-y-4 mt-4">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="name"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Nome Completo</FormLabel>
+                                                            <FormControl>
+                                                                <div className="relative">
+                                                                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                    <Input placeholder="Nome do usuário" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                                </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="username"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Usuário (Login)</FormLabel>
+                                                            <FormControl>
+                                                                <div className="relative">
+                                                                    <AtSign className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                    <Input placeholder="usuario.admin" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                                </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="email"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Email (Opcional)</FormLabel>
+                                                            <FormControl>
+                                                                <div className="relative">
+                                                                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                    <Input placeholder="email@exemplo.com" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                                </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="role"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                <FormControl>
+                                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                        <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                        <SelectValue placeholder="Selecione o nível" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    <SelectItem value="ADMIN">Administrador (ADMIN)</SelectItem>
+                                                                    <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                                                                    <SelectItem value="GERENTE">Gerente</SelectItem>
+                                                                    {user?.role === 'MASTER' && (
+                                                                        <SelectItem value="MASTER" className="text-emerald-600 font-bold">
+                                                                            Master (Global)
+                                                                        </SelectItem>
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="areaId"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Praça (Opcional)</FormLabel>
+                                                            <Select onValueChange={(val) => {
+                                                                field.onChange(val)
+                                                                form.setValue("neighborhoodId", "") // Reset neighborhood on area change
+                                                            }} value={field.value || ""}>
+                                                                <FormControl>
+                                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                        <SelectValue placeholder="Selecione a praça" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {areas.map((area) => (
+                                                                        <SelectItem key={area.id} value={area.id}>
+                                                                            {area.name} ({area.city})
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="neighborhoodId"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground">Bairro (Opcional)</FormLabel>
+                                                            <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedAreaId}>
+                                                                <FormControl>
+                                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                        <SelectValue placeholder="Selecione o bairro" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {neighborhoods.map((n) => (
+                                                                        <SelectItem key={n.id} value={n.id}>
+                                                                            {n.name}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="canResetActivation"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-3 shadow-sm bg-muted/20">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel className="text-foreground text-xs font-bold flex items-center gap-1.5 uppercase">
+                                                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                                                    Resetar Ativação
+                                                                </FormLabel>
+                                                                <p className="text-[10px] text-muted-foreground">O usuário poderá remover a ativação do app.</p>
+                                                            </div>
+                                                            <FormControl>
+                                                                <Switch
+                                                                    checked={field.value}
+                                                                    onCheckedChange={field.onChange}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="password"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-foreground flex justify-between">
+                                                                Senha
+                                                                {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <div className="relative">
+                                                                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                    <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
+                                                                </div>
+                                                            </FormControl>
+                                                            {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </TabsContent>
+                                            {user?.role === 'MASTER' && (
+                                                <TabsContent value="acessos" className="space-y-4 mt-4">
+                                                    <div className="space-y-4">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Selecione as permissões que este usuário terá no sistema:
+                                                        </p>
+                                                        {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
+                                                            <div key={groupName} className="space-y-3">
+                                                                <h4 className="text-sm font-semibold text-foreground">{groupName}</h4>
+                                                                <div className="space-y-2 pl-4">
+                                                                    {permissions.map((permission) => (
+                                                                        <div key={permission} className="flex items-center space-x-2">
+                                                                            <Checkbox
+                                                                                id={permission}
+                                                                                checked={userPermissions[permission] || false}
+                                                                                onCheckedChange={(checked) => {
+                                                                                    setUserPermissions({
+                                                                                        ...userPermissions,
+                                                                                        [permission]: checked as boolean
+                                                                                    })
+                                                                                }}
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={permission}
+                                                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                                                            >
+                                                                                {PERMISSION_LABELS[permission]}
+                                                                            </label>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
+                                                </TabsContent>
                                             )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-foreground flex justify-between">
-                                                        Senha
-                                                        {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional na edição)</span>}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                            <Input type="password" placeholder="******" className="pl-9 bg-muted/50 border-input" {...field} />
-                                                        </div>
-                                                    </FormControl>
-                                                    {editingId && <p className="text-[0.8rem] text-muted-foreground mt-1">Deixe em branco para manter a senha atual.</p>}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        </Tabs>
                                         <DialogFooter className="gap-2 sm:gap-0">
                                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                                                 Cancelar
