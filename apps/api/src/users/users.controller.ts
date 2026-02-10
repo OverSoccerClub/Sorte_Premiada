@@ -282,21 +282,21 @@ export class UsersController {
 
     @Patch(':id')
     async update(@Param('id') id: string, @Body() updateUserDto: any, @Request() req: any) {
-        // Buscar usuário para validar companyId e permissões
-        const user = await this.usersService.findById(id);
+        // Buscar usuário para validar companyId e permissões (Direto Prisma)
+        const user = await this.prisma.client.user.findUnique({ where: { id } });
 
         if (!user) {
             throw new ForbiddenException('Usuário não encontrado');
         }
 
         // Validar permissão baseada no tipo de usuário
-        if (user.role === 'CAMBISTA' && !this.hasPermission(req.user, 'EDIT_CAMBISTA')) {
+        if (user.role === Role.CAMBISTA && !this.hasPermission(req.user, 'EDIT_CAMBISTA')) {
             throw new ForbiddenException('Você não tem permissão para editar cambistas');
         }
-        if (user.role === 'COBRADOR' && !this.hasPermission(req.user, 'EDIT_COBRADOR')) {
+        if (user.role === Role.COBRADOR && !this.hasPermission(req.user, 'EDIT_COBRADOR')) {
             throw new ForbiddenException('Você não tem permissão para editar cobradores');
         }
-        if (user.role === 'ADMIN' && !this.hasPermission(req.user, 'EDIT_ADMIN')) {
+        if (user.role === Role.ADMIN && !this.hasPermission(req.user, 'EDIT_ADMIN')) {
             throw new ForbiddenException('Você não tem permissão para editar administradores');
         }
 
@@ -312,6 +312,10 @@ export class UsersController {
         delete (restDto as any).companyId;
         delete (restDto as any).company;
         delete (restDto as any).areaId;
+        // Impedir alteração de username se não for MASTER (opcional, mas seguro)
+        if (req.user.role !== 'MASTER') {
+            delete (restDto as any).username;
+        }
 
         const data: Prisma.UserUpdateInput = { ...restDto };
 
@@ -324,7 +328,14 @@ export class UsersController {
             data.area = { connect: { id: areaId } };
         }
 
-        return this.usersService.update(id, data, req.user.userId);
+        // Atualizar lastModifiedBy
+        data.lastModifiedBy = req.user.userId;
+
+        console.log(`[UsersController] Direct Update for ID: ${id}`);
+        return this.prisma.client.user.update({
+            where: { id },
+            data
+        });
     }
 
     @Delete(':id')
