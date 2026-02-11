@@ -28,6 +28,8 @@ import { ScheduleDialog } from "@/components/games/schedule-dialog"
 import { Switch } from "@/components/ui/switch"
 import { useActiveCompanyId } from "@/context/use-active-company"
 import { useAuth } from "@/context/auth-context"
+import { usePermissions } from "@/hooks/usePermissions"
+import { PERMISSIONS } from "@/lib/permissions"
 
 interface Game {
     id: string
@@ -38,6 +40,7 @@ interface Game {
     isActive: boolean
     price: number
     rules: any
+    type?: string
     extractionTimes?: string[]
     // ... other props
     prizeMilhar?: number
@@ -52,6 +55,7 @@ interface Game {
 
 export default function GamesPage() {
     const { user } = useAuth()
+    const { hasPermission } = usePermissions()
     const { showAlert } = useAlert()
     const activeCompanyId = useActiveCompanyId()
     const [games, setGames] = useState<Game[]>([])
@@ -221,6 +225,14 @@ export default function GamesPage() {
                         <Button variant="outline" size="sm" className="hidden sm:flex">
                             <FileText className="w-4 h-4 mr-2" />
                             Relatório 2x1000
+                        </Button>
+                    </Link>
+                )}
+                {hasPermission(PERMISSIONS.VIEW_SALES_REPORT) && games.some(g => g.type === 'PAIPITA_AI' || g.name.toLowerCase().includes('palpita')) && (
+                    <Link href="/dashboard/games/palpita">
+                        <Button variant="outline" size="sm" className="hidden sm:flex">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Relatório Palpita Ai
                         </Button>
                     </Link>
                 )}

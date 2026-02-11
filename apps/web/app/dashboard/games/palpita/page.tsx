@@ -30,6 +30,9 @@ import {
     ArrowUpRight,
     Filter
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { usePermissions } from "@/hooks/usePermissions"
+import { PERMISSIONS } from "@/lib/permissions"
 
 export default function PalpitaReportPage() {
     const { showAlert } = useAlert()
@@ -37,6 +40,16 @@ export default function PalpitaReportPage() {
     const getBrazilToday = () => {
         return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
     }
+
+    const router = useRouter()
+    const { hasPermission } = usePermissions()
+
+    useEffect(() => {
+        if (!hasPermission(PERMISSIONS.VIEW_SALES_REPORT)) {
+            router.push("/dashboard")
+            showAlert("Acesso Negado", "Você não tem permissão para acessar este relatório.", "error")
+        }
+    }, [hasPermission, router, showAlert])
 
     const [tickets, setTickets] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
