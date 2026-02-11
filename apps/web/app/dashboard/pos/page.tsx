@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppConfig } from "../../AppConfig";
 import { StandardPageHeader } from "@/components/standard-page-header";
@@ -53,6 +54,7 @@ export default function PosManagementPage() {
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ONLINE' | 'ACTIVE' | 'PENDING'>('ALL');
     const [filter, setFilter] = useState("");
+    const [showAllCompanies, setShowAllCompanies] = useState(false); // MASTER only
     const [currentPage, setCurrentPage] = useState(1);
 
     // ... existing state ...
@@ -77,7 +79,9 @@ export default function PosManagementPage() {
         try {
             const token = localStorage.getItem("token");
             const queryParams = new URLSearchParams();
-            if (activeCompanyId) {
+
+            // Only send targetCompanyId if NOT showing all companies (or if not master)
+            if (activeCompanyId && !showAllCompanies) {
                 queryParams.append('targetCompanyId', activeCompanyId);
             }
 
@@ -104,7 +108,7 @@ export default function PosManagementPage() {
             clearInterval(interval);
             clearInterval(tickInterval);
         };
-    }, [activeCompanyId]);
+    }, [activeCompanyId, showAllCompanies]);
 
     // Gerar nome sugerido quando a lista de dispositivos ou nome da empresa mudar
     useEffect(() => {
@@ -357,6 +361,20 @@ export default function PosManagementPage() {
                                 onChange={(e) => setFilter(e.target.value)}
                             />
                         </div>
+
+                        {user?.role === 'MASTER' && (
+                            <div className="flex items-center gap-2 border px-3 py-2 rounded-md bg-background">
+                                <Switch
+                                    id="global-view"
+                                    checked={showAllCompanies}
+                                    onCheckedChange={setShowAllCompanies}
+                                />
+                                <Label htmlFor="global-view" className="cursor-pointer text-xs font-medium">
+                                    Ver Todas
+                                </Label>
+                            </div>
+                        )}
+
                         <Button onClick={fetchDevices} variant="outline" size="icon">
                             <RotateCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                         </Button>
