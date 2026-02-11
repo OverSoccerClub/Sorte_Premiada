@@ -91,6 +91,21 @@ export function usePermissions() {
         }
     };
 
+    /**
+     * Verifica uma permissão e exibe um alerta explicito se negado.
+     * Retorna true se permitido, false se negado.
+     * Útil para usar em handlers de clique: if (!guard('EDIT_USER')) return;
+     */
+    const guard = (permission: string, customMessage?: string): boolean => {
+        if (hasPermission(permission)) return true;
+
+        const label = PERMISSION_LABELS[permission] || permission;
+        const message = customMessage || `Você não tem permissão para: ${label}.`;
+
+        showAlert("Acesso Negado", message, "error");
+        return false;
+    };
+
     return {
         hasPermission,
         hasAnyPermission,
@@ -98,5 +113,6 @@ export function usePermissions() {
         canCreateUserType,
         canEditUserType,
         canDeleteUserType,
+        guard,
     };
 }
