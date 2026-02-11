@@ -141,7 +141,7 @@ export default function PalpitaDetailsPage() {
                     // So I MUST send numbers.
                     // I will send the results string as numbers array: ["H", "D", "A", ...].
 
-                    const result efficientArray = Array.from({ length: 14 }, (_, i) => results[i + 1] || "X")
+                    const efficientArray = Array.from({ length: 14 }, (_, i) => results[i + 1] || "X")
 
                     const token = localStorage.getItem("token")
                     const payload = {
