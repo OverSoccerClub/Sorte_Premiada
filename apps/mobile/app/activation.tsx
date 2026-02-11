@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
+import * as Clipboard from 'expo-clipboard';
 import { StatusBar } from "expo-status-bar";
 import tw from "../lib/tailwind";
 import { useCompany } from "../context/CompanyContext";
@@ -35,6 +38,37 @@ export default function ActivationScreen() {
 
     const hideAlert = () => {
         setAlertConfig((prev) => ({ ...prev, visible: false }));
+    };
+
+    const [deviceId, setDeviceId] = useState<string>("Carregando ID...");
+
+    useEffect(() => {
+        const fetchDeviceId = async () => {
+            let id = 'unknown-device';
+            if (Platform.OS === 'android') {
+                id = Application.getAndroidId() || 'ANDROID-NO-ID';
+            } else if (Platform.OS === 'ios') {
+                const iosId = await Application.getIosIdForVendorAsync();
+                id = iosId || 'IOS-NO-ID';
+            }
+
+            // Fallback strategy logic (same as CompanyContext)
+            if (id === 'unknown-device' || id.includes('NO-ID')) {
+                const brand = (Device.brand || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const model = (Device.modelName || Device.modelId || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const osVersion = (Device.osVersion || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const manufacturer = (Device.manufacturer || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
+                const combined = `${manufacturer}-${brand}-${model}-${osVersion}`;
+                id = `FALLBACK-${combined.substring(0, 50)}`;
+            }
+            setDeviceId(id);
+        };
+        fetchDeviceId();
+    }, []);
+
+    const copyToClipboard = async () => {
+        await Clipboard.setStringAsync(deviceId);
+        showAlert("Copiado!", "ID do dispositivo copiado.", "success");
     };
 
     const validateCodeFormat = (code: string): boolean => {
@@ -181,6 +215,16 @@ export default function ActivationScreen() {
                                 Exemplo: <Text style={tw`font-mono text-gray-400`}>AP-A3B9-K7M2N5</Text>
                             </Text>
                         </View>
+
+                        {/* Device ID Display */}
+                        <TouchableOpacity onPress={copyToClipboard} style={tw`mt-6 p-3 bg-gray-900/50 rounded-lg border border-gray-800 items-center w-full`}>
+                            <Text style={tw`text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1`}>
+                                ID DO DISPOSITIVO (Para Suporte)
+                            </Text>
+                            <Text style={tw`text-emerald-500 font-mono text-xs text-center`}>
+                                {deviceId} <MaterialCommunityIcons name="content-copy" size={12} />
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
