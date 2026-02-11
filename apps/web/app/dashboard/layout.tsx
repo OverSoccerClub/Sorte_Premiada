@@ -97,6 +97,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 { icon: Trophy, label: "Palpita Ai (Apostar)", href: "/dashboard/games/paipita-ai" },
                 { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
                 { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
+                { icon: Trophy, label: "Gestão Palpita Ai", href: "/dashboard/palpita" },
                 { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
                 // { icon: QrCode, label: "Validação", href: "/dashboard/validate" }, // Future
             ]
