@@ -51,6 +51,11 @@ export const PERMISSIONS = {
     VALIDATE_TICKET: 'VALIDATE_TICKET',
     EDIT_TICKET: 'EDIT_TICKET',
 
+    // === PALPITA AI (3) ===
+    VIEW_PALPITA: 'VIEW_PALPITA',
+    CREATE_PALPITA_DRAW: 'CREATE_PALPITA_DRAW',
+    MANAGE_PALPITA_RESULTS: 'MANAGE_PALPITA_RESULTS',
+
     // === SISTEMA (5) ===
     MANAGE_SETTINGS: 'MANAGE_SETTINGS',
     MANAGE_COMPANY: 'MANAGE_COMPANY',
@@ -119,6 +124,11 @@ export const PERMISSION_LABELS: Record<string, string> = {
     [PERMISSIONS.MANAGE_DEVICES]: 'Gerenciar Dispositivos POS',
     [PERMISSIONS.VIEW_LOGS]: 'Visualizar Logs do Sistema',
     [PERMISSIONS.MANAGE_ANNOUNCEMENTS]: 'Gerenciar Avisos',
+
+    // Palpita Ai
+    [PERMISSIONS.VIEW_PALPITA]: 'Visualizar Concursos Palpita Ai',
+    [PERMISSIONS.CREATE_PALPITA_DRAW]: 'Criar Concursos Palpita Ai',
+    [PERMISSIONS.MANAGE_PALPITA_RESULTS]: 'Apurar Resultados Palpita Ai',
 };
 
 export const PERMISSION_GROUPS = {
@@ -179,5 +189,10 @@ export const PERMISSION_GROUPS = {
         PERMISSIONS.MANAGE_DEVICES,
         PERMISSIONS.VIEW_LOGS,
         PERMISSIONS.MANAGE_ANNOUNCEMENTS,
+    ],
+    'Palpita Ai': [
+        PERMISSIONS.VIEW_PALPITA,
+        PERMISSIONS.CREATE_PALPITA_DRAW,
+        PERMISSIONS.MANAGE_PALPITA_RESULTS,
     ],
 };

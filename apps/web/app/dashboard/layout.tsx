@@ -10,6 +10,8 @@ import { useCompany } from "@/context/company-context";
 import { useAuth } from "@/context/auth-context";
 import { TenantSwitcher } from "@/components/tenant-switcher";
 import { CompanyIndicator } from "@/components/company-indicator";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/permissions";
 
 const sidebarGroups = [
     {
@@ -69,6 +71,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const { settings, loading: companyLoading } = useCompany(); // Renamed to companyLoading to avoid conflict
     const { user, loading: authLoading } = useAuth(); // Import auth context
+    const { hasPermission } = usePermissions();
 
     const sidebarGroups = [
         {
@@ -97,7 +100,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 { icon: Trophy, label: "Palpita Ai (Apostar)", href: "/dashboard/games/paipita-ai" },
                 { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
                 { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
-                { icon: Trophy, label: "Gestão Palpita Ai", href: "/dashboard/palpita" },
+                ...(hasPermission(PERMISSIONS.VIEW_PALPITA) ? [{ icon: Trophy, label: "Gestão Palpita Ai", href: "/dashboard/palpita" }] : []),
                 { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },
                 // { icon: QrCode, label: "Validação", href: "/dashboard/validate" }, // Future
             ]
