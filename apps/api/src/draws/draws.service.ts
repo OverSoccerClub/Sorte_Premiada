@@ -161,30 +161,71 @@ export class DrawsService {
 
             // Check if all matches have results
             const results = fullDraw.matches.map(m => m.result);
-            if (results.some(r => !r)) return; // Not ready
+            if (results.some(r => !r || r === '')) return; // Not ready
 
-            for (const ticket of tickets) {
+            // 1. Calculate Revenue and Prize Pool
+            // Filter tickets that are valid users (prevent test/admin tickets from skewing if needed, but usually all tickets count)
+            // Assuming 'PENDING' or 'PAID' are valid. 'WON'/'LOST' usually means already processed, but we might be re-processing.
+            // Safety: We use all non-cancelled tickets to calculate pool.
+            const validTickets = tickets.filter(t => t.status !== 'CANCELLED');
+
+            const totalRevenue = validTickets.reduce((sum, t) => sum + Number(t.amount), 0);
+            const prizePool = totalRevenue * 0.70; // 70% of Revenue
+
+            // 2. Identify Winners by Tier
+            const winners14: typeof tickets = [];
+            const winners13: typeof tickets = [];
+            const winners12: typeof tickets = [];
+            const losers: typeof tickets = [];
+
+            for (const ticket of validTickets) {
                 const guesses = ticket.numbers as string[];
-                if (!guesses || guesses.length !== 14) continue;
+                if (!guesses || guesses.length !== 14) {
+                    losers.push(ticket);
+                    continue;
+                }
 
                 let hits = 0;
                 guesses.forEach((g, i) => {
                     if (g === results[i]) hits++;
                 });
 
-                // Win Condition: 13 or 14 hits
-                const hasMatch = hits >= 13;
+                // Store hits for debugging/display if we had a field for it (we assumed `hits` in plan but it's not in schema yet)
+                // We will just process the win status.
 
-                /* 
-                   TODO: Prize Calculation for Loteca is usually Parimutuel (Rateio).
-                   Currently relying on ticket.possiblePrize which might be 0 if not set.
-                   If Fixed Odds info is added later, it works automatically.
-                */
-                // Adding 0 as prizeAmount to use existing ticket.possiblePrize or logic
-                await this.updateTicketStatus(tx, ticket, hasMatch ? 'WON' : 'LOST', 0, () => {
-                    if (hasMatch) wonCount++; else lostCount++;
-                });
+                if (hits === 14) winners14.push(ticket);
+                else if (hits === 13) winners13.push(ticket);
+                else if (hits === 12) winners12.push(ticket);
+                else losers.push(ticket);
             }
+
+            // 3. Calculate Individual Prizes
+            // 80% for 14 hits, 15% for 13 hits, 5% for 12 hits
+            const pool14 = prizePool * 0.80;
+            const pool13 = prizePool * 0.15;
+            const pool12 = prizePool * 0.05;
+
+            const prizePer14 = winners14.length > 0 ? pool14 / winners14.length : 0;
+            const prizePer13 = winners13.length > 0 ? pool13 / winners13.length : 0;
+            const prizePer12 = winners12.length > 0 ? pool12 / winners12.length : 0;
+
+            console.log(`[PalpitaAi] Revenue: ${totalRevenue}, Pool: ${prizePool}`);
+            console.log(`[PalpitaAi] Winners: 14pts=${winners14.length} (R$${prizePer14.toFixed(2)}), 13pts=${winners13.length} (R$${prizePer13.toFixed(2)}), 12pts=${winners12.length} (R$${prizePer12.toFixed(2)})`);
+
+            // 4. Update Tickets
+            // Helper to batch update status
+            const updateBatch = async (list: typeof tickets, status: string, amount: number) => {
+                for (const ticket of list) {
+                    await this.updateTicketStatus(tx, ticket, status, amount, () => {
+                        if (status === 'WON') wonCount++; else lostCount++;
+                    });
+                }
+            };
+
+            await updateBatch(winners14, 'WON', prizePer14);
+            await updateBatch(winners13, 'WON', prizePer13);
+            await updateBatch(winners12, 'WON', prizePer12);
+            await updateBatch(losers, 'LOST', 0);
         }
         // Existing Logic (2x1000 / JB - Suffix Match)
         else {
