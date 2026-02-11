@@ -586,7 +586,7 @@ export default function CambistasPage() {
                                             />
                                         </div>
 
-                                        <div className="md:col-span-5">
+                                        <div className="md:col-span-4">
                                             <FormField
                                                 control={form.control}
                                                 name="name"
@@ -605,52 +605,6 @@ export default function CambistasPage() {
                                             />
                                         </div>
 
-                                        <div className="md:col-span-4">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                                                    <AtSign className="h-4 w-4 text-muted-foreground" />
-                                                    Login (Automático)
-                                                </label>
-                                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 h-10 flex items-center">
-                                                    <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate">
-                                                        <Info className="h-3 w-3 inline mr-1" />
-                                                        Gerado via Nome + Empresa
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="md:col-span-3">
-                                            <FormField
-                                                control={form.control}
-                                                name="password"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="text-foreground flex justify-between">
-                                                            Senha
-                                                            {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional)</span>}
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <div className="relative">
-                                                                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                <Input type={showPassword ? "text" : "password"} placeholder="******" className="pl-9 pr-10 bg-muted/50 border-input" {...field} />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setShowPassword(!showPassword)}
-                                                                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
-                                                                    tabIndex={-1}
-                                                                >
-                                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                                </button>
-                                                            </div>
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        {/* --- CONTATO (LINHA UNICA) --- */}
                                         <div className="md:col-span-4">
                                             <FormField
                                                 control={form.control}
@@ -716,6 +670,51 @@ export default function CambistasPage() {
                                                     </FormItem>
                                                 )}
                                             />
+                                        </div>
+
+                                        <div className="md:col-span-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="password"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-foreground flex justify-between">
+                                                            Senha
+                                                            {editingId && <span className="text-xs font-normal text-muted-foreground">(Opcional)</span>}
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                <Input type={showPassword ? "text" : "password"} placeholder="******" className="pl-9 pr-10 bg-muted/50 border-input" {...field} />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setShowPassword(!showPassword)}
+                                                                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                                                                    tabIndex={-1}
+                                                                >
+                                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+
+                                        <div className="md:col-span-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                                                    <AtSign className="h-4 w-4 text-muted-foreground" />
+                                                    Login (Automático)
+                                                </label>
+                                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 h-10 flex items-center justify-center">
+                                                    <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate font-medium">
+                                                        <Info className="h-3 w-3 inline mr-1" />
+                                                        Gerado via Nome + Empresa
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
