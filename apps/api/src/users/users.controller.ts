@@ -156,12 +156,13 @@ export class UsersController {
 
         // Extrair areaId e username se vier no body
         // Extrair campos que não devem ir no restDto (serão tratados manualmente ou filtrados pelo Prisma)
-        const { areaId, username, companyId: _cid, company: _c, ...restDto } = createUserDto;
+        const { areaId, neighborhoodId, username, companyId: _cid, company: _c, ...restDto } = createUserDto;
 
         // Limpeza extra para garantir que não haja conflito com a extensão de Tenant ou Tipos do Prisma
         delete (restDto as any).companyId;
         delete (restDto as any).company;
         delete (restDto as any).areaId;
+        delete (restDto as any).neighborhoodId;
 
         // Validar e inferir Company ID a partir da Área se necessário
         if (areaId) {
@@ -223,6 +224,11 @@ export class UsersController {
             // Se tiver areaId, conectar à área
             if (areaId) {
                 data.area = { connect: { id: areaId } };
+            }
+
+            // Se tiver neighborhoodId, conectar ao bairro (apenas se não for string vazia)
+            if (neighborhoodId && typeof neighborhoodId === 'string' && neighborhoodId.length > 0) {
+                data.neighborhood = { connect: { id: neighborhoodId } };
             }
 
             return await this.usersService.create(data);

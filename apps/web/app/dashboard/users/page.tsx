@@ -477,7 +477,14 @@ export default function UsersPage() {
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormLabel className="text-foreground">Nível de Acesso</FormLabel>
-                                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                    <Select onValueChange={(val) => {
+                                                                        field.onChange(val)
+                                                                        // Reset area/neighborhood if switching to ADMIN/MASTER
+                                                                        if (val === "ADMIN" || val === "MASTER") {
+                                                                            form.setValue("areaId", "")
+                                                                            form.setValue("neighborhoodId", "")
+                                                                        }
+                                                                    }} defaultValue={field.value}>
                                                                         <FormControl>
                                                                             <SelectTrigger className="pl-9 bg-muted/50 border-input">
                                                                                 <Shield className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -500,63 +507,69 @@ export default function UsersPage() {
                                                             )}
                                                         />
                                                     </div>
-                                                    <div className="md:col-span-4">
-                                                        <FormField
-                                                            control={form.control}
-                                                            name="areaId"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-foreground">Praça (Opcional)</FormLabel>
-                                                                    <Select onValueChange={(val) => {
-                                                                        field.onChange(val)
-                                                                        form.setValue("neighborhoodId", "") // Reset neighborhood on area change
-                                                                    }} value={field.value || ""}>
-                                                                        <FormControl>
-                                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                                <SelectValue placeholder="Selecione a praça" />
-                                                                            </SelectTrigger>
-                                                                        </FormControl>
-                                                                        <SelectContent>
-                                                                            {areas.map((area) => (
-                                                                                <SelectItem key={area.id} value={area.id}>
-                                                                                    {area.name} ({area.city})
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    </div>
-                                                    <div className="md:col-span-4">
-                                                        <FormField
-                                                            control={form.control}
-                                                            name="neighborhoodId"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-foreground">Bairro (Opcional)</FormLabel>
-                                                                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedAreaId}>
-                                                                        <FormControl>
-                                                                            <SelectTrigger className="pl-9 bg-muted/50 border-input">
-                                                                                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                                                <SelectValue placeholder="Selecione o bairro" />
-                                                                            </SelectTrigger>
-                                                                        </FormControl>
-                                                                        <SelectContent>
-                                                                            {neighborhoods.map((n) => (
-                                                                                <SelectItem key={n.id} value={n.id}>
-                                                                                    {n.name}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    </div>
+
+                                                    {/* Area and Neighborhood - Only for SUPERVISOR/GERENTE */}
+                                                    {(form.watch("role") === "SUPERVISOR" || form.watch("role") === "GERENTE") && (
+                                                        <>
+                                                            <div className="md:col-span-4">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="areaId"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel className="text-foreground">Praça (Obrigatório)</FormLabel>
+                                                                            <Select onValueChange={(val) => {
+                                                                                field.onChange(val)
+                                                                                form.setValue("neighborhoodId", "") // Reset neighborhood on area change
+                                                                            }} value={field.value || ""}>
+                                                                                <FormControl>
+                                                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                                        <SelectValue placeholder="Selecione a praça" />
+                                                                                    </SelectTrigger>
+                                                                                </FormControl>
+                                                                                <SelectContent>
+                                                                                    {areas.map((area) => (
+                                                                                        <SelectItem key={area.id} value={area.id}>
+                                                                                            {area.name} ({area.city})
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                            <div className="md:col-span-4">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name="neighborhoodId"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel className="text-foreground">Bairro (Opcional)</FormLabel>
+                                                                            <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedAreaId}>
+                                                                                <FormControl>
+                                                                                    <SelectTrigger className="pl-9 bg-muted/50 border-input">
+                                                                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                                                        <SelectValue placeholder="Selecione o bairro" />
+                                                                                    </SelectTrigger>
+                                                                                </FormControl>
+                                                                                <SelectContent>
+                                                                                    {neighborhoods.map((n) => (
+                                                                                        <SelectItem key={n.id} value={n.id}>
+                                                                                            {n.name}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        </>
+                                                    )}
 
                                                     {/* ROW 3: Reset Activation, Password */}
                                                     <div className="md:col-span-5">
