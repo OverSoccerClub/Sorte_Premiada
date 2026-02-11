@@ -29,6 +29,7 @@ export default function PalpitaPage() {
 
     // Create Modal State
     const [modalOpen, setModalOpen] = useState(false)
+    const [selectedDrawId, setSelectedDrawId] = useState<string | null>(null)
     const [drawDate, setDrawDate] = useState(new Date().toISOString().split('T')[0])
     const [drawTime, setDrawTime] = useState("16:00")
     const [matches, setMatches] = useState<any[]>(Array.from({ length: 14 }, (_, i) => ({
@@ -160,6 +161,46 @@ export default function PalpitaPage() {
         })
     }
 
+    const handleEdit = (draw: any) => {
+        setSelectedDrawId(draw.id)
+
+        // Parse date and time
+        const dateObj = new Date(draw.drawDate)
+        setDrawDate(dateObj.toISOString().split('T')[0])
+        setDrawTime(dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+
+        // Set matches
+        if (draw.matches && draw.matches.length > 0) {
+            const sortedMatches = [...draw.matches].sort((a, b) => a.matchOrder - b.matchOrder)
+            setMatches(sortedMatches)
+        } else {
+            // Fallback if no matches
+            setMatches(Array.from({ length: 14 }, (_, i) => ({
+                matchOrder: i + 1,
+                homeTeam: "",
+                awayTeam: "",
+                matchDate: new Date().toISOString(),
+                result: null
+            })))
+        }
+
+        setModalOpen(true)
+    }
+
+    const handleNew = () => {
+        setSelectedDrawId(null)
+        setDrawDate(new Date().toISOString().split('T')[0])
+        setDrawTime("16:00")
+        setMatches(Array.from({ length: 14 }, (_, i) => ({
+            matchOrder: i + 1,
+            homeTeam: "",
+            awayTeam: "",
+            matchDate: "",
+            result: null
+        })))
+        setModalOpen(true)
+    }
+
     const handleSave = async () => {
         if (!selectedGameId) return
         setSaving(true)
@@ -179,8 +220,11 @@ export default function PalpitaPage() {
                 numbers: [] // Empty for Palpita initially
             }
 
-            const res = await fetch(`${API_URL}/draws`, {
-                method: 'POST',
+            const url = selectedDrawId ? `${API_URL}/draws/${selectedDrawId}` : `${API_URL}/draws`
+            const method = selectedDrawId ? 'PATCH' : 'POST'
+
+            const res = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -189,11 +233,11 @@ export default function PalpitaPage() {
             })
 
             if (res.ok) {
-                showAlert("Sucesso", "Novo Concurso Criado!", "success")
+                showAlert("Sucesso", selectedDrawId ? "Concurso Atualizado!" : "Novo Concurso Criado!", "success")
                 setModalOpen(false)
                 fetchDraws()
             } else {
-                showAlert("Erro", "Falha ao criar concurso", "error")
+                showAlert("Erro", selectedDrawId ? "Falha ao atualizar concurso" : "Falha ao criar concurso", "error")
             }
         } catch (e) {
             showAlert("Erro", "Erro ao salvar", "error")
@@ -222,7 +266,7 @@ export default function PalpitaPage() {
                             </SelectContent>
                         </Select>
                     )}
-                    <Button onClick={() => setModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 h-9">
+                    <Button onClick={handleNew} className="bg-emerald-600 hover:bg-emerald-700 h-9">
                         <Plus className="w-4 h-4 mr-2" /> Novo Concurso
                     </Button>
                 </div>
@@ -273,7 +317,10 @@ export default function PalpitaPage() {
                                         <TableCell>
                                             <span className="text-sm text-muted-foreground">{draw.matches?.length || 0} jogos</span>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="flex gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => handleEdit(draw)}>
+                                                Editar
+                                            </Button>
                                             <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/palpita/${draw.id}`)}>
                                                 Detalhes / Apurar
                                             </Button>
@@ -290,7 +337,7 @@ export default function PalpitaPage() {
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Novo Concurso Palpita Ai</DialogTitle>
+                        <DialogTitle>{selectedDrawId ? "Editar Concurso" : "Novo Concurso Palpita Ai"}</DialogTitle>
                         <DialogDescription>Selecione a data de encerramento e os 14 jogos.</DialogDescription>
                     </DialogHeader>
 

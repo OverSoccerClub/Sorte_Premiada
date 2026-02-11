@@ -421,7 +421,7 @@ export class DrawsService {
                 id,
                 ...(companyId ? { companyId } : {})
             },
-            include: { game: true }
+            include: { game: true, matches: { orderBy: { matchOrder: 'asc' } } }
         });
 
         if (!draw) return null;
