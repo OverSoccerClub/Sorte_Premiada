@@ -1,7 +1,10 @@
 import { useAuth } from '@/context/auth-context';
+import { useAlert } from '@/context/alert-context';
+import { PERMISSION_LABELS } from '@/lib/permissions';
 
 export function usePermissions() {
     const { user } = useAuth();
+    const { showAlert } = useAlert();
 
     /**
      * Verifica se o usuário tem uma permissão específica

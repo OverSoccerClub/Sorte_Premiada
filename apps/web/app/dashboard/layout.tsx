@@ -12,6 +12,7 @@ import { TenantSwitcher } from "@/components/tenant-switcher";
 import { CompanyIndicator } from "@/components/company-indicator";
 import { usePermissions } from "@/hooks/usePermissions";
 import { PERMISSIONS } from "@/lib/permissions";
+import { SessionTimer } from "@/components/session-timer";
 
 const sidebarGroups = [
     {
@@ -249,6 +250,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                                 <span className="font-medium">{settings.companyName}</span>
                             </div>
                         )}
+
+                        {/* Session Timer */}
+                        <SessionTimer />
 
                         {/* User Indicator */}
                         {user && (
