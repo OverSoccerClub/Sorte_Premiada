@@ -13,6 +13,7 @@ interface CompanySettings {
     phone?: string
     whatsapp?: string
     email?: string
+    showPlanTotalValue?: boolean
     plan?: {
         name: string
         features: string[]

@@ -107,7 +107,7 @@ export function PlanUsageDialog({ trigger, open: controlledOpen, onOpenChange }:
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+            {!!trigger && <DialogTrigger asChild>{trigger as any}</DialogTrigger>}
             <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center justify-between">

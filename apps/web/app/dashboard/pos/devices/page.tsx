@@ -100,7 +100,7 @@ export default function DeviceManagementPage() {
         setIsGenerating(true);
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${AppConfig.API_BASE_URL}/devices/generate-code`, {
+            const response = await fetch(`${AppConfig.api.baseUrl}/devices/generate-code`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export default function DeviceManagementPage() {
         try {
             const token = localStorage.getItem("token");
             const endpoint = currentStatus ? "deactivate" : "reactivate";
-            const response = await fetch(`${AppConfig.API_BASE_URL}/devices/${deviceId}/${endpoint}`, {
+            const response = await fetch(`${AppConfig.api.baseUrl}/devices/${deviceId}/${endpoint}`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,

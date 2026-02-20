@@ -32,7 +32,9 @@ export function CompanyIndicator() {
                         Empresa
                     </span>
                     {user?.role === 'MASTER' && (
-                        <Crown className="w-3.5 h-3.5 text-amber-500 ml-auto" title="Modo MASTER" />
+                        <span title="Modo MASTER" className="ml-auto flex">
+                            <Crown className="w-3.5 h-3.5 text-amber-500" />
+                        </span>
                     )}
                 </div>
                 <div className="flex items-center gap-2">
