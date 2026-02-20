@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ChampStatus {
+  OPEN
+  CLOSED
+  FINISHED
+}
+
+enum MatchResult {
+  HOME
+  DRAW
+  AWAY
+}
+
+enum TicketStatus {
+  PENDING
+  PAID
+  CANCELLED
+  WINNER
+}
+
+enum PayMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+}
+
+enum PayStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model PalpitaUser {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  cpf       String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tickets   PalpitaTicket[]
+
+  @@map("palpita_users")
+}
+
+model PalpitaChampionship {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      ChampStatus @default(OPEN)
+  drawDate    DateTime
+  matches     PalpitaMatch[]
+  tickets     PalpitaTicket[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("palpita_championships")
+}
+
+model PalpitaMatch {
+  id             String              @id @default(cuid())
+  championship   PalpitaChampionship @relation(fields: [championshipId], references: [id], onDelete: Cascade)
+  championshipId String
+  homeTeam       String
+  awayTeam       String
+  homeTeamLogo   String?
+  awayTeamLogo   String?
+  order          Int
+  result         MatchResult?
+  picks          PalpitaPick[]
+  createdAt      DateTime            @default(now())
+
+  @@map("palpita_matches")
+}
+
+model PalpitaTicket {
+  id             String              @id @default(cuid())
+  user           PalpitaUser         @relation(fields: [userId], references: [id])
+  userId         String
+  championship   PalpitaChampionship @relation(fields: [championshipId], references: [id])
+  championshipId String
+  status         TicketStatus        @default(PENDING)
+  amount         Decimal             @default(10.00) @db.Decimal(10, 2)
+  hits           Int?
+  prize          Decimal?            @db.Decimal(10, 2)
+  picks          PalpitaPick[]
+  payment        PalpitaPayment?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@map("palpita_tickets")
+}
+
+model PalpitaPick {
+  id       String        @id @default(cuid())
+  ticket   PalpitaTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId String
+  match    PalpitaMatch  @relation(fields: [matchId], references: [id])
+  matchId  String
+  pick     MatchResult
+
+  @@unique([ticketId, matchId])
+  @@map("palpita_picks")
+}
+
+model PalpitaPayment {
+  id              String        @id @default(cuid())
+  ticket          PalpitaTicket @relation(fields: [ticketId], references: [id])
+  ticketId        String        @unique
+  mpPaymentId     String?
+  mpPreferenceId  String?
+  method          PayMethod
+  status          PayStatus     @default(PENDING)
+  pixQrCode       String?
+  pixQrCodeBase64 String?
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("palpita_payments")
+}
