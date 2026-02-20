@@ -33,10 +33,16 @@
   "version": "1.0.0",
   "dependencies": {
     "ajv": "8.17.1",
+    "expo": "~52.0.48",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-native": "0.76.9"
   },
   "overrides": {
-    "expo-modules-core": "~1.12.11"
+    "expo-modules-core": "~1.12.11",
+    "mobile": {
+      "react": "18.3.1",
+      "react-dom": "18.3.1"
+    }
   }
 }
