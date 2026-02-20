@@ -504,77 +504,75 @@ function CompanySettingsContent() {
                             </div>
                         </div>
 
-                        {/* Configurações Avançadas do Template Alternativo */}
-                        {settings.ticketTemplate === 'alternative' && (
-                            <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-4 border border-border animate-in fade-in slide-in-from-top-4 duration-500">
-                                <h4 className="font-semibold text-sm flex items-center gap-2 text-emerald-600">
-                                    <Settings2 className="w-4 h-4" />
-                                    Personalizar Dimensões (Template Alternativo)
-                                </h4>
+                        {/* Configurações Avançadas dos Templates */}
+                        <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-4 border border-border">
+                            <h4 className="font-semibold text-sm flex items-center gap-2 text-emerald-600">
+                                <Settings2 className="w-4 h-4" />
+                                Personalizar Dimensões da Logomarca e QR Code
+                            </h4>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Largura da Logo (px)</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                value={settings.alternativeLogoWidth || 500}
-                                                onChange={(e) => handleChange("alternativeLogoWidth", parseInt(e.target.value))}
-                                                className="font-mono"
-                                                min={100}
-                                                max={1000}
-                                            />
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 500px</span>
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Largura da Logo (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeLogoWidth || 500}
+                                            onChange={(e) => handleChange("alternativeLogoWidth", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={100}
+                                            max={1000}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 500px</span>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Altura da Logo (px)</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                value={settings.alternativeLogoHeight || 85}
-                                                onChange={(e) => handleChange("alternativeLogoHeight", parseInt(e.target.value))}
-                                                className="font-mono"
-                                                min={20}
-                                                max={300}
-                                            />
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 85px</span>
-                                        </div>
+                                <div className="space-y-2">
+                                    <Label>Altura da Logo (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeLogoHeight || 85}
+                                            onChange={(e) => handleChange("alternativeLogoHeight", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={20}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 85px</span>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Largura QR Code (px)</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                value={settings.alternativeQrWidth || 120}
-                                                onChange={(e) => handleChange("alternativeQrWidth", parseInt(e.target.value))}
-                                                className="font-mono"
-                                                min={50}
-                                                max={300}
-                                            />
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
-                                        </div>
+                                <div className="space-y-2">
+                                    <Label>Largura QR Code (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeQrWidth || 120}
+                                            onChange={(e) => handleChange("alternativeQrWidth", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={50}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Altura QR Code (px)</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                value={settings.alternativeQrHeight || 120}
-                                                onChange={(e) => handleChange("alternativeQrHeight", parseInt(e.target.value))}
-                                                className="font-mono"
-                                                min={50}
-                                                max={300}
-                                            />
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
-                                        </div>
+                                <div className="space-y-2">
+                                    <Label>Altura QR Code (px)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            type="number"
+                                            value={settings.alternativeQrHeight || 120}
+                                            onChange={(e) => handleChange("alternativeQrHeight", parseInt(e.target.value))}
+                                            className="font-mono"
+                                            min={50}
+                                            max={300}
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap w-24">Padrão: 120px</span>
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </CardContent>
                 </Card>
 

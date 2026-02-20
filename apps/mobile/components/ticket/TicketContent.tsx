@@ -79,6 +79,17 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     // Determinar se deve mostrar logo ou ícone
     const shouldShowLogo = data.companyLogoUrl && !logoError;
 
+    // Dimensões Parametrizadas
+    const logoWidth = data.alternativeLogoWidth || 140;
+    const logoHeight = data.alternativeLogoHeight || 70;
+
+    // QR Code Dimensões
+    const qrCodeWidth = Number(data.alternativeQrWidth) || Number(data.qrcodeWidth) || 240;
+    const qrCodeHeight = Number(data.alternativeQrHeight) || Number(data.qrcodeHeight) || undefined;
+    const hasQrHeight = !!qrCodeHeight;
+    const qrScaleY = hasQrHeight ? (qrCodeHeight! / qrCodeWidth) : (isCapture ? 0.425 : 1);
+    const qrMargin = -((qrCodeWidth) * (1 - qrScaleY) / 2);
+
     // Helper to get formatted POS name
     const getPosName = () => {
         if (!data.deviceName) return data.terminalId || '----';
@@ -103,7 +114,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 {shouldShowLogo ? (
                     <Image
                         source={{ uri: data.companyLogoUrl }}
-                        style={{ width: 140, height: 70, resizeMode: 'contain', marginBottom: 2 }}
+                        style={{ width: logoWidth, height: logoHeight, resizeMode: 'contain', marginBottom: 2 }}
                         onError={() => {
                             console.warn('[TicketContent] Failed to load company logo, using fallback icon');
                             setLogoError(true);
@@ -385,17 +396,17 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <View style={[
                         tw`items-center justify-center w-full mt-2`,
                         {
-                            transform: [{ scaleY: data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : (isCapture ? 0.425 : 1) }],
+                            transform: [{ scaleY: qrScaleY }],
                         },
-                        (!!data.qrcodeHeight || isCapture) && {
-                            marginTop: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2),
-                            marginBottom: -((data.qrcodeWidth || 240) * (1 - (data.qrcodeHeight ? (data.qrcodeHeight / (data.qrcodeWidth || 240)) : 0.425)) / 2)
+                        (hasQrHeight || isCapture) && {
+                            marginTop: qrMargin,
+                            marginBottom: qrMargin
                         }
                     ]}>
                         <View style={tw`border-[3px] border-black p-1 bg-white`}>
                             <QRCode
                                 value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
-                                size={Number(data.qrcodeWidth) || 240}
+                                size={qrCodeWidth}
                             />
                         </View>
                     </View>
