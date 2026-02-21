@@ -765,7 +765,7 @@ export default function Game2x1000Screen() {
 
             {/* Modal & Alerts */}
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleBackFromModal}>
-                <View style={tw`flex-1 bg-black/90`}>
+                <SafeAreaView style={tw`flex-1 bg-black/90`}>
                     <ScrollView
                         style={tw`flex-1`}
                         contentContainerStyle={tw`items-center p-4 pb-10`}
@@ -830,7 +830,7 @@ export default function Game2x1000Screen() {
                             <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
 
             <ReceiptModal

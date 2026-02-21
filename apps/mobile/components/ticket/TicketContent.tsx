@@ -130,7 +130,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <Text style={[
                     tw`text-xl font-black text-black text-center uppercase mb-0.5`,
                     { letterSpacing: 1 }
-                ]} numberOfLines={1}>
+                ]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
                     {brandMain}
                 </Text>
 
