@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
 import * as Application from 'expo-application';
 import * as Location from 'expo-location';
 import { DevicesService } from '../services/devices.service';
 import { useAuth } from '../context/AuthContext';
+import { getStableDeviceId } from '../utils/deviceId';
 
 export function usePosTracking() {
     const { user } = useAuth();
@@ -14,18 +14,13 @@ export function usePosTracking() {
         let isMounted = true;
 
         const init = async () => {
-            // 1. Get Device ID
-            let deviceId = 'UNKNOWN';
-            if (Platform.OS === 'android') {
-                deviceId = Application.getAndroidId() || 'ANDROID-NO-ID';
-            } else if (Platform.OS === 'ios') {
-                const iosId = await Application.getIosIdForVendorAsync();
-                deviceId = iosId || 'IOS-NO-ID';
-            }
+            // 1. Get Device ID (stable, persistent UUID per installation)
+            const deviceId = await getStableDeviceId();
+            deviceIdRef.current = deviceId;
 
             // 2. Register Device on Mount (Once)
             // Get Model
-            const model = Platform.OS === 'android' ? 'Android Device' : 'iOS Device'; // Simple fallback without expo-device 
+            const model = Application.nativeApplicationVersion ? 'Mobile Device' : 'Unknown Device';
             // Actually expo-device is better for model name, but let's stick to simple or use "Platform.constants.Model" if available? 
             // Or just pass generic info. Application.nativeApplicationVersion
 

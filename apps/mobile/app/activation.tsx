@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import * as Application from 'expo-application';
-import * as Device from 'expo-device';
 import * as Clipboard from 'expo-clipboard';
 import { StatusBar } from "expo-status-bar";
 import tw from "../lib/tailwind";
@@ -12,6 +10,7 @@ import { VersionFooter } from "../components/VersionFooter";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScreenLayout } from "../components/ScreenLayout";
 import { FormField } from "../components/FormField";
+import { getStableDeviceId } from "../utils/deviceId";
 
 export default function ActivationScreen() {
     const [activationCode, setActivationCode] = useState("");
@@ -44,23 +43,7 @@ export default function ActivationScreen() {
 
     useEffect(() => {
         const fetchDeviceId = async () => {
-            let id = 'unknown-device';
-            if (Platform.OS === 'android') {
-                id = Application.getAndroidId() || 'ANDROID-NO-ID';
-            } else if (Platform.OS === 'ios') {
-                const iosId = await Application.getIosIdForVendorAsync();
-                id = iosId || 'IOS-NO-ID';
-            }
-
-            // Fallback strategy logic (same as CompanyContext)
-            if (id === 'unknown-device' || id.includes('NO-ID')) {
-                const brand = (Device.brand || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const model = (Device.modelName || Device.modelId || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const osVersion = (Device.osVersion || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const manufacturer = (Device.manufacturer || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const combined = `${manufacturer}-${brand}-${model}-${osVersion}`;
-                id = `FALLBACK-${combined.substring(0, 50)}`;
-            }
+            const id = await getStableDeviceId();
             setDeviceId(id);
         };
         fetchDeviceId();

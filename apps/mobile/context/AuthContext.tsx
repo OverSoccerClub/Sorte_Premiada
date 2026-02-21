@@ -1,13 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from "expo-router";
-import { Platform } from "react-native";
-import * as Application from 'expo-application';
 import { AppConfig } from "../constants/AppConfig";
 import { useSettings } from "./SettingsContext";
 import { useLoading } from "./LoadingContext";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useLicenseCheck } from "../hooks/useLicenseCheck";
+import { getStableDeviceId } from "../utils/deviceId";
 
 interface User {
     id: string;
@@ -95,16 +94,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // Using the IP from AppConfig
             const API_URL = AppConfig.api.baseUrl;
 
-            // Obter Device ID para validação de licença cruzada (Cross-Company Check)
+            // Obter Device ID estável para validação de licença
             let deviceId = null;
             try {
-                // Tenta obter o ID do Android (mais estável)
-                if (Platform.OS === 'android') {
-                    deviceId = Application.getAndroidId();
-                } else {
-                    // Fallback para iOS ou outros
-                    deviceId = await Application.getIosIdForVendorAsync();
-                }
+                deviceId = await getStableDeviceId();
             } catch (e) {
                 console.warn("Could not get deviceId for login", e);
             }

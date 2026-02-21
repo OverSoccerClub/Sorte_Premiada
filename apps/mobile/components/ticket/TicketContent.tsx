@@ -103,7 +103,6 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     };
 
     // Helper to format Draw Date as per requirement: DD/MM/YY ÀS HH:MM
-    // Enforces Brazil Time (UTC-3) using date-utils
     const formatDrawDate = (dateStr: string | undefined) => {
         return formatBrazilDate(dateStr, { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' ÀS ');
     };
@@ -217,8 +216,8 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                                     <View style={tw`flex-row justify-between w-full px-1 mt-1`}>
                                         {num.toString().padStart(4, '0').split('').map((digit, i) => (
                                             <View key={i} style={tw`items-center`}>
-                                                <Text style={[tw`text-xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
-                                                <Text style={[tw`text-[6px] text-gray-800 text-center font-bold uppercase -mt-0.5`, { fontFamily: 'serif' }]}>
+                                                <Text style={[tw`text-xl text-black font-black mb-0`, { fontFamily: 'Roboto_700Bold' }]}>{digit}</Text>
+                                                <Text style={[tw`text-[6px] text-gray-800 text-center font-bold uppercase -mt-0.5`, { fontFamily: 'Roboto_400Regular' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
                                             </View>
@@ -226,7 +225,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                                     </View>
                                 ) : (
                                     <View style={tw`flex-row justify-center w-full px-4 items-center`}>
-                                        <Text style={[tw`text-xl text-gray-400 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
+                                        <Text style={tw`text-xl text-gray-400 font-bold mb-0 uppercase tracking-widest`}>AUTO</Text>
                                     </View>
                                 )}
                             </View>
@@ -261,7 +260,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             ) : data.possiblePrize ? (
                 <View style={tw`mb-2 border border-black rounded p-1 mx-2 bg-gray-100 items-center`}>
-                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
+                        <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
                     <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : null}

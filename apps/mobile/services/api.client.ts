@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppConfig } from '../constants/AppConfig';
+import { notifyDeviceInvalidated } from '../utils/activationBridge';
 
 const DEVICE_TOKEN_KEY = '@device_token';
 
@@ -45,7 +46,8 @@ export class ApiClient {
                 const errorData = await response.clone().json().catch(() => null);
                 if (errorData?.message?.toLowerCase().includes('dispositivo')) {
                     await AsyncStorage.multiRemove([DEVICE_TOKEN_KEY, '@company_id', '@company_settings']);
-                    // O CompanyContext detectará a mudança e redirecionará para ativação
+                    // Notificar CompanyContext para atualizar estado imediatamente (evita pedir ativação só no próximo reopen)
+                    notifyDeviceInvalidated();
                 }
             }
 

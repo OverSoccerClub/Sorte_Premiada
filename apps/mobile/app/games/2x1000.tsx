@@ -485,7 +485,7 @@ export default function Game2x1000Screen() {
                 })(),
                 secondChanceLabel: secondChanceConfig.enabled ? secondChanceConfig.label : undefined,
                 secondChancePrize: secondChanceConfig.enabled ? secondChanceConfig.prize : undefined,
-                promptMessage: "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS", // 2x1000 might not have gameConfig loaded in this scope?
+                promptMessage: "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS",
                 mainMatchMessage: "ACERTANDO TODOS OS NÚMEROS NA ORDEM",
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,

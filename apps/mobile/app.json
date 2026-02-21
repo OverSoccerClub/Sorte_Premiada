@@ -1,8 +1,8 @@
-﻿{
+{
     "expo": {
         "name": "InnoBet",
         "slug": "innobet",
-        "version": "1.5.45",
+        "version": "1.5.47",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -36,7 +36,7 @@
                 "android.permission.WRITE_EXTERNAL_STORAGE",
                 "android.permission.REQUEST_INSTALL_PACKAGES"
             ],
-            "versionCode": 264
+            "versionCode": 266
         },
         "web": {
             "favicon": "./assets/favicon.png"

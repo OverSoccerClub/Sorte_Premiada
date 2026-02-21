@@ -1,9 +1,9 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppConfig } from '../constants/AppConfig';
-import { Platform } from 'react-native';
-import * as Application from 'expo-application';
-import * as Device from 'expo-device';
+import { getStableDeviceId } from '../utils/deviceId';
+import { setOnDeviceInvalidated } from '../utils/activationBridge';
 
 export interface CompanySettings {
     companyName: string;
@@ -73,6 +73,7 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
     const [activationCode, setActivationCode] = useState<string | null>(null);
     const [verificationStatus, setVerificationStatus] = useState<'verified' | 'offline' | 'failed' | 'checking'>('checking');
     const [isActivated, setIsActivated] = useState(false);
+    const clearActivationRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
     // Carrega token e settings salvos
     const loadStoredData = useCallback(async () => {
@@ -177,31 +178,8 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
 
     const activateDevice = useCallback(async (activationCode: string) => {
         try {
-            // Obter ID único do dispositivo real (Android ID ou iOS Vendor ID)
-            let deviceId = 'unknown-device';
-            if (Platform.OS === 'android') {
-                deviceId = Application.getAndroidId() || 'ANDROID-NO-ID';
-            } else if (Platform.OS === 'ios') {
-                const iosId = await Application.getIosIdForVendorAsync();
-                deviceId = iosId || 'IOS-NO-ID';
-            }
-            // Fallback aprimorado: usar combinação de identificadores para criar ID estável
-            if (deviceId === 'unknown-device' || deviceId.includes('NO-ID')) {
-                console.warn('[Device Activation] Primary device ID unavailable, using fallback strategy');
-
-                // Combinar múltiplos identificadores para criar um ID mais único e estável
-                const brand = (Device.brand || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const model = (Device.modelName || Device.modelId || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const osVersion = (Device.osVersion || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-                const manufacturer = (Device.manufacturer || 'UNKNOWN').replace(/[^A-Z0-9]/gi, '');
-
-                // Criar hash baseado em múltiplos fatores (mais estável que random)
-                const combined = `${manufacturer}-${brand}-${model}-${osVersion}`;
-                deviceId = `FALLBACK-${combined.substring(0, 50)}`;
-
-                console.warn('[Device Activation] Using fallback device ID:', deviceId);
-                console.warn('[Device Activation] Device Info:', { brand, model, osVersion, manufacturer });
-            }
+            // Obter ID único estável da instalação (persiste no AsyncStorage)
+            const deviceId = await getStableDeviceId();
 
             const response = await fetch(`${AppConfig.api.baseUrl}/devices/activate`, {
                 method: 'POST',
@@ -258,6 +236,9 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
         setVerificationStatus('failed'); // or checking/idle
     }, []);
 
+    // Manter ref atualizada para o callback do activationBridge
+    clearActivationRef.current = clearActivation;
+
     const refresh = useCallback(async () => {
         await AsyncStorage.removeItem(CACHE_KEY);
         setIsLoading(true);
@@ -276,6 +257,27 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
         return () => { isMounted = false; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Registrar callback para quando ApiClient detectar 401 (dispositivo inválido)
+    // Assim o estado é atualizado imediatamente, evitando pedir ativação só no próximo reopen
+    useEffect(() => {
+        setOnDeviceInvalidated(() => {
+            clearActivationRef.current();
+        });
+        return () => setOnDeviceInvalidated(null);
+    }, []);
+
+    // Recarregar dados quando o app volta do background (sincroniza com AsyncStorage)
+    // Útil se o token foi limpo por ApiClient enquanto o app estava em background
+    useEffect(() => {
+        const handleAppStateChange = (nextState: AppStateStatus) => {
+            if (nextState === 'active') {
+                loadStoredData();
+            }
+        };
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+        return () => subscription.remove();
+    }, [loadStoredData]);
 
     return (
         <CompanyContext.Provider value={{
