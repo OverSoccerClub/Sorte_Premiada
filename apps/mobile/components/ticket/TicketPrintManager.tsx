@@ -27,7 +27,7 @@ export const TicketPrintManager = forwardRef<ViewShot, TicketPrintManagerProps>(
         >
             <ViewShot
                 ref={ref}
-                options={{ format: "png", quality: 1.0, result: "tmpfile" }}
+                options={{ format: "png", quality: 1.0, result: "tmpfile", width: 384 }}
                 style={{ backgroundColor: '#ffffff', width: 384 }}
             >
                 <TicketDisplay data={data} mode="capture" template={template} />

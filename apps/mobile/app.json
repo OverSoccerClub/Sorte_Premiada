@@ -2,7 +2,7 @@
     "expo": {
         "name": "InnoBet",
         "slug": "innobet",
-        "version": "1.5.44",
+        "version": "1.5.45",
         "runtimeVersion": {
             "policy": "appVersion"
         },
@@ -36,10 +36,7 @@
                 "android.permission.WRITE_EXTERNAL_STORAGE",
                 "android.permission.REQUEST_INSTALL_PACKAGES"
             ],
-            "edgeToEdgeEnabled": true,
-            "predictiveBackGestureEnabled": false,
-            "package": "com.anonymous.sortepremiada",
-            "versionCode": 263
+            "versionCode": 264
         },
         "web": {
             "favicon": "./assets/favicon.png"
