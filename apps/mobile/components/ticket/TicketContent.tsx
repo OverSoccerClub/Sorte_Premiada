@@ -83,10 +83,10 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     // Dimensões Parametrizadas
     const logoWidth = data.alternativeLogoWidth || 140;
-    const logoHeight = data.alternativeLogoHeight || 70;
+    const logoHeight = data.alternativeLogoHeight || 50;
 
     // QR Code Dimensões
-    const qrCodeWidth = Number(data.alternativeQrWidth) || Number(data.qrcodeWidth) || 240;
+    const qrCodeWidth = Number(data.alternativeQrWidth) || Number(data.qrcodeWidth) || 180;
     const qrCodeHeight = Number(data.alternativeQrHeight) || Number(data.qrcodeHeight) || undefined;
     const hasQrHeight = !!qrCodeHeight;
     const qrScaleY = hasQrHeight ? (qrCodeHeight! / qrCodeWidth) : (isCapture ? 0.425 : 1);
@@ -109,9 +109,9 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
     };
 
     return (
-        <View style={tw`bg-white w-[384px] p-1`}>
+        <View style={tw`bg-white w-[384px] p-0.5`}>
             {/* Header Clean & Professional */}
-            <View style={tw`items-center mb-1 w-full pt-1 pb-1 border-b-2 border-dashed border-black mx-2`}>
+            <View style={tw`items-center mb-0.5 w-full pt-1 pb-0.5 border-b border-dashed border-black mx-2`}>
                 {/* Logo Centralizado e Maior */}
                 {shouldShowLogo ? (
                     <Image
@@ -128,27 +128,27 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
                 {/* Nome da Empresa */}
                 <Text style={[
-                    tw`text-2xl font-black text-black text-center uppercase mb-1`,
+                    tw`text-xl font-black text-black text-center uppercase mb-0.5`,
                     { letterSpacing: 1 }
                 ]}>
                     {brandMain}
                 </Text>
 
                 {brandSuffix && (
-                    <Text style={tw`text-sm font-bold text-black uppercase mb-3`}>
+                    <Text style={tw`text-[10px] font-bold text-black uppercase mb-1`}>
                         {brandSuffix}
                     </Text>
                 )}
 
                 {/* Nome do Jogo e Data */}
-                <View style={tw`w-full flex-row justify-center items-center mt-2 bg-black py-1`}>
+                <View style={tw`w-full flex-row justify-center items-center mt-1 bg-black py-0.5`}>
                     <MaterialCommunityIcons name="soccer" size={20} color="white" style={tw`mr-2`} />
                     <Text style={tw`text-white font-black text-lg uppercase`}>
                         {data.bannerText || data.gameName}
                     </Text>
                 </View>
-                <Text style={tw`text-center font-bold text-black text-[12px] mt-1`}>
-                    EXTRAÇÃO: <Text style={tw`font-black text-[14px]`}>
+                <Text style={tw`text-center font-bold text-black text-[10px] mt-0.5`}>
+                    EXTRAÇÃO: <Text style={tw`font-black text-[11px]`}>
                         {formatDrawDate(data.drawDate || data.date)}
                         {data.city || data.areaName ? ` - ${data.city ? `${data.city}/` : ''}${data.areaName || ''}` : ''}
                     </Text>
@@ -157,7 +157,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
             {/* Special Palpita Match List - Loteca Style */}
             {data.matches ? (
-                <View style={tw`mb-4 px-2`}>
+                <View style={tw`mb-2 px-2`}>
                     {data.matches.map((match, idx) => {
                         // Split match label into Home and Away teams
                         // Expected format: "HOME x AWAY" or just "HOME" (reprint fallback)
@@ -172,7 +172,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         const selection = match.selection;
 
                         return (
-                            <View key={idx} style={tw`flex-row items-center border-b border-gray-300 border-dashed py-0.5`}>
+                            <View key={idx} style={tw`flex-row items-center border-b border-gray-300 border-dashed py-0.2`}>
                                 {/* Index Column */}
                                 <Text style={tw`w-6 text-xs font-bold text-gray-500`}>
                                     {match.order.toString().padStart(2, '0')}
@@ -211,13 +211,13 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         // Let's check logic: Loteria Tradicional stores numbers in `numbers` array.
                         // If I just display them in boxes, it works.
                         return (
-                            <View key={idx} style={tw`w-[49%] mb-3 items-center border border-gray-300 rounded-lg p-2 bg-gray-50`}>
+                            <View key={idx} style={tw`w-[49%] mb-1 items-center border border-gray-300 rounded-lg p-1 bg-gray-50`}>
                                 <Text style={tw`font-bold text-[10px] text-gray-500 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
                                 {num !== undefined ? (
                                     <View style={tw`flex-row justify-between w-full px-2 mt-1`}>
                                         {num.toString().padStart(4, '0').split('').map((digit, i) => (
                                             <View key={i} style={tw`items-center`}>
-                                                <Text style={[tw`text-4xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
+                                                <Text style={[tw`text-2xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
                                                 <Text style={[tw`text-[7px] text-gray-600 text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
@@ -226,7 +226,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                                     </View>
                                 ) : (
                                     <View style={tw`flex-row justify-center w-full px-4 items-center`}>
-                                        <Text style={[tw`text-4xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
+                                        <Text style={[tw`text-2xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
                                     </View>
                                 )}
                             </View>
@@ -235,34 +235,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             )}
 
-            <View style={tw`border-b-2 border-dashed border-black mb-1 mx-2 mt-1`} />
+            <View style={tw`border-b border-dashed border-black mb-1 mx-2 mt-0.5`} />
 
             {/* Prompt Message (Incentivo) */}
-            <View style={tw`mb-3 px-4`}>
-                <Text style={tw`text-center font-black text-[12px] text-black uppercase leading-tight`}>
+            <View style={tw`mb-1 px-4`}>
+                <Text style={tw`text-center font-black text-[10px] text-black uppercase leading-tight`}>
                     {data.promptMessage || ((data.gameName === 'Palpita Ai' || data.gameName === 'PALPITA AI' || (data.matches && data.matches.length > 0)) ? "BOA SORTE!" : "VOCÊ GANHA SE ACERTAR EM UMA DAS FEZINHAS:")}
                 </Text>
             </View>
 
             {data.prizes ? (
-                <View style={tw`mb-4 border-2 border-black rounded p-2 mx-2 bg-gray-100`}>
-                    <View style={tw`flex-row justify-between mb-1 border-b border-gray-300 pb-1`}>
-                        <Text style={tw`font-bold text-[11px] text-black`}>MILHAR:</Text>
-                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.milhar || 'R$ 0,00'}</Text>
+                <View style={tw`mb-2 border border-black rounded p-1 mx-2 bg-gray-100`}>
+                    <View style={tw`flex-row justify-between mb-0.5 border-b border-gray-200 pb-0.5`}>
+                        <Text style={tw`font-bold text-[10px] text-black`}>MILHAR:</Text>
+                        <Text style={tw`font-black text-[11px] text-black`}>{data.prizes.milhar || 'R$ 0,00'}</Text>
                     </View>
-                    <View style={tw`flex-row justify-between mb-1 border-b border-gray-300 pb-1`}>
-                        <Text style={tw`font-bold text-[11px] text-black`}>CENTENA:</Text>
-                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.centena || 'R$ 0,00'}</Text>
+                    <View style={tw`flex-row justify-between mb-0.5 border-b border-gray-200 pb-0.5`}>
+                        <Text style={tw`font-bold text-[10px] text-black`}>CENTENA:</Text>
+                        <Text style={tw`font-black text-[11px] text-black`}>{data.prizes.centena || 'R$ 0,00'}</Text>
                     </View>
                     <View style={tw`flex-row justify-between`}>
-                        <Text style={tw`font-bold text-[11px] text-black`}>DEZENA:</Text>
-                        <Text style={tw`font-black text-[13px] text-black`}>{data.prizes.dezena || 'R$ 0,00'}</Text>
+                        <Text style={tw`font-bold text-[10px] text-black`}>DEZENA:</Text>
+                        <Text style={tw`font-black text-[11px] text-black`}>{data.prizes.dezena || 'R$ 0,00'}</Text>
                     </View>
                 </View>
             ) : data.possiblePrize ? (
-                <View style={tw`mb-4 border-2 border-black rounded p-2 mx-2 bg-gray-100 items-center`}>
-                    <Text style={tw`text-center font-bold text-xs text-black uppercase mb-1`}>PRÊMIO MÁXIMO</Text>
-                    <Text style={tw`text-center font-black text-3xl text-black`}>{data.possiblePrize}</Text>
+                <View style={tw`mb-2 border border-black rounded p-1 mx-2 bg-gray-100 items-center`}>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
+                    <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : null}
 
@@ -280,15 +280,15 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
             {/* Second Chance */}
             {data.secondChanceNumber !== undefined && data.secondChanceNumber !== null && (
-                <View style={tw`items-center mb-4 mx-1 pt-2 border-t-2 border-black border-dashed`}>
-                    <View style={tw`bg-black rounded-lg py-1 px-4 mb-2 items-center w-full shadow-sm`}>
+                <View style={tw`items-center mb-1 mx-1 pt-1 border-t border-black border-dashed`}>
+                    <View style={tw`bg-black rounded-lg py-0.5 px-4 mb-1 items-center w-full shadow-sm`}>
                         <View style={tw`flex-row items-center`}>
-                            <MaterialCommunityIcons name="ticket-percent" size={16} color="white" style={tw`mr-2`} />
-                            <Text style={tw`text-white text-center font-black text-lg uppercase`}>
+                            <MaterialCommunityIcons name="ticket-percent" size={14} color="white" style={tw`mr-2`} />
+                            <Text style={tw`text-white text-center font-black text-base uppercase`}>
                                 {data.secondChanceLabel || 'SEGUNDA CHANCE'}
                             </Text>
                         </View>
-                        <Text style={tw`text-gray-300 text-center text-[9px] font-bold uppercase mt-0.5`}>
+                        <Text style={tw`text-gray-300 text-center text-[8px] font-bold uppercase mt-0.5`}>
                             SORTEIO EXTRA - {data.secondChanceDrawDate || 'SÁBADO'}
                         </Text>
                     </View>
@@ -299,17 +299,17 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         </View>
                     )}
 
-                    <View style={tw`item-center my-1 border-2 border-black rounded-lg p-2 w-full items-center bg-gray-50`}>
+                    <View style={tw`item-center my-0.5 border border-black rounded-lg p-1 w-full items-center bg-gray-50`}>
                         <View style={tw`flex-row gap-4`}>
                             {scDigits.map((n, i) => (
-                                <Text key={i} style={tw`text-4xl font-black text-black`}>{n}</Text>
+                                <Text key={i} style={tw`text-2xl font-black text-black`}>{n}</Text>
                             ))}
                         </View>
                     </View>
 
                     {/* Main Match Message (Above dashed line with Black Strip) */}
-                    <View style={tw`mt-4 bg-black py-1.5 px-4 w-full shadow-sm`}>
-                        <Text style={[tw`text-white text-center font-black text-[10px] uppercase`, { letterSpacing: 0.5 }]}>
+                    <View style={tw`mt-1 bg-black py-1 px-4 w-full shadow-sm`}>
+                        <Text style={[tw`text-white text-center font-black text-[9px] uppercase`, { letterSpacing: 0.5 }]}>
                             {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
                         </Text>
                     </View>
@@ -329,7 +329,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
                 <View style={tw`w-[32%] items-end`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                    <Text style={tw`text-[9px] text-black font-bold`}>Preço: {data.price}</Text>
                 </View>
             </View>
 
@@ -346,7 +346,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </Text>
                 </View>
                 <View style={tw`w-[32%] items-end`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>{data.date}</Text>
+                    <Text style={tw`text-[9px] text-black font-bold`}>{data.date}</Text>
                 </View>
             </View>
 
@@ -370,28 +370,28 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                             ],
                         },
                         {
-                            marginTop: -(140 * (1 - (isCapture ? 0.38 : 1)) / 2),
-                            marginBottom: -(140 * (1 - (isCapture ? 0.38 : 1)) / 2)
+                            marginTop: -(100 * (1 - (isCapture ? 0.38 : 1)) / 2),
+                            marginBottom: -(100 * (1 - (isCapture ? 0.38 : 1)) / 2)
                         }
                     ]}>
-                        <View style={tw`border-[3px] border-black p-2 bg-white rounded-lg`}>
+                        <View style={tw`border-[2px] border-black p-1 bg-white rounded-lg`}>
                             <QRCode
                                 value={`${data.websiteUrl || 'https://www.palpita_ai.com.br'}/sorteio/${displayTicketId}`}
-                                size={140}
+                                size={100}
                             />
                         </View>
                     </View>
                 </View>
             ) : (
-                <View style={tw`items-center mb-4`}>
-                    <View style={tw`overflow-hidden items-center justify-center mb-2`}>
+                <View style={tw`items-center mb-1`}>
+                    <View style={tw`overflow-hidden items-center justify-center mb-1`}>
                         <Barcode
                             value={data.ticketId || '000000000000'}
                             width={370}
-                            height={45} // Reduced by 50%
+                            height={30} // Reduced height
                         />
-                        <View style={tw`bg-black rounded-full py-1 px-6 mt-2 mb-4 items-center min-w-[220px]`}>
-                            <Text style={tw`font-black text-4xl text-white tracking-[3px]`}>{displayTicketId}</Text>
+                        <View style={tw`bg-black rounded-full py-0.5 px-6 mt-1 mb-2 items-center min-w-[180px]`}>
+                            <Text style={tw`font-black text-2xl text-white tracking-[3px]`}>{displayTicketId}</Text>
                         </View>
                     </View>
 
