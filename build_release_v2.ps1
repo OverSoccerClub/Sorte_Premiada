@@ -285,8 +285,8 @@ if ($buildSuccess) {
         # Criar version.json
         $versionContent = @{
             apkUrl  = $ApkName
-            build   = "257"
-            version = "1.5.38"
+            build   = "258"
+            version = "1.5.39"
             force   = $true
         } | ConvertTo-Json
         

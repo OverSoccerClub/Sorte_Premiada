@@ -48,6 +48,7 @@ export default function Game2x1000Screen() {
         milhar?: string;
         centena?: string;
         dezena?: string;
+        bannerText?: string;
     } | null>(null);
 
     // Second Chance State
@@ -767,7 +768,7 @@ export default function Game2x1000Screen() {
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
                         style={tw`flex-1`}
-                        contentContainerStyle={tw`items-center p-4 pb-32`}
+                        contentContainerStyle={tw`items-center p-4 pb-40`}
                         showsVerticalScrollIndicator={true}
                         bounces={true}
                     >

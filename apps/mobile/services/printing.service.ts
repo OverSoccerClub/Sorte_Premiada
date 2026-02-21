@@ -133,7 +133,7 @@ export const printTicket = async (
         // Reset and delay to prevent garbage on some POS (like Sunmi/Smart2)
         try {
           await BLEPrinter.printText("\x1b@"); // ESC @ - Initialize printer
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 800));
         } catch (e) {
           console.warn("[printTicket] Reset command failed, continuing...", e);
         }
@@ -595,6 +595,14 @@ export const printDailyReport = async (
         }
 
         await BLEPrinter.printText("\n\n\n"); // Feed
+
+        // Reset and delay to prevent garbage on some POS (like Sunmi/Smart2)
+        try {
+          await BLEPrinter.printText("\x1b@"); // ESC @ - Initialize printer
+          await new Promise(resolve => setTimeout(resolve, 800));
+        } catch (e) {
+          console.warn("[printTicket] Reset command failed, continuing...", e);
+        }
         return true;
       } catch (imgError) {
         console.warn("Failed to print image FINAL, falling back to text:", imgError);
