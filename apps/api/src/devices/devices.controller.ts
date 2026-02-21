@@ -23,8 +23,9 @@ export class DevicesController {
         try {
             const device = await this.devicesService.validateDeviceToken(token);
             return { active: true, companyId: device.companyId };
-        } catch {
-            throw new UnauthorizedException('Dispositivo inválido ou inativo');
+        } catch (err: any) {
+            if (err instanceof UnauthorizedException) throw err;
+            throw new UnauthorizedException(err?.message || 'Dispositivo inválido ou inativo');
         }
     }
 

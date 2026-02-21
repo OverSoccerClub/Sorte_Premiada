@@ -50,7 +50,9 @@ export class ApiClient {
                     msg.includes('desativado') ||
                     msg.includes('não encontrado') ||
                     msg.includes('nao encontrado') ||
-                    msg.includes('inválido ou inativo');
+                    msg.includes('token inválido') ||
+                    msg.includes('token invalido') ||
+                    msg.includes('expirado');
                 if (isDeviceRevoked) {
                     await AsyncStorage.multiRemove([DEVICE_TOKEN_KEY, '@company_id', '@company_settings']);
                     notifyDeviceInvalidated();

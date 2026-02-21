@@ -1,5 +1,11 @@
 # Build Release Script - Professional Edition
-# Usage: .\build_release.ps1 [-Clean]
+# Usage: .\build_release.ps1 [-Clean] [-Fast]
+#
+# Fluxo: 1) Atualiza version.json a partir do app.json
+#        2) Gera o APK (Gradle)
+#        3) Copia InnoBet.apk e version.json para .\dist\
+#        4) Copia InnoBet.apk e version.json para ..\deploy-update\ (OTA / nuvem)
+# A pasta deploy-update e a unica fonte para publicar atualizacao (APK + version.json).
 
 param (
     [switch]$Clean = $false,
@@ -183,6 +189,8 @@ try {
     
     # Otimização de Memória e Envs
     $env:GRADLE_OPTS = "-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=true"
+    # Expo/React Native esperam NODE_ENV no bundle (expo-constants, etc.)
+    if (-not $env:NODE_ENV) { $env:NODE_ENV = "production" }
     
     # Propriedades de arquitetura
     if ($Arch) {
@@ -198,14 +206,22 @@ try {
     cmd /c "gradlew $gradleArgs -x lint > gradle_build_new.log 2>&1"
     
     if ($LASTEXITCODE -ne 0) { 
+        $logPath = Join-Path $absAndroidDir "gradle_build_new.log"
+        Write-Host "`n[ERRO] Gradle falhou. Últimas 70 linhas do log:" -ForegroundColor Red
+        Write-Host "-------" -ForegroundColor DarkGray
+        if (Test-Path $logPath) {
+            Get-Content $logPath -Tail 70 -Encoding UTF8 | ForEach-Object { Write-Host $_ }
+        }
+        Write-Host "-------" -ForegroundColor DarkGray
+        Write-Host "Log completo: $logPath" -ForegroundColor Yellow
         Set-Location ..
         throw "Falha na compilação do Gradle." 
     }
     Set-Location ..
 
-    # 6. Artifact Management
-    Show-Progress -Activity "Gerando APK" -Status "Finalizando Artefatos..." -PercentComplete 90
-    Write-Step "5/5 Processando artefatos..." -Color "Yellow"
+    # 6. Artifact Management: dist + deploy-update (version.json ja foi atualizado no passo 2)
+    Show-Progress -Activity "Gerando APK" -Status "Copiando APK e version.json para dist e deploy-update..." -PercentComplete 90
+    Write-Step "5/5 Processando artefatos e copiando para deploy-update..." -Color "Yellow"
 
     if (-not (Test-Path $distDir)) { New-Item -ItemType Directory -Path $distDir | Out-Null }
 
@@ -213,17 +229,18 @@ try {
         Copy-Item $apkOutput -Destination "$distDir\$finalApkName" -Force
         Copy-Item $versionJsonPath -Destination "$distDir\version.json" -Force
 
-        # Copiar para deploy-update (repositório na nuvem / atualização OTA)
+        # Copiar para deploy-update (pasta para publicar na nuvem / OTA)
         $deployUpdateDir = "..\deploy-update"
-        if (Test-Path $deployUpdateDir) {
-            Copy-Item "$distDir\$finalApkName" -Destination "$deployUpdateDir\InnoBet.apk" -Force
-            Copy-Item $versionJsonPath -Destination "$deployUpdateDir\version.json" -Force
-            Write-Host "   -> deploy-update: InnoBet.apk e version.json atualizados" -ForegroundColor Cyan
-        }
+        if (-not (Test-Path $deployUpdateDir)) { New-Item -ItemType Directory -Path $deployUpdateDir -Force | Out-Null }
+        Copy-Item "$distDir\$finalApkName" -Destination "$deployUpdateDir\InnoBet.apk" -Force
+        Copy-Item $versionJsonPath -Destination "$deployUpdateDir\version.json" -Force
+        $deployAbs = (Resolve-Path $deployUpdateDir).Path
+        Write-Host "   -> deploy-update: InnoBet.apk e version.json copiados para $deployAbs" -ForegroundColor Cyan
 
         Show-Progress -Activity "Gerando APK" -Status "Concluído" -PercentComplete 100
         Write-Step "SUCESSO! APK Gerado:" -Color "Green"
-        Write-Host "   -> $(Resolve-Path "$distDir\$finalApkName")" -ForegroundColor White
+        Write-Host "   -> dist: $(Resolve-Path "$distDir\$finalApkName")" -ForegroundColor White
+        Write-Host "   -> deploy-update: $deployAbs\InnoBet.apk" -ForegroundColor White
     }
     else {
         throw "APK não encontrado em $apkOutput"

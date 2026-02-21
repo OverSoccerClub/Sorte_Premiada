@@ -111,7 +111,8 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
 
     /**
      * Consulta o banco (API) para verificar se o dispositivo está ativado.
-     * Retorna true se ativo, false se 401 (inválido/inativo), e mantém estado em caso de erro de rede.
+     * Só retorna false (e faz clear) quando a API disser que o dispositivo foi REVOGADO (desativado/não encontrado).
+     * 401 por token expirado ou erro de rede NÃO limpa ativação.
      */
     const verifyDeviceWithBackend = useCallback(async (token: string): Promise<boolean> => {
         try {
@@ -124,10 +125,21 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             });
             clearTimeout(timeoutId);
             if (response.ok) return true;
-            if (response.status === 401) return false;
-            return true; // Outros códigos ou erro: considerar ativado e deixar offline/retry
+            if (response.status === 401) {
+                const body = await response.json().catch(() => ({}));
+                const msg = (body?.message || '').toLowerCase();
+                const revogado =
+                    msg.includes('desativado') ||
+                    msg.includes('não encontrado') ||
+                    msg.includes('nao encontrado') ||
+                    msg.includes('token inválido') ||
+                    msg.includes('token invalido') ||
+                    msg.includes('expirado');
+                return !revogado;
+            }
+            return true;
         } catch {
-            return true; // Rede falhou: manter token e considerar ativado (offline)
+            return true;
         }
     }, []);
 
@@ -160,11 +172,15 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
                 if (response.status === 401 || response.status === 403 || response.status === 404) {
                     const errBody = await response.json().catch(() => ({}));
                     const message = (errBody?.message || '').toLowerCase();
+                    // "Inválido ou inativo" genérico não deve limpar o login se for timeout,
+                    // mas se for explicitamente token inválido ou desativado, deve forçar reativação.
                     if (
                         message.includes('desativado') ||
                         message.includes('não encontrado') ||
                         message.includes('nao encontrado') ||
-                        message.includes('inválido ou inativo')
+                        message.includes('token inválido') ||
+                        message.includes('token invalido') ||
+                        message.includes('expirado')
                     ) {
                         await clearActivation();
                         return;

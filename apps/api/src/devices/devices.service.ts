@@ -589,9 +589,10 @@ export class DevicesService {
                 throw new UnauthorizedException('Dispositivo desativado');
             }
 
-            if (device.deviceToken !== token) {
-                throw new UnauthorizedException('Token inválido');
-            }
+            // NOTE: We intentionally do NOT compare device.deviceToken === token here.
+            // The JWT signature is sufficient proof of authenticity (signed with app secret).
+            // The redundant DB comparison caused activation loss when any re-activation
+            // overwrote deviceToken in the database, invalidating the original device's token.
 
             // Atualizar lastSeenAt
             await this.prisma.posTerminal.update({

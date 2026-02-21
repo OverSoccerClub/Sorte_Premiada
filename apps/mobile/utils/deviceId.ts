@@ -2,26 +2,26 @@
  * Stable Device ID Helper
  *
  * Generates a unique, persistent UUID per app installation stored in AsyncStorage.
- * This avoids the problem where `Application.getAndroidId()` returns null or
- * returns the SAME value across different units of the same POS brand/model
- * (e.g., Moderninha, Sunmi), which caused the backend to archive one device's
- * token when another device of the same model connected — wiping the session.
+ *
+ * IMPORTANT: We intentionally do NOT use `Application.getAndroidId()` as the primary ID
+ * because many POS devices (Sunmi, Moderninha, etc.) return the same AndroidId across
+ * different units from the same batch/model. This caused the backend to archive one device's
+ * activation when another device of the same model connected — wiping the session.
+ *
+ * Solution: Always generate a truly random UUID on first install and persist it in AsyncStorage.
+ * The UUID never changes as long as the app data exists on the device.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Application from 'expo-application';
-import { Platform } from 'react-native';
 
 const DEVICE_ID_STORAGE_KEY = '@stable_device_id';
 
 /**
  * Returns or creates a stable unique device ID for this app installation.
- * Priority:
- *   1. Cached ID from AsyncStorage (most stable — survives restarts)
- *   2. Android ANDROID_ID (if valid and non-empty)
- *   3. Random UUID generated once and persisted forever
+ * - On first run: generates a random UUID and saves it permanently
+ * - On subsequent runs: reads the cached UUID from AsyncStorage
  */
 export async function getStableDeviceId(): Promise<string> {
-    // 1. Try to get cached ID first (fastest path after first run)
+    // Always try cached ID first (fastest path and most stable)
     try {
         const cached = await AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY);
         if (cached && cached.length > 8) {
@@ -31,37 +31,21 @@ export async function getStableDeviceId(): Promise<string> {
         console.warn('[DeviceID] AsyncStorage read failed:', e);
     }
 
-    // 2. Try native ID (Android only, may be null/empty on some POS hardware)
-    let nativeId: string | null = null;
-    try {
-        if (Platform.OS === 'android') {
-            const androidId = Application.getAndroidId();
-            // Some POS devices return '0000000000000000' or very short IDs — reject those
-            if (androidId && androidId.length >= 10 && androidId !== '0000000000000000') {
-                nativeId = androidId;
-            }
-        } else if (Platform.OS === 'ios') {
-            nativeId = await Application.getIosIdForVendorAsync();
-        }
-    } catch (e) {
-        console.warn('[DeviceID] Native ID fetch failed:', e);
-    }
+    // Generate a new random UUID for this installation
+    const newId = generateUUID();
 
-    // 3. Fall back to a UUID if native ID is unavailable or suspicious
-    const finalId = nativeId || generateUUID();
-
-    // Persist for future calls
+    // Persist for all future calls
     try {
-        await AsyncStorage.setItem(DEVICE_ID_STORAGE_KEY, finalId);
+        await AsyncStorage.setItem(DEVICE_ID_STORAGE_KEY, newId);
     } catch (e) {
         console.warn('[DeviceID] AsyncStorage write failed:', e);
     }
 
-    console.log('[DeviceID] Resolved stable device ID:', finalId.substring(0, 12) + '...');
-    return finalId;
+    console.log('[DeviceID] Generated new stable device ID:', newId.substring(0, 12) + '...');
+    return newId;
 }
 
-// Simple RFC4122-compliant UUID generator (no external dependencies required)
+// RFC4122-compliant UUID v4 generator (no external dependencies required)
 function generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
         const r = (Math.random() * 16) | 0;

@@ -3,14 +3,26 @@ import * as Application from 'expo-application';
 import * as Location from 'expo-location';
 import { DevicesService } from '../services/devices.service';
 import { useAuth } from '../context/AuthContext';
+import { useCompany } from '../context/CompanyContext';
 import { getStableDeviceId } from '../utils/deviceId';
 
+/**
+ * POS Tracking: register + heartbeat só quando o dispositivo está ATIVADO.
+ * Evita criar registros "órfãos" (deviceId físico sem companyId/token) no banco,
+ * que causavam confusão e "pedir ativação" indevido.
+ */
 export function usePosTracking() {
     const { user } = useAuth();
+    const { deviceToken } = useCompany();
     const heartbeatInterval = useRef<NodeJS.Timeout | null>(null);
     const deviceIdRef = useRef<string | null>(null);
 
     useEffect(() => {
+        if (!deviceToken) {
+            deviceIdRef.current = null;
+            return;
+        }
+
         let isMounted = true;
 
         const init = async () => {
@@ -18,12 +30,8 @@ export function usePosTracking() {
             const deviceId = await getStableDeviceId();
             deviceIdRef.current = deviceId;
 
-            // 2. Register Device on Mount (Once)
-            // Get Model
+            // 2. Register Device only when activated (evita órfão no banco)
             const model = Application.nativeApplicationVersion ? 'Mobile Device' : 'Unknown Device';
-            // Actually expo-device is better for model name, but let's stick to simple or use "Platform.constants.Model" if available? 
-            // Or just pass generic info. Application.nativeApplicationVersion
-
             await DevicesService.register({
                 deviceId,
                 model,
@@ -91,7 +99,6 @@ export function usePosTracking() {
             isMounted = false;
             if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
 
-            // Try to set offline on unmount (best effort)
             if (deviceIdRef.current) {
                 console.log('[POS Tracking] Cleanup: Sending OFFLINE status');
                 DevicesService.heartbeat({
@@ -100,7 +107,5 @@ export function usePosTracking() {
                 }).catch(e => console.warn("Failed to set offline", e));
             }
         };
-    }, [user]); // Re-run if user changes? Yes to update currentUserId immediately on login/logout?
-    // Actually if we re-run verify, we register again. Register is idempotent (upsert). 
-    // It ensures heartbeat sends new user ID instantly.
+    }, [user, deviceToken]);
 }

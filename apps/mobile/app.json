@@ -1,70 +1,83 @@
 {
-    "expo": {
-        "name": "InnoBet",
-        "slug": "innobet",
-        "version": "1.5.48",
-        "runtimeVersion": {
-            "policy": "appVersion"
-        },
-        "scheme": "megasena",
-        "orientation": "portrait",
-        "icon": "./assets/nova_logo_final.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": false,
-        "splash": {
-            "image": "./assets/nova_logo_final.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#1E293B"
-        },
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/nova_logo_final.png",
-                "backgroundColor": "#1E293B"
-            },
-            "permissions": [
-                "android.permission.INTERNET",
-                "android.permission.BLUETOOTH",
-                "android.permission.BLUETOOTH_ADMIN",
-                "android.permission.BLUETOOTH_CONNECT",
-                "android.permission.BLUETOOTH_SCAN",
-                "android.permission.ACCESS_FINE_LOCATION",
-                "android.permission.CAMERA",
-                "android.permission.READ_EXTERNAL_STORAGE",
-                "android.permission.WRITE_EXTERNAL_STORAGE",
-                "android.permission.REQUEST_INSTALL_PACKAGES"
-            ],
-            "versionCode": 267
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": [
-            "expo-router",
-            "expo-file-system",
-            [
-                "expo-camera",
-                {
-                    "cameraPermission": "Permitir acesso à câmera para ler bilhetes."
-                }
-            ],
-            [
-                "expo-build-properties",
-                {
-                    "android": {
-                        "usesCleartextTraffic": true,
-                        "kotlinVersion": "1.9.25"
-                    }
-                }
-            ]
-        ],
-        "updates": {
-            "url": "https://www.inforcomputer.com/Atualizacoes/InnoBet",
-            "enabled": true,
-            "checkAutomatically": "NEVER",
-            "fallbackToCacheTimeout": 0
+  "expo": {
+    "name": "InnoBet",
+    "slug": "innobet",
+    "version": "1.5.50",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "scheme": "megasena",
+    "orientation": "portrait",
+    "icon": "./assets/nova_logo_final.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/nova_logo_final.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E293B"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/nova_logo_final.png",
+        "backgroundColor": "#1E293B"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.REQUEST_INSTALL_PACKAGES",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.REQUEST_INSTALL_PACKAGES",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "versionCode": 269,
+      "package": "com.anonymous.innobet"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-file-system",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir acesso à câmera para ler bilhetes."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
+    ],
+    "updates": {
+      "url": "https://www.inforcomputer.com/Atualizacoes/InnoBet",
+      "enabled": true,
+      "checkAutomatically": "NEVER",
+      "fallbackToCacheTimeout": 0
     }
+  }
 }

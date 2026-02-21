@@ -1,5 +1,5 @@
 export const AppConfig = {
-    version: "1.5.48",
+    version: "1.5.50",
     name: "A Perseverança",
     api: {
         // DEV: Use localhost and run 'adb reverse tcp:3333 tcp:3333'
