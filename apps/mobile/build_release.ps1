@@ -212,7 +212,15 @@ try {
     if (Test-Path $apkOutput) {
         Copy-Item $apkOutput -Destination "$distDir\$finalApkName" -Force
         Copy-Item $versionJsonPath -Destination "$distDir\version.json" -Force
-        
+
+        # Copiar para deploy-update (repositório na nuvem / atualização OTA)
+        $deployUpdateDir = "..\deploy-update"
+        if (Test-Path $deployUpdateDir) {
+            Copy-Item "$distDir\$finalApkName" -Destination "$deployUpdateDir\InnoBet.apk" -Force
+            Copy-Item $versionJsonPath -Destination "$deployUpdateDir\version.json" -Force
+            Write-Host "   -> deploy-update: InnoBet.apk e version.json atualizados" -ForegroundColor Cyan
+        }
+
         Show-Progress -Activity "Gerando APK" -Status "Concluído" -PercentComplete 100
         Write-Step "SUCESSO! APK Gerado:" -Color "Green"
         Write-Host "   -> $(Resolve-Path "$distDir\$finalApkName")" -ForegroundColor White

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Put, Delete, Param, UseGuards, Request, Logger, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, Delete, Param, UseGuards, Request, Logger, Query, UnauthorizedException } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -9,6 +9,24 @@ export class DevicesController {
     private readonly logger = new Logger(DevicesController.name);
 
     constructor(private readonly devicesService: DevicesService) { }
+
+    /**
+     * Verifica se o dispositivo está ativado no banco (token válido e ativo).
+     * Público: usa apenas header x-device-token. Usado pelo app na abertura para decidir tela de ativação.
+     */
+    @Get('verify')
+    async verify(@Request() req: any) {
+        const token = req.headers?.['x-device-token'];
+        if (!token) {
+            throw new UnauthorizedException('Token do dispositivo não fornecido');
+        }
+        try {
+            const device = await this.devicesService.validateDeviceToken(token);
+            return { active: true, companyId: device.companyId };
+        } catch {
+            throw new UnauthorizedException('Dispositivo inválido ou inativo');
+        }
+    }
 
     @Post('register')
     async register(@Body() body: { deviceId: string; model?: string; appVersion?: string }) {

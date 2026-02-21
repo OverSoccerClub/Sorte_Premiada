@@ -2,6 +2,16 @@ import { Injectable, UnauthorizedException, BadRequestException, NotFoundExcepti
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * SEGURANÇA – Controle de dispositivos ativados
+ * -----------------------------------------------
+ * - Um código de ativação pertence a uma empresa (companyId) e a um único registro (PosTerminal).
+ * - Um código só pode ativar um dispositivo físico: mesmo código em outro deviceId → "Código já utilizado".
+ * - Reativação permitida apenas para o MESMO deviceId (mesmo aparelho).
+ * - Dispositivo já ativado em empresa A não pode ser ativado com código da empresa B → "Dispositivo já vinculado a outra empresa".
+ * - Token JWT do dispositivo contém deviceId (id do registro) e companyId; validação sempre no banco (isActive, deviceToken).
+ * - GET /devices/verify: consulta ao banco na abertura do app garante que apenas dispositivos ativos e válidos permaneçam ativados.
+ */
 @Injectable()
 export class DevicesService {
     constructor(

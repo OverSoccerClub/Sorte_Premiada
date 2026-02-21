@@ -109,22 +109,41 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
 
+    /**
+     * Consulta o banco (API) para verificar se o dispositivo está ativado.
+     * Retorna true se ativo, false se 401 (inválido/inativo), e mantém estado em caso de erro de rede.
+     */
+    const verifyDeviceWithBackend = useCallback(async (token: string): Promise<boolean> => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const response = await fetch(`${AppConfig.api.baseUrl}/devices/verify`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'x-device-token': token },
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            if (response.ok) return true;
+            if (response.status === 401) return false;
+            return true; // Outros códigos ou erro: considerar ativado e deixar offline/retry
+        } catch {
+            return true; // Rede falhou: manter token e considerar ativado (offline)
+        }
+    }, []);
+
     const fetchSettings = useCallback(async (currentTokenOverride?: string | null) => {
         const tokenToUse = currentTokenOverride !== undefined ? currentTokenOverride : deviceToken;
 
         try {
-            // Se não está ativado, usa defaults
             if (!tokenToUse) {
                 setSettings(defaultSettings);
                 setIsLoading(false);
                 return;
             }
 
-            // Fetch from API with device token
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
             setVerificationStatus('checking');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             const response = await fetch(`${AppConfig.api.baseUrl}/company/settings`, {
                 method: 'GET',
@@ -136,41 +155,36 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             });
             clearTimeout(timeoutId);
 
-            if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404) {
-                console.warn(`Device token invalid or expired (Status: ${response.status}).`);
-
-                // Security: If device is specifically Forbidden (403) or Not Found (404), or Unauthorized (401),
-                // we MUST de-activate to allow re-activation given the device was deleted/banned on server.
-                if (response.status === 403 || response.status === 404 || response.status === 401) {
-                    console.warn("Deactivating device due to server rejection.");
-                    await clearActivation();
-                    return;
+            if (!response.ok) {
+                setVerificationStatus('offline');
+                if (response.status === 401 || response.status === 403 || response.status === 404) {
+                    const errBody = await response.json().catch(() => ({}));
+                    const message = (errBody?.message || '').toLowerCase();
+                    if (
+                        message.includes('desativado') ||
+                        message.includes('não encontrado') ||
+                        message.includes('nao encontrado') ||
+                        message.includes('inválido ou inativo')
+                    ) {
+                        await clearActivation();
+                        return;
+                    }
                 }
-
-                setVerificationStatus('failed');
                 return;
             }
 
-            if (response.ok) {
-                setVerificationStatus('verified');
-                const data = await response.json();
-                const newSettings = { ...defaultSettings, ...data };
-                setSettings(newSettings);
-
-                // Cache the settings
-                await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
-                    data: newSettings,
-                    timestamp: Date.now(),
-                }));
-            }
+            setVerificationStatus('verified');
+            const data = await response.json();
+            const newSettings = { ...defaultSettings, ...data };
+            setSettings(newSettings);
+            await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
+                data: newSettings,
+                timestamp: Date.now(),
+            }));
         } catch (error) {
-            console.warn('Failed to fetch company settings, using defaults:', error);
-            // If we have a token but fetch failed, we are efficiently "Offline" but Activated
-            if (deviceToken) {
-                setVerificationStatus('offline');
-            } else {
-                setVerificationStatus('failed'); // Should not happen if check above passes
-            }
+            console.warn('Failed to fetch company settings:', error);
+            if (tokenToUse) setVerificationStatus('offline');
+            else setVerificationStatus('failed');
         } finally {
             setIsLoading(false);
         }
@@ -245,13 +259,31 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
         await fetchSettings();
     }, [fetchSettings]);
 
+    // Ao iniciar o app: consultar o banco (API) para saber se o dispositivo está ativado.
     useEffect(() => {
         let isMounted = true;
         const init = async () => {
             const token = await loadStoredData();
-            if (isMounted) {
-                await fetchSettings(token);
+            if (!isMounted) return;
+
+            if (!token) {
+                setIsActivated(false);
+                setVerificationStatus('failed');
+                setIsLoading(false);
+                return;
             }
+
+            const isActiveInBackend = await verifyDeviceWithBackend(token);
+            if (!isMounted) return;
+
+            if (!isActiveInBackend) {
+                await clearActivation();
+                setIsLoading(false);
+                return;
+            }
+
+            setIsActivated(true);
+            await fetchSettings(token);
         };
         init();
         return () => { isMounted = false; };

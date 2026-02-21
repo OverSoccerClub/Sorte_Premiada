@@ -41,12 +41,18 @@ export class ApiClient {
                 headers,
             });
 
-            // Se retornar 401 e a mensagem indicar dispositivo inválido, limpar token
+            // Só limpar ativação quando o servidor indicar revogação explícita do dispositivo.
+            // 401 genérico (ex.: token expirado) não deve desativar o app ao sair/voltar.
             if (response.status === 401) {
                 const errorData = await response.clone().json().catch(() => null);
-                if (errorData?.message?.toLowerCase().includes('dispositivo')) {
+                const msg = (errorData?.message || '').toLowerCase();
+                const isDeviceRevoked =
+                    msg.includes('desativado') ||
+                    msg.includes('não encontrado') ||
+                    msg.includes('nao encontrado') ||
+                    msg.includes('inválido ou inativo');
+                if (isDeviceRevoked) {
                     await AsyncStorage.multiRemove([DEVICE_TOKEN_KEY, '@company_id', '@company_settings']);
-                    // Notificar CompanyContext para atualizar estado imediatamente (evita pedir ativação só no próximo reopen)
                     notifyDeviceInvalidated();
                 }
             }
