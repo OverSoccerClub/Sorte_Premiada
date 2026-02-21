@@ -101,15 +101,19 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
                     setSettings(prev => JSON.stringify(prev) !== JSON.stringify(data) ? { ...defaultSettings, ...data } : prev);
                 }
             }
+            return storedToken;
         } catch (error) {
             console.error('Erro ao carregar dados armazenados:', error);
+            return null;
         }
     }, []);
 
-    const fetchSettings = useCallback(async () => {
+    const fetchSettings = useCallback(async (currentTokenOverride?: string | null) => {
+        const tokenToUse = currentTokenOverride !== undefined ? currentTokenOverride : deviceToken;
+
         try {
             // Se não está ativado, usa defaults
-            if (!deviceToken) {
+            if (!tokenToUse) {
                 setSettings(defaultSettings);
                 setIsLoading(false);
                 return;
@@ -125,7 +129,7 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-device-token': deviceToken,
+                    'x-device-token': tokenToUse,
                 },
                 signal: controller.signal,
             });
@@ -261,12 +265,17 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
     }, [fetchSettings]);
 
     useEffect(() => {
+        let isMounted = true;
         const init = async () => {
-            await loadStoredData();
-            await fetchSettings();
+            const token = await loadStoredData();
+            if (isMounted) {
+                await fetchSettings(token);
+            }
         };
         init();
-    }, [loadStoredData, fetchSettings]);
+        return () => { isMounted = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <CompanyContext.Provider value={{
