@@ -130,7 +130,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <Text style={[
                     tw`text-xl font-black text-black text-center uppercase mb-0.5`,
                     { letterSpacing: 1 }
-                ]}>
+                ]} numberOfLines={1}>
                     {brandMain}
                 </Text>
 
@@ -211,14 +211,14 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         // Let's check logic: Loteria Tradicional stores numbers in `numbers` array.
                         // If I just display them in boxes, it works.
                         return (
-                            <View key={idx} style={tw`w-[49%] mb-1 items-center border border-gray-300 rounded-lg p-1 bg-gray-50`}>
-                                <Text style={tw`font-bold text-[10px] text-gray-500 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
+                            <View key={idx} style={tw`w-[49%] mb-1 items-center border-[1.5px] border-black rounded p-1 bg-white`}>
+                                <Text style={tw`font-bold text-[10px] text-gray-800 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
                                 {num !== undefined ? (
-                                    <View style={tw`flex-row justify-between w-full px-2 mt-1`}>
+                                    <View style={tw`flex-row justify-between w-full px-1 mt-1`}>
                                         {num.toString().padStart(4, '0').split('').map((digit, i) => (
                                             <View key={i} style={tw`items-center`}>
-                                                <Text style={[tw`text-2xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
-                                                <Text style={[tw`text-[7px] text-gray-600 text-center font-bold uppercase -mt-1`, { fontFamily: 'serif' }]}>
+                                                <Text style={[tw`text-xl text-black font-black mb-0`, { fontFamily: 'serif' }]}>{digit}</Text>
+                                                <Text style={[tw`text-[6px] text-gray-800 text-center font-bold uppercase -mt-0.5`, { fontFamily: 'serif' }]}>
                                                     {numberToText(parseInt(digit))}
                                                 </Text>
                                             </View>
@@ -226,7 +226,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                                     </View>
                                 ) : (
                                     <View style={tw`flex-row justify-center w-full px-4 items-center`}>
-                                        <Text style={[tw`text-2xl text-gray-300 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
+                                        <Text style={[tw`text-xl text-gray-400 font-bold mb-0 tracking-[5px]`, { fontFamily: 'serif' }]}>AUTO</Text>
                                     </View>
                                 )}
                             </View>
@@ -383,33 +383,34 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </View>
                 </View>
             ) : (
-                <View style={tw`items-center mb-1`}>
-                    <View style={tw`overflow-hidden items-center justify-center mb-1`}>
+                <View style={tw`items-center mb-1 w-full`}>
+                    <View style={tw`overflow-hidden items-center justify-center mb-1 w-full`}>
                         <Barcode
                             value={data.ticketId || '000000000000'}
                             width={370}
-                            height={30} // Reduced height
+                            height={30}
                         />
-                        <View style={tw`bg-black rounded-full py-0.5 px-6 mt-1 mb-2 items-center min-w-[180px]`}>
-                            <Text style={tw`font-black text-2xl text-white tracking-[3px]`}>{displayTicketId}</Text>
-                        </View>
                     </View>
 
-                    <View style={[
-                        tw`items-center justify-center w-full mt-2`,
-                        {
-                            transform: [{ scaleY: qrScaleY }],
-                        },
-                        (hasQrHeight || isCapture) && {
-                            marginTop: qrMargin,
-                            marginBottom: qrMargin
-                        }
-                    ]}>
-                        <View style={tw`border-[3px] border-black p-1 bg-white`}>
-                            <QRCode
-                                value={`${data.websiteUrl || 'https://www.fezinhadehoje.com.br'}/sorteio/${displayTicketId}`}
-                                size={qrCodeWidth}
-                            />
+                    <View style={tw`flex-row justify-between items-center w-full mt-1 px-2`}>
+                        <View style={tw`bg-black rounded-full py-0.5 px-3 items-center flex-1 mr-2`}>
+                            <Text style={tw`font-black text-[16px] text-white tracking-[2px]`} numberOfLines={1} adjustsFontSizeToFit>
+                                {displayTicketId}
+                            </Text>
+                        </View>
+
+                        <View style={[
+                            tw`items-center justify-center`,
+                            {
+                                transform: [{ scaleY: qrScaleY }],
+                            }
+                        ]}>
+                            <View style={tw`border-[2px] border-black p-0.5 bg-white rounded`}>
+                                <QRCode
+                                    value={`${data.websiteUrl || 'https://www.fezinhadehoje.com.br'}/sorteio/${displayTicketId}`}
+                                    size={70}
+                                />
+                            </View>
                         </View>
                     </View>
                 </View>
