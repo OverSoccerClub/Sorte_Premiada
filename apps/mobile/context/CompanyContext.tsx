@@ -78,12 +78,16 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
     // Carrega token e settings salvos
     const loadStoredData = useCallback(async () => {
         try {
-            const [storedToken, storedCompanyId, storedActivationCode, cached] = await Promise.all([
-                AsyncStorage.getItem(DEVICE_TOKEN_KEY),
-                AsyncStorage.getItem(COMPANY_ID_KEY),
-                AsyncStorage.getItem(ACTIVATION_CODE_KEY),
-                AsyncStorage.getItem(CACHE_KEY),
-            ]);
+            let storedToken = null;
+            let storedCompanyId = null;
+            let storedActivationCode = null;
+            let cached = null;
+
+            // Load individually to prevent a crash in one key (e.g. CursorWindow too big for CACHE_KEY) from failing all keys
+            try { storedToken = await AsyncStorage.getItem(DEVICE_TOKEN_KEY); } catch (e) { console.warn("Erro ao carregar token", e); }
+            try { storedCompanyId = await AsyncStorage.getItem(COMPANY_ID_KEY); } catch (e) { console.warn("Erro ao carregar companyId", e); }
+            try { storedActivationCode = await AsyncStorage.getItem(ACTIVATION_CODE_KEY); } catch (e) { console.warn("Erro ao carregar activationCode", e); }
+            try { cached = await AsyncStorage.getItem(CACHE_KEY); } catch (e) { console.warn("Erro ao carregar configurações de cache", e); }
 
             // Only update state if changed to prevent effects loop
             setDeviceToken(prev => (prev !== storedToken ? storedToken : prev));
@@ -105,7 +109,8 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             return storedToken;
         } catch (error) {
             console.error('Erro ao carregar dados armazenados:', error);
-            return null;
+            // Even if an unexpected error occurs, don't just return null. The data might partially exist.
+            return AsyncStorage.getItem(DEVICE_TOKEN_KEY).catch(() => null);
         }
     }, []);
 
@@ -196,10 +201,18 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             const data = await response.json();
             const newSettings = { ...defaultSettings, ...data };
             setSettings(newSettings);
-            await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
+
+            // Evitar armazenar JSONs gigantescos que estouram o limite de 2MB do SQLite CursorWindow no Android
+            const settingsString = JSON.stringify({
                 data: newSettings,
                 timestamp: Date.now(),
-            }));
+            });
+
+            if (settingsString.length < 1500000) { // Limit to ~1.5MB max string size
+                await AsyncStorage.setItem(CACHE_KEY, settingsString).catch(e => console.warn('Cache too large or write failed.', e));
+            } else {
+                console.warn('Configurações ignoradas no cache por exceder o limite de tamanho (CursorWindow limit)');
+            }
         } catch (error) {
             console.warn('Failed to fetch company settings:', error);
             if (tokenToUse) setVerificationStatus('offline');
@@ -230,16 +243,18 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
 
             const data = await response.json();
 
-            // Salvar token, companyId e settings
-            await Promise.all([
-                AsyncStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken),
-                AsyncStorage.setItem(COMPANY_ID_KEY, data.companyId),
-                AsyncStorage.setItem(ACTIVATION_CODE_KEY, activationCode),
-                AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
-                    data: data.companySettings,
-                    timestamp: Date.now(),
-                })),
-            ]);
+            // Salvar token, companyId e settings individualmente
+            await AsyncStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
+            await AsyncStorage.setItem(COMPANY_ID_KEY, data.companyId);
+            await AsyncStorage.setItem(ACTIVATION_CODE_KEY, activationCode);
+
+            const settingsString = JSON.stringify({
+                data: data.companySettings,
+                timestamp: Date.now(),
+            });
+            if (settingsString.length < 1500000) {
+                await AsyncStorage.setItem(CACHE_KEY, settingsString).catch(() => { });
+            }
 
             // Atualizar estado
             setDeviceToken(data.deviceToken);
