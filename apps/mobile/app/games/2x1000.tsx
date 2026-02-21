@@ -768,14 +768,14 @@ export default function Game2x1000Screen() {
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
                         style={tw`flex-1`}
-                        contentContainerStyle={tw`items-center p-4 pb-40`}
+                        contentContainerStyle={tw`items-center p-4 pb-10`}
                         showsVerticalScrollIndicator={true}
                         bounces={true}
                     >
                         <View style={tw`w-full max-w-[400px]`}>
-                            <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAÇÃO</Text>
+                            <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4 uppercase`}>Confirmação</Text>
 
-                            <View style={tw`bg-white mb-6 shadow-2xl w-full relative rounded-xl items-center`}>
+                            <View style={tw`bg-white mb-4 shadow-2xl w-full relative rounded-xl items-center`}>
                                 <TicketDisplay
                                     data={{
                                         gameName: gameName,
@@ -808,25 +808,28 @@ export default function Game2x1000Screen() {
                                     </View>
                                 )}
                             </View>
-
-                            <TouchableOpacity
-                                style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
-                                onPress={handlePrint}
-                            >
-                                <View style={tw`flex-row items-center`}>
-                                    <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
-                                    <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95 w-full mb-4`}
-                                onPress={handleBackFromModal}
-                            >
-                                <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
-                            </TouchableOpacity>
                         </View>
                     </ScrollView>
+
+                    {/* Fixed Footer for Modal */}
+                    <View style={tw`p-4 bg-gray-900 border-t border-gray-800`}>
+                        <TouchableOpacity
+                            style={tw`bg-emerald-600 p-4 rounded-2xl items-center mb-3 shadow-lg shadow-emerald-600/20 active:scale-95 w-full`}
+                            onPress={handlePrint}
+                        >
+                            <View style={tw`flex-row items-center`}>
+                                <Ionicons name="print" size={24} color="white" style={tw`mr-3`} />
+                                <Text style={tw`text-white font-bold text-lg uppercase tracking-wide`}>Confirmar</Text>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={tw`bg-gray-800 p-4 rounded-2xl items-center active:scale-95 w-full`}
+                            onPress={handleBackFromModal}
+                        >
+                            <Text style={tw`text-gray-400 font-bold`}>Voltar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </Modal>
 
