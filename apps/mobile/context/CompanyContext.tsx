@@ -128,14 +128,15 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             if (response.status === 401) {
                 const body = await response.json().catch(() => ({}));
                 const msg = (body?.message || '').toLowerCase();
-                const revogado =
-                    msg.includes('desativado') ||
-                    msg.includes('não encontrado') ||
-                    msg.includes('nao encontrado') ||
-                    msg.includes('token inválido') ||
-                    msg.includes('token invalido') ||
-                    msg.includes('expirado');
-                return !revogado;
+                const isDeviceRevoked =
+                    (msg.includes('desativado') && msg.includes('dispositivo')) ||
+                    msg.includes('dispositivo não encontrado') ||
+                    msg.includes('dispositivo desativado') ||
+                    msg.includes('token do dispositivo') ||
+                    msg === 'token inválido ou expirado' ||
+                    msg === 'dispositivo não encontrado' ||
+                    msg === 'dispositivo desativado';
+                return !isDeviceRevoked;
             }
             return true;
         } catch {
@@ -174,14 +175,16 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
                     const message = (errBody?.message || '').toLowerCase();
                     // "Inválido ou inativo" genérico não deve limpar o login se for timeout,
                     // mas se for explicitamente token inválido ou desativado, deve forçar reativação.
-                    if (
-                        message.includes('desativado') ||
-                        message.includes('não encontrado') ||
-                        message.includes('nao encontrado') ||
-                        message.includes('token inválido') ||
-                        message.includes('token invalido') ||
-                        message.includes('expirado')
-                    ) {
+                    const isDeviceRevoked =
+                        (message.includes('desativado') && message.includes('dispositivo')) ||
+                        message.includes('dispositivo não encontrado') ||
+                        message.includes('dispositivo desativado') ||
+                        message.includes('token do dispositivo') ||
+                        message === 'token inválido ou expirado' ||
+                        message === 'dispositivo não encontrado' ||
+                        message === 'dispositivo desativado';
+
+                    if (isDeviceRevoked) {
                         await clearActivation();
                         return;
                     }
@@ -279,6 +282,7 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
     useEffect(() => {
         let isMounted = true;
         const init = async () => {
+            console.log('[AUDIT] CompanyContext init starting v1.5.52...');
             const token = await loadStoredData();
             if (!isMounted) return;
 
@@ -292,7 +296,10 @@ export const CompanyProvider = ({ children }: { children: React.ReactNode }) => 
             const isActiveInBackend = await verifyDeviceWithBackend(token);
             if (!isMounted) return;
 
+            console.log('[AUDIT] Backend verification result:', isActiveInBackend);
+
             if (!isActiveInBackend) {
+                console.log('[AUDIT] Clearing activation due to backend rejection');
                 await clearActivation();
                 setIsLoading(false);
                 return;

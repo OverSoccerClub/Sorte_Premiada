@@ -47,12 +47,14 @@ export class ApiClient {
                 const errorData = await response.clone().json().catch(() => null);
                 const msg = (errorData?.message || '').toLowerCase();
                 const isDeviceRevoked =
-                    msg.includes('desativado') ||
-                    msg.includes('não encontrado') ||
-                    msg.includes('nao encontrado') ||
-                    msg.includes('token inválido') ||
-                    msg.includes('token invalido') ||
-                    msg.includes('expirado');
+                    (msg.includes('desativado') && msg.includes('dispositivo')) ||
+                    msg.includes('dispositivo não encontrado') ||
+                    msg.includes('dispositivo desativado') ||
+                    msg.includes('token do dispositivo') ||
+                    msg === 'token inválido ou expirado' ||
+                    msg === 'dispositivo não encontrado' ||
+                    msg === 'dispositivo desativado';
+
                 if (isDeviceRevoked) {
                     await AsyncStorage.multiRemove([DEVICE_TOKEN_KEY, '@company_id', '@company_settings']);
                     notifyDeviceInvalidated();

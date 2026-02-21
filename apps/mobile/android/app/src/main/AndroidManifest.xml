@@ -36,7 +36,6 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="megasena"/>
-        <data android:scheme="com.anonymous.sortepremiada"/>
         <data android:scheme="com.anonymous.innobet"/>
       </intent-filter>
     </activity>
