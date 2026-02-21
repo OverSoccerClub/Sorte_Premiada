@@ -183,6 +183,7 @@ export class CompanyService {
             alternativeLogoHeight: (company as any).alternativeLogoHeight,
             alternativeQrWidth: (company as any).alternativeQrWidth,
             alternativeQrHeight: (company as any).alternativeQrHeight,
+            websiteUrl: (company as any).websiteUrl,
             plan: (company as any).plan ? {
                 name: (company as any).plan.name,
                 features: (company as any).plan.features,

@@ -20,6 +20,7 @@ export interface UpdateCompanySettingsDto {
     alternativeLogoHeight?: number;
     alternativeQrWidth?: number;
     alternativeQrHeight?: number;
+    websiteUrl?: string;
 }
 
 export interface CreateCompanyDto {

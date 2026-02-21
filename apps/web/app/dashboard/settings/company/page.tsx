@@ -35,6 +35,7 @@ interface CompanySettings {
     alternativeLogoHeight?: number;
     alternativeQrWidth?: number;
     alternativeQrHeight?: number;
+    websiteUrl: string;
 }
 
 const defaultSettings: CompanySettings = {
@@ -56,6 +57,7 @@ const defaultSettings: CompanySettings = {
     alternativeLogoHeight: 85,
     alternativeQrWidth: 120,
     alternativeQrHeight: 120,
+    websiteUrl: "",
 };
 
 function CompanySettingsContent() {
@@ -237,6 +239,19 @@ function CompanySettingsContent() {
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="websiteUrl">URL do Site (para QR Code)</Label>
+                            <Input
+                                id="websiteUrl"
+                                value={settings.websiteUrl || ""}
+                                onChange={(e) => handleChange("websiteUrl", e.target.value)}
+                                placeholder="www.banca.com.br"
+                            />
+                            <p className="text-[10px] text-muted-foreground">
+                                Define para onde o QR Code do bilhete redirecionará ao ser escaneado.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="slogan">Slogan / Subtítulo</Label>
                             <Input
                                 id="slogan"
@@ -301,6 +316,19 @@ function CompanySettingsContent() {
                                     className="flex-1"
                                 />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="websiteUrl">URL do Site (para QR Code)</Label>
+                            <Input
+                                id="websiteUrl"
+                                value={settings.websiteUrl || ""}
+                                onChange={(e) => handleChange("websiteUrl", e.target.value)}
+                                placeholder="www.suabanca.com.br"
+                            />
+                            <p className="text-[10px] text-muted-foreground">
+                                Esta URL será usada como base para os QR Codes impressos nos bilhetes.
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

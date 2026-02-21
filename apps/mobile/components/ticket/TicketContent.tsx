@@ -51,6 +51,8 @@ export interface TicketData {
         label: string; // "Team A x Team B"
         selection: string; // "1", "X", "2"
     }[];
+    bannerText?: string;
+    websiteUrl?: string;
 }
 
 interface TicketContentProps {
@@ -142,7 +144,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 <View style={tw`w-full flex-row justify-center items-center mt-2 bg-black py-1`}>
                     <MaterialCommunityIcons name="soccer" size={20} color="white" style={tw`mr-2`} />
                     <Text style={tw`text-white font-black text-lg uppercase`}>
-                        {data.gameName}
+                        {data.bannerText || data.gameName}
                     </Text>
                 </View>
                 <Text style={tw`text-center font-bold text-black text-[12px] mt-1`}>
@@ -374,7 +376,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     ]}>
                         <View style={tw`border-[3px] border-black p-2 bg-white rounded-lg`}>
                             <QRCode
-                                value={`https://www.palpita_ai.com.br/sorteio/${displayTicketId}`}
+                                value={`${data.websiteUrl || 'https://www.palpita_ai.com.br'}/sorteio/${displayTicketId}`}
                                 size={140}
                             />
                         </View>
@@ -405,7 +407,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     ]}>
                         <View style={tw`border-[3px] border-black p-1 bg-white`}>
                             <QRCode
-                                value={`https://www.fezinhadehoje.com.br/sorteio/${displayTicketId}`}
+                                value={`${data.websiteUrl || 'https://www.fezinhadehoje.com.br'}/sorteio/${displayTicketId}`}
                                 size={qrCodeWidth}
                             />
                         </View>

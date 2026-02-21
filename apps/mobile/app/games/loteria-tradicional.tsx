@@ -250,6 +250,8 @@ export default function LoteriaTradicionalScreen() {
 
             const ticketObj: TicketData = {
                 gameName: `LT - ${modality}`,
+                bannerText: gameConfig?.bannerText || undefined,
+                websiteUrl: companySettings?.websiteUrl || undefined,
                 numbers: ticketData.numbers.map(String),
                 price: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gamePrice),
                 ticketId: ticketData.id,
@@ -479,6 +481,8 @@ export default function LoteriaTradicionalScreen() {
                                     alternativeLogoHeight: settings.alternativeLogoHeight,
                                     alternativeQrWidth: settings.alternativeQrWidth,
                                     alternativeQrHeight: settings.alternativeQrHeight,
+                                    bannerText: gameConfig?.bannerText || undefined,
+                                    websiteUrl: companySettings?.websiteUrl || undefined,
                                 }}
                                 mode="preview"
                                 template={settings.ticketTemplate as 'default' | 'alternative'}

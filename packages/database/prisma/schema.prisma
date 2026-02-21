@@ -39,6 +39,7 @@ model Company {
   alternativeLogoHeight Int? @default(85)  // Altura da logo no template alternativo (px)
   alternativeQrWidth    Int? @default(120) // Largura do QR Code no template alternativo (px)
   alternativeQrHeight   Int? @default(120) // Altura do QR Code no template alternativo (px)
+  websiteUrl            String? // URL base para o QR Code (ex: www.banca.com.br)
 
   // === LICENCIAMENTO ===
   licenseStatus    LicenseStatus @default(TRIAL)
@@ -228,6 +229,7 @@ model Game {
   colorClass  String? @default("bg-emerald-600") // Tailwind color class
 
   rules             Json
+  bannerText        String? // Texto customizado para a tarja preta do bilhete
   draws             Draw[]
   tickets           Ticket[]
   price             Decimal            @default(5.00)

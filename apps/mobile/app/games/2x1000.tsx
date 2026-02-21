@@ -116,8 +116,14 @@ export default function Game2x1000Screen() {
                         setGamePrizes({
                             milhar: fmt(game.prizeMilhar),
                             centena: fmt(game.prizeCentena),
-                            dezena: fmt(game.prizeDezena)
+                            dezena: fmt(game.prizeDezena),
+                            bannerText: game.bannerText || undefined
                         });
+                    } else if (game.bannerText) {
+                        setGamePrizes(prev => ({
+                            ...prev,
+                            bannerText: game.bannerText
+                        } as any));
                     }
 
                     // Store Second Chance Config
@@ -489,6 +495,8 @@ export default function Game2x1000Screen() {
                 alternativeLogoHeight: settings.alternativeLogoHeight,
                 alternativeQrWidth: settings.alternativeQrWidth,
                 alternativeQrHeight: settings.alternativeQrHeight,
+                bannerText: gamePrizes?.bannerText || "JOGO 2x1000",
+                websiteUrl: companySettings?.websiteUrl || undefined
             };
 
             setLastTicket(fullTicket);
@@ -758,8 +766,10 @@ export default function Game2x1000Screen() {
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleBackFromModal}>
                 <View style={tw`flex-1 bg-black/90`}>
                     <ScrollView
-                        contentContainerStyle={tw`items-center p-4 pb-20`}
+                        style={tw`flex-1`}
+                        contentContainerStyle={tw`items-center p-4 pb-32`}
                         showsVerticalScrollIndicator={true}
+                        bounces={true}
                     >
                         <View style={tw`w-full max-w-[400px]`}>
                             <Text style={tw`text-white font-bold text-xl mb-4 text-center mt-4`}>CONFIRMAÇÃO</Text>
@@ -780,6 +790,8 @@ export default function Game2x1000Screen() {
                                         alternativeLogoHeight: settings.alternativeLogoHeight,
                                         alternativeQrWidth: settings.alternativeQrWidth,
                                         alternativeQrHeight: settings.alternativeQrHeight,
+                                        bannerText: gamePrizes?.bannerText || "JOGO 2x1000",
+                                        websiteUrl: companySettings?.websiteUrl || undefined
                                     }}
                                     mode="preview"
                                     template={settings.ticketTemplate as 'default' | 'alternative'}

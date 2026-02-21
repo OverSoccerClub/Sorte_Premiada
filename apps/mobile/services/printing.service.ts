@@ -129,6 +129,15 @@ export const printTicket = async (
         }
 
         await BLEPrinter.printText("\n\n\n"); // Feed
+
+        // Reset and delay to prevent garbage on some POS (like Sunmi/Smart2)
+        try {
+          await BLEPrinter.printText("\x1b@"); // ESC @ - Initialize printer
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (e) {
+          console.warn("[printTicket] Reset command failed, continuing...", e);
+        }
+
         console.log(`[printTicket] ✅ BLE IMAGE PRINT COMPLETE`);
         console.log(`[printTicket] ========== PRINTING SERVICE END ==========`);
         return true;

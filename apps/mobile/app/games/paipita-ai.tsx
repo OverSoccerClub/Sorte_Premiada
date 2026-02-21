@@ -228,6 +228,8 @@ export default function GamePaipitaScreen() {
                 companyName: settings.companyName,
                 companyLogoUrl: settings.logoUrl,
                 status: ticketData.status,
+                bannerText: activeDraw?.game?.bannerText || undefined,
+                websiteUrl: companySettings?.websiteUrl || undefined,
                 promptMessage: "BOA SORTE!",
                 // Prizes could be fetched from game config
             };
@@ -395,7 +397,9 @@ export default function GamePaipitaScreen() {
                                         date: formatBrazilDate(getBrazilNowDate(), { dateStyle: 'short', timeStyle: 'medium' }),
                                         ticketId: "PREVIEW",
                                         companyName: settings.companyName,
-                                        companyLogoUrl: settings.logoUrl
+                                        companyLogoUrl: settings.logoUrl,
+                                        bannerText: activeDraw?.game?.bannerText || undefined,
+                                        websiteUrl: companySettings?.websiteUrl || undefined,
                                     }}
                                     mode="preview"
                                     scale={0.8}

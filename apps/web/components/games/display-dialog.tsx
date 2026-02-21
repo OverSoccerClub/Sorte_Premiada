@@ -39,7 +39,7 @@ const colorOptions = [
 
 export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: DisplayConfigDialogProps) {
     const { showAlert } = useAlert()
-    const [displayValues, setDisplayValues] = useState({ name: "", displayName: "", iconName: "", colorClass: "" })
+    const [displayValues, setDisplayValues] = useState({ name: "", displayName: "", iconName: "", colorClass: "", bannerText: "" })
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
@@ -48,7 +48,8 @@ export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: Dis
                 name: game.name || "",
                 displayName: game.displayName || "",
                 iconName: game.iconName || "game-controller-outline",
-                colorClass: game.colorClass || "bg-emerald-600"
+                colorClass: game.colorClass || "bg-emerald-600",
+                bannerText: game.bannerText || ""
             })
         }
     }, [open, game])
@@ -63,7 +64,8 @@ export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: Dis
                 name: displayValues.name,
                 displayName: displayValues.displayName || null,
                 iconName: displayValues.iconName,
-                colorClass: displayValues.colorClass
+                colorClass: displayValues.colorClass,
+                bannerText: (displayValues as any).bannerText || null
             }
 
             const res = await fetch(`${API_URL}/games/${game.id}`, {
@@ -105,6 +107,15 @@ export function DisplayConfigDialog({ open, onOpenChange, game, onSuccess }: Dis
                             placeholder="Ex: 2x1000"
                         />
                         <p className="text-[10px] text-muted-foreground">Nome interno usado no sistema.</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Texto da Tarja do Bilhete (Impressão)</Label>
+                        <Input
+                            value={(displayValues as any).bannerText || ""}
+                            onChange={(e) => setDisplayValues({ ...displayValues, bannerText: e.target.value } as any)}
+                            placeholder="Ex: JOGO 2x1000"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Texto em destaque na tarja preta do bilhete vertical.</p>
                     </div>
                     <div className="space-y-2">
                         <Label>Nome de Exibição (opcional)</Label>

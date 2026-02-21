@@ -21,6 +21,7 @@ export interface CompanySettings {
     alternativeLogoHeight?: number;
     alternativeQrWidth?: number;
     alternativeQrHeight?: number;
+    websiteUrl?: string;
 }
 
 const defaultSettings: CompanySettings = {
