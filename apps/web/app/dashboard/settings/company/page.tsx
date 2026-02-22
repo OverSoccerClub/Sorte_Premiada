@@ -468,7 +468,7 @@ function CompanySettingsContent() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Default Template */}
                             <div
                                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'default'
