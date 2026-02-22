@@ -2,7 +2,7 @@
   "expo": {
     "name": "InnoBet",
     "slug": "innobet",
-    "version": "1.5.57",
+    "version": "1.5.58",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -48,7 +48,7 @@
         "android.permission.REQUEST_INSTALL_PACKAGES",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 276,
+      "versionCode": 277,
       "package": "com.anonymous.innobet"
     },
     "web": {
