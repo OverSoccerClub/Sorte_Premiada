@@ -6,7 +6,7 @@ import { TicketData } from './TicketContent';
 
 interface TicketPrintManagerProps {
     data: TicketData | null;
-    template?: 'default' | 'alternative';
+    template?: 'default' | 'alternative' | 'milhar';
 }
 
 /**

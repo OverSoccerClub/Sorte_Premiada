@@ -3,19 +3,20 @@ import { View } from 'react-native';
 import tw from '../../lib/tailwind';
 import { TicketContent, TicketData } from './TicketContent';
 import { TicketContentAlternative } from './TicketContentAlternative';
+import { TicketContentMilhar } from './TicketContentMilhar';
 
 interface TicketDisplayProps {
     data: TicketData;
     mode: 'preview' | 'capture';
     scale?: number;
-    template?: 'default' | 'alternative';
+    template?: 'default' | 'alternative' | 'milhar';
 }
 
 export function TicketDisplay({ data, mode, scale = 0.80, template = 'default' }: TicketDisplayProps) {
     const isCapture = mode === 'capture';
-    const TemplateComponent = template === 'alternative' ? TicketContentAlternative : TicketContent;
+    const TemplateComponent = template === 'milhar' ? TicketContentMilhar : (template === 'alternative' ? TicketContentAlternative : TicketContent);
 
-    console.log(`[TicketDisplay] Mode: ${mode}, Template: ${template}, Component: ${template === 'alternative' ? 'TicketContentAlternative' : 'TicketContent'}`);
+    console.log(`[TicketDisplay] Mode: ${mode}, Template: ${template}, Component: ${TemplateComponent.name}`);
 
     if (isCapture) {
         return <TemplateComponent data={data} isCapture={true} />;

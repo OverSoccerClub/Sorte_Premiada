@@ -21,7 +21,7 @@ interface ReceiptModalProps {
     onPrint?: (imageUri?: string) => Promise<void>; // Kept for backward compat if needed, but we'll use hook
     autoPrint?: boolean;
     isReprint?: boolean;
-    template?: 'default' | 'alternative';
+    template?: 'default' | 'alternative' | 'milhar';
 }
 
 export function ReceiptModal({ visible, onClose, ticketData, autoPrint, isReprint = false, template }: ReceiptModalProps) {

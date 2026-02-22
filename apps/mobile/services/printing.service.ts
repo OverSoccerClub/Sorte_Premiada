@@ -78,7 +78,7 @@ export const printTicket = async (
   data: TicketData,
   printerType: PrinterType = 'BLE',
   imageUri?: string,
-  template: 'default' | 'alternative' = 'default'
+  template: 'default' | 'alternative' | 'milhar' = 'default'
 ) => {
   const { numbers, ticketId, date, price, gameName, possiblePrize, status, prizes, secondChanceStatus, series, ticketNumber, terminalId, areaName, city } = data;
 
@@ -272,8 +272,8 @@ export const printTicket = async (
     // BLE Printing Logic
     console.log(`[printTicket] 📝 Using TEXT-based BLE printing...`);
 
-    if (template === 'alternative') {
-      console.warn(`[printTicket] ⚠️ WARNING: Alternative template selected but TEXT printing doesn't support it!`);
+    if (template === 'alternative' || template === 'milhar') {
+      console.warn(`[printTicket] ⚠️ WARNING: ${template} template selected but TEXT printing doesn't support it!`);
       console.warn(`[printTicket] ⚠️ The printed ticket will use DEFAULT layout instead.`);
       console.warn(`[printTicket] ⚠️ This usually means image capture/printing failed.`);
     }

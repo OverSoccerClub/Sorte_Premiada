@@ -646,7 +646,7 @@ export default function Game2x1000Screen() {
             <View style={tw`flex-1 items-center`}>
 
                 {/* Hidden Capture Area */}
-                <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative'} />
+                <TicketPrintManager ref={printViewShotRef} data={lastTicket} template={settings.ticketTemplate as 'default' | 'alternative' | 'milhar'} />
 
 
                 <View style={tw`w-[90%] max-w-[400px] flex-1 p-4`}>
@@ -795,7 +795,7 @@ export default function Game2x1000Screen() {
                                         websiteUrl: companySettings?.websiteUrl || undefined
                                     }}
                                     mode="preview"
-                                    template={settings.ticketTemplate as 'default' | 'alternative'}
+                                    template={settings.ticketTemplate as 'default' | 'alternative' | 'milhar'}
                                 />
                                 {isAutoPick && (
                                     <View style={tw`absolute -top-3 -right-2 bg-emerald-500 px-3 py-1 rounded-full shadow-lg z-50 elevation-5`}>

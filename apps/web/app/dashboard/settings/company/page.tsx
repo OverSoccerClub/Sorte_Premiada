@@ -530,6 +530,37 @@ function CompanySettingsContent() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Milhar Template */}
+                            <div
+                                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${settings.ticketTemplate === 'milhar'
+                                    ? 'border-emerald-500 bg-emerald-500/10'
+                                    : 'border-border hover:border-emerald-500/50'
+                                    }`}
+                                onClick={() => handleChange('ticketTemplate', 'milhar')}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${settings.ticketTemplate === 'milhar'
+                                        ? 'border-emerald-500 bg-emerald-500'
+                                        : 'border-border'
+                                        }`}>
+                                        {settings.ticketTemplate === 'milhar' && (
+                                            <div className="w-2 h-2 bg-white rounded-full" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-semibold text-sm mb-1">Milhar (Compacto)</h4>
+                                        <p className="text-xs text-muted-foreground mb-2">
+                                            Layout compacto baseado na Fezinha, focado em Milhar
+                                        </p>
+                                        <div className="bg-muted/50 rounded p-2 text-[10px] space-y-1">
+                                            <div className="font-mono">• Grid compacto</div>
+                                            <div className="font-mono">• Texto "Milhar"</div>
+                                            <div className="font-mono">• QR Code + Código de barras</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Configurações Avançadas dos Templates */}
