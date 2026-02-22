@@ -91,8 +91,8 @@ android {
         applicationId 'com.anonymous.innobet'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 274
-        versionName "1.5.55"
+        versionCode 275
+        versionName "1.5.56"
     }
     signingConfigs {
         debug {

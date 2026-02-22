@@ -21,7 +21,7 @@
 > Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
 > Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
 > Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
-> Task :expo-updates-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :expo-updates-gradle-plugin:compileKotlin
 > Task :expo-updates-gradle-plugin:compileJava NO-SOURCE
 > Task :expo-updates-gradle-plugin:classes UP-TO-DATE
 > Task :expo-updates-gradle-plugin:jar UP-TO-DATE
@@ -164,7 +164,7 @@ To suppress this warning, remove "buildToolsVersion '32.0.0'" from your build.gr
 > Task :app:generateCodegenArtifactsFromSchema SKIPPED
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preReleaseBuild UP-TO-DATE
-> Task :app:generateReleaseBuildConfig UP-TO-DATE
+> Task :app:generateReleaseBuildConfig
 > Task :expo:generateExpoModulesPackageListTask UP-TO-DATE
 > Task :expo:preBuild UP-TO-DATE
 > Task :expo:preReleaseBuild UP-TO-DATE
@@ -285,7 +285,7 @@ To suppress this warning, remove "buildToolsVersion '32.0.0'" from your build.gr
 > Task :app:createBundleReleaseJsAndAssets
 Starting Metro Bundler
 warning: Bundler cache is empty, rebuilding (this may take a minute)
-Android Bundled 16840ms index.js (1883 modules)
+Android Bundled 17272ms index.js (1883 modules)
 Writing bundle output to: android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle
 Writing sourcemap output to: android\app\build\intermediates\sourcemaps\react\release\index.android.bundle.packager.map
 Copying 78 asset files
@@ -545,12 +545,10 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:generateReleaseResValues UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:packageReleaseResources UP-TO-DATE
-> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:generateReleaseResources UP-TO-DATE
-> Task :app:mergeReleaseResources UP-TO-DATE
-> Task :app:packageReleaseResources UP-TO-DATE
-> Task :app:parseReleaseLocalResources UP-TO-DATE
-> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
 > Task :app:extractDeepLinksRelease UP-TO-DATE
 > Task :expo:extractDeepLinksRelease UP-TO-DATE
 > Task :expo:processReleaseManifest UP-TO-DATE
@@ -567,6 +565,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-device:extractDeepLinksRelease UP-TO-DATE
 > Task :expo-device:processReleaseManifest UP-TO-DATE
 > Task :expo-eas-client:extractDeepLinksRelease UP-TO-DATE
+> Task :app:parseReleaseLocalResources
 > Task :expo-eas-client:processReleaseManifest UP-TO-DATE
 > Task :expo-file-system:extractDeepLinksRelease UP-TO-DATE
 > Task :expo-file-system:processReleaseManifest UP-TO-DATE
@@ -624,9 +623,13 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-view-shot:processReleaseManifest UP-TO-DATE
 > Task :react-native-worklets-core:extractDeepLinksRelease UP-TO-DATE
 > Task :react-native-worklets-core:processReleaseManifest UP-TO-DATE
-> Task :app:processReleaseMainManifest UP-TO-DATE
-> Task :app:processReleaseManifest UP-TO-DATE
-> Task :app:processReleaseManifestForPackage UP-TO-DATE
+> Task :app:mergeReleaseResources
+
+> Task :app:processReleaseMainManifest
+C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml Warning:
+	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:0 to replace other declarations but no other declaration present
+
+> Task :app:processReleaseManifest
 > Task :expo:compileReleaseLibraryResources UP-TO-DATE
 > Task :expo:parseReleaseLocalResources UP-TO-DATE
 > Task :expo:generateReleaseRFile UP-TO-DATE
@@ -735,7 +738,6 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:compileReleaseLibraryResources UP-TO-DATE
 > Task :react-native-worklets-core:parseReleaseLocalResources UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseRFile UP-TO-DATE
-> Task :app:processReleaseResources UP-TO-DATE
 > Task :expo:checkKotlinGradlePluginConfigurationErrors
 > Task :expo:generateReleaseBuildConfig UP-TO-DATE
 > Task :expo-application:checkKotlinGradlePluginConfigurationErrors
@@ -887,6 +889,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo:javaPreCompileRelease UP-TO-DATE
 > Task :expo:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :expo:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :app:processReleaseManifestForPackage
 > Task :react-native-async-storage_async-storage:generateReleaseBuildConfig UP-TO-DATE
 > Task :react-native-async-storage_async-storage:javaPreCompileRelease UP-TO-DATE
 > Task :react-native-async-storage_async-storage:compileReleaseJavaWithJavac UP-TO-DATE
@@ -936,10 +939,8 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:javaPreCompileRelease UP-TO-DATE
 > Task :react-native-worklets-core:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :react-native-worklets-core:bundleLibCompileToJarRelease UP-TO-DATE
-> Task :app:compileReleaseKotlin UP-TO-DATE
 > Task :app:buildKotlinToolingMetadata UP-TO-DATE
 > Task :app:javaPreCompileRelease UP-TO-DATE
-> Task :app:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :app:extractProguardFiles UP-TO-DATE
 > Task :expo:bundleLibRuntimeToJarRelease UP-TO-DATE
 > Task :expo:processReleaseJavaRes UP-TO-DATE
@@ -1157,7 +1158,6 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:extractProguardFiles UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseLintModel UP-TO-DATE
 > Task :react-native-worklets-core:prepareLintJarForPublish UP-TO-DATE
-> Task :app:generateReleaseLintVitalReportModel UP-TO-DATE
 > Task :expo:mergeReleaseJniLibFolders UP-TO-DATE
 > Task :expo:mergeReleaseNativeLibs NO-SOURCE
 > Task :expo:stripReleaseDebugSymbols NO-SOURCE
@@ -1285,6 +1285,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86]
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86_64]
+> Task :app:processReleaseResources
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86_64]
 > Task :react-native-reanimated:mergeReleaseJniLibFolders UP-TO-DATE
 > Task :react-native-reanimated:mergeReleaseNativeLibs UP-TO-DATE
@@ -1420,7 +1421,10 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-camera:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
 > Task :expo-camera:extractDeepLinksForAarRelease UP-TO-DATE
 > Task :expo-camera:extractReleaseAnnotations UP-TO-DATE
+> Task :app:compileReleaseKotlin
 > Task :expo-camera:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :app:compileReleaseJavaWithJavac
+> Task :app:generateReleaseLintVitalReportModel
 > Task :expo-camera:mergeReleaseConsumerProguardFiles UP-TO-DATE
 > Task :expo-camera:mergeReleaseShaders UP-TO-DATE
 > Task :expo-camera:compileReleaseShaders NO-SOURCE
@@ -1457,11 +1461,11 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-constants:mergeReleaseShaders UP-TO-DATE
 > Task :expo-constants:compileReleaseShaders NO-SOURCE
 > Task :expo-constants:generateReleaseAssets UP-TO-DATE
-> Task :expo-constants:packageReleaseAssets
+> Task :expo-constants:packageReleaseAssets UP-TO-DATE
 > Task :expo-constants:prepareReleaseArtProfile UP-TO-DATE
 > Task :expo-constants:mergeReleaseJavaResource UP-TO-DATE
 > Task :expo-constants:syncReleaseLibJars UP-TO-DATE
-> Task :expo-constants:bundleReleaseLocalLintAar
+> Task :expo-constants:bundleReleaseLocalLintAar UP-TO-DATE
 > Task :expo-device:mergeReleaseJniLibFolders UP-TO-DATE
 > Task :expo-device:mergeReleaseNativeLibs NO-SOURCE
 > Task :expo-device:stripReleaseDebugSymbols NO-SOURCE
@@ -1798,6 +1802,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-system-ui:writeReleaseLintModelMetadata UP-TO-DATE
 > Task :expo-updates:writeReleaseLintModelMetadata UP-TO-DATE
 > Task :expo-updates-interface:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :expo:lintVitalAnalyzeRelease UP-TO-DATE
 > Task :expo:writeReleaseLintModelMetadata UP-TO-DATE
 > Task :expo-application:lintVitalAnalyzeRelease UP-TO-DATE
 > Task :expo-asset:lintVitalAnalyzeRelease UP-TO-DATE
@@ -1959,14 +1964,12 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-updates-interface:bundleLibRuntimeToDirRelease UP-TO-DATE
 > Task :expo-modules-core:bundleLibRuntimeToDirRelease UP-TO-DATE
 > Task :app:checkReleaseDuplicateClasses UP-TO-DATE
-> Task :app:dexBuilderRelease UP-TO-DATE
+> Task :app:dexBuilderRelease
 > Task :app:desugarReleaseFileDependencies UP-TO-DATE
 > Task :app:mergeReleaseStartupProfile UP-TO-DATE
 > Task :app:mergeExtDexRelease UP-TO-DATE
 > Task :app:mergeReleaseArtProfile UP-TO-DATE
-> Task :app:mergeDexRelease UP-TO-DATE
 > Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
-> Task :app:compileReleaseArtProfile UP-TO-DATE
 > Task :app:mergeReleaseShaders UP-TO-DATE
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:createReleaseUpdatesResources UP-TO-DATE
@@ -1975,7 +1978,6 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :app:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :app:processReleaseJavaRes UP-TO-DATE
 > Task :app:mergeReleaseJavaResource UP-TO-DATE
-> Task :app:optimizeReleaseResources UP-TO-DATE
 > Task :app:collectReleaseDependencies UP-TO-DATE
 > Task :app:sdkReleaseDependencyData UP-TO-DATE
 > Task :app:validateSigningRelease UP-TO-DATE
@@ -1984,6 +1986,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo:bundleReleaseAar UP-TO-DATE
 > Task :expo:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo:mergeReleaseResources UP-TO-DATE
+> Task :app:compressReleaseAssets
 > Task :expo:verifyReleaseResources UP-TO-DATE
 > Task :expo:assembleRelease UP-TO-DATE
 > Task :expo-application:bundleReleaseAar UP-TO-DATE
@@ -1999,19 +2002,21 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-camera:bundleReleaseAar UP-TO-DATE
 > Task :expo-camera:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo-camera:mergeReleaseResources UP-TO-DATE
+> Task :app:lintVitalAnalyzeRelease
 > Task :expo-camera:verifyReleaseResources UP-TO-DATE
 > Task :expo-camera:assembleRelease UP-TO-DATE
 > Task :expo-clipboard:bundleReleaseAar UP-TO-DATE
 > Task :expo-clipboard:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:compressReleaseAssets
 > Task :expo-clipboard:mergeReleaseResources UP-TO-DATE
+> Task :app:lintVitalReportRelease
 > Task :expo-clipboard:verifyReleaseResources UP-TO-DATE
+> Task :app:lintVitalRelease
 > Task :expo-clipboard:assembleRelease UP-TO-DATE
-> Task :expo-constants:bundleReleaseAar
+> Task :expo-constants:bundleReleaseAar UP-TO-DATE
 > Task :expo-constants:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo-constants:mergeReleaseResources UP-TO-DATE
 > Task :expo-constants:verifyReleaseResources UP-TO-DATE
-> Task :expo-constants:assembleRelease
+> Task :expo-constants:assembleRelease UP-TO-DATE
 > Task :expo-device:bundleReleaseAar UP-TO-DATE
 > Task :expo-device:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo-device:mergeReleaseResources UP-TO-DATE
@@ -2053,6 +2058,7 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-linking:verifyReleaseResources UP-TO-DATE
 > Task :expo-linking:assembleRelease UP-TO-DATE
 > Task :expo-location:bundleReleaseAar UP-TO-DATE
+> Task :app:optimizeReleaseResources
 > Task :expo-location:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo-location:mergeReleaseResources UP-TO-DATE
 > Task :expo-location:verifyReleaseResources UP-TO-DATE
@@ -2142,16 +2148,14 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-screens:mergeReleaseResources UP-TO-DATE
 > Task :react-native-screens:verifyReleaseResources UP-TO-DATE
 > Task :react-native-screens:assembleRelease UP-TO-DATE
-> Task :app:packageRelease
-> Task :app:createReleaseApkListingFileRedirect UP-TO-DATE
 > Task :react-native-svg:bundleReleaseAar UP-TO-DATE
 > Task :react-native-svg:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:mergeDexRelease
 > Task :react-native-svg:mergeReleaseResources UP-TO-DATE
 > Task :react-native-svg:verifyReleaseResources UP-TO-DATE
 > Task :react-native-svg:assembleRelease UP-TO-DATE
 > Task :react-native-thermal-receipt-printer-image-qr:bundleReleaseAar UP-TO-DATE
 > Task :react-native-thermal-receipt-printer-image-qr:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :expo:lintVitalAnalyzeRelease
 > Task :react-native-thermal-receipt-printer-image-qr:mergeReleaseResources UP-TO-DATE
 > Task :react-native-thermal-receipt-printer-image-qr:verifyReleaseResources UP-TO-DATE
 > Task :react-native-thermal-receipt-printer-image-qr:assembleRelease UP-TO-DATE
@@ -2165,10 +2169,10 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:mergeReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:verifyReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:assembleRelease UP-TO-DATE
-> Task :app:lintVitalAnalyzeRelease
-> Task :app:lintVitalReportRelease UP-TO-DATE
-> Task :app:lintVitalRelease
+> Task :app:compileReleaseArtProfile
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 16s
-1608 actionable tasks: 78 executed, 1530 up-to-date
+BUILD SUCCESSFUL in 1m 38s
+1608 actionable tasks: 95 executed, 1513 up-to-date
