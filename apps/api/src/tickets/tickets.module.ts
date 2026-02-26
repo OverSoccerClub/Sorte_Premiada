@@ -9,5 +9,6 @@ import { NotificationsModule } from '../notifications/notifications.module';
     imports: [PrismaModule, FinanceModule, forwardRef(() => NotificationsModule)],
     controllers: [TicketsController],
     providers: [TicketsService],
+    exports: [TicketsService],
 })
 export class TicketsModule { }
