@@ -101,6 +101,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 { icon: Trophy, label: "Palpita Ai (Apostar)", href: "/dashboard/games/paipita-ai" },
                 { icon: Ticket, label: "Gestão de Jogos", href: "/dashboard/games" },
                 { icon: Calendar, label: "Gestão de Sorteios", href: "/dashboard/draws" },
+                { icon: Calendar, label: "Sorteio Minuto da Sorte", href: "/dashboard/admin/minuto-sorte" },
                 ...(hasPermission(PERMISSIONS.VIEW_SALES_REPORT) ? [{ icon: Trophy, label: "Relatório Palpita Ai", href: "/dashboard/games/palpita" }] : []),
                 ...(hasPermission(PERMISSIONS.VIEW_PALPITA) ? [{ icon: Trophy, label: "Gestão Palpita Ai", href: "/dashboard/palpita" }] : []),
                 { icon: Search, label: "Consultar Bilhete", href: "/dashboard/consultar-bilhete" },

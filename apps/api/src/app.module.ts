@@ -31,6 +31,7 @@ import { PublicSiteModule } from './public-site/public-site.module';
 
 import { BugsModule } from './bugs/bugs.module';
 import { NeighborhoodsModule } from './neighborhoods/neighborhoods.module';
+import { MinutoSorteModule } from './minuto-sorte/minuto-sorte.module';
 import { APP_GUARD } from '@nestjs/core';
 import { LicenseGuard } from './licensing/license.guard';
 
@@ -67,6 +68,7 @@ import { LicenseGuard } from './licensing/license.guard';
     BugsModule, // Sistema de rastreamento de bugs
     PublicSiteModule, // Endpoints públicos para o site de marketing
     NeighborhoodsModule,
+    MinutoSorteModule,
   ],
   controllers: [AppController],
   providers: [

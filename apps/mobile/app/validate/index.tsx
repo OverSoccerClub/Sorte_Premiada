@@ -81,6 +81,37 @@ export default function ValidateTicketScreen() {
         setManualCode('');
     };
 
+    const handleCashout = async () => {
+        if (!result || result.status !== 'WON') return;
+
+        setLoading(true);
+        try {
+            const ticketCode = result.code || result.hash || result.ticketNumber || result.id;
+            const res = await TicketsService.cashout(token!, ticketCode);
+            if (res.success) {
+                setResult({
+                    ...result,
+                    status: 'PAID',
+                    message: res.message || 'Prêmio pago com sucesso.'
+                });
+            } else {
+                setResult({
+                    ...result,
+                    error: true,
+                    message: res.message
+                });
+            }
+        } catch (error) {
+            setResult({
+                ...result,
+                error: true,
+                message: "Erro ao processar pagamento."
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <View style={tw`flex-1 bg-black`}>
             <CameraView
@@ -180,8 +211,18 @@ export default function ValidateTicketScreen() {
                                     {result.message}
                                 </Text>
 
+                                {result.status === 'WON' && !result.error && (
+                                    <TouchableOpacity
+                                        style={tw`bg-green-600 w-full py-3 rounded-lg mt-4 flex-row justify-center items-center`}
+                                        onPress={handleCashout}
+                                    >
+                                        <Ionicons name="cash-outline" size={20} color="white" style={tw`mr-2`} />
+                                        <Text style={tw`text-white text-center font-bold text-lg`}>Pagar Prêmio</Text>
+                                    </TouchableOpacity>
+                                )}
+
                                 <TouchableOpacity
-                                    style={tw`bg-emerald-600 w-full py-3 rounded-lg mt-8`}
+                                    style={tw`bg-emerald-600 w-full py-3 rounded-lg mt-4`}
                                     onPress={resetScan}
                                 >
                                     <Text style={tw`text-white text-center font-bold`}>Ler Outro Bilhete</Text>

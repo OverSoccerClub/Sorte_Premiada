@@ -1513,4 +1513,38 @@ export class TicketsService {
 
         return ticket;
     }
+
+    async findPublicByHash(hash: string) {
+        const ticket = await this.prisma.client.ticket.findFirst({
+            where: { hash },
+            select: {
+                id: true,
+                hash: true,
+                status: true,
+                createdAt: true,
+                drawDate: true,
+                numbers: true,
+                amount: true,
+                possiblePrize: true,
+                gameType: true,
+                gameId: true,
+                game: { select: { name: true } },
+                user: { select: { name: true } }
+            }
+        });
+
+        if (!ticket) {
+            throw new BadRequestException('Bilhete não encontrado.');
+        }
+
+        let draw = null;
+        if (ticket.status === 'WON' || ticket.status === 'LOST' || ticket.status === 'PAID') {
+            draw = await this.prisma.client.draw.findFirst({
+                where: { gameId: ticket.gameId, drawDate: ticket.drawDate },
+                select: { numbers: true }
+            });
+        }
+
+        return { ...ticket, draw };
+    }
 }

@@ -29,16 +29,16 @@ model Company {
   primaryColor String? @default("#50C878")
   updateUrl    String? // URL do repositório para atualizações do App
   initials     String? // Iniciais da empresa para códigos de ativação (ex: "AP" para "A Perseverança")
-  
+
   // === CONFIGURAÇÕES DE EXIBIÇÃO ===
   showPlanTotalValue Boolean @default(true) // Exibir valor total calculado nos planos
   ticketTemplate     String  @default("default") // Template de bilhete: "default" | "alternative"
-  
+
   // Configurações do Template Alternativo
-  alternativeLogoWidth  Int? @default(500) // Largura da logo no template alternativo (px)
-  alternativeLogoHeight Int? @default(85)  // Altura da logo no template alternativo (px)
-  alternativeQrWidth    Int? @default(120) // Largura do QR Code no template alternativo (px)
-  alternativeQrHeight   Int? @default(120) // Altura do QR Code no template alternativo (px)
+  alternativeLogoWidth  Int?    @default(500) // Largura da logo no template alternativo (px)
+  alternativeLogoHeight Int?    @default(85) // Altura da logo no template alternativo (px)
+  alternativeQrWidth    Int?    @default(120) // Largura do QR Code no template alternativo (px)
+  alternativeQrHeight   Int?    @default(120) // Altura do QR Code no template alternativo (px)
   websiteUrl            String? // URL base para o QR Code (ex: www.banca.com.br)
 
   // === LICENCIAMENTO ===
@@ -56,7 +56,7 @@ model Company {
   // === PLANO DE ASSINATURA (Dinâmico) ===
   planId String?
   plan   Plan?   @relation(fields: [planId], references: [id])
-  
+
   // Mantemos o Enum e campos manuais como snapshot/fallback
   subscriptionPlan SubscriptionPlan @default(BASIC)
   monthlyPrice     Decimal          @default(0)
@@ -143,24 +143,24 @@ model User {
   canCancelTickets         Boolean           @default(false) // Permissão para o cambista cancelar bilhetes
   canResetActivation       Boolean           @default(false) // Permissão para o cambista resetar a ativação do dispositivo
   commissionRate           Decimal?          @default(20.00) // Porcentagem padrão de comissão (ex: 20%)
-  
+
   // Custom Permissions (Granular Access Control)
-  permissions              Json?             @default("{}") // Armazena flags de permissão (ex: { "MANAGE_GAMES": true })
+  permissions Json? @default("{}") // Armazena flags de permissão (ex: { "MANAGE_GAMES": true })
 
   // Dados Cadastrais Completos
-  address      String?
-  city         String?
-  state        String?
-  zipCode      String?
-  phone        String?
+  address             String?
+  city                String?
+  state               String?
+  zipCode             String?
+  phone               String?
   addressNeighborhood String?
-  number       String?
-  complement   String?
-  cpf          String?
+  number              String?
+  complement          String?
+  cpf                 String?
 
   // New Commission Rules
-  minSalesThreshold Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
-  fixedCommission   Decimal? @default(40.00) // Ganho fixo se não atingir a meta (R$)
+  minSalesThreshold  Decimal? @default(200.00) // Meta mínima de vendas para ganhar % (R$)
+  fixedCommission    Decimal? @default(40.00) // Ganho fixo se não atingir a meta (R$)
   commissionGoalType GoalType @default(CURRENCY) // Tipo da meta: valor ou quantidade
 
   // Corporate Maturity
@@ -174,11 +174,11 @@ model User {
   targetedAnnouncements Announcement[] @relation("UserTargetedAnnouncements")
 
   // Bug Tracking Relations
-  bugsReported   BugReport[] @relation("BugReportedBy")
-  bugsAssigned   BugReport[] @relation("BugAssignedTo")
-  bugsFixed      BugReport[] @relation("BugFixedBy")
-  bugsValidated  BugReport[] @relation("BugValidatedBy")
-  bugComments    BugComment[] @relation("BugCommentUser")
+  bugsReported  BugReport[]  @relation("BugReportedBy")
+  bugsAssigned  BugReport[]  @relation("BugAssignedTo")
+  bugsFixed     BugReport[]  @relation("BugFixedBy")
+  bugsValidated BugReport[]  @relation("BugValidatedBy")
+  bugComments   BugComment[] @relation("BugCommentUser")
 
   @@index([companyId])
 }
@@ -193,23 +193,23 @@ model Area {
   state               String
   seriesNumber        String // Série base inicial (obrigatório) - ex: "0001"
   currentSeries       String // Série atual em uso (incrementa automaticamente)
-  ticketsInSeries     Int    @default(0) // Contador de bilhetes na série atual
-  maxTicketsPerSeries Int    @default(2500) // Máximo de bilhetes por série
+  ticketsInSeries     Int     @default(0) // Contador de bilhetes na série atual
+  maxTicketsPerSeries Int     @default(2500) // Máximo de bilhetes por série
   isActive            Boolean @default(true) // Controla se a praça está operando
-  
-  // Series Control Extensions
-  warningThreshold    Int     @default(80) // Porcentagem para aviso (ex: 80%)
-  notifyOnWarning     Boolean @default(true) // Enviar notificação ao atingir threshold
-  autoCycleSeries     Boolean @default(true) // Se false, para as vendas ao atingir o limite até intervenção manual
 
-  users               User[]
-  configs             AreaConfig[]
-  neighborhoods       Neighborhood[]
-  posTerminals        PosTerminal[]
-  draws               Draw[]
-  extractionSeries    ExtractionSeries[]
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  // Series Control Extensions
+  warningThreshold Int     @default(80) // Porcentagem para aviso (ex: 80%)
+  notifyOnWarning  Boolean @default(true) // Enviar notificação ao atingir threshold
+  autoCycleSeries  Boolean @default(true) // Se false, para as vendas ao atingir o limite até intervenção manual
+
+  users            User[]
+  configs          AreaConfig[]
+  neighborhoods    Neighborhood[]
+  posTerminals     PosTerminal[]
+  draws            Draw[]
+  extractionSeries ExtractionSeries[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   @@index([companyId])
 }
@@ -244,10 +244,10 @@ model Game {
   commissionRate  Decimal @default(10.0) // Comissão padrão do jogo (ex: 10%)
 
   // Configuração Segunda Chance (Sorteio Semanal/Sábado)
-  secondChanceEnabled    Boolean @default(false)
+  secondChanceEnabled    Boolean  @default(false)
   secondChanceRangeStart Int? // e.g. 122300
   secondChanceRangeEnd   Int? // e.g. 125500
-  secondChanceWeekday    Int?    @default(6) // 0=Dom, 6=Sáb
+  secondChanceWeekday    Int?     @default(6) // 0=Dom, 6=Sáb
   secondChanceDrawTime   String? // "HH:mm", e.g. "19:00"
   secondChancePrize      Decimal? @default(1000) // Prêmio do sorteio de Segunda Chance
   secondChanceLabel      String?  @default("SEGUNDA CHANCE") // Label customizável para exibição
@@ -263,8 +263,7 @@ model Game {
 
   // Ticket Numbering Configuration
   ticketNumberingMode String? @default("RANDOM") // "RANDOM" ou "SEQUENTIAL"
-  maxTicketsPerSeries Int?    @default(2500)     // Limite de bilhetes por série
-
+  maxTicketsPerSeries Int?    @default(2500) // Limite de bilhetes por série
 
   configs AreaConfig[]
 
@@ -276,31 +275,31 @@ model Draw {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  gameId    String
-  game      Game     @relation(fields: [gameId], references: [id])
-  numbers   String[]
-  drawDate  DateTime
-  series    Int? // Número sequencial do sorteio
-  areaId    String? // Vinculação por praça
-  area      Area?    @relation(fields: [areaId], references: [id])
-  matches   SoccerMatch[]
+  gameId      String
+  game        Game          @relation(fields: [gameId], references: [id])
+  numbers     String[]
+  drawDate    DateTime
+  series      Int? // Número sequencial do sorteio
+  areaId      String? // Vinculação por praça
+  area        Area?         @relation(fields: [areaId], references: [id])
+  matches     SoccerMatch[]
   description String? // Ex: "Rodada 15 - Brasileirão" ou "Especial Champions League"
-  createdAt DateTime @default(now())
+  createdAt   DateTime      @default(now())
 
   @@index([companyId])
 }
 
 model SoccerMatch {
-  id        String   @id @default(uuid())
-  drawId    String
-  draw      Draw     @relation(fields: [drawId], references: [id], onDelete: Cascade)
-  
-  homeTeam  String
-  awayTeam  String
-  matchDate DateTime
+  id     String @id @default(uuid())
+  drawId String
+  draw   Draw   @relation(fields: [drawId], references: [id], onDelete: Cascade)
+
+  homeTeam   String
+  awayTeam   String
+  matchDate  DateTime
   matchOrder Int // 1 to 14
-  result    String? // "1", "X", "2", "CANCELLED"
-  
+  result     String? // "1", "X", "2", "CANCELLED"
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -318,7 +317,7 @@ model SecondChanceDraw {
   winningNumber Int
   prizeAmount   Decimal
   drawDate      DateTime // Which Saturday this refers to
-  series        Int?     // Opcional: Para sorteios vinculados a uma série específica
+  series        Int? // Opcional: Para sorteios vinculados a uma série específica
   createdAt     DateTime @default(now())
 
   @@index([companyId])
@@ -364,7 +363,6 @@ model Ticket {
   secondChanceStatus   TicketStatus @default(PENDING) // Status específico para a Segunda Chance
   ticketNumber         Int? // Número sequencial do bilhete na série (0001-2500 para 2x1000)
   series               Int? // Número da série da área/praça (ex: 1, 2, 3)
-
 
   // Financial Snapshot
   commissionRate  Decimal @default(0) // Taxa aplicada no momento da venda
@@ -476,7 +474,7 @@ model Payment {
   planId        String? // ID do plano aplicado
   planName      String? // Nome do plano (snapshot)
   planDetails   Json? // Detalhes completos do plano (maxUsers, etc)
-  
+
   cancelledBy     String? // ID de quem cancelou
   cancelledByName String? // Nome de quem cancelou
   cancelledAt     DateTime? // Quando foi cancelado
@@ -555,7 +553,7 @@ model Transaction {
   description String
   amount      Decimal
   type        TransactionType
-  category    String?          @default("SALE") // SALE, PRIZE_PAYOUT, COLLECTION, COMMISSION_PAYMENT, ADJUSTMENT
+  category    String?         @default("SALE") // SALE, PRIZE_PAYOUT, COLLECTION, COMMISSION_PAYMENT, ADJUSTMENT
   createdAt   DateTime        @default(now())
   userId      String
   user        User            @relation(fields: [userId], references: [id])
@@ -616,22 +614,22 @@ model PosTerminal {
   lastUser   User?   @relation("PosLastUser", fields: [lastUserId], references: [id])
 
   appVersion String?
-  
+
   // === SISTEMA DE ATIVAÇÃO ===
-  name           String? // Nome do dispositivo (ex: "POS Loja Centro")
-  description    String? // Descrição opcional
-  activationCode String?   @unique // Código de ativação (ex: "AP-2024-ABC123")
+  name                    String? // Nome do dispositivo (ex: "POS Loja Centro")
+  description             String? // Descrição opcional
+  activationCode          String?   @unique // Código de ativação (ex: "AP-2024-ABC123")
   activationCodeExpiresAt DateTime? // Data de expiração do código (30 dias após geração)
-  deviceToken    String?   @unique // JWT para autenticação do dispositivo
-  activatedAt    DateTime? // Data/hora de ativação
-  isActive       Boolean   @default(true) // Controle de ativação/desativação remota
-  
+  deviceToken             String?   @unique // JWT para autenticação do dispositivo
+  activatedAt             DateTime? // Data/hora de ativação
+  isActive                Boolean   @default(true) // Controle de ativação/desativação remota
+
   // Vínculo com Área/Praça
   areaId String?
   area   Area?   @relation(fields: [areaId], references: [id])
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([companyId])
   @@index([activationCode])
@@ -700,7 +698,7 @@ model AreaConfig {
   prizeMultiplier Decimal?
   maxLiability    Decimal?
 
-  isActive  Boolean  @default(true)
+  isActive        Boolean  @default(true)
   extractionTimes String[] @default([]) // Horários específicos de sorteio para esta praça
 
   createdAt DateTime @default(now())
@@ -713,11 +711,11 @@ model Neighborhood {
   id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
-  
-  name      String
-  areaId    String
-  area      Area     @relation(fields: [areaId], references: [id])
-  users     User[]
+
+  name   String
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id])
+  users  User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -748,26 +746,26 @@ model SecurityLog {
 
 // === CONFIGURAÇÃO DE PLANOS ===
 model Plan {
-  id          String   @id @default(uuid())
-  name        String   @unique // ex: "Basic", "Pro", "Enterprise"
+  id          String  @id @default(uuid())
+  name        String  @unique // ex: "Basic", "Pro", "Enterprise"
   description String?
-  
-  // Preços e Limites Padrão
-  price              Decimal  @default(0)
-  maxUsers           Int      @default(10)
-  maxTicketsPerMonth Int      @default(1000)
-  maxGames           Int      @default(5)
-  maxActiveDevices   Int      @default(5) // Limite de dispositivos POS ativos simultaneamente
-  
-  features    String[] // Lista de features habilitadas (ex: ["API", "Support"])
-  
-  isActive    Boolean  @default(true)
-  isDefault   Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  companies   Company[]
+  // Preços e Limites Padrão
+  price              Decimal @default(0)
+  maxUsers           Int     @default(10)
+  maxTicketsPerMonth Int     @default(1000)
+  maxGames           Int     @default(5)
+  maxActiveDevices   Int     @default(5) // Limite de dispositivos POS ativos simultaneamente
+
+  features String[] // Lista de features habilitadas (ex: ["API", "Support"])
+
+  isActive  Boolean @default(true)
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companies Company[]
 }
 
 // ============================================
@@ -775,26 +773,26 @@ model Plan {
 // ============================================
 
 enum BugStatus {
-  OPEN          // Bug reportado, aguardando análise
-  IN_PROGRESS   // Em desenvolvimento/correção
-  FIXED         // Corrigido, aguardando validação
-  VALIDATED     // Validado pela equipe de testes
-  CLOSED        // Fechado/resolvido
-  REOPENED      // Reaberto após validação
+  OPEN // Bug reportado, aguardando análise
+  IN_PROGRESS // Em desenvolvimento/correção
+  FIXED // Corrigido, aguardando validação
+  VALIDATED // Validado pela equipe de testes
+  CLOSED // Fechado/resolvido
+  REOPENED // Reaberto após validação
 }
 
 enum BugSeverity {
-  CRITICAL      // Sistema quebrado/indisponível
-  HIGH          // Funcionalidade importante quebrada
-  MEDIUM        // Bug que afeta funcionalidade secundária
-  LOW           // Bug cosmético ou menor
+  CRITICAL // Sistema quebrado/indisponível
+  HIGH // Funcionalidade importante quebrada
+  MEDIUM // Bug que afeta funcionalidade secundária
+  LOW // Bug cosmético ou menor
 }
 
 enum BugPriority {
-  URGENT        // Precisa ser corrigido imediatamente
-  HIGH          // Alta prioridade
-  MEDIUM        // Prioridade média
-  LOW           // Pode esperar
+  URGENT // Precisa ser corrigido imediatamente
+  HIGH // Alta prioridade
+  MEDIUM // Prioridade média
+  LOW // Pode esperar
 }
 
 // ============================================
@@ -808,42 +806,42 @@ model BugReport {
 
   // Informações Básicas
   title       String
-  description String   @db.Text // Descrição detalhada do bug
-  
+  description String @db.Text // Descrição detalhada do bug
+
   // Classificação
-  status      BugStatus    @default(OPEN)
-  severity    BugSeverity
-  priority    BugPriority
-  
+  status   BugStatus   @default(OPEN)
+  severity BugSeverity
+  priority BugPriority
+
   // Localização e Reprodução
-  location         String?  // Página/módulo onde ocorreu (ex: "/dashboard/games")
-  stepsToReproduce String?  @db.Text // Passos detalhados para reproduzir
-  environment      String?  // Informações do ambiente (browser, versão, etc.)
-  
+  location         String? // Página/módulo onde ocorreu (ex: "/dashboard/games")
+  stepsToReproduce String? @db.Text // Passos detalhados para reproduzir
+  environment      String? // Informações do ambiente (browser, versão, etc.)
+
   // Atribuição e Responsabilidade
   reportedByUserId String
-  reportedByUser   User     @relation("BugReportedBy", fields: [reportedByUserId], references: [id])
-  
+  reportedByUser   User   @relation("BugReportedBy", fields: [reportedByUserId], references: [id])
+
   assignedToUserId String?
-  assignedToUser   User?    @relation("BugAssignedTo", fields: [assignedToUserId], references: [id])
-  
+  assignedToUser   User?   @relation("BugAssignedTo", fields: [assignedToUserId], references: [id])
+
   // Correção e Validação
-  fixDescription    String?  @db.Text // Descrição da correção aplicada
-  fixedAt           DateTime?
-  fixedByUserId     String?
-  fixedByUser       User?    @relation("BugFixedBy", fields: [fixedByUserId], references: [id])
-  
+  fixDescription String?   @db.Text // Descrição da correção aplicada
+  fixedAt        DateTime?
+  fixedByUserId  String?
+  fixedByUser    User?     @relation("BugFixedBy", fields: [fixedByUserId], references: [id])
+
   validatedAt       DateTime?
   validatedByUserId String?
-  validatedByUser   User?    @relation("BugValidatedBy", fields: [validatedByUserId], references: [id])
-  
+  validatedByUser   User?     @relation("BugValidatedBy", fields: [validatedByUserId], references: [id])
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Histórico de Comentários
   comments BugComment[]
-  
+
   @@index([companyId])
   @@index([status])
   @@index([severity])
@@ -856,19 +854,19 @@ model BugComment {
   id          String    @id @default(uuid())
   bugReportId String
   bugReport   BugReport @relation(fields: [bugReportId], references: [id], onDelete: Cascade)
-  
-  userId  String
-  user    User   @relation("BugCommentUser", fields: [userId], references: [id])
-  
+
+  userId String
+  user   User   @relation("BugCommentUser", fields: [userId], references: [id])
+
   comment String @db.Text
-  
+
   // Rastreamento de mudanças de status
-  statusChange     Boolean?    // Se este comentário representa uma mudança de status
-  previousStatus   BugStatus?
-  newStatus        BugStatus?
-  
+  statusChange   Boolean? // Se este comentário representa uma mudança de status
+  previousStatus BugStatus?
+  newStatus      BugStatus?
+
   createdAt DateTime @default(now())
-  
+
   @@index([bugReportId])
   @@index([userId])
 }

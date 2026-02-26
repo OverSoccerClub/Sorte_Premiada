@@ -227,6 +227,45 @@ export class DrawsService {
             await updateBatch(winners12, 'WON', prizePer12);
             await updateBatch(losers, 'LOST', 0);
         }
+        // MINUTO DA SORTE Logic
+        else if (gameType === 'MINUTO_SORTE') {
+            if (!draw.numbers || draw.numbers.length === 0) return;
+            const lotteryNumber = (draw.numbers as string[])[0];
+            if (lotteryNumber.length !== 5) return;
+
+            const primeirosDigitios = parseInt(lotteryNumber.substring(0, 2), 10);
+            const ultimosDigitios = parseInt(lotteryNumber.substring(3, 5), 10);
+
+            const drawnHour = primeirosDigitios % 24;
+            const drawnMinute = ultimosDigitios % 60;
+
+            for (const ticket of tickets) {
+                if (!ticket.numbers || (ticket.numbers as string[]).length < 2) continue;
+
+                const [chosenHour, purchaseMinute] = ticket.numbers as string[];
+                const isHourMatch = (parseInt(chosenHour, 10) === drawnHour);
+                const isMinuteMatch = (parseInt(purchaseMinute, 10) === drawnMinute);
+
+                let isWin = false;
+                let wonAmount = 0;
+
+                if (isHourMatch || isMinuteMatch) {
+                    isWin = true;
+                    // Multiplier logic
+                    let multiplier = 0;
+                    if (isHourMatch && isMinuteMatch) multiplier = 15;
+                    else if (isHourMatch) multiplier = 10;
+                    else multiplier = 5;
+
+                    wonAmount = Number(ticket.amount) * multiplier;
+                    if (wonAmount > 500) wonAmount = 500; // Teto Máximo
+                }
+
+                await this.updateTicketStatus(tx, ticket, isWin ? 'WON' : 'LOST', wonAmount, () => {
+                    if (isWin) wonCount++; else lostCount++;
+                });
+            }
+        }
         // Existing Logic (2x1000 / JB - Suffix Match)
         else {
             if (!draw.numbers || draw.numbers.length === 0) return;

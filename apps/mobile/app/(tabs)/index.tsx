@@ -187,6 +187,8 @@ export default function Dashboard() {
             router.push("/games/loteria-tradicional");
         } else if (game.type === 'PAIPITA_AI' || gameName.includes("paipita")) {
             router.push("/games/paipita-ai");
+        } else if (gameName.includes("minuto") || gameName.includes("sorte")) {
+            router.push("/games/minuto-sorte");
         } else {
             // Future games - use placeholder with game name
             router.push({ pathname: "/games/placeholder", params: { title: game.displayName || game.name } });

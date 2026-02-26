@@ -75,6 +75,12 @@ export class TicketsController {
     }
 
 
+    @Get('public/:hash')
+    async getPublicTicket(@Param('hash') hash: string) {
+        // Public path without JWT
+        return this.ticketsService.findPublicByHash(hash);
+    }
+
     @Get('validate/:id')
     @UseGuards(JwtAuthGuard)
     async validate(@Request() req: any, @Param('id') id: string) {

@@ -102,9 +102,7 @@ export const TicketsService = {
 
     validate: async (token: string, ticketIdOrHash: string): Promise<{ success: boolean; data?: any; message?: string }> => {
         try {
-            const url = `${AppConfig.api.baseUrl}/tickets/validate/${ticketIdOrHash}`;
-            console.log("[TicketsService] Validating:", url);
-
+            let url = `${AppConfig.api.baseUrl}/tickets/validate/${ticketIdOrHash}`;
             console.log("[TicketsService] Validating:", url);
 
             const res = await ApiClient.fetch(url, {
@@ -140,6 +138,29 @@ export const TicketsService = {
             return { success: true, message: json.message || "Solicitação enviada com sucesso" };
         } catch (error) {
             console.error("[TicketsService] Request Cancel Error:", error);
+            return { success: false, message: "Erro de conexão" };
+        }
+    },
+
+    cashout: async (token: string, ticketIdOrHash: string): Promise<{ success: boolean; data?: any; message?: string }> => {
+        try {
+            let url = `${AppConfig.api.baseUrl}/tickets/${ticketIdOrHash}/redeem`;
+
+            console.log("[TicketsService] Cashout:", url);
+
+            const res = await ApiClient.post(url.replace(AppConfig.api.baseUrl, ''), {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const json = await res.json();
+
+            if (!res.ok) {
+                return { success: false, message: json.message || "Erro ao pagar prêmio" };
+            }
+
+            return { success: true, data: json, message: json.message || "Prêmio pago com sucesso!" };
+        } catch (error) {
+            console.error("[TicketsService] Cashout Error:", error);
             return { success: false, message: "Erro de conexão" };
         }
     }
