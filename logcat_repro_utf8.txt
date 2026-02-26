@@ -1,0 +1,1185 @@
+﻿--------- beginning of main
+02-21 16:39:48.977 30146 31982 I ADB_SERVICES: post waitpid (pid=31981) status=0000
+02-21 16:39:48.978 30146 30146 I ADB_SERVICES: for fd 25, revents = 2011
+02-21 16:39:48.978 30146 30146 I ADB_SERVICES: for fd 25, revents = 2011
+02-21 16:39:48.979 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=697236
+02-21 16:39:49.851   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.87 max=503.47 min=503.40
+02-21 16:39:49.862   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986368,dur:1006.86,max:503.50,min:503.37
+02-21 16:39:50.520   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:39:51.345   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1494.42 max=503.55 min=487.55
+02-21 16:39:51.356   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007900,dur:1494.10,max:503.54,min:487.19
+02-21 16:39:51.976   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:39:52.352   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.64 max=503.38 min=503.26
+02-21 16:39:52.363   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986185,dur:1006.96,max:503.49,min:503.46
+02-21 16:39:53.538   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:39:53.847   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1495.25 max=504.49 min=487.27
+02-21 16:39:53.858   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007838,dur:1494.14,max:503.60,min:487.13
+02-21 16:39:54.853   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.13 max=503.80 min=502.33
+02-21 16:39:54.864   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986374,dur:1006.86,max:503.60,min:503.26
+--------- beginning of system
+02-21 16:39:55.732   489   523 E storaged: getDiskStats failed with result NOT_SUPPORTED and size 0
+02-21 16:39:56.348   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1494.92 max=504.40 min=487.60
+02-21 16:39:56.358   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.008203,dur:1493.87,max:503.47,min:487.29
+02-21 16:39:56.556   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:39:57.353   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1005.28 max=503.52 min=501.76
+02-21 16:39:57.365   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986673,dur:1006.71,max:503.52,min:503.18
+02-21 16:39:58.360   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1007.06 max=504.70 min=502.36
+02-21 16:39:58.372   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986527,dur:1006.78,max:503.43,min:503.35
+02-21 16:39:59.564   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:39:59.854   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1493.44 max=503.36 min=487.23
+02-21 16:39:59.866   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.008031,dur:1494.00,max:503.54,min:487.19
+02-21 16:39:59.910 30861 30939 I gle.android.gm: Explicit concurrent copying GC freed 748(70KB) AllocSpace objects, 0(0B) LOS objects, 24% free, 3MB/4MB, paused 262us total 327.781ms
+02-21 16:40:00.033   366   386 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.05 dur=59986.23 max=59959.53 min=6.76
+02-21 16:40:00.861   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1007.55 max=504.41 min=503.14
+02-21 16:40:00.873   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:4.963960,dur:1007.26,max:503.60,min:14.66
+02-21 16:40:01.995   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:02.355   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1494.08 max=503.50 min=487.21
+02-21 16:40:02.367   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007814,dur:1494.16,max:503.62,min:487.21
+02-21 16:40:02.581   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:03.086 30146 30146 I ADB_SERVICES: service_to_fd shell,v2:export ANDROID_LOG_TAGS=''; exec logcat
+02-21 16:40:03.363   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1007.02 max=503.55 min=503.47
+02-21 16:40:03.374   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986336,dur:1006.88,max:503.49,min:503.39
+02-21 16:40:04.856   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1493.51 max=503.56 min=486.60
+02-21 16:40:04.868   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.008349,dur:1493.76,max:503.62,min:486.77
+02-21 16:40:05.595   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:05.771 31255 31255 D Log4jTimberTree: SimCardMonitorAlarmService - BaseMonitor - onStartCommand - Received a request...
+02-21 16:40:05.773 31255 31993 D Log4jTimberTree: doActionInternal: interval - 60000 | start - false
+02-21 16:40:05.793 31255 31993 D Log4jTimberTree: DeviceManager - monitorName: SimCardMonitorAlarmService = AppExecutionRestrictionsAlarmService
+02-21 16:40:05.794 31255 31993 D Log4jTimberTree: scheduleNextAlarm: interval - 60000
+02-21 16:40:05.798 31255 31993 D Log4jTimberTree: MonitorAlarmManager - SimCardMonitorAlarmService: Alarm canceled.
+02-21 16:40:05.801 31255 31993 D Log4jTimberTree: SimCardMonitorAlarmService: Next alarm in 69 seconds (~1 minutes).
+02-21 16:40:05.809  1009  1009 W NotificationEntryMgr: removeNotification for unknown key: 0|br.com.mobiltec.c4m.android.agent|999991|null|1000
+02-21 16:40:05.862   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.04 max=503.57 min=502.47
+02-21 16:40:05.874   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.987177,dur:1006.45,max:503.24,min:503.21
+02-21 16:40:07.357   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1495.29 max=503.54 min=489.50
+02-21 16:40:07.369   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007313,dur:1494.54,max:503.51,min:487.74
+02-21 16:40:08.364   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.55 max=503.46 min=503.09
+02-21 16:40:08.376   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986541,dur:1006.77,max:503.50,min:503.28
+02-21 16:40:08.605   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:09.858   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1494.22 max=504.17 min=487.07
+02-21 16:40:09.861 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=8704
+02-21 16:40:09.870   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007668,dur:1494.27,max:503.60,min:487.26
+02-21 16:40:10.865   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1007.21 max=503.65 min=503.56
+02-21 16:40:10.877   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986757,dur:1006.67,max:503.34,min:503.33
+02-21 16:40:11.566  1582 30765 D ACCS_TEST: MessageHandler onSend
+02-21 16:40:11.615   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:12.015   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:12.359   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1493.79 max=503.47 min=486.85
+02-21 16:40:12.371   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007383,dur:1494.48,max:503.63,min:487.36
+02-21 16:40:12.692  1582  2367 D ACCS_TEST: handleControlMsg
+02-21 16:40:12.692  1582  2367 D ACCS_TEST: handleControlMsg configTagAliyunPush, dataId: b3700356-733d-4b9e-a1ff-b1b0a903dfb0, serviceId: null, command:100, errorCode: ÚöÖÞ»»þáü´╝Ü200, ÚöÖÞ»»´╝ÜµêÉÕèƒ
+02-21 16:40:13.366   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.65 max=503.81 min=502.85
+02-21 16:40:13.377   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.987793,dur:1006.14,max:503.42,min:502.73
+02-21 16:40:14.280   353   353 D lights  : write_int open fd=7
+02-21 16:40:14.624   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:14.860   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1493.76 max=503.40 min=487.01
+02-21 16:40:14.871   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007968,dur:1494.05,max:503.60,min:487.16
+02-21 16:40:15.866   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.83 max=504.21 min=502.63
+02-21 16:40:15.878   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986324,dur:1006.89,max:503.47,min:503.42
+02-21 16:40:17.361   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1494.21 max=503.55 min=487.42
+02-21 16:40:17.372   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.007959,dur:1494.05,max:503.54,min:487.23
+02-21 16:40:17.638   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:18.367   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1006.78 max=503.52 min=503.26
+02-21 16:40:18.379   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986648,dur:1006.72,max:503.40,min:503.32
+02-21 16:40:18.923   513   563 D ApmSession: Connect
+02-21 16:40:18.925   318   318 W hwservicemanager: getTransport: Cannot find entry vendor.mediatek.hardware.apmonitor@1.0::IAPMonitorService/default in either framework or device manifest.
+02-21 16:40:18.925   513   563 D ApmSession: Connect: false
+02-21 16:40:18.926   513   563 D ApmNative: apmIsKpiEnabled2: type = 54, ret = 0
+02-21 16:40:19.861   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=2.01 dur=1493.76 max=503.30 min=487.37
+02-21 16:40:19.862 30146 30146 I ADB_SERVICES: fdevent_loop length=1
+02-21 16:40:19.873   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:2.008019,dur:1494.01,max:503.43,min:487.20
+02-21 16:40:20.656   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:20.868   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) queueBuffer: fps=1.99 dur=1007.22 max=503.71 min=503.52
+02-21 16:40:20.880   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.986148,dur:1006.97,max:503.55,min:503.43
+02-21 16:40:21.705   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:40:21.708   353   353 D lights  : write_int open fd=7
+02-21 16:40:21.721   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:40:21.763   997   997 V PhoneWindow: DecorView setVisiblity: visibility = 8, Parent = android.view.ViewRootImpl@df09463, this = DecorView@9a42f71[InputMethod]
+02-21 16:40:21.767   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:40:21.767   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 4 lines
+02-21 16:40:21.767   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:40:21.767   357  1276 W IMGMemtrackHAL: hal_get_memory: memtrack cache rebuild was required
+02-21 16:40:21.774   997  3656 D Surface : Surface::disconnect(this=0x87dff000,api=1)
+02-21 16:40:21.774   366  1278 I BufferQueueProducer: [InputMethod#0](this:0xae90b000,id:780,api:1,p:997,c:366) disconnect(P): api 1
+02-21 16:40:21.775   366  1278 D BufferQueueConsumer: [InputMethod#0](this:0xae90b000,id:780,api:1,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:40:21.784   366  1278 I BufferQueueProducer: [NavigationBar#0](this:0xae905000,id:706,api:1,p:1009,c:366) queueBuffer: fps=0.02 dur=60338.83 max=60338.83 min=60338.83
+02-21 16:40:21.887   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:8.934871,dur:1007.29,max:503.32,min:15.48
+02-21 16:40:21.980   366   366 I BufferQueueConsumer: [InputMethod#0](this:0xae90b000,id:780,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:40:21.981   366   366 I BufferQueue: [InputMethod#0](this:0xae90b000,id:780,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:40:22.034   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:23.674   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:23.833   822  1052 D AES     : AEEIOCTL_GET/SET_SF_STATE IOCTL,cmd= 1074294797, lParam=0. 
+02-21 16:40:23.834   822  1052 D AES     : AEEIOCTL_RT_MON_Kick IOCTL,cmd= 2147774474, lParam=300. 
+02-21 16:40:24.880   357   382 I libPowerHal: perfUserScnCheckAll
+02-21 16:40:26.692   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:29.704   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:32.053   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:32.056 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=7714
+02-21 16:40:32.716   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:38.751   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 2 lines
+02-21 16:40:41.769   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:42.073   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:44.786   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:45.429  1582 30765 D ACCS_TEST: MessageHandler onSend
+02-21 16:40:45.872  1582  2367 D ACCS_TEST: handleControlMsg
+02-21 16:40:45.872  1582  2367 D ACCS_TEST: handleControlMsg configTagAliyunPush, dataId: 4cabe089-0478-4d7a-a286-f387b6afce08, serviceId: null, command:100, errorCode: ÚöÖÞ»»þáü´╝Ü200, ÚöÖÞ»»´╝ÜµêÉÕèƒ
+02-21 16:40:47.804   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:50.816   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:52.092   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:40:52.092 30146 30146 I ADB_SERVICES: fdevent_loop length=1
+02-21 16:40:53.828   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:53.830 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=1678
+02-21 16:40:53.835   822  1052 D AES     : AEEIOCTL_GET/SET_SF_STATE IOCTL,cmd= 1074294797, lParam=0. 
+02-21 16:40:53.835   822  1052 D AES     : AEEIOCTL_RT_MON_Kick IOCTL,cmd= 2147774474, lParam=300. 
+02-21 16:40:55.733   489   523 E storaged: getDiskStats failed with result NOT_SUPPORTED and size 0
+02-21 16:40:56.839   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:40:59.857   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:00.023   366  1278 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.05 dur=59990.39 max=59959.47 min=10.87
+02-21 16:41:00.033   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.209719,dur:38146.22,max:38033.33,min:14.93
+02-21 16:41:02.111   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:02.874   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:04.804   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:04.811   822   980 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.501187, right = 0.501187
+02-21 16:41:04.811   822   980 E AudioTrack: start(): 0x9b4f8780, mState = 1
+02-21 16:41:04.811   361  3006 D APM_AudioPolicyManager: startOutput() output 13, stream 1, session 145
+02-21 16:41:04.811   361  3006 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 1
+02-21 16:41:04.814   344  3116 D AudioALSAStreamManager: +syncSharedOutDevice(), routingSharedOutDevice: 2
+02-21 16:41:04.815   344  3116 D AudioALSAStreamManager: -syncSharedOutDevice()
+02-21 16:41:04.815   344  3116 D AudioALSAStreamManager: setMasterVolume(), volume = 1.000000
+02-21 16:41:04.815   344  3116 D AudioMTKGainController: setNormalVolume(), mSceneIndex = 0, stream 1, devices 0x2, index 8, mode 0x0
+02-21 16:41:04.815   344  3116 D AudioMTKGainController: setSpeakerGain(), gain = 18, spkAnaType = 3, spkLMixerName = Lineout_PGAL_GAIN, spkRMixerName = Lineout_PGAR_GAIN
+02-21 16:41:04.815   344  3116 D AudioALSAStreamOut: open(), flags 6
+02-21 16:41:04.815   344  3116 D AudioALSAStreamManager: +createPlaybackHandler(), mAudioMode = 0, output_devices = 0x2, isMixerOut = 0x0, flag = 6
+02-21 16:41:04.815   344  3116 D AudioALSAPlaybackHandlerNormal: +open(), flag 6, mDevice = 0x2
+02-21 16:41:04.815   344  3116 D AudioALSADeviceParser: compare pcm success = 7, stringpair = I2S0DL1_PLayback
+02-21 16:41:04.815   344  3116 D AudioALSAPlaybackHandlerBase: transferAudioFormatToPcmFormat(), audio_format(0x4) => pcm_format(0x1)
+02-21 16:41:04.815   344  3116 D AudioALSAPlaybackHandlerNormal: open(), mConfig: channels = 2, rate = 48000, period_size = 256, period_count = 2, format = 1, avail_min = 256, start_threshold = 512
+02-21 16:41:04.815   344  3116 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 1, device = 0x2, SampleRate = 48000
+02-21 16:41:04.816   344  3116 D AudioALSAPlaybackHandlerBase: openPcmDriverWithFlag(), pcm device = 7 flag = 0x8 mPcm = 0xb59a87e0
+02-21 16:41:04.816   344  3116 D AudioALSAPlaybackHandlerBase: CreateAurisysLibManager, voip: 0, mAurisysScenario: 1
+02-21 16:41:04.816   344  3116 D aurisys_utility: input dev: 0x0, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 1, ch maks: 0x3, hw_info_mask: 0x0; output dev: 0x2, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 2, ch maks: 0x3, hw_info_mask: 0x0; task_scene: 2, audio_mode: 0, output_flags: 0x6, input_source: 0, input_flags: 0x0, enhancement_feature_mask: 0x0
+02-21 16:41:04.816   344  3116 D aurisys_utility: lib, working fs: 48000, fmt: 0x3, frame = 0, b_interleave = 1, num_ul_ref_buf_array = 0, num_dl_ref_buf_array = 0
+02-21 16:41:04.816   344  3116 D aurisys_utility: dl in[type:2], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3; dl out[type:3], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3
+02-21 16:41:04.816   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [5]/[PlaybackDRC]
+02-21 16:41:04.816   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [0]/[PlaybackACF]
+02-21 16:41:04.816   344  3116 D aurisys_lib_handler: aurisys_arsi_parsing_param_file(), gProductInfo "platform=invalid,device=SP_B08,model=O1", file_path "/vendor/etc/audio_param", enhancement_mode 0, param_buf_size 2528, data_size 2528
+02-21 16:41:04.816   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), lib_name mtk_bessound, 0xb4842380, memory_size 72532, arsi_handler 0xb47cf3c0, retval 0
+02-21 16:41:04.816   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), arsi_query_process_unit_bytes, ul 0, dl 512, retval 0
+02-21 16:41:04.816   344  3116 D aurisys_lib_manager: DL Lib, lib_name mtk_bessound, 0xb4842380, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x3, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:04.816   344  3116 D aurisys_lib_manager: DL out, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x4, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:04.817   344  3116 D AudioALSAHardwareResourceManager: +startOutputDevice(), new_devices = 0x2, mOutputDevices = 0x0, mStartOutputDevicesCount = 0 SampleRate = 48000
+02-21 16:41:04.817   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:04.818   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = ext_speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:04.821   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:04.828   344  3116 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 0
+02-21 16:41:04.828   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] mOutputSampleRate 16000,  mInputSampleRate 48000, mInChannel 2, mOutChannel, 0 format 4
+02-21 16:41:04.828   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] create SRC handle fail
+02-21 16:41:04.828   344  3116 D AudioALSAPlaybackHandlerNormal: -open()
+02-21 16:41:04.828   344  3116 E AudioALSAPlaybackHandlerBase: -getHardwareBufferInfo(), pcm_get_htimestamp fail, ret = -1, pcm_get_error = 
+02-21 16:41:04.829   366   387 I BufferQueueProducer: [NavigationBar#0](this:0xae905000,id:706,api:1,p:1009,c:366) queueBuffer: fps=0.02 dur=43044.58 max=43044.58 min=43044.58
+02-21 16:41:04.839   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.624319,dur:4805.23,max:4774.74,min:14.61
+02-21 16:41:04.846   822  1639 I ActivityManager: START u0 {flg=0x10804000 cmp=com.android.systemui/.recents.RecentsActivity} from uid 10014
+02-21 16:41:04.847  1009  1009 I BufferQueue: [unnamed-1009-29](this:0x84f16000,id:29,api:0,p:-1,c:-1) BufferQueue core=(1009:com.android.systemui)
+02-21 16:41:04.844  1009  1009 W ndroid.systemui: type=1400 audit(0.0:1683): avc: denied { read } for name="u:object_r:graphics_debug_prop:s0" dev="tmpfs" ino=10030 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:graphics_debug_prop:s0 tclass=file permissive=0
+02-21 16:41:04.847   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:1
+02-21 16:41:04.848   357   382 I libPowerHal: 8: cpu_ctrl set freq: 2001000 -1
+02-21 16:41:04.849  1009  1009 E libc    : Access denied finding property "vendor.debug.sf.stc_interval"
+02-21 16:41:04.847  1009  1009 W ndroid.systemui: type=1400 audit(0.0:1684): avc: denied { read } for name="u:object_r:debug_bq_dump_prop:s0" dev="tmpfs" ino=9990 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:debug_bq_dump_prop:s0 tclass=file permissive=0
+02-21 16:41:04.851  1009  1009 E libc    : Access denied finding property "vendor.debug.bq.dump"
+02-21 16:41:04.851  1009  1009 I BufferQueueConsumer: [unnamed-1009-29](this:0x84f16000,id:29,api:0,p:-1,c:1009) connect(C): consumer=(1009:com.android.systemui) controlledByApp=false
+02-21 16:41:04.851  1009  1009 W ndroid.systemui: type=1400 audit(0.0:1685): avc: denied { read } for name="u:object_r:debug_bq_dump_prop:s0" dev="tmpfs" ino=9990 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:debug_bq_dump_prop:s0 tclass=file permissive=0
+02-21 16:41:04.852  1009  1009 E libc    : Access denied finding property "vendor.debug.bq.dump"
+02-21 16:41:04.853  1009  1009 I BufferQueueConsumer: [unnamed-1009-29](this:0x84f16000,id:29,api:0,p:-1,c:1009) setConsumerName: unnamed-1009-29
+02-21 16:41:04.853  1009  1009 E libc    : Access denied finding property "vendor.debug.bq.line"
+02-21 16:41:04.853  1009  1009 I BufferQueueConsumer: [unnamed-1009-29](this:0x84f16000,id:29,api:0,p:-1,c:1009) setDefaultBufferSize: width=656 height=112
+02-21 16:41:04.851  1009  1009 W ndroid.systemui: type=1400 audit(0.0:1686): avc: denied { read } for name="u:object_r:graphics_debug_prop:s0" dev="tmpfs" ino=10030 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:graphics_debug_prop:s0 tclass=file permissive=0
+02-21 16:41:04.859   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:04.859   822  1639 V WindowManager: Set focused app to: AppWindowToken{de83c7e token=Token{3ad2e39 ActivityRecord{e6a3600 u0 com.android.systemui/.recents.RecentsActivity t35}}} old focus=AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}} moveFocusNow=true
+02-21 16:41:04.860   822  1639 V WindowManager: findFocusedWindow: Reached focused app=AppWindowToken{de83c7e token=Token{3ad2e39 ActivityRecord{e6a3600 u0 com.android.systemui/.recents.RecentsActivity t35}}}
+02-21 16:41:04.860   822  1639 V WindowManager: Changing focus from Window{457689e u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} to null Callers=com.android.server.wm.WindowManagerService.setFocusedApp:2630 com.android.server.am.ActivityManagerService.setResumedActivityUncheckLocked:3634 com.android.server.am.ActivityStack.onActivityStateChanged:503 com.android.server.am.TaskRecord.onActivityStateChanged:1794 
+02-21 16:41:04.860   822  1639 D WindowManager: Input focus has changed to null
+02-21 16:41:04.859   822  1639 I chatty  : uid=1000(system) Binder:822_B identical 1 line
+02-21 16:41:04.859   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:04.861  1009  1009 W RenderThread: type=1400 audit(0.0:1687): avc: denied { read } for name="u:object_r:graphics_debug_prop:s0" dev="tmpfs" ino=10030 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:graphics_debug_prop:s0 tclass=file permissive=0
+02-21 16:41:04.863  1009  1342 D Surface : Surface::connect(this=0x865c5800,api=1)
+02-21 16:41:04.863  1009  1342 I BufferQueueProducer: [unnamed-1009-29](this:0x84f16000,id:29,api:1,p:1009,c:1009) connect(P): api=1 producer=(1009:com.android.systemui) producerControlledByApp=false
+02-21 16:41:04.864   822   901 I WindowManager: Focus moving from Window{457689e u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} to null
+02-21 16:41:04.865  1009  1342 E libc    : Access denied finding property "vendor.debug.bq.line"
+02-21 16:41:04.873   357  1276 I vendor.mediatek.hardware.power@2.0-impl: notifyAppState pack:com.android.systemui, act:com.android.systemui.recents.RecentsActivity, pid:1009, state:1
+02-21 16:41:04.875   357   382 I libPowerHal: [perfNotifyAppState] foreground:com.android.systemui, pid:1009
+02-21 16:41:04.881  1009  1342 D Surface : Surface::disconnect(this=0x865c5800,api=1)
+02-21 16:41:04.881  1009  1342 I BufferQueueProducer: [unnamed-1009-29](this:0x84f16000,id:29,api:1,p:1009,c:1009) disconnect(P): api 1
+02-21 16:41:04.881  1009  1342 D BufferQueueConsumer: [unnamed-1009-29](this:0x84f16000,id:29,api:1,p:-1,c:1009) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:04.883  1009  1009 I BufferQueueConsumer: [unnamed-1009-29](this:0x84f16000,id:29,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:41:04.883  1009  1009 I BufferQueue: [unnamed-1009-29](this:0x84f16000,id:29,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:04.906  1009  1009 V PhoneWindow: DecorView setVisiblity: visibility = 0, Parent = android.view.ViewRootImpl@e2a2d20, this = DecorView@1b0c9dd[RecentsActivity]
+02-21 16:41:04.910   822  1643 I WindowManager: Relayout Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity}: oldVis=4 newVis=0 focusMayChange = true
+02-21 16:41:04.914   366  1278 I BufferQueue: [unnamed-366-781](this:0xae90b000,id:781,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:04.914   366  1278 I BufferQueueConsumer: [unnamed-366-781](this:0xae90b000,id:781,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:04.915   366  1278 I BufferQueueConsumer: [unnamed-366-781](this:0xae90b000,id:781,api:0,p:-1,c:366) setConsumerName: unnamed-366-781
+02-21 16:41:04.915   366  1278 I BufferQueueConsumer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:0,p:-1,c:366) setConsumerName: com.android.systemui/com.android.systemui.recents.RecentsActivity#0
+02-21 16:41:04.915   366  1278 I BufferQueueConsumer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:0,p:-1,c:366) setDefaultBufferSize: width=720 height=1440
+02-21 16:41:04.916   822  1643 V WindowManager: Changing focus from null to Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:2134 com.android.server.wm.Session.relayout:244 android.view.IWindowSession$Stub.onTransact:309 com.android.server.wm.Session.onTransact:164 
+02-21 16:41:04.916   822  1643 D WindowManager: Input focus has changed to Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity}
+02-21 16:41:04.917   822   901 I WindowManager: Focus moving from null to Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity}
+02-21 16:41:04.921  1009  1342 D Surface : Surface::connect(this=0x865c5800,api=1)
+02-21 16:41:04.921  1009  1009 D Surface : Surface::allocateBuffers(this=0x865c5800)
+02-21 16:41:04.921   822  1005 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.000000, right = 0.000000
+02-21 16:41:04.921   822  1005 D AudioTrack: stop(): 0x9b4f8780, mState = 0
+02-21 16:41:04.922   822  1005 D AudioTrack: audiotrack 0x9b4f8780 stop done
+02-21 16:41:04.922   366   387 I BufferQueueProducer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:1009,c:366) connect(P): api=1 producer=(1009:com.android.systemui) producerControlledByApp=true
+02-21 16:41:04.924 31870 31870 V PhoneWindow: DecorView setVisiblity: visibility = 4, Parent = android.view.ViewRootImpl@46a9010, this = DecorView@5a46709[MainActivity]
+02-21 16:41:04.932  1009  1009 V StatusBar: mStatusBarWindow: com.android.systemui.statusbar.phone.StatusBarWindowView{e5a08aa V.ED..... ........ 0,0-720,48} canPanelBeCollapsed(): false
+02-21 16:41:04.932  1009  1009 I vol.Events: writeEvent dismiss_dialog volume_controller
+02-21 16:41:04.942 31870 31888 D Surface : Surface::disconnect(this=0x9b4c5000,api=1)
+02-21 16:41:04.943   366  1289 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:31870,c:366) disconnect(P): api 1
+02-21 16:41:04.943   366  1289 D BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:04.963 31870 31903 I ReactNativeJNI: Memory warning (pressure level: TRIM_MEMORY_UI_HIDDEN) received by JS VM, ignoring because it's non-severe
+02-21 16:41:04.963   366  1289 I BufferQueue: [unnamed-366-782](this:0xae977000,id:782,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:04.963   366  1289 I BufferQueueConsumer: [unnamed-366-782](this:0xae977000,id:782,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:04.963   366  1289 I BufferQueueConsumer: [unnamed-366-782](this:0xae977000,id:782,api:0,p:-1,c:366) setConsumerName: unnamed-366-782
+02-21 16:41:04.963   366  1289 I BufferQueueConsumer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:0,p:-1,c:366) setConsumerName: thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0
+02-21 16:41:04.964   366  1289 I BufferQueueConsumer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:0,p:-1,c:366) setDefaultBufferSize: width=656 height=112
+02-21 16:41:04.964   822   938 D Surface : Surface::connect(this=0x7efde800,api=2)
+02-21 16:41:04.965   366  1278 I BufferQueueProducer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:2,p:822,c:366) connect(P): api=2 producer=(822:system_server) producerControlledByApp=false
+02-21 16:41:04.967   822   938 D Surface : Surface::disconnect(this=0x7efde800,api=2)
+02-21 16:41:04.967   366   615 I BufferQueueProducer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:2,p:822,c:366) disconnect(P): api 2
+02-21 16:41:04.967   366   615 D BufferQueueConsumer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:2,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:04.975   366   366 I SurfaceFlinger: screenshot (com.anonymous.innobet/com.anonymous.innobet.MainActivity#0)
+02-21 16:41:04.995   366   387 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.60 dur=4972.23 max=4943.34 min=11.48
+02-21 16:41:05.009   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:0
+02-21 16:41:05.010   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:05.011   361   413 D APM_AudioPolicyManager: stopOutput() output 13, stream 1, session 145
+02-21 16:41:05.011   361   413 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 0
+02-21 16:41:05.014   357   382 I libPowerHal: 16: cpu_ctrl set freq: -1 -1
+02-21 16:41:05.023   366   366 I BufferQueueProducer: [FramebufferSurface](this:0xaf297000,id:0,api:1,p:366,c:366) queueBuffer: fps=0.11 dur=182421.11 max=182111.70 min=14.27
+02-21 16:41:05.176  1009  1053 I ndroid.systemu: NativeAlloc concurrent copying GC freed 15289(1100KB) AllocSpace objects, 0(0B) LOS objects, 50% free, 4MB/9MB, paused 212us total 141.102ms
+02-21 16:41:05.316   366  1289 W SurfaceFlinger: Attempting to set client state on removed layer: thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0
+02-21 16:41:05.318   366  1289 W SurfaceFlinger: Attempting to set client state on removed layer: com.anonymous.innobet/com.anonymous.innobet.MainActivity#0
+02-21 16:41:05.318   366  1289 W SurfaceFlinger: Attempting to destroy on removed layer: thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0
+02-21 16:41:05.318   366  1289 W SurfaceFlinger: Attempting to destroy on removed layer: com.anonymous.innobet/com.anonymous.innobet.MainActivity#0
+02-21 16:41:05.325   366   366 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:41:05.326   366   366 I BufferQueueConsumer: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:2,p:-1,c:-1) disconnect(C)
+02-21 16:41:05.329   366   366 I BufferQueue: [thumbnail anim: AppWindowToken{7e645d8 token=Token{5867cbb ActivityRecord{c29854a u0 com.anonymous.innobet/.MainActivity t118}}}#0](this:0xae977000,id:782,api:2,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:05.343   822  2518 I OpenGLRenderer: Initialized EGL, version 1.4
+02-21 16:41:05.343   822  2518 D OpenGLRenderer: Swap behavior 2
+02-21 16:41:05.524   344   670 D AudioALSAStreamOut: standby(), flag 6
+02-21 16:41:05.524   344   670 D AudioALSAStreamOut: standbyStreamOut(), flag 6
+02-21 16:41:05.524   344   670 D AudioALSAStreamOut: close(), flags 6
+02-21 16:41:05.524   344   670 D AudioALSAPlaybackHandlerNormal: +close(), flag 6, mDevice = 0x2
+02-21 16:41:05.524   344   670 D AudioVoiceUIDL: [SetInputStandBy] ReadRefFromRing to exit? (0) 
+02-21 16:41:05.524   344   670 D AudioALSAHardwareResourceManager: +stopOutputDevice(), mOutputDevices = 0x2, mStartOutputDevicesCount = 1
+02-21 16:41:05.524   344   670 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = ext_speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:05.524   344   670 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:05.525   344   670 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 1
+02-21 16:41:05.525   344   670 D AudioALSAPlaybackHandlerBase: -closePcmDriver(), mPcm = 0x0
+02-21 16:41:05.525   344   670 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 0, device = 0x2, SampleRate = 48000
+02-21 16:41:05.525   344   670 D AudioALSAPlaybackHandlerBase: DestroyAurisysLibManager()
+02-21 16:41:05.525   344   670 D aurisys_lib_handler: aurisys_arsi_destroy_handler(), lib_name mtk_bessound, 0xb4842380, arsi_destroy_handler, arsi_handler = 0xb47cf3c0, retval = 0
+02-21 16:41:05.526   344   670 D aurisys_lib_manager: delete_aurisys_lib_manager(), manager 0xb59ed420
+02-21 16:41:05.526   344   670 D AudioALSAPlaybackHandlerNormal: -close()
+02-21 16:41:05.667   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:05.677   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:05.846   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:60.534664,dur:1007.69,max:31.69,min:11.74
+02-21 16:41:05.873   822   878 I system_server: NativeAlloc concurrent copying GC freed 60963(2MB) AllocSpace objects, 8(352KB) LOS objects, 31% free, 12MB/18MB, paused 350us total 373.440ms
+02-21 16:41:05.892   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:05.904   822  3054 I ActivityManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10200000 cmp=com.android.launcher3/.Launcher} from uid 10014
+02-21 16:41:05.905   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:1
+02-21 16:41:05.907   357   382 I libPowerHal: 8: cpu_ctrl set freq: 2001000 -1
+02-21 16:41:05.914   822  3054 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:05.915   822  3054 V WindowManager: Set focused app to: AppWindowToken{5c2ba5d token=Token{6938c34 ActivityRecord{ff5b307 u0 com.android.launcher3/.Launcher t2}}} old focus=AppWindowToken{de83c7e token=Token{3ad2e39 ActivityRecord{e6a3600 u0 com.android.systemui/.recents.RecentsActivity t35}}} moveFocusNow=true
+02-21 16:41:05.915   822  3054 V WindowManager: findFocusedWindow: Reached focused app=AppWindowToken{5c2ba5d token=Token{6938c34 ActivityRecord{ff5b307 u0 com.android.launcher3/.Launcher t2}}}
+02-21 16:41:05.916   822  3054 V WindowManager: Changing focus from Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity} to null Callers=com.android.server.wm.WindowManagerService.setFocusedApp:2630 com.android.server.am.ActivityManagerService.setResumedActivityUncheckLocked:3634 com.android.server.am.ActivityStack.onActivityStateChanged:503 com.android.server.am.TaskRecord.onActivityStateChanged:1794 
+02-21 16:41:05.916   822  3054 D WindowManager: Input focus has changed to null
+02-21 16:41:05.914   822  3054 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:05.919   357  1276 I vendor.mediatek.hardware.power@2.0-impl: notifyAppState pack:com.android.launcher3, act:com.android.launcher3.Launcher, pid:1620, state:1
+02-21 16:41:05.920   357   382 I libPowerHal: [perfNotifyAppState] foreground:com.android.launcher3, pid:1620
+02-21 16:41:05.921   822   901 I WindowManager: Focus moving from Window{b91f8e2 u0 com.android.systemui/com.android.systemui.recents.RecentsActivity} to null
+02-21 16:41:05.930  1009  1009 V StatusBar: mStatusBarWindow: com.android.systemui.statusbar.phone.StatusBarWindowView{e5a08aa V.ED..... ........ 0,0-720,48} canPanelBeCollapsed(): false
+02-21 16:41:05.931  1009  1009 I vol.Events: writeEvent dismiss_dialog volume_controller
+02-21 16:41:05.943   822  1643 I ActivityManager: Killing 31870:com.anonymous.innobet/u0a64 (adj 900): remove task
+02-21 16:41:05.946   822   895 W libprocessgroup: kill(-31870, 9) failed: No such process
+02-21 16:41:05.956  1620  1620 V PhoneWindow: DecorView setVisiblity: visibility = 0, Parent = android.view.ViewRootImpl@6387714, this = DecorView@7cafbbd[Launcher]
+02-21 16:41:05.958   366  1289 I BufferQueueProducer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:1009,c:366) queueBuffer: fps=46.96 dur=1000.90 max=241.73 min=5.98
+02-21 16:41:05.961   822  3074 I WindowManager: Relayout Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher}: oldVis=4 newVis=0 focusMayChange = true
+02-21 16:41:05.965   366  1289 I BufferQueue: [unnamed-366-783](this:0xae249000,id:783,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:05.966   366  1289 I BufferQueueConsumer: [unnamed-366-783](this:0xae249000,id:783,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:05.966   366  1289 I BufferQueueConsumer: [unnamed-366-783](this:0xae249000,id:783,api:0,p:-1,c:366) setConsumerName: unnamed-366-783
+02-21 16:41:05.966   366  1289 I BufferQueueConsumer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:0,p:-1,c:366) setConsumerName: com.android.launcher3/com.android.launcher3.Launcher#0
+02-21 16:41:05.966   366  1289 I BufferQueueConsumer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:0,p:-1,c:366) setDefaultBufferSize: width=720 height=1440
+02-21 16:41:05.967   822  3074 V WindowManager: Changing focus from null to Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:2134 com.android.server.wm.Session.relayout:244 android.view.IWindowSession$Stub.onTransact:309 com.android.server.wm.Session.onTransact:164 
+02-21 16:41:05.967   822  3074 D WindowManager: Input focus has changed to Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher}
+02-21 16:41:05.969   822   901 I WindowManager: Focus moving from null to Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher}
+02-21 16:41:05.970  1009  1009 V PhoneWindow: DecorView setVisiblity: visibility = 4, Parent = android.view.ViewRootImpl@e2a2d20, this = DecorView@1b0c9dd[RecentsActivity]
+02-21 16:41:05.970  1620  1846 D Surface : Surface::connect(this=0x9b4c5000,api=1)
+02-21 16:41:05.970  1620  1620 D Surface : Surface::allocateBuffers(this=0x9b4c5000)
+02-21 16:41:05.971   366   386 I BufferQueueProducer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:1620,c:366) connect(P): api=1 producer=(1620:com.android.launcher3) producerControlledByApp=true
+02-21 16:41:05.979  1009  1342 D Surface : Surface::disconnect(this=0x865c5800,api=1)
+02-21 16:41:05.980   366   615 I BufferQueueProducer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:1009,c:366) disconnect(P): api 1
+02-21 16:41:05.980   366   615 D BufferQueueConsumer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:05.980  1009  1342 D OpenGLRenderer: endAllActiveAnimators on 0x9b4f4f80 (RippleDrawable) with handle 0x867fa370
+02-21 16:41:05.991   822   895 W libprocessgroup: kill(-31870, 9) failed: No such process
+02-21 16:41:06.013   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:0
+02-21 16:41:06.023   822  1643 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:06.024   357   382 I libPowerHal: 16: cpu_ctrl set freq: -1 -1
+02-21 16:41:06.041   822   895 W libprocessgroup: kill(-31870, 9) failed: No such process
+02-21 16:41:06.052   822   953 W InputDispatcher: channel '457689e com.anonymous.innobet/com.anonymous.innobet.MainActivity (server)' ~ Consumer closed input channel or an error occurred.  events=0x9
+02-21 16:41:06.052   822   953 E InputDispatcher: channel '457689e com.anonymous.innobet/com.anonymous.innobet.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+02-21 16:41:06.053   822  4240 D MtkConnectivityService: ConnectivityService NetworkRequestInfo binderDied(NetworkRequest [ TRACK_DEFAULT id=286, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ], android.os.BinderProxy@388fc3b)
+02-21 16:41:06.054   366  1289 I BufferQueue: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:778,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:06.055   366   366 I BufferQueueConsumer: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:41:06.056   822   971 D MtkConnectivityService: releasing NetworkRequest [ TRACK_DEFAULT id=286, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ] (release request)
+02-21 16:41:06.065   822  3054 I WindowManager: WIN DEATH: Window{457689e u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:06.066   822  3054 W InputDispatcher: Attempted to unregister already unregistered input channel '457689e com.anonymous.innobet/com.anonymous.innobet.MainActivity (server)'
+02-21 16:41:06.074   366   387 I SurfaceFlinger: [SF client] Remove(0xae946e10) for (822:system_server)
+02-21 16:41:06.088   822   895 W libprocessgroup: kill(-31870, 9) failed: No such process
+02-21 16:41:06.088   822   895 I libprocessgroup: Successfully killed process cgroup uid 10064 pid 31870 in 142ms
+02-21 16:41:06.095   822   901 W ActivityManager: setHasOverlayUi called on unknown pid: 31870
+02-21 16:41:06.096   361  3006 D APM_AudioPolicyManager: AudioPolicyManager:setRecordSilenced(uid:10064, silenced:1)
+02-21 16:41:06.096   361  3006 D AudioFlinger: AudioFlinger::setRecordSilenced(uid:10064, silenced:1)
+02-21 16:41:06.125  1009  3707 I ndroid.systemu: Explicit concurrent copying GC freed 4630(313KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 4MB/9MB, paused 161us total 152.420ms
+02-21 16:41:06.529  1582 30765 D ACCS_TEST: MessageHandler onSend
+02-21 16:41:06.575   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:06.591   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:06.596   822   980 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.501187, right = 0.501187
+02-21 16:41:06.597   822   980 E AudioTrack: start(): 0x9b4f8780, mState = 1
+02-21 16:41:06.597   361  2359 D APM_AudioPolicyManager: startOutput() output 13, stream 1, session 145
+02-21 16:41:06.597   361  2359 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 1
+02-21 16:41:06.599   344  3116 D AudioALSAStreamManager: +syncSharedOutDevice(), routingSharedOutDevice: 2
+02-21 16:41:06.599   344  3116 D AudioALSAStreamManager: -syncSharedOutDevice()
+02-21 16:41:06.599   344  3116 D AudioALSAStreamManager: setMasterVolume(), volume = 1.000000
+02-21 16:41:06.599   344  3116 D AudioMTKGainController: setNormalVolume(), mSceneIndex = 0, stream 1, devices 0x2, index 8, mode 0x0
+02-21 16:41:06.599   344  3116 D AudioMTKGainController: setSpeakerGain(), gain = 18, spkAnaType = 3, spkLMixerName = Lineout_PGAL_GAIN, spkRMixerName = Lineout_PGAR_GAIN
+02-21 16:41:06.599   344  3116 D AudioALSAStreamOut: open(), flags 6
+02-21 16:41:06.599   344  3116 D AudioALSAStreamManager: +createPlaybackHandler(), mAudioMode = 0, output_devices = 0x2, isMixerOut = 0x0, flag = 6
+02-21 16:41:06.599   344  3116 D AudioALSAPlaybackHandlerNormal: +open(), flag 6, mDevice = 0x2
+02-21 16:41:06.599   344  3116 D AudioALSADeviceParser: compare pcm success = 7, stringpair = I2S0DL1_PLayback
+02-21 16:41:06.599   344  3116 D AudioALSAPlaybackHandlerBase: transferAudioFormatToPcmFormat(), audio_format(0x4) => pcm_format(0x1)
+02-21 16:41:06.600   344  3116 D AudioALSAPlaybackHandlerNormal: open(), mConfig: channels = 2, rate = 48000, period_size = 256, period_count = 2, format = 1, avail_min = 256, start_threshold = 512
+02-21 16:41:06.600   344  3116 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 1, device = 0x2, SampleRate = 48000
+02-21 16:41:06.601   344  3116 D AudioALSAPlaybackHandlerBase: openPcmDriverWithFlag(), pcm device = 7 flag = 0x8 mPcm = 0xb59a87e0
+02-21 16:41:06.601   344  3116 D AudioALSAPlaybackHandlerBase: CreateAurisysLibManager, voip: 0, mAurisysScenario: 1
+02-21 16:41:06.601   344  3116 D aurisys_utility: input dev: 0x0, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 1, ch maks: 0x3, hw_info_mask: 0x0; output dev: 0x2, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 2, ch maks: 0x3, hw_info_mask: 0x0; task_scene: 2, audio_mode: 0, output_flags: 0x6, input_source: 0, input_flags: 0x0, enhancement_feature_mask: 0x0
+02-21 16:41:06.601   344  3116 D aurisys_utility: lib, working fs: 48000, fmt: 0x3, frame = 0, b_interleave = 1, num_ul_ref_buf_array = 0, num_dl_ref_buf_array = 0
+02-21 16:41:06.601   344  3116 D aurisys_utility: dl in[type:2], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3; dl out[type:3], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3
+02-21 16:41:06.601   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [5]/[PlaybackDRC]
+02-21 16:41:06.601   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [0]/[PlaybackACF]
+02-21 16:41:06.601   344  3116 D aurisys_lib_handler: aurisys_arsi_parsing_param_file(), gProductInfo "platform=invalid,device=SP_B08,model=O1", file_path "/vendor/etc/audio_param", enhancement_mode 0, param_buf_size 2528, data_size 2528
+02-21 16:41:06.602   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), lib_name mtk_bessound, 0xb4842380, memory_size 72532, arsi_handler 0xb47cfc00, retval 0
+02-21 16:41:06.602   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), arsi_query_process_unit_bytes, ul 0, dl 512, retval 0
+02-21 16:41:06.602   344  3116 D aurisys_lib_manager: DL Lib, lib_name mtk_bessound, 0xb4842380, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x3, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:06.602   344  3116 D aurisys_lib_manager: DL out, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x4, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:06.602   344  3116 D AudioALSAHardwareResourceManager: +startOutputDevice(), new_devices = 0x2, mOutputDevices = 0x0, mStartOutputDevicesCount = 0 SampleRate = 48000
+02-21 16:41:06.602   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:06.603   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = ext_speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:06.614   344  3116 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 0
+02-21 16:41:06.614   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] mOutputSampleRate 16000,  mInputSampleRate 48000, mInChannel 2, mOutChannel, 0 format 4
+02-21 16:41:06.614   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] create SRC handle fail
+02-21 16:41:06.614   344  3116 D AudioALSAPlaybackHandlerNormal: -open()
+02-21 16:41:06.615   344  3116 E AudioALSAPlaybackHandlerBase: -getHardwareBufferInfo(), pcm_get_htimestamp fail, ret = -1, pcm_get_error = 
+02-21 16:41:06.707   822  1005 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.000000, right = 0.000000
+02-21 16:41:06.707   822  1005 D AudioTrack: stop(): 0x9b4f8780, mState = 0
+02-21 16:41:06.707   822  1005 D AudioTrack: audiotrack 0x9b4f8780 stop done
+02-21 16:41:06.800   361   413 D APM_AudioPolicyManager: stopOutput() output 13, stream 1, session 145
+02-21 16:41:06.800   361   413 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 0
+02-21 16:41:06.853   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:35.756863,dur:1006.80,max:421.94,min:14.40
+02-21 16:41:06.887   366  1278 I BufferQueue: [com.android.systemui/com.android.systemui.recents.RecentsActivity#0](this:0xae90b000,id:781,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:06.895   366   386 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.53 dur=1899.96 max=1899.96 min=1899.96
+02-21 16:41:06.899   366   386 I BufferQueueProducer: [NavigationBar#0](this:0xae905000,id:706,api:1,p:1009,c:366) queueBuffer: fps=13.04 dur=2070.48 max=1603.59 min=5.97
+02-21 16:41:07.310   344   344 D AudioALSAStreamOut: standby(), flag 6
+02-21 16:41:07.310   344   344 D AudioALSAStreamOut: standbyStreamOut(), flag 6
+02-21 16:41:07.310   344   344 D AudioALSAStreamOut: close(), flags 6
+02-21 16:41:07.310   344   344 D AudioALSAPlaybackHandlerNormal: +close(), flag 6, mDevice = 0x2
+02-21 16:41:07.310   344   344 D AudioVoiceUIDL: [SetInputStandBy] ReadRefFromRing to exit? (0) 
+02-21 16:41:07.310   344   344 D AudioALSAHardwareResourceManager: +stopOutputDevice(), mOutputDevices = 0x2, mStartOutputDevicesCount = 1
+02-21 16:41:07.311   344   344 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = ext_speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:07.311   344   344 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:07.312   344   344 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 1
+02-21 16:41:07.312   344   344 D AudioALSAPlaybackHandlerBase: -closePcmDriver(), mPcm = 0x0
+02-21 16:41:07.312   344   344 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 0, device = 0x2, SampleRate = 48000
+02-21 16:41:07.313   344   344 D AudioALSAPlaybackHandlerBase: DestroyAurisysLibManager()
+02-21 16:41:07.313   344   344 D aurisys_lib_handler: aurisys_arsi_destroy_handler(), lib_name mtk_bessound, 0xb4842380, arsi_destroy_handler, arsi_handler = 0xb47cfc00, retval = 0
+02-21 16:41:07.313   344   344 D aurisys_lib_manager: delete_aurisys_lib_manager(), manager 0xb59ed420
+02-21 16:41:07.313   344   344 D AudioALSAPlaybackHandlerNormal: -close()
+02-21 16:41:07.338   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:07.356   822  1643 I ActivityManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.anonymous.innobet/.MainActivity bnds=[360,422][526,672]} from uid 1000
+02-21 16:41:07.339   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:41:07.360   822   980 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.501187, right = 0.501187
+02-21 16:41:07.360   822   980 E AudioTrack: start(): 0x9b4f8780, mState = 1
+02-21 16:41:07.360   361  2359 D APM_AudioPolicyManager: startOutput() output 13, stream 1, session 145
+02-21 16:41:07.360   361  2359 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 1
+02-21 16:41:07.363   344  3116 D AudioALSAStreamManager: +syncSharedOutDevice(), routingSharedOutDevice: 2
+02-21 16:41:07.363   366   386 I BufferQueueProducer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:1620,c:366) queueBuffer: fps=17.73 dur=1353.79 max=592.78 min=9.54
+02-21 16:41:07.363   344  3116 D AudioALSAStreamManager: -syncSharedOutDevice()
+02-21 16:41:07.363   344  3116 D AudioALSAStreamManager: setMasterVolume(), volume = 1.000000
+02-21 16:41:07.363   344  3116 D AudioMTKGainController: setNormalVolume(), mSceneIndex = 0, stream 1, devices 0x2, index 8, mode 0x0
+02-21 16:41:07.363   344  3116 D AudioMTKGainController: setSpeakerGain(), gain = 18, spkAnaType = 3, spkLMixerName = Lineout_PGAL_GAIN, spkRMixerName = Lineout_PGAR_GAIN
+02-21 16:41:07.363   344  3116 D AudioALSAStreamOut: open(), flags 6
+02-21 16:41:07.363   344  3116 D AudioALSAStreamManager: +createPlaybackHandler(), mAudioMode = 0, output_devices = 0x2, isMixerOut = 0x0, flag = 6
+02-21 16:41:07.363   344  3116 D AudioALSAPlaybackHandlerNormal: +open(), flag 6, mDevice = 0x2
+02-21 16:41:07.363   344  3116 D AudioALSADeviceParser: compare pcm success = 7, stringpair = I2S0DL1_PLayback
+02-21 16:41:07.364   344  3116 D AudioALSAPlaybackHandlerBase: transferAudioFormatToPcmFormat(), audio_format(0x4) => pcm_format(0x1)
+02-21 16:41:07.364   344  3116 D AudioALSAPlaybackHandlerNormal: open(), mConfig: channels = 2, rate = 48000, period_size = 256, period_count = 2, format = 1, avail_min = 256, start_threshold = 512
+02-21 16:41:07.364   344  3116 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 1, device = 0x2, SampleRate = 48000
+02-21 16:41:07.365   344  3116 D AudioALSAPlaybackHandlerBase: openPcmDriverWithFlag(), pcm device = 7 flag = 0x8 mPcm = 0xb59a87e0
+02-21 16:41:07.365   344  3116 D AudioALSAPlaybackHandlerBase: CreateAurisysLibManager, voip: 0, mAurisysScenario: 1
+02-21 16:41:07.365   344  3116 D aurisys_utility: input dev: 0x0, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 1, ch maks: 0x3, hw_info_mask: 0x0; output dev: 0x2, fmt = 0x3, fs: 48000, max fs: 48000, ch: 2, max ch: 2, ch maks: 0x3, hw_info_mask: 0x0; task_scene: 2, audio_mode: 0, output_flags: 0x6, input_source: 0, input_flags: 0x0, enhancement_feature_mask: 0x0
+02-21 16:41:07.365   344  3116 D aurisys_utility: lib, working fs: 48000, fmt: 0x3, frame = 0, b_interleave = 1, num_ul_ref_buf_array = 0, num_dl_ref_buf_array = 0
+02-21 16:41:07.365   344  3116 D aurisys_utility: dl in[type:2], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3; dl out[type:3], ch: 2, ch_mask: 0x0, buf fs: 48000, buf content fs: 48000, fmt: 0x3
+02-21 16:41:07.366   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [5]/[PlaybackDRC]
+02-21 16:41:07.366   344  3116 D AudioCompFltCustParam: getPlaybackPostProcessParameterFromXML Type/Name [0]/[PlaybackACF]
+02-21 16:41:07.366   344  3116 D aurisys_lib_handler: aurisys_arsi_parsing_param_file(), gProductInfo "platform=invalid,device=SP_B08,model=O1", file_path "/vendor/etc/audio_param", enhancement_mode 0, param_buf_size 2528, data_size 2528
+02-21 16:41:07.366   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), lib_name mtk_bessound, 0xb4842380, memory_size 72532, arsi_handler 0xb47cf3c0, retval 0
+02-21 16:41:07.366   344  3116 D aurisys_lib_handler: aurisys_arsi_create_handler(), arsi_query_process_unit_bytes, ul 0, dl 512, retval 0
+02-21 16:41:07.366   344  3116 D aurisys_lib_manager: DL Lib, lib_name mtk_bessound, 0xb4842380, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x3, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:07.366   344  3116 D aurisys_lib_manager: DL out, sample_rate: 48000 => 48000, num_channels: 2 => 2, audio_format: 0x3 => 0x4, interleave: 1 => 1, frame: 0 => 0
+02-21 16:41:07.366   344  3116 D AudioALSAHardwareResourceManager: +startOutputDevice(), new_devices = 0x2, mOutputDevices = 0x0, mStartOutputDevicesCount = 0 SampleRate = 48000
+02-21 16:41:07.366   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:1
+02-21 16:41:07.366   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:07.367   344  3116 D AudioALSADeviceConfigManager: ApplyDeviceTurnonSequenceByName() DeviceName = ext_speaker_output descriptor->DeviceStatusCounte = 0
+02-21 16:41:07.368   357   382 I libPowerHal: 8: cpu_ctrl set freq: 2001000 -1
+02-21 16:41:07.370   822  1643 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:07.370   822  1643 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:07.374   822   938 D ViewRootImpl[innobet]: hardware acceleration = false , fakeHwAccelerated = true, sRendererDisabled = false, forceHwAccelerated = false, sSystemRendererDisabled = false
+02-21 16:41:07.378   344  3116 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 0
+02-21 16:41:07.378   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] mOutputSampleRate 16000,  mInputSampleRate 48000, mInChannel 2, mOutChannel, 0 format 4
+02-21 16:41:07.378   344  3116 D AudioVoiceUIDL: [GetSRCInputParameter] create SRC handle fail
+02-21 16:41:07.378   344  3116 D AudioALSAPlaybackHandlerNormal: -open()
+02-21 16:41:07.378   344  3116 E AudioALSAPlaybackHandlerBase: -getHardwareBufferInfo(), pcm_get_htimestamp fail, ret = -1, pcm_get_error = 
+02-21 16:41:07.379   822  3074 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:07.380   822  3074 I chatty  : uid=1000(system) Binder:822_14 identical 2 lines
+02-21 16:41:07.380   822  3074 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:07.394   366   386 I BufferQueue: [unnamed-366-784](this:0xae973000,id:784,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:07.395   366   386 I BufferQueueConsumer: [unnamed-366-784](this:0xae973000,id:784,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:07.395   366   386 I BufferQueueConsumer: [unnamed-366-784](this:0xae973000,id:784,api:0,p:-1,c:366) setConsumerName: unnamed-366-784
+02-21 16:41:07.396   366   386 I BufferQueueConsumer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:0,p:-1,c:366) setConsumerName: Splash Screen com.anonymous.innobet#0
+02-21 16:41:07.396   366   386 I BufferQueueConsumer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:0,p:-1,c:366) setDefaultBufferSize: width=720 height=1440
+02-21 16:41:07.397   822   938 V WindowManager: Changing focus from Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher} to null Callers=com.android.server.wm.WindowManagerService.relayoutWindow:2134 com.android.server.wm.Session.relayout:244 android.view.ViewRootImpl.relayoutWindow:6751 android.view.ViewRootImpl.performTraversals:2091 
+02-21 16:41:07.397   822   938 D WindowManager: Input focus has changed to null
+02-21 16:41:07.398   822   901 I WindowManager: Focus moving from Window{8e39278 u0 com.android.launcher3/com.android.launcher3.Launcher} to null
+02-21 16:41:07.404   822   938 D Surface : lockCanvas
+02-21 16:41:07.404   822   938 D Surface : Surface::connect(this=0x88e92800,api=2)
+02-21 16:41:07.404   366  1289 I BufferQueueProducer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:2,p:822,c:366) connect(P): api=2 producer=(822:system_server) producerControlledByApp=false
+02-21 16:41:07.424   822   894 I ActivityManager: Start proc 32024:com.anonymous.innobet/u0a64 for activity com.anonymous.innobet/.MainActivity
+02-21 16:41:07.440 32024 32024 E onymous.innobe: Not starting debugger since process cannot load the jdwp agent.
+02-21 16:41:07.450 32024 32024 E libc    : Access denied finding property "persist.vendor.sys.activitylog"
+02-21 16:41:07.447 32024 32024 W re-initialized>: type=1400 audit(0.0:1688): avc: denied { read } for name="u:object_r:mtk_amslog_prop:s0" dev="tmpfs" ino=10053 scontext=u:r:untrusted_app:s0:c64,c256,c512,c768 tcontext=u:object_r:mtk_amslog_prop:s0 tclass=file permissive=0
+02-21 16:41:07.462   822  3074 V WindowManager: Set focused app to: AppWindowToken{3c87eed token=Token{65a4904 ActivityRecord{b012117 u0 com.anonymous.innobet/.MainActivity t119}}} old focus=AppWindowToken{5c2ba5d token=Token{6938c34 ActivityRecord{ff5b307 u0 com.android.launcher3/.Launcher t2}}} moveFocusNow=true
+02-21 16:41:07.464   822  1005 D AudioTrack: setVolume(): 0x9b4f8780, left = 0.000000, right = 0.000000
+02-21 16:41:07.464   822  1005 D AudioTrack: stop(): 0x9b4f8780, mState = 0
+02-21 16:41:07.464   822  1005 D AudioTrack: audiotrack 0x9b4f8780 stop done
+02-21 16:41:07.466   357   383 I vendor.mediatek.hardware.power@2.0-impl: notifyAppState pack:com.anonymous.innobet, act:com.anonymous.innobet.MainActivity, pid:32024, state:1
+02-21 16:41:07.469   357   382 I libPowerHal: [perfNotifyAppState] foreground:com.anonymous.innobet, pid:32024
+02-21 16:41:07.474   361  2359 D APM_AudioPolicyManager: AudioPolicyManager:setRecordSilenced(uid:10064, silenced:0)
+02-21 16:41:07.475   361  2359 D AudioFlinger: AudioFlinger::setRecordSilenced(uid:10064, silenced:0)
+02-21 16:41:07.561   361   413 D APM_AudioPolicyManager: stopOutput() output 13, stream 1, session 145
+02-21 16:41:07.562   361   413 V APM::AudioOutputDescriptor: changeRefCount() stream 1, count 0
+02-21 16:41:07.579 32024 32024 W FirebaseApp: Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.
+02-21 16:41:07.579 32024 32024 I FirebaseInitProvider: FirebaseApp initialization unsuccessful
+02-21 16:41:07.627 32024 32024 W SoLoader: Initializing SoLoader: 0
+02-21 16:41:07.628 32024 32024 W SoLoader: Recording new base apk path: /data/app/com.anonymous.innobet-UvydEps8ymsKxRvRnT0UMg==/base.apk
+02-21 16:41:07.628 32024 32024 W SoLoader: Previously recorded 0 base apk paths.
+02-21 16:41:07.631 32024 32024 I SoLoader: Preparing SO source: DirectorySoSource[root = /system/lib flags = 2]
+02-21 16:41:07.631 32024 32024 I SoLoader: Preparing SO source: DirectorySoSource[root = /vendor/lib flags = 2]
+02-21 16:41:07.631 32024 32024 I SoLoader: Preparing SO source: DirectApkSoSource[root = [/data/app/com.anonymous.innobet-UvydEps8ymsKxRvRnT0UMg==/base.apk!/lib/armeabi-v7a]]
+02-21 16:41:07.673 32024 32024 I SoLoader: Preparing SO source: ApplicationSoSource[DirectorySoSource[root = /data/app/com.anonymous.innobet-UvydEps8ymsKxRvRnT0UMg==/lib/arm flags = 0]]
+02-21 16:41:07.674 32024 32024 I SoLoader: init finish: 4 SO sources prepared
+02-21 16:41:07.674 32024 32024 W SoLoader: SoLoader initialized: 8
+02-21 16:41:07.684  1582  2367 D ACCS_TEST: handleControlMsg
+02-21 16:41:07.684  1582  2367 D ACCS_TEST: handleControlMsg configTagAliyunPush, dataId: 8320570a-b8e5-49ce-99f2-a301c63d0c95, serviceId: null, command:100, errorCode: ÚöÖÞ»»þáü´╝Ü200, ÚöÖÞ»»´╝ÜµêÉÕèƒ
+02-21 16:41:07.724 32024 32024 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+02-21 16:41:07.736   822  1643 V SettingsProvider: packageValueForCallResult, name = null, value : Bundle[{_track_generation=android.util.MemoryIntArray@68, value=null, _generation_index=0, _generation=15}]
+02-21 16:41:07.840 32024 32024 I SurfaceFactory: [static] sSurfaceFactory = com.mediatek.view.impl.SurfaceFactoryImpl@51b670d
+02-21 16:41:07.841 32024 32024 D OpenGLRenderer: Skia GL Pipeline
+02-21 16:41:07.849  1620  1846 D Surface : Surface::disconnect(this=0x9b4c5000,api=1)
+02-21 16:41:07.854   366  1289 I BufferQueueProducer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:1620,c:366) disconnect(P): api 1
+02-21 16:41:07.854   366  1289 D BufferQueueConsumer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:07.859   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:42.739262,dur:1006.10,max:326.41,min:14.23
+02-21 16:41:07.868 32024 32024 D ViewRootImpl[MainActivity]: hardware acceleration = true , fakeHwAccelerated = false, sRendererDisabled = false, forceHwAccelerated = false, sSystemRendererDisabled = false
+02-21 16:41:07.870   366  1289 I SurfaceFlinger: [SF client] NEW(0xae946fa0) for (822:system_server)
+02-21 16:41:07.874 32024 32024 V PhoneWindow: DecorView setVisiblity: visibility = 0, Parent = android.view.ViewRootImpl@5a46709, this = DecorView@85acd0e[MainActivity]
+02-21 16:41:07.891   822  1643 I WindowManager: Relayout Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}: oldVis=4 newVis=0 focusMayChange = true
+02-21 16:41:07.895   366  1289 I BufferQueue: [unnamed-366-785](this:0xae248000,id:785,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:07.895   366  1289 I BufferQueueConsumer: [unnamed-366-785](this:0xae248000,id:785,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:07.895   366  1289 I BufferQueueConsumer: [unnamed-366-785](this:0xae248000,id:785,api:0,p:-1,c:366) setConsumerName: unnamed-366-785
+02-21 16:41:07.896   366  1289 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:0,p:-1,c:366) setConsumerName: com.anonymous.innobet/com.anonymous.innobet.MainActivity#0
+02-21 16:41:07.896   366  1289 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:0,p:-1,c:366) setDefaultBufferSize: width=720 height=1440
+02-21 16:41:07.897   822  1643 V WindowManager: Changing focus from null to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:2134 com.android.server.wm.Session.relayout:244 android.view.IWindowSession$Stub.onTransact:309 com.android.server.wm.Session.onTransact:164 
+02-21 16:41:07.897   822  1643 D WindowManager: Input focus has changed to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:07.898   822   901 I WindowManager: Focus moving from null to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:07.899 32024 32024 D Surface : Surface::allocateBuffers(this=0x9b4c5000)
+02-21 16:41:07.906 32024 32042 E GED     : Failed to get GED Log Buf, err(0)
+02-21 16:41:07.913 32024 32042 I ConfigStore: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasWideColorDisplay retrieved: 0
+02-21 16:41:07.913 32024 32042 I ConfigStore: android::hardware::configstore::V1_0::ISurfaceFlingerConfigs::hasHDRDisplay retrieved: 0
+02-21 16:41:07.913 32024 32042 I OpenGLRenderer: Initialized EGL, version 1.4
+02-21 16:41:07.914 32024 32042 D OpenGLRenderer: Swap behavior 2
+02-21 16:41:07.924 32024 32039 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+02-21 16:41:07.936 32024 32042 D Surface : Surface::connect(this=0x9b4c5000,api=1)
+02-21 16:41:07.937   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:1,p:32024,c:366) connect(P): api=1 producer=(32024:com.anonymous.innobet) producerControlledByApp=true
+02-21 16:41:08.029 32024 32046 I dev.expo.updates: {"timestamp":1771702868028,"message":"embeddedAssetFileMap: embeddedAssets count = 79","code":"None","level":"info"}
+02-21 16:41:08.032 32024 32046 I dev.expo.updates: {"timestamp":1771702868032,"message":"embeddedAssetFileMap: 778ffc9fe8773a878e9c30a6304784de,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/778ffc9fe8773a878e9c30a6304784de.png","code":"None","level":"info"}
+02-21 16:41:08.034 32024 32046 I dev.expo.updates: {"timestamp":1771702868033,"message":"embeddedAssetFileMap: c79c3606a1cf168006ad3979763c7e0c,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/c79c3606a1cf168006ad3979763c7e0c.png","code":"None","level":"info"}
+02-21 16:41:08.035 32024 32046 I dev.expo.updates: {"timestamp":1771702868035,"message":"embeddedAssetFileMap: 02bc1fa7c0313217bde2d65ccbff40c9,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/02bc1fa7c0313217bde2d65ccbff40c9.png","code":"None","level":"info"}
+02-21 16:41:08.037 32024 32046 I dev.expo.updates: {"timestamp":1771702868037,"message":"embeddedAssetFileMap: 35ba0eaec5a4f5ed12ca16fabeae451d,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/35ba0eaec5a4f5ed12ca16fabeae451d.png","code":"None","level":"info"}
+02-21 16:41:08.039 32024 32046 I dev.expo.updates: {"timestamp":1771702868039,"message":"embeddedAssetFileMap: 0a328cd9c1afd0afe8e3b1ec5165b1b4,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/0a328cd9c1afd0afe8e3b1ec5165b1b4.png","code":"None","level":"info"}
+02-21 16:41:08.041 32024 32046 I dev.expo.updates: {"timestamp":1771702868041,"message":"embeddedAssetFileMap: 3cd68ccdb8938e3711da2e8831b85493,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/3cd68ccdb8938e3711da2e8831b85493.png","code":"None","level":"info"}
+02-21 16:41:08.043 32024 32046 I dev.expo.updates: {"timestamp":1771702868043,"message":"embeddedAssetFileMap: 61ca7e64b7d605716c57706cef640b9a,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/61ca7e64b7d605716c57706cef640b9a.png","code":"None","level":"info"}
+02-21 16:41:08.046 32024 32046 I dev.expo.updates: {"timestamp":1771702868046,"message":"embeddedAssetFileMap: aff2c65b39a296d4f7e96d0f58169170,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/aff2c65b39a296d4f7e96d0f58169170.png","code":"None","level":"info"}
+02-21 16:41:08.048 32024 32046 I dev.expo.updates: {"timestamp":1771702868048,"message":"embeddedAssetFileMap: d8e7601e3df962f83c62371ac14964d8,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/d8e7601e3df962f83c62371ac14964d8.png","code":"None","level":"info"}
+02-21 16:41:08.049 32024 32046 I dev.expo.updates: {"timestamp":1771702868049,"message":"embeddedAssetFileMap: 3cd68ccdb8938e3711da2e8831b85493,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/3cd68ccdb8938e3711da2e8831b85493.png","code":"None","level":"info"}
+02-21 16:41:08.051 32024 32046 I dev.expo.updates: {"timestamp":1771702868051,"message":"embeddedAssetFileMap: 0747a1317bbe9c6fc340b889ef8ab3ae,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/0747a1317bbe9c6fc340b889ef8ab3ae.png","code":"None","level":"info"}
+02-21 16:41:08.052 32024 32046 I dev.expo.updates: {"timestamp":1771702868052,"message":"embeddedAssetFileMap: d84e297c3b3e49a614248143d53e40ca,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/d84e297c3b3e49a614248143d53e40ca.png","code":"None","level":"info"}
+02-21 16:41:08.054 32024 32046 I dev.expo.updates: {"timestamp":1771702868054,"message":"embeddedAssetFileMap: 1190ab078c57159f4245a328118fcd9a,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/1190ab078c57159f4245a328118fcd9a.png","code":"None","level":"info"}
+02-21 16:41:08.056 32024 32046 I dev.expo.updates: {"timestamp":1771702868055,"message":"embeddedAssetFileMap: 78c625386b4d0690b421eb0fc78f7b9c,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/78c625386b4d0690b421eb0fc78f7b9c.png","code":"None","level":"info"}
+02-21 16:41:08.058 32024 32046 I dev.expo.updates: {"timestamp":1771702868057,"message":"embeddedAssetFileMap: 0747a1317bbe9c6fc340b889ef8ab3ae,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/0747a1317bbe9c6fc340b889ef8ab3ae.png","code":"None","level":"info"}
+02-21 16:41:08.059 32024 32046 I dev.expo.updates: {"timestamp":1771702868059,"message":"embeddedAssetFileMap: 4403c6117ec30c859bc95d70ce4a71d3,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/4403c6117ec30c859bc95d70ce4a71d3.png","code":"None","level":"info"}
+02-21 16:41:08.061 32024 32046 I dev.expo.updates: {"timestamp":1771702868060,"message":"embeddedAssetFileMap: 069d99eb1fa6712c0b9034a58c6b57dd,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/069d99eb1fa6712c0b9034a58c6b57dd.png","code":"None","level":"info"}
+02-21 16:41:08.062 32024 32046 I dev.expo.updates: {"timestamp":1771702868062,"message":"embeddedAssetFileMap: c3273c9e5321f20d1e42c2efae2578c4,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/c3273c9e5321f20d1e42c2efae2578c4.png","code":"None","level":"info"}
+02-21 16:41:08.063   344   670 D AudioALSAStreamOut: standby(), flag 6
+02-21 16:41:08.063   344   670 D AudioALSAStreamOut: standbyStreamOut(), flag 6
+02-21 16:41:08.063   344   670 D AudioALSAStreamOut: close(), flags 6
+02-21 16:41:08.063   344   670 D AudioALSAPlaybackHandlerNormal: +close(), flag 6, mDevice = 0x2
+02-21 16:41:08.063   344   670 D AudioVoiceUIDL: [SetInputStandBy] ReadRefFromRing to exit? (0) 
+02-21 16:41:08.063   344   670 D AudioALSAHardwareResourceManager: +stopOutputDevice(), mOutputDevices = 0x2, mStartOutputDevicesCount = 1
+02-21 16:41:08.063   344   670 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = ext_speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:08.063   344   670 D AudioALSADeviceConfigManager: ApplyDeviceTurnoffSequenceByName(), DeviceName = speaker_output descriptor->DeviceStatusCounter = 1
+02-21 16:41:08.063 32024 32046 I dev.expo.updates: {"timestamp":1771702868063,"message":"embeddedAssetFileMap: 286d67d3f74808a60a78d3ebf1a5fb57,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/286d67d3f74808a60a78d3ebf1a5fb57.png","code":"None","level":"info"}
+02-21 16:41:08.064   344   670 D AudioALSAStreamManager: speakerStatusChangeCb(), status = 1
+02-21 16:41:08.064   344   670 D AudioALSAPlaybackHandlerBase: -closePcmDriver(), mPcm = 0x0
+02-21 16:41:08.064   344   670 D AudioALSAPlaybackHandlerNormal: SetLowJitterMode(), bypass low jitter mode, bEnable = 0, device = 0x2, SampleRate = 48000
+02-21 16:41:08.064   344   670 D AudioALSAPlaybackHandlerBase: DestroyAurisysLibManager()
+02-21 16:41:08.064   344   670 D aurisys_lib_handler: aurisys_arsi_destroy_handler(), lib_name mtk_bessound, 0xb4842380, arsi_destroy_handler, arsi_handler = 0xb47cf3c0, retval = 0
+02-21 16:41:08.065   344   670 D aurisys_lib_manager: delete_aurisys_lib_manager(), manager 0xb59ed420
+02-21 16:41:08.065   344   670 D AudioALSAPlaybackHandlerNormal: -close()
+02-21 16:41:08.065 32024 32046 I dev.expo.updates: {"timestamp":1771702868065,"message":"embeddedAssetFileMap: d1ea1496f9057eb392d5bbf3732a61b7,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/d1ea1496f9057eb392d5bbf3732a61b7.png","code":"None","level":"info"}
+02-21 16:41:08.067 32024 32046 I dev.expo.updates: {"timestamp":1771702868066,"message":"embeddedAssetFileMap: 19eeb73b9593a38f8e9f418337fc7d10,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/19eeb73b9593a38f8e9f418337fc7d10.png","code":"None","level":"info"}
+02-21 16:41:08.068 32024 32046 I dev.expo.updates: {"timestamp":1771702868068,"message":"embeddedAssetFileMap: ab19f4cbc543357183a20571f68380a3,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/ab19f4cbc543357183a20571f68380a3.png","code":"None","level":"info"}
+02-21 16:41:08.070 32024 32046 I dev.expo.updates: {"timestamp":1771702868069,"message":"embeddedAssetFileMap: d8b800c443b8972542883e0b9de2bdc6,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/d8b800c443b8972542883e0b9de2bdc6.png","code":"None","level":"info"}
+02-21 16:41:08.071 32024 32046 I dev.expo.updates: {"timestamp":1771702868071,"message":"embeddedAssetFileMap: 412dd9275b6b48ad28f5e3d81bb1f626,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/412dd9275b6b48ad28f5e3d81bb1f626.png","code":"None","level":"info"}
+02-21 16:41:08.073 32024 32046 I dev.expo.updates: {"timestamp":1771702868072,"message":"embeddedAssetFileMap: 20e71bdf79e3a97bf55fd9e164041578,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/20e71bdf79e3a97bf55fd9e164041578.png","code":"None","level":"info"}
+02-21 16:41:08.074 32024 32046 I dev.expo.updates: {"timestamp":1771702868074,"message":"embeddedAssetFileMap: 3a2ba31570920eeb9b1d217cabe58315,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/3a2ba31570920eeb9b1d217cabe58315.ttf","code":"None","level":"info"}
+02-21 16:41:08.076 32024 32046 I dev.expo.updates: {"timestamp":1771702868075,"message":"embeddedAssetFileMap: 31b5ffea3daddc69dd01a1f3d6cf63c5,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/31b5ffea3daddc69dd01a1f3d6cf63c5.ttf","code":"None","level":"info"}
+02-21 16:41:08.077 32024 32046 I dev.expo.updates: {"timestamp":1771702868077,"message":"embeddedAssetFileMap: 140c53a7643ea949007aa9a282153849,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/140c53a7643ea949007aa9a282153849.ttf","code":"None","level":"info"}
+02-21 16:41:08.079 32024 32046 I dev.expo.updates: {"timestamp":1771702868079,"message":"embeddedAssetFileMap: a76d309774d33d9856f650bed4292a23,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/a76d309774d33d9856f650bed4292a23.ttf","code":"None","level":"info"}
+02-21 16:41:08.080 32024 32046 I dev.expo.updates: {"timestamp":1771702868080,"message":"embeddedAssetFileMap: b49ae8ab2dbccb02c4d11caaacf09eab,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b49ae8ab2dbccb02c4d11caaacf09eab.ttf","code":"None","level":"info"}
+02-21 16:41:08.082 32024 32046 I dev.expo.updates: {"timestamp":1771702868082,"message":"embeddedAssetFileMap: b06871f281fee6b241d60582ae9369b9,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b06871f281fee6b241d60582ae9369b9.ttf","code":"None","level":"info"}
+02-21 16:41:08.085 32024 32046 I dev.expo.updates: {"timestamp":1771702868085,"message":"embeddedAssetFileMap: 1f77739ca9ff2188b539c36f30ffa2be,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/1f77739ca9ff2188b539c36f30ffa2be.ttf","code":"None","level":"info"}
+02-21 16:41:08.087 32024 32046 I dev.expo.updates: {"timestamp":1771702868087,"message":"embeddedAssetFileMap: 605ed7926cf39a2ad5ec2d1f9d391d3d,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/605ed7926cf39a2ad5ec2d1f9d391d3d.ttf","code":"None","level":"info"}
+02-21 16:41:08.089 32024 32046 I dev.expo.updates: {"timestamp":1771702868089,"message":"embeddedAssetFileMap: 3b89dd103490708d19a95adcae52210e,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/3b89dd103490708d19a95adcae52210e.ttf","code":"None","level":"info"}
+02-21 16:41:08.090 32024 32046 I dev.expo.updates: {"timestamp":1771702868090,"message":"embeddedAssetFileMap: 370dd5af19f8364907b6e2c41f45dbbf,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/370dd5af19f8364907b6e2c41f45dbbf.ttf","code":"None","level":"info"}
+02-21 16:41:08.092 32024 32046 I dev.expo.updates: {"timestamp":1771702868092,"message":"embeddedAssetFileMap: adec7d6f310bc577f05e8fe06a5daccf,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/adec7d6f310bc577f05e8fe06a5daccf.ttf","code":"None","level":"info"}
+02-21 16:41:08.093 32024 32046 I dev.expo.updates: {"timestamp":1771702868093,"message":"embeddedAssetFileMap: 56c8d80832e37783f12c05db7c8849e2,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/56c8d80832e37783f12c05db7c8849e2.ttf","code":"None","level":"info"}
+02-21 16:41:08.095 32024 32046 I dev.expo.updates: {"timestamp":1771702868094,"message":"embeddedAssetFileMap: e20945d7c929279ef7a6f1db184a4470,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/e20945d7c929279ef7a6f1db184a4470.ttf","code":"None","level":"info"}
+02-21 16:41:08.096 32024 32046 I dev.expo.updates: {"timestamp":1771702868096,"message":"embeddedAssetFileMap: 6148e7019854f3bde85b633cb88f3c25,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/6148e7019854f3bde85b633cb88f3c25.ttf","code":"None","level":"info"}
+02-21 16:41:08.097 32024 32046 I dev.expo.updates: {"timestamp":1771702868097,"message":"embeddedAssetFileMap: b62641afc9ab487008e996a5c5865e56,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b62641afc9ab487008e996a5c5865e56.ttf","code":"None","level":"info"}
+02-21 16:41:08.099 32024 32046 I dev.expo.updates: {"timestamp":1771702868098,"message":"embeddedAssetFileMap: 4e85bc9ebe07e0340c9c4fc2f6c38908,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/4e85bc9ebe07e0340c9c4fc2f6c38908.ttf","code":"None","level":"info"}
+02-21 16:41:08.100 32024 32046 I dev.expo.updates: {"timestamp":1771702868100,"message":"embeddedAssetFileMap: f7c53c47a66934504fcbc7cc164895a7,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/f7c53c47a66934504fcbc7cc164895a7.ttf","code":"None","level":"info"}
+02-21 16:41:08.101 32024 32046 I dev.expo.updates: {"timestamp":1771702868101,"message":"embeddedAssetFileMap: d2285965fe34b05465047401b8595dd0,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/d2285965fe34b05465047401b8595dd0.ttf","code":"None","level":"info"}
+02-21 16:41:08.103 32024 32046 I dev.expo.updates: {"timestamp":1771702868103,"message":"embeddedAssetFileMap: 1681f34aaca71b8dfb70756bca331eb2,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/1681f34aaca71b8dfb70756bca331eb2.ttf","code":"None","level":"info"}
+02-21 16:41:08.106 32024 32046 I dev.expo.updates: {"timestamp":1771702868105,"message":"embeddedAssetFileMap: cbe63ed69fbc743029eb4102c26d8cb0,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/cbe63ed69fbc743029eb4102c26d8cb0.png","code":"None","level":"info"}
+02-21 16:41:08.107 32024 32046 I dev.expo.updates: {"timestamp":1771702868107,"message":"embeddedAssetFileMap: 05906502f18d236fd53cd20e87ace52e,png => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/05906502f18d236fd53cd20e87ace52e.png","code":"None","level":"info"}
+02-21 16:41:08.109 32024 32046 I dev.expo.updates: {"timestamp":1771702868108,"message":"embeddedAssetFileMap: 1e6f2d32ab9876b49936181f9c0b8725,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/1e6f2d32ab9876b49936181f9c0b8725.ttf","code":"None","level":"info"}
+02-21 16:41:08.111 32024 32046 I dev.expo.updates: {"timestamp":1771702868110,"message":"embeddedAssetFileMap: 83e5ab4249b88f89ccf80e15a98b92f0,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/83e5ab4249b88f89ccf80e15a98b92f0.ttf","code":"None","level":"info"}
+02-21 16:41:08.112 32024 32046 I dev.expo.updates: {"timestamp":1771702868112,"message":"embeddedAssetFileMap: 25e374a16a818685911e36bee59a6ee4,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/25e374a16a818685911e36bee59a6ee4.ttf","code":"None","level":"info"}
+02-21 16:41:08.114 32024 32046 I dev.expo.updates: {"timestamp":1771702868113,"message":"embeddedAssetFileMap: 303c6d9e16168364d3bc5b7f766cfff4,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/303c6d9e16168364d3bc5b7f766cfff4.ttf","code":"None","level":"info"}
+02-21 16:41:08.116 32024 32046 I dev.expo.updates: {"timestamp":1771702868116,"message":"embeddedAssetFileMap: 7d752fb726f5ece291e2e522fcecf86d,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/7d752fb726f5ece291e2e522fcecf86d.ttf","code":"None","level":"info"}
+02-21 16:41:08.118 32024 32046 I dev.expo.updates: {"timestamp":1771702868118,"message":"embeddedAssetFileMap: dae3c6eddbf79c41f922e4809ca9d09c,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/dae3c6eddbf79c41f922e4809ca9d09c.ttf","code":"None","level":"info"}
+02-21 16:41:08.120 32024 32046 I dev.expo.updates: {"timestamp":1771702868120,"message":"embeddedAssetFileMap: dd5415b95e675853c6ccdceba7324ce7,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/dd5415b95e675853c6ccdceba7324ce7.ttf","code":"None","level":"info"}
+02-21 16:41:08.121 32024 32046 I dev.expo.updates: {"timestamp":1771702868121,"message":"embeddedAssetFileMap: 27fd63e58793434ce14a41e30176a4de,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/27fd63e58793434ce14a41e30176a4de.ttf","code":"None","level":"info"}
+02-21 16:41:08.123 32024 32046 I dev.expo.updates: {"timestamp":1771702868123,"message":"embeddedAssetFileMap: dc44e38f98466ebcd6c013be9016fa1f,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/dc44e38f98466ebcd6c013be9016fa1f.ttf","code":"None","level":"info"}
+02-21 16:41:08.124 32024 32046 I dev.expo.updates: {"timestamp":1771702868124,"message":"embeddedAssetFileMap: dca165220aefe216510c6de8ae9578ff,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/dca165220aefe216510c6de8ae9578ff.ttf","code":"None","level":"info"}
+02-21 16:41:08.127 32024 32046 I dev.expo.updates: {"timestamp":1771702868126,"message":"embeddedAssetFileMap: 41c80845424f35477f8ecadfb646a67d,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/41c80845424f35477f8ecadfb646a67d.ttf","code":"None","level":"info"}
+02-21 16:41:08.129 32024 32046 I dev.expo.updates: {"timestamp":1771702868129,"message":"embeddedAssetFileMap: 00b6f1f0c053c61b8048a6dbbabecaa2,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/00b6f1f0c053c61b8048a6dbbabecaa2.ttf","code":"None","level":"info"}
+02-21 16:41:08.131 32024 32046 I dev.expo.updates: {"timestamp":1771702868131,"message":"embeddedAssetFileMap: 1fc3ee9d387437d060344e57a179e3dc,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/1fc3ee9d387437d060344e57a179e3dc.ttf","code":"None","level":"info"}
+02-21 16:41:08.133 32024 32046 I dev.expo.updates: {"timestamp":1771702868133,"message":"embeddedAssetFileMap: 918982b4cec9e30df58aca1e12cf6445,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/918982b4cec9e30df58aca1e12cf6445.ttf","code":"None","level":"info"}
+02-21 16:41:08.136 32024 32046 I dev.expo.updates: {"timestamp":1771702868136,"message":"embeddedAssetFileMap: 2d365b1721b9ba2ff4771393a0ce2e46,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/2d365b1721b9ba2ff4771393a0ce2e46.ttf","code":"None","level":"info"}
+02-21 16:41:08.138 32024 32046 I dev.expo.updates: {"timestamp":1771702868138,"message":"embeddedAssetFileMap: dc10ada6fd67b557d811d9a6d031c4de,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/dc10ada6fd67b557d811d9a6d031c4de.ttf","code":"None","level":"info"}
+02-21 16:41:08.139 32024 32046 I dev.expo.updates: {"timestamp":1771702868139,"message":"embeddedAssetFileMap: 80b61563f9e8f51aa379816e1c6016ef,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/80b61563f9e8f51aa379816e1c6016ef.ttf","code":"None","level":"info"}
+02-21 16:41:08.141 32024 32046 I dev.expo.updates: {"timestamp":1771702868141,"message":"embeddedAssetFileMap: 792016eae54d22079ccf6f0760938b0a,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/792016eae54d22079ccf6f0760938b0a.ttf","code":"None","level":"info"}
+02-21 16:41:08.145 32024 32046 I dev.expo.updates: {"timestamp":1771702868144,"message":"embeddedAssetFileMap: 33ee4a7a2a00f4a23de896dc720a167f,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/33ee4a7a2a00f4a23de896dc720a167f.ttf","code":"None","level":"info"}
+02-21 16:41:08.147 32024 32046 I dev.expo.updates: {"timestamp":1771702868147,"message":"embeddedAssetFileMap: f7f923044efb7a3d9cf90eaaa5c07b00,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/f7f923044efb7a3d9cf90eaaa5c07b00.ttf","code":"None","level":"info"}
+02-21 16:41:08.149 32024 32046 I dev.expo.updates: {"timestamp":1771702868149,"message":"embeddedAssetFileMap: f21ea2ee1c7372ae821e3ab4f21dceb3,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/f21ea2ee1c7372ae821e3ab4f21dceb3.ttf","code":"None","level":"info"}
+02-21 16:41:08.151 32024 32046 I dev.expo.updates: {"timestamp":1771702868150,"message":"embeddedAssetFileMap: 139479e8be03b8933573510aeed5036c,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/139479e8be03b8933573510aeed5036c.ttf","code":"None","level":"info"}
+02-21 16:41:08.153 32024 32046 I dev.expo.updates: {"timestamp":1771702868152,"message":"embeddedAssetFileMap: 3ee049c7379fa0111fa60753076ed13e,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/3ee049c7379fa0111fa60753076ed13e.ttf","code":"None","level":"info"}
+02-21 16:41:08.156 32024 32046 I dev.expo.updates: {"timestamp":1771702868156,"message":"embeddedAssetFileMap: 0df3ca88b5cc69095fa6960be024b6b0,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/0df3ca88b5cc69095fa6960be024b6b0.ttf","code":"None","level":"info"}
+02-21 16:41:08.158 32024 32046 I dev.expo.updates: {"timestamp":1771702868157,"message":"embeddedAssetFileMap: 4ad1f8bd28473f905ff5d8d9ee6e46c4,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/4ad1f8bd28473f905ff5d8d9ee6e46c4.ttf","code":"None","level":"info"}
+02-21 16:41:08.159 32024 32046 I dev.expo.updates: {"timestamp":1771702868159,"message":"embeddedAssetFileMap: 5ac3cfb8bb385319e5dc90e310fc6217,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/5ac3cfb8bb385319e5dc90e310fc6217.ttf","code":"None","level":"info"}
+02-21 16:41:08.161 32024 32046 I dev.expo.updates: {"timestamp":1771702868160,"message":"embeddedAssetFileMap: b2b51c1f3126dac9b0d8f9cf477e30aa,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b2b51c1f3126dac9b0d8f9cf477e30aa.ttf","code":"None","level":"info"}
+02-21 16:41:08.162 32024 32046 I dev.expo.updates: {"timestamp":1771702868162,"message":"embeddedAssetFileMap: b94d9cb13b877df529f7d8f1f7daa04a,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b94d9cb13b877df529f7d8f1f7daa04a.ttf","code":"None","level":"info"}
+02-21 16:41:08.164 32024 32046 I dev.expo.updates: {"timestamp":1771702868163,"message":"embeddedAssetFileMap: 57520555569bc37741929ffbd1d51655,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/57520555569bc37741929ffbd1d51655.ttf","code":"None","level":"info"}
+02-21 16:41:08.165 32024 32046 I dev.expo.updates: {"timestamp":1771702868165,"message":"embeddedAssetFileMap: b87eacd35ccf0ae12482a98c4b4e550a,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/b87eacd35ccf0ae12482a98c4b4e550a.ttf","code":"None","level":"info"}
+02-21 16:41:08.167 32024 32046 I dev.expo.updates: {"timestamp":1771702868167,"message":"embeddedAssetFileMap: fe14a3918950e2ecebdff85d6acd99ec,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/fe14a3918950e2ecebdff85d6acd99ec.ttf","code":"None","level":"info"}
+02-21 16:41:08.169 32024 32046 I dev.expo.updates: {"timestamp":1771702868169,"message":"embeddedAssetFileMap: 2492a2590b69b466c0980862dd01bf5b,ttf => file:\/\/\/data\/user\/0\/com.anonymous.innobet\/files\/.expo-internal\/2492a2590b69b466c0980862dd01bf5b.ttf","code":"None","level":"info"}
+02-21 16:41:08.189 32024 32024 W SoLoader: SoLoader already initialized
+02-21 16:41:08.254 32024 32024 D jni_lib_merge: Entering merged library JNI_OnLoad.
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing 12 pre-merged libs (including stub)
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libfabricjni_so.  onload_func: 0x8482ced9
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libmapbufferjni_so.  onload_func: 0x8485fed1
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libreact_devsupportjni_so.  onload_func: 0x848b6995
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libreact_featureflagsjni_so.  onload_func: 0x848bb665
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libreact_newarchdefaults_so.  onload_func: 0x848d35d1
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x84939055
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x8494daf5
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register librninstance_so.  onload_func: 0x8495fd01
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x849a5831
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libuimanagerjni_so.  onload_func: 0x849aad49
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: Preparing to register libyoga_so.  onload_func: 0x849ae591
+02-21 16:41:08.255 32024 32024 D jni_lib_merge: About to register 11 actual methods.
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: Entering merged library JNI_OnLoad.
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: Preparing 4 pre-merged libs (including stub)
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: Preparing to register libhermes_executor_so.  onload_func: 0x84b95391
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: Preparing to register libhermesinstancejni_so.  onload_func: 0x84b99bdd
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: Preparing to register libjsijniprofiler_so.  onload_func: 0x84b9a0ed
+02-21 16:41:08.258 32024 32024 D jni_lib_merge: About to register 3 actual methods.
+02-21 16:41:08.259 32024 32024 W SoLoader: SoLoader already initialized
+02-21 16:41:08.356  1440  4181 I FontLog : (REDACTED) Received query %s, URI %s
+02-21 16:41:08.357  1440  4181 I FontLog : (REDACTED) Query [%s] resolved to %s
+02-21 16:41:08.361  1440  4181 I FontLog : (REDACTED) Fetch %s end status %s
+02-21 16:41:08.378  1440  4181 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+02-21 16:41:08.387  1440  4181 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+02-21 16:41:08.923   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:09.466  1440 31161 I .gms.persisten: Explicit concurrent copying GC freed 68473(3MB) AllocSpace objects, 3(168KB) LOS objects, 37% free, 9MB/15MB, paused 185us total 352.599ms
+02-21 16:41:09.862 32024 32051 I ExpoModulesCore: Ô£à AppContext was initialized
+02-21 16:41:09.950 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.drawer.ReactDrawerLayoutManager
+02-21 16:41:09.961 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.uimanager.LayoutShadowNode
+02-21 16:41:09.968 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollViewManager
+02-21 16:41:09.976 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollContainerViewManager
+02-21 16:41:09.982 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.progressbar.ReactProgressBarViewManager
+02-21 16:41:09.985 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.progressbar.ProgressBarShadowNode
+02-21 16:41:09.989 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactScrollViewManager
+02-21 16:41:09.996 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchManager
+02-21 16:41:10.002 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchManager$ReactSwitchShadowNode
+02-21 16:41:10.004 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.safeareaview.ReactSafeAreaViewManager
+02-21 16:41:10.007 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.safeareaview.ReactSafeAreaViewShadowNode
+02-21 16:41:10.008 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.swiperefresh.SwipeRefreshLayoutManager
+02-21 16:41:10.014 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageViewManager
+02-21 16:41:10.015 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageShadowNode
+02-21 16:41:10.018 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.image.ReactImageManager
+02-21 16:41:10.024 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.modal.ReactModalHostManager
+02-21 16:41:10.028 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactRawTextManager
+02-21 16:41:10.031 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactRawTextShadowNode
+02-21 16:41:10.033 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputManager
+02-21 16:41:10.039 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputShadowNode
+02-21 16:41:10.044 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactTextViewManager
+02-21 16:41:10.048 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactTextShadowNode
+02-21 16:41:10.050 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.view.ReactViewManager
+02-21 16:41:10.055 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextViewManager
+02-21 16:41:10.055 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextShadowNode
+02-21 16:41:10.057 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.unimplementedview.ReactUnimplementedViewManager
+02-21 16:41:10.061 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class expo.modules.kotlin.views.GroupViewManagerWrapper
+02-21 16:41:10.067 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaProviderManager
+02-21 16:41:10.070 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaViewManager
+02-21 16:41:10.072 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.th3rdwave.safeareacontext.SafeAreaViewShadowNode
+02-21 16:41:10.075 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenContainerViewManager
+02-21 16:41:10.078 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenViewManager
+02-21 16:41:10.084 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ModalScreenViewManager
+02-21 16:41:10.085 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenStackViewManager
+02-21 16:41:10.088 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenStackHeaderConfigViewManager
+02-21 16:41:10.093 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenStackHeaderSubviewManager
+02-21 16:41:10.096 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.SearchBarManager
+02-21 16:41:10.099 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenFooterManager
+02-21 16:41:10.102 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenContentWrapperManager
+02-21 16:41:10.105 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$DefsViewManager
+02-21 16:41:10.110 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.VirtualViewManager$RenderableShadowNode
+02-21 16:41:10.113 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeMergeManager
+02-21 16:41:10.118 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$LinearGradientManager
+02-21 16:41:10.122 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeGaussianBlurManager
+02-21 16:41:10.125 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeColorMatrixManager
+02-21 16:41:10.129 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ClipPathViewManager
+02-21 16:41:10.134 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$SymbolManager
+02-21 16:41:10.139 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$PatternManager
+02-21 16:41:10.145 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeBlendManager
+02-21 16:41:10.149 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.SvgViewManager
+02-21 16:41:10.153 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$UseViewManager
+02-21 16:41:10.158 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$CircleViewManager
+02-21 16:41:10.163 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TSpanViewManager
+02-21 16:41:10.170 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FilterManager
+02-21 16:41:10.174 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$MarkerManager
+02-21 16:41:10.179 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ForeignObjectManager
+02-21 16:41:10.184 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$EllipseViewManager
+02-21 16:41:10.189 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$LineViewManager
+02-21 16:41:10.198 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeFloodManager
+02-21 16:41:10.203 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$GroupViewManager
+02-21 16:41:10.207 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TextViewManager
+02-21 16:41:10.211 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$ImageViewManager
+02-21 16:41:10.216 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$RadialGradientManager
+02-21 16:41:10.221 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$MaskManager
+02-21 16:41:10.226 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$RectViewManager
+02-21 16:41:10.231 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$TextPathViewManager
+02-21 16:41:10.237 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$FeOffsetManager
+02-21 16:41:10.240 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.horcrux.svg.RenderableViewManager$PathViewManager
+02-21 16:41:10.302   822  1639 D MtkConnectivityService: requestNetwork for uid/pid:10064/32024 NetworkRequest [ TRACK_DEFAULT id=287, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ]
+02-21 16:41:10.305   822   968 D WIFI_UT : got request NetworkRequest [ TRACK_DEFAULT id=287, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ] with score 60
+02-21 16:41:10.305   822   968 D WIFI    : got request NetworkRequest [ TRACK_DEFAULT id=287, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ] with score 60
+02-21 16:41:10.305   822   992 D Ethernet: got request NetworkRequest [ TRACK_DEFAULT id=287, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ] with score 60
+02-21 16:41:10.306  1155  1155 D PhoneSwitcherNetworkRequstListener: got request NetworkRequest [ TRACK_DEFAULT id=287, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED Unwanted:  Uid: 10064] ] with score 60
+02-21 16:41:10.310 32024 32034 I onymous.innobe: Background concurrent copying GC freed 70284(3MB) AllocSpace objects, 2(40KB) LOS objects, 46% free, 6MB/12MB, paused 110us total 128.097ms
+02-21 16:41:10.546 32024 32058 I ExpoModulesCore: Ô£à JSI interop was installed
+02-21 16:41:10.547 32024 32058 W ExpoModulesCore: ÔÜá´©Å JSI interop was already installed
+02-21 16:41:10.561 32024 32058 I ExpoModulesCore: Ô£à Constants were exported
+02-21 16:41:10.568 32024 32058 I dev.expo.updates: {"timestamp":1771702870568,"message":"UpdatesModule: getConstants called","code":"None","level":"info"}
+02-21 16:41:10.692 32024 32058 I ReactNativeJS: Running "main"
+02-21 16:41:10.777   822  3054 V SettingsProvider: packageValueForCallResult, name = bluetooth_name, value : Bundle[{_track_generation=android.util.MemoryIntArray@68, value=O1, _generation_index=1, _generation=6}]
+02-21 16:41:11.076 32024 32042 E ion     : ioctl c0044901 failed with code -1: Invalid argument
+02-21 16:41:11.076 32024 32042 E GED     : Failed to get GED Log Buf, err(0)
+02-21 16:41:11.077   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:1.243242,dur:3217.39,max:3167.88,min:16.15
+02-21 16:41:11.111   822   938 D View    : [Warning] assignParent to null: this = DecorView@c108021[innobet]
+02-21 16:41:11.111   822   901 I ActivityManager: Displayed com.anonymous.innobet/.MainActivity: +3s729ms
+02-21 16:41:11.123 32024 32058 W ReactNativeJS: `transition-transform` unknown or invalid utility
+02-21 16:41:11.163 32024 32058 W ReactNativeJS: `placeholder-gray-600` unknown or invalid utility
+02-21 16:41:11.176   357  1276 I vendor.mediatek.hardware.power@2.0-impl: powerHintAsync hint:8, data:0
+02-21 16:41:11.192  1620  1620 V PhoneWindow: DecorView setVisiblity: visibility = 4, Parent = android.view.ViewRootImpl@6387714, this = DecorView@7cafbbd[Launcher]
+02-21 16:41:11.195   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:11.197   822  1639 I PowerWrap: PowerHal_Wrap_querySysInfo
+02-21 16:41:11.198   822  1639 E PowerHalWrapper: <amsBoostStop> duration: 6000ms
+02-21 16:41:11.198   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:11.200   822  1639 I PowerWrap: PowerHal_Wrap_mtkPowerHint
+02-21 16:41:11.219   366   366 I BufferQueueConsumer: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:41:11.219   366   366 I BufferQueue: [com.android.launcher3/com.android.launcher3.Launcher#0](this:0xae249000,id:783,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:11.290   822   938 D Surface : Surface::disconnect(this=0x88e92800,api=2)
+02-21 16:41:11.292   366  1289 I BufferQueueProducer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:2,p:822,c:366) disconnect(P): api 2
+02-21 16:41:11.292   366  1289 D BufferQueueConsumer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:2,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:11.294   366   386 W SurfaceFlinger: Attempting to set client state on removed layer: Splash Screen com.anonymous.innobet#0
+02-21 16:41:11.294   366   386 W SurfaceFlinger: Attempting to destroy on removed layer: Splash Screen com.anonymous.innobet#0
+02-21 16:41:11.301   366   366 I BufferQueueConsumer: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:2,p:-1,c:-1) disconnect(C)
+02-21 16:41:11.302   366   366 I BufferQueue: [Splash Screen com.anonymous.innobet#0](this:0xae973000,id:784,api:2,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:11.316   366   387 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=4.30 dur=4420.22 max=3463.06 min=9.70
+02-21 16:41:11.327 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:11.335 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:11.343 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreenStackHeaderConfigShadowNode
+02-21 16:41:11.353 32024 32059 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.swmansion.rnscreens.ScreensShadowNode
+02-21 16:41:11.360 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:11.367 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:11.482 32024 32058 E ReactNativeJS: 'Erro ao pegar token Expo:', { [Error: Make sure to complete the guide at https://docs.expo.dev/push-notifications/fcm-credentials/ : Default FirebaseApp is not initialized in this process com.anonymous.innobet. Make sure to call FirebaseApp.initializeApp(Context) first.] code: 'E_REGISTRATION_FAILED' }
+02-21 16:41:11.489 32024 32058 I ReactNativeJS: '[Network] Connection changed:', { isConnected: true, isInternetReachable: true, type: 'wifi' }
+02-21 16:41:11.490 32024 32058 I ReactNativeJS: '[Network] Connection changed:', { isConnected: true, isInternetReachable: true, type: 'wifi' }
+02-21 16:41:11.494 32024 32058 I ReactNativeJS: [SettingsContext] No token found, using default settings
+02-21 16:41:11.548 32024 32058 I ReactNativeJS: '[Network] Connection changed:', { isConnected: true, isInternetReachable: true, type: 'wifi' }
+02-21 16:41:11.548 32024 32058 I ReactNativeJS: '[Network] Connection changed:', { isConnected: true, isInternetReachable: true, type: 'wifi' }
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: console.error: Erro ao pegar token Expo: Error: Make sure to complete the guide at https://docs.expo.dev/push-notifications/fcm-credentials/ : Default FirebaseApp is not initialized in this process com.anonymous.innobet. Make sure to call FirebaseApp.initializeApp(Context) first., js engine: hermes, stack:
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: _construct@1:99485
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: Wrapper@1:99139
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: _callSuper@1:97140
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: SyntheticError@1:98626
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: reactConsoleErrorHandler@1:98287
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: ?anon_0_@1:1585719
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: asyncGeneratorStep@1:565825
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: _throw@1:566130
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: anonymous@1:120943
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: _callTimer@1:119942
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: _callReactNativeMicrotasksPass@1:120086
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: callReactNativeMicrotasks@1:122017
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: __callReactNativeMicrotasks@1:91596
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: anonymous@1:90731
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: __guard@1:91470
+02-21 16:41:11.643 32024 32059 E unknown:ReactNative: flushedQueue@1:90642
+02-21 16:41:11.784 32024 32058 I ReactNativeJS: BLE Printer initialized
+02-21 16:41:11.842 32024 32042 E GED     : Failed to get GED Log Buf, err(0)
+02-21 16:41:11.937   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:11.986 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:11.986 32024 32059 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+02-21 16:41:12.126   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:12.153   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:1,p:32024,c:366) queueBuffer: fps=6.65 dur=1052.15 max=435.63 min=11.91
+02-21 16:41:12.164   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:32.196785,dur:1087.07,max:325.79,min:13.85
+02-21 16:41:12.367 32024 32058 W ReactNativeJS: `transform` unknown or invalid utility
+02-21 16:41:12.412 32024 32058 I ReactNativeJS: '[Updater] Checking for updates at:', 'https://www.inforcomputer.com/Atualizacoes/InnoBet/version.json?t=1771702872412'
+02-21 16:41:12.437 32024 32073 W onymous.innobe: Unknown chunk type '200'.
+02-21 16:41:12.442 32024 32073 I WebViewFactory: Loading com.google.android.webview version 138.0.7204.179 (code 720417900)
+02-21 16:41:12.443 32024 32073 W onymous.innobe: Unknown chunk type '200'.
+02-21 16:41:12.445 32024 32024 D ViewRootImpl[MainActivity]: hardware acceleration = true , fakeHwAccelerated = false, sRendererDisabled = false, forceHwAccelerated = false, sSystemRendererDisabled = false
+02-21 16:41:12.492   366  1289 D SurfaceFlinger: duplicate layer name: changing com.anonymous.innobet/com.anonymous.innobet.MainActivity to com.anonymous.innobet/com.anonymous.innobet.MainActivity#1
+02-21 16:41:12.492   366  1289 I BufferQueue: [unnamed-366-786](this:0xae90b000,id:786,api:0,p:-1,c:-1) BufferQueue core=(366:/system/bin/surfaceflinger)
+02-21 16:41:12.492   366  1289 I BufferQueueConsumer: [unnamed-366-786](this:0xae90b000,id:786,api:0,p:-1,c:366) connect(C): consumer=(366:/system/bin/surfaceflinger) controlledByApp=false
+02-21 16:41:12.493   366  1289 I BufferQueueConsumer: [unnamed-366-786](this:0xae90b000,id:786,api:0,p:-1,c:366) setConsumerName: unnamed-366-786
+02-21 16:41:12.493   366  1289 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:0,p:-1,c:366) setConsumerName: com.anonymous.innobet/com.anonymous.innobet.MainActivity#1
+02-21 16:41:12.493   366  1289 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:0,p:-1,c:366) setDefaultBufferSize: width=720 height=1440
+02-21 16:41:12.494   822  6314 V WindowManager: Changing focus from Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} to Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:2134 com.android.server.wm.Session.relayout:244 android.view.IWindowSession$Stub.onTransact:309 com.android.server.wm.Session.onTransact:164 
+02-21 16:41:12.494   822  6314 D WindowManager: Input focus has changed to Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:12.495   822   901 I WindowManager: Focus moving from Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} to Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:12.497 32024 32042 D Surface : Surface::connect(this=0x80896000,api=1)
+02-21 16:41:12.497 32024 32024 D Surface : Surface::allocateBuffers(this=0x80896000)
+02-21 16:41:12.497   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:1,p:32024,c:366) connect(P): api=1 producer=(32024:com.anonymous.innobet) producerControlledByApp=true
+02-21 16:41:12.498 32024 32073 I onymous.innobe: Rejecting re-init on previously-failed class java.lang.Class<WV.AM>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/webkit/PacProcessor;
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.498 32024 32073 I onymous.innobe: Caused by: java.lang.ClassNotFoundException: Didn't find class "android.webkit.PacProcessor" on path: DexPathList[[zip file "/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk"],nativeLibraryDirectories=[/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/lib/arm, /data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk!/lib/armeabi-v7a, /system/lib]]
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class dalvik.system.BaseDexClassLoader.findClass(java.lang.String) (BaseDexClassLoader.java:134)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String, boolean) (ClassLoader.java:379)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String) (ClassLoader.java:312)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.498 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.499 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.499 32024 32073 I onymous.innobe: 
+02-21 16:41:12.499 32024 32073 I onymous.innobe: Rejecting re-init on previously-failed class java.lang.Class<WV.AM>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/webkit/PacProcessor;
+02-21 16:41:12.499 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.499 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.500 32024 32073 I onymous.innobe: Caused by: java.lang.ClassNotFoundException: Didn't find class "android.webkit.PacProcessor" on path: DexPathList[[zip file "/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk"],nativeLibraryDirectories=[/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/lib/arm, /data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk!/lib/armeabi-v7a, /system/lib]]
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class dalvik.system.BaseDexClassLoader.findClass(java.lang.String) (BaseDexClassLoader.java:134)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String, boolean) (ClassLoader.java:379)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String) (ClassLoader.java:312)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.500 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.500 32024 32073 I onymous.innobe: 
+02-21 16:41:12.511 32024 32073 I onymous.innobe: Rejecting re-init on previously-failed class java.lang.Class<WV.AM>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/webkit/PacProcessor;
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.511 32024 32073 I onymous.innobe: Caused by: java.lang.ClassNotFoundException: Didn't find class "android.webkit.PacProcessor" on path: DexPathList[[zip file "/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk"],nativeLibraryDirectories=[/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/lib/arm, /data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk!/lib/armeabi-v7a, /system/lib]]
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class dalvik.system.BaseDexClassLoader.findClass(java.lang.String) (BaseDexClassLoader.java:134)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String, boolean) (ClassLoader.java:379)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String) (ClassLoader.java:312)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.511 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.511 32024 32073 I onymous.innobe: 
+02-21 16:41:12.512 32024 32073 I onymous.innobe: Rejecting re-init on previously-failed class java.lang.Class<WV.AM>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/webkit/PacProcessor;
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.512 32024 32073 I onymous.innobe: Caused by: java.lang.ClassNotFoundException: Didn't find class "android.webkit.PacProcessor" on path: DexPathList[[zip file "/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk"],nativeLibraryDirectories=[/data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/lib/arm, /data/app/com.google.android.webview-5Qheia9dr00Xpw0tBcysAQ==/base.apk!/lib/armeabi-v7a, /system/lib]]
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class dalvik.system.BaseDexClassLoader.findClass(java.lang.String) (BaseDexClassLoader.java:134)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String, boolean) (ClassLoader.java:379)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.ClassLoader.loadClass(java.lang.String) (ClassLoader.java:312)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.classForName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:-2)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class java.lang.Class.forName(java.lang.String, boolean, java.lang.ClassLoader) (Class.java:453)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getWebViewProviderClass(java.lang.ClassLoader) (WebViewFactory.java:176)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.lang.Class android.webkit.WebViewFactory.getProviderClass() (WebViewFactory.java:459)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.WebViewFactoryProvider android.webkit.WebViewFactory.getProvider() (WebViewFactory.java:251)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.CookieManager android.webkit.CookieManager.getInstance() (CookieManager.java:40)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at android.webkit.CookieManager com.facebook.react.modules.network.ForwardingCookieHandler.getCookieManager() (ForwardingCookieHandler.java:102)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.Map com.facebook.react.modules.network.ForwardingCookieHandler.get(java.net.URI, java.util.Map) (ForwardingCookieHandler.java:43)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.List okhttp3.JavaNetCookieJar.loadForRequest(okhttp3.HttpUrl) (JavaNetCookieJar.kt:47)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at java.util.List com.facebook.react.modules.network.ReactCookieJarContainer.loadForRequest(okhttp3.HttpUrl) (ReactCookieJarContainer.java:44)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.BridgeInterceptor.intercept(okhttp3.Interceptor$Chain) (BridgeInterceptor.kt:74)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(okhttp3.Interceptor$Chain) (RetryAndFollowUpInterceptor.kt:76)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.http.RealInterceptorChain.proceed(okhttp3.Request) (RealInterceptorChain.kt:109)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at okhttp3.Response okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp() (RealCall.kt:201)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void okhttp3.internal.connection.RealCall$AsyncCall.run() (RealCall.kt:517)
+02-21 16:41:12.512 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor.runWorker(java.util.concurrent.ThreadPoolExecutor$Worker) (ThreadPoolExecutor.java:1167)
+02-21 16:41:12.513 32024 32073 I onymous.innobe:   at void java.util.concurrent.ThreadPoolExecutor$Worker.run() (ThreadPoolExecutor.java:641)
+02-21 16:41:12.513 32024 32073 I onymous.innobe:   at void java.lang.Thread.run() (Thread.java:764)
+02-21 16:41:12.513 32024 32073 I onymous.innobe: 
+02-21 16:41:12.543 32024 32073 I cr_WVCFactoryProvider: version=138.0.7204.179 (720417900) minSdkVersion=26 isBundle=false multiprocess=true packageId=2
+02-21 16:41:12.575   822   901 I WindowManager: Losing delayed focus: Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:12.579 32024 32080 I chromium: [0221/164112.579402:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+02-21 16:41:12.604 32024 32073 I cr_LibraryLoader: Successfully loaded native library
+02-21 16:41:12.606 32024 32073 I cr_CachingUmaRecorder: Flushed 7 samples from 7 histograms, 0 samples were dropped.
+02-21 16:41:12.637 32024 32073 I onymous.innobe: The ClassLoaderContext is a special shared library.
+02-21 16:41:12.645 32024 32073 I System.out: port:443
+02-21 16:41:12.777 32024 32073 D OpenSSLLib: OpensslErr:Module:12(177:); file:external/boringssl/src/crypto/asn1/asn1_lib.c ;Line:168;Function:ASN1_get_object
+02-21 16:41:12.778 32024 32073 D OpenSSLLib: OpensslErr:Module:12(177:); file:external/boringssl/src/crypto/asn1/asn1_lib.c ;Line:168;Function:ASN1_get_object
+02-21 16:41:12.790 32024 32034 I onymous.innobe: Background concurrent copying GC freed 106677(4MB) AllocSpace objects, 14(360KB) LOS objects, 43% free, 7MB/13MB, paused 204us total 155.469ms
+02-21 16:41:12.938 32024 32058 I ReactNativeJS: [Updater] Current: 1.5.50 (269) | Remote: 1.5.51 (270)
+02-21 16:41:12.941 32024 32058 W ReactNativeJS: [Updater] Skipping update 1.5.51 (270) because it previously failed.
+02-21 16:41:12.971 32024 32042 D Surface : Surface::disconnect(this=0x80896000,api=1)
+02-21 16:41:12.971   366  1278 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:1,p:32024,c:366) disconnect(P): api 1
+02-21 16:41:12.972   366  1278 D BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:1,p:-1,c:366) getReleasedBuffers: returning mask 0xffffffffffffffff
+02-21 16:41:12.972 32024 32024 D View    : [Warning] assignParent to null: this = DecorView@1c15c5a[MainActivity]
+02-21 16:41:12.974   822  6314 V WindowManager: Remove Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} client=b06b632, surfaceController=Surface(name=com.anonymous.innobet/com.anonymous.innobet.MainActivity)/@0x13b27f5 Callers=com.android.server.wm.WindowState.removeIfPossible:1966 com.android.server.wm.WindowManagerService.removeWindow:1671 com.android.server.wm.Session.remove:226 android.view.IWindowSession$Stub.onTransact:261 com.android.server.wm.Session.onTransact:164 
+02-21 16:41:12.977   822  6314 V WindowManager: Changing focus from Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity EXITING} to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity} Callers=com.android.server.wm.WindowState.setupWindowForRemoveOnExit:2105 com.android.server.wm.WindowState.removeIfPossible:2076 com.android.server.wm.WindowState.removeIfPossible:1966 com.android.server.wm.WindowManagerService.removeWindow:1671 
+02-21 16:41:12.977   822  6314 D WindowManager: Input focus has changed to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:12.982   822   901 I WindowManager: Focus moving from Window{a0aff83 u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity EXITING} to Window{b81341b u0 com.anonymous.innobet/com.anonymous.innobet.MainActivity}
+02-21 16:41:13.170   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:47.701633,dur:1006.25,max:180.57,min:15.12
+02-21 16:41:13.204   366   386 W SurfaceFlinger: Attempting to set client state on removed layer: com.anonymous.innobet/com.anonymous.innobet.MainActivity#1
+02-21 16:41:13.205   366   386 W SurfaceFlinger: Attempting to destroy on removed layer: com.anonymous.innobet/com.anonymous.innobet.MainActivity#1
+02-21 16:41:13.217   366   366 I BufferQueueConsumer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:1,p:-1,c:-1) disconnect(C)
+02-21 16:41:13.219   366   366 I BufferQueue: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#1](this:0xae90b000,id:786,api:1,p:-1,c:-1) ~BufferQueueCore
+02-21 16:41:13.658 32024 32091 D ProfileInstaller: Skipping profile installation for com.anonymous.innobet
+02-21 16:41:14.807 31255 31255 D Log4jTimberTree: SimCardMonitorAlarmService - BaseMonitor - onStartCommand - Received a request...
+02-21 16:41:14.808 31255 32092 D Log4jTimberTree: doActionInternal: interval - 60000 | start - false
+02-21 16:41:14.809 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=143606
+02-21 16:41:14.821 31255 32092 D Log4jTimberTree: DeviceManager - monitorName: SimCardMonitorAlarmService = AppExecutionRestrictionsAlarmService
+02-21 16:41:14.822 31255 32092 D Log4jTimberTree: scheduleNextAlarm: interval - 60000
+02-21 16:41:14.826 31255 32092 D Log4jTimberTree: MonitorAlarmManager - SimCardMonitorAlarmService: Alarm canceled.
+02-21 16:41:14.828 31255 32092 D Log4jTimberTree: SimCardMonitorAlarmService: Next alarm in 62 seconds (~1 minutes).
+02-21 16:41:14.832  1009  1009 W NotificationEntryMgr: removeNotification for unknown key: 0|br.com.mobiltec.c4m.android.agent|999991|null|1000
+02-21 16:41:14.952   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:17.208   357   382 I libPowerHal: 15: cpu_ctrl set freq: -1 -1
+02-21 16:41:17.963   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:18.926   513   563 D ApmSession: Connect
+02-21 16:41:18.927   318   318 W hwservicemanager: getTransport: Cannot find entry vendor.mediatek.hardware.apmonitor@1.0::IAPMonitorService/default in either framework or device manifest.
+02-21 16:41:18.928   513   563 D ApmSession: Connect: false
+02-21 16:41:18.928   513   563 D ApmNative: apmIsKpiEnabled2: type = 54, ret = 0
+02-21 16:41:20.980   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:22.145   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:23.836   822  1052 D AES     : AEEIOCTL_GET/SET_SF_STATE IOCTL,cmd= 1074294797, lParam=0. 
+02-21 16:41:23.836   822  1052 D AES     : AEEIOCTL_RT_MON_Kick IOCTL,cmd= 2147774474, lParam=300. 
+02-21 16:41:23.837 30146 30146 I ADB_SERVICES: fdevent_loop length=1
+02-21 16:41:23.993   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:27.010   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:41:30.028   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:32.164   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:33.046   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:36.063   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:38.558 30146 31991 I ADB_SERVICES: post waitpid (pid=31990) status=0001
+02-21 16:41:39.075   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:42.087   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:42.184   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:45.104   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:48.123   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:41:51.139   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:52.203   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:41:52.579   497   943 I StepRecognize: batch: handle:16, flag:0,samplingPeriodNs:1000000 maxBatchReportLatencyNs:0
+
+02-21 16:41:52.579   497   943 E StepRecognize: no batch control attr
+
+02-21 16:41:52.579   497   943 E SensorManager: batch failed 16 0 1000000 0 err = -1
+02-21 16:41:52.579   822  6314 E SensorService: sensor batch failed 0x9c7a87a0 0x00000011 1000000 0 err=Operation not permitted
+02-21 16:41:52.584   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:41:52.584   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 3 lines
+02-21 16:41:52.584   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:41:52.584   357  1276 W IMGMemtrackHAL: hal_get_memory: memtrack cache rebuild was required
+02-21 16:41:52.591   497   943 I Accelerometer: batch: handle:0, flag:0,samplingPeriodNs:20000000 maxBatchReportLatencyNs:0
+
+02-21 16:41:52.593   497   943 I Accelerometer: flush, flushCnt:1
+02-21 16:41:52.593   497   497 I Accelerometer: flush complete, flushCnt:0
+02-21 16:41:53.106   497   943 I Accelerometer: batch: handle:0, flag:0,samplingPeriodNs:20000000 maxBatchReportLatencyNs:100000000
+
+02-21 16:41:53.132  1440  1867 I ActivityScheduler: nextTriggerTime: 89883654, in 238099ms, detectorType: 39, FULL_TYPE alarmWindowMillis: 80000
+02-21 16:41:54.154   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:41:55.734   489   523 E storaged: getDiskStats failed with result NOT_SUPPORTED and size 0
+02-21 16:41:56.265   695   723 I [BIP]   :  [BIP NL] event newlink match dev 0, interface index 31
+02-21 16:41:56.265   695   723 I [BIP]   :  [BIP NL] the link status of interface(index:0) changes to 1
+02-21 16:41:56.270   822   899 I EthernetTracker: interfaceLinkStateChanged, iface: wlan0, up: true
+02-21 16:41:57.160   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:00.028   366   386 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.33 dur=48712.75 max=47973.64 min=9.37
+02-21 16:42:00.041   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.085340,dur:46871.11,max:46819.90,min:16.29
+02-21 16:42:00.166   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:01.260 30146 30146 I ADB_SERVICES: fdevent_loop length=1
+02-21 16:42:01.261 30146 30146 I ADB_SERVICES: service_to_fd shell,v2:export ANDROID_LOG_TAGS=''; exec logcat '-d'
+02-21 16:42:01.313 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=6622
+02-21 16:42:01.401 30146 32113 I ADB_SERVICES: post waitpid (pid=32112) status=0000
+02-21 16:42:01.401 30146 30146 I ADB_SERVICES: for fd 25, revents = 2010
+02-21 16:42:01.401 30146 30146 I ADB_SERVICES: for fd 25, revents = 2010
+02-21 16:42:01.403 30146 30146 I ADB_SERVICES: ref_cnt != 0 ref_cnt=-1, id=6, peer->id=22
+02-21 16:42:02.222   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:03.179   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:09.196   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 2 lines
+02-21 16:42:12.213   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:12.242   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:15.231   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:16.835   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:42:16.835   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 3 lines
+02-21 16:42:16.835   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:42:16.835   357  1276 W IMGMemtrackHAL: hal_get_memory: memtrack cache rebuild was required
+02-21 16:42:16.882  1009  1009 W NotificationEntryMgr: removeNotification for unknown key: 0|br.com.mobiltec.c4m.android.agent|999991|null|1000
+02-21 16:42:18.249   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:18.929   318   318 W hwservicemanager: getTransport: Cannot find entry vendor.mediatek.hardware.apmonitor@1.0::IAPMonitorService/default in either framework or device manifest.
+02-21 16:42:21.266   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:22.256   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:24.284   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:27.296   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:42:30.308   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:32.275   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:33.320   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:36.328   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:42:39.346   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:42.295   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:42.363   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:48.391   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 2 lines
+02-21 16:42:51.403   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:52.309   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:42:54.415   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:42:55.735   489   523 E storaged: getDiskStats failed with result NOT_SUPPORTED and size 0
+02-21 16:42:57.433   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:00.006   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:00.008   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 3 lines
+02-21 16:43:00.008   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:00.034   366   386 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.05 dur=60005.24 max=59973.82 min=12.02
+02-21 16:43:00.046   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.049996,dur:60004.87,max:59975.64,min:14.58
+02-21 16:43:00.448   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:02.328   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:03.466   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:06.483   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:43:09.500   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:12.348   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:12.512   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:15.524   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:43:18.542   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:18.931   318   318 W hwservicemanager: getTransport: Cannot find entry vendor.mediatek.hardware.apmonitor@1.0::IAPMonitorService/default in either framework or device manifest.
+02-21 16:43:19.889   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:19.889   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 3 lines
+02-21 16:43:19.889   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:19.889   357  1276 W IMGMemtrackHAL: hal_get_memory: memtrack cache rebuild was required
+02-21 16:43:19.923  1009  1009 W NotificationEntryMgr: removeNotification for unknown key: 0|br.com.mobiltec.c4m.android.agent|999991|null|1000
+02-21 16:43:20.032   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:20.093   357  1276 I chatty  : uid=1000(system) HwBinder:357_3 identical 8 lines
+02-21 16:43:20.093   357  1276 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:43:21.559   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:22.368   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:24.578   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:27.471   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:27.487   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:27.590   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:30.605   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:32.034 31274 31304 I Finsky:background: [1596] Stats for Executor: bgExecutor vax@32196a5[Running, pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 36]
+02-21 16:43:32.140 31274 31304 I Finsky:background: [1596] Stats for Executor: LightweightExecutor vax@9d19a7a[Running, pool size = 3, active threads = 0, queued tasks = 0, completed tasks = 143]
+02-21 16:43:32.387   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:32.455 31274 31304 I Finsky:background: [1596] Stats for Executor: BlockingExecutor vax@fac222b[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 6]
+02-21 16:43:33.623   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:34.454   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:35.705   822   822 I chatty  : uid=1000 system_server identical 5 lines
+02-21 16:43:35.980   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:36.042   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:1,p:32024,c:366) queueBuffer: fps=0.06 dur=143889.32 max=143050.47 min=6.80
+02-21 16:43:36.048   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.083329,dur:36001.74,max:35971.85,min:14.51
+02-21 16:43:36.129   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:36.635   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:37.101   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:37.177   366   386 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:1,p:32024,c:366) queueBuffer: fps=4.41 dur=1134.93 max=1023.80 min=9.84
+02-21 16:43:37.184   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:4.399078,dur:1136.60,max:1023.36,min:16.40
+02-21 16:43:37.972  1582 32160 I System.out: port:443
+02-21 16:43:38.076   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:38.245  1582 32160 I com.xcheng.mdm: The ClassLoaderContext is a special shared library.
+02-21 16:43:38.246  1582 32160 I System.out: [OkHttp] sendRequest>>
+02-21 16:43:38.246  1582 32160 I System.out: [OkHttp] sendRequest<<
+02-21 16:43:39.645   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:40.722   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:40.780   366   387 I BufferQueueProducer: [com.anonymous.innobet/com.anonymous.innobet.MainActivity#0](this:0xae248000,id:785,api:1,p:32024,c:366) queueBuffer: fps=3.89 dur=3602.81 max=2789.41 min=15.06
+02-21 16:43:40.789   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:3.883262,dur:3605.22,max:2793.90,min:14.73
+02-21 16:43:40.901   822   822 I PowerWrap: PowerHal_TouchBoost
+02-21 16:43:42.405   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:42.663   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:45.681   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:48.675 31512 31528 I Finsky  : [1611] Stats for Executor: BlockingExecutor vax@e0aee68[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 22]
+02-21 16:43:48.675 31512 31528 I Finsky  : [1611] Stats for Executor: LightweightExecutor vax@bbb6281[Running, pool size = 3, active threads = 0, queued tasks = 0, completed tasks = 1051]
+02-21 16:43:48.699   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:48.725 31512 31528 I Finsky  : [1611] Stats for Executor: bgExecutor vax@7926f26[Running, pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 138]
+02-21 16:43:51.717   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:52.424   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:43:54.729   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:43:55.736   489   523 E storaged: getDiskStats failed with result NOT_SUPPORTED and size 0
+02-21 16:43:57.744   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:44:00.012   357   383 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:44:00.013   357   383 I chatty  : uid=1000(system) merged_hal_serv identical 3 lines
+02-21 16:44:00.013   357   383 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:44:00.023   366   386 I BufferQueueProducer: [StatusBar#0](this:0xae1f3000,id:4,api:1,p:1009,c:366) queueBuffer: fps=0.05 dur=59988.92 max=59956.32 min=13.23
+02-21 16:44:00.035   366   366 I SurfaceFlinger: [Built-in Screen (type:0)] fps:0.207843,dur:19245.30,max:19148.01,min:31.53
+02-21 16:44:00.153   357   383 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:44:00.154   357   383 I chatty  : uid=1000(system) merged_hal_serv identical 3 lines
+02-21 16:44:00.154   357   383 E IMGMemtrackHAL: GetGLMemtrackRecords: Subtracting per-pid stats from global stats would wrap. Clamping global stats to zero.
+02-21 16:44:00.755   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:44:02.443   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:44:03.767   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:44:06.779   822   968 I chatty  : uid=1000(system) WifiStateMachin identical 1 line
+02-21 16:44:09.798   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:44:12.462   504   504 I thermal_repeater: [recvMdThermalInfo] ret=28, strLen=127,  2, 32767, -127, 0, 32767, 0
+02-21 16:44:12.815   822   968 E WifiVendorHal: getWifiLinkLayerStats(l.937) failed {.code = ERROR_NOT_SUPPORTED, .description = }
+02-21 16:44:14.538 30146 30146 I ADB_SERVICES: fdevent_loop length=1
+02-21 16:44:14.538 30146 30146 I ADB_SERVICES: service_to_fd shell,v2:export ANDROID_LOG_TAGS=''; exec logcat '-d'
+02-21 16:44:14.590 30146 30146 I ADB_SERVICES: local_socket_flush_outgoing read_data=164733
