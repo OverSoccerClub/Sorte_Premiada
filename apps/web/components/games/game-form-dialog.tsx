@@ -106,6 +106,7 @@ export function GameFormDialog({ open, onOpenChange, gameToEdit, onSuccess }: Ga
                                 <SelectItem value="PAIPITA_AI">Palpita Ai (Loteca)</SelectItem>
                                 <SelectItem value="2X1000">2x1000 (Milhar)</SelectItem>
                                 <SelectItem value="LOTERIA_TRADICIONAL">Loteria Tradicional (Bicho)</SelectItem>
+                                <SelectItem value="MINUTO_SORTE">Minuto da Sorte</SelectItem>
                             </SelectContent>
                         </Select>
                         <p className="text-[10px] text-muted-foreground">O tipo define as regras de validação e interface. Não pode ser alterado após criar.</p>
