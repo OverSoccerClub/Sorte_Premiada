@@ -447,6 +447,7 @@ export default function DashboardPage() {
                                     <SelectItem value="all">Todos os Jogos</SelectItem>
                                     <SelectItem value="LOTERIA_TRADICIONAL">Loteria Tradicional</SelectItem>
                                     <SelectItem value="2x1000">2x1000</SelectItem>
+                                    <SelectItem value="MINUTO_SORTE">Minuto da Sorte</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -508,7 +509,7 @@ export default function DashboardPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="font-mono text-xs font-bold bg-slate-100 px-2 py-1 rounded text-slate-700">
-                                                    {sale.ticketNumber ? sale.ticketNumber.toString().padStart(4, '0') : '-'}
+                                                    {sale.ticketNumber ? sale.ticketNumber.toString().padStart(4, '0') : (sale.hash ? sale.hash.substring(0, 4) : '-')}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">

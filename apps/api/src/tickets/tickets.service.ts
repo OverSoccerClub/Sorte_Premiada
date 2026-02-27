@@ -291,15 +291,15 @@ export class TicketsService {
             }
         }
 
-        // 2x1000 Special Logic
-        if (data.gameType === '2x1000') {
-            const NUMBERS_PER_TICKET = 4;
+        // 2x1000 or MINUTO_SORTE Special Logic for ticketNumber
+        if (data.gameType === '2x1000' || data.gameType === 'MINUTO_SORTE') {
+            const NUMBERS_PER_TICKET = data.gameType === 'MINUTO_SORTE' ? 2 : 4;
             const isAutoPick = !data.numbers || data.numbers.length === 0;
 
-            if (isAutoPick) {
+            if (isAutoPick && data.gameType === '2x1000') {
                 const sNum = seriesNumber ? Number(seriesNumber) : undefined;
                 data.numbers = await this.generateRandomAvailableNumbers(gameId, NUMBERS_PER_TICKET, drawDate!, sNum);
-            } else {
+            } else if (data.gameType === '2x1000') {
                 if (data.numbers.length !== NUMBERS_PER_TICKET) {
                     throw new Error(`Ticket must have exactly ${NUMBERS_PER_TICKET} thousands.`);
                 }
