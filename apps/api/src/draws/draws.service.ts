@@ -239,6 +239,10 @@ export class DrawsService {
             const drawnHour = primeirosDigitios % 24;
             const drawnMinute = ultimosDigitios % 60;
 
+            const prizeAmbos = Number(fullDraw.game.prizeOursAmbos || 5000);
+            const prizeHora = Number(fullDraw.game.prizeOursHora || 100);
+            const prizeMinuto = Number(fullDraw.game.prizeOursMinuto || 50);
+
             for (const ticket of tickets) {
                 if (!ticket.numbers || (ticket.numbers as string[]).length < 2) continue;
 
@@ -249,17 +253,23 @@ export class DrawsService {
                 let isWin = false;
                 let wonAmount = 0;
 
-                if (isHourMatch || isMinuteMatch) {
+                if (isHourMatch && isMinuteMatch) {
                     isWin = true;
-                    // Multiplier logic
-                    let multiplier = 0;
-                    if (isHourMatch && isMinuteMatch) multiplier = 15;
-                    else if (isHourMatch) multiplier = 10;
-                    else multiplier = 5;
-
-                    wonAmount = Number(ticket.amount) * multiplier;
-                    if (wonAmount > 500) wonAmount = 500; // Teto Máximo
+                    wonAmount = prizeAmbos;
+                } else if (isHourMatch) {
+                    isWin = true;
+                    wonAmount = prizeHora;
+                } else if (isMinuteMatch) {
+                    isWin = true;
+                    wonAmount = prizeMinuto;
                 }
+
+                // Ajustar proporcional ao valor apostado? 
+                // A especificação diz "R$ 5.000,00 (Exemplo para aposta de R$ 10,00)"
+                // Isso sugere que o prêmio configurado é para a aposta de R$ 10,00.
+                // Então prémio final = (Aposta / 10) * ValorConfigurado
+                const betAmount = Number(ticket.amount);
+                wonAmount = (betAmount / 10) * wonAmount;
 
                 await this.updateTicketStatus(tx, ticket, isWin ? 'WON' : 'LOST', wonAmount, () => {
                     if (isWin) wonCount++; else lostCount++;

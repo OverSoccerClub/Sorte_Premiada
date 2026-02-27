@@ -60,6 +60,9 @@ export class GamesController {
                 prizeMilhar: game.prizeMilhar ? Number(game.prizeMilhar) : null,
                 prizeCentena: game.prizeCentena ? Number(game.prizeCentena) : null,
                 prizeDezena: game.prizeDezena ? Number(game.prizeDezena) : null,
+                prizeOursAmbos: game.prizeOursAmbos ? Number(game.prizeOursAmbos) : null,
+                prizeOursHora: game.prizeOursHora ? Number(game.prizeOursHora) : null,
+                prizeOursMinuto: game.prizeOursMinuto ? Number(game.prizeOursMinuto) : null,
                 maxLiability: Number(game.maxLiability),
                 prizeMultiplier: Number(game.prizeMultiplier),
                 commissionRate: Number(game.commissionRate)

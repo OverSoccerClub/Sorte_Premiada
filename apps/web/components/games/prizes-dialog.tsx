@@ -16,7 +16,14 @@ interface PrizesDialogProps {
 
 export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDialogProps) {
     const { showAlert } = useAlert()
-    const [prizeValues, setPrizeValues] = useState({ milhar: "", centena: "", dezena: "" })
+    const [prizeValues, setPrizeValues] = useState({
+        milhar: "",
+        centena: "",
+        dezena: "",
+        prizeOursAmbos: "",
+        prizeOursHora: "",
+        prizeOursMinuto: ""
+    })
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
@@ -24,7 +31,10 @@ export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDial
             setPrizeValues({
                 milhar: game.prizeMilhar ? String(Number(game.prizeMilhar)) : "5000",
                 centena: game.prizeCentena ? String(Number(game.prizeCentena)) : "600",
-                dezena: game.prizeDezena ? String(Number(game.prizeDezena)) : "60"
+                dezena: game.prizeDezena ? String(Number(game.prizeDezena)) : "60",
+                prizeOursAmbos: game.prizeOursAmbos ? String(Number(game.prizeOursAmbos)) : "5000",
+                prizeOursHora: game.prizeOursHora ? String(Number(game.prizeOursHora)) : "100",
+                prizeOursMinuto: game.prizeOursMinuto ? String(Number(game.prizeOursMinuto)) : "50"
             })
         }
     }, [open, game])
@@ -35,10 +45,16 @@ export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDial
         try {
             const token = localStorage.getItem("token")
 
-            const payload = {
+            const payload: any = {
                 prizeMilhar: Number(prizeValues.milhar),
                 prizeCentena: Number(prizeValues.centena),
                 prizeDezena: Number(prizeValues.dezena)
+            }
+
+            if (game.type === 'MINUTO_SORTE') {
+                payload.prizeOursAmbos = Number(prizeValues.prizeOursAmbos)
+                payload.prizeOursHora = Number(prizeValues.prizeOursHora)
+                payload.prizeOursMinuto = Number(prizeValues.prizeOursMinuto)
             }
 
             const res = await fetch(`${API_URL}/games/${game.id}`, {
@@ -72,45 +88,91 @@ export function PrizesDialog({ open, onOpenChange, game, onSuccess }: PrizesDial
                     <DialogDescription>Defina os valores de premiação para cada acerto.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label>Prêmio Milhar (Acerto de 4 dígitos)</Label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
-                            <Input
-                                type="number"
-                                className="pl-9"
-                                value={prizeValues.milhar}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, milhar: e.target.value })}
-                                placeholder="Ex: 10000"
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Prêmio Centena (Acerto de 3 dígitos)</Label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
-                            <Input
-                                type="number"
-                                className="pl-9"
-                                value={prizeValues.centena}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, centena: e.target.value })}
-                                placeholder="Ex: 100"
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Prêmio Dezena (Acerto de 2 dígitos)</Label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
-                            <Input
-                                type="number"
-                                className="pl-9"
-                                value={prizeValues.dezena}
-                                onChange={(e) => setPrizeValues({ ...prizeValues, dezena: e.target.value })}
-                                placeholder="Ex: 10"
-                            />
-                        </div>
-                    </div>
+                    {game?.type === 'MINUTO_SORTE' ? (
+                        <>
+                            <div className="space-y-2">
+                                <Label>Prêmio Ambos (Hora e Minuto)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.prizeOursAmbos}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, prizeOursAmbos: e.target.value })}
+                                        placeholder="Ex: 5000"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Prêmio Só Hora</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.prizeOursHora}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, prizeOursHora: e.target.value })}
+                                        placeholder="Ex: 100"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Prêmio Só Minuto</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.prizeOursMinuto}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, prizeOursMinuto: e.target.value })}
+                                        placeholder="Ex: 50"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="space-y-2">
+                                <Label>Prêmio Milhar (Acerto de 4 dígitos)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.milhar}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, milhar: e.target.value })}
+                                        placeholder="Ex: 10000"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Prêmio Centena (Acerto de 3 dígitos)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.centena}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, centena: e.target.value })}
+                                        placeholder="Ex: 100"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Prêmio Dezena (Acerto de 2 dígitos)</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-muted-foreground">R$</span>
+                                    <Input
+                                        type="number"
+                                        className="pl-9"
+                                        value={prizeValues.dezena}
+                                        onChange={(e) => setPrizeValues({ ...prizeValues, dezena: e.target.value })}
+                                        placeholder="Ex: 10"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>

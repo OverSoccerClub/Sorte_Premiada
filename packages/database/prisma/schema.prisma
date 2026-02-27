@@ -261,6 +261,11 @@ model Game {
   prizeDezena  Decimal? @default(60) // Prêmio para Dezena Seca
   prizeGrupo   Decimal? @default(18) // Prêmio para Grupo (Loteria Tradicional)
 
+  // Custom Prize Configuration (Minuto da Sorte)
+  prizeOursAmbos  Decimal? @default(5000) // Acertou Hora e Minuto
+  prizeOursHora   Decimal? @default(100)  // Acertou só a Hora
+  prizeOursMinuto Decimal? @default(50)   // Acertou só o Minuto
+
   // Ticket Numbering Configuration
   ticketNumberingMode String? @default("RANDOM") // "RANDOM" ou "SEQUENTIAL"
   maxTicketsPerSeries Int?    @default(2500) // Limite de bilhetes por série

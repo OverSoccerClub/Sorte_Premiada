@@ -214,8 +214,18 @@ export function ScheduleDialog({ open, onOpenChange, game, onSuccess }: Schedule
             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Horários de Extração - {game?.name}</DialogTitle>
-                    <DialogDescription>Configure os horários de sorteio Globais e por Praça.</DialogDescription>
+                    <DialogDescription>
+                        {game?.type === 'MINUTO_SORTE'
+                            ? "Para o Minuto da Sorte, defina o horário em que o sorteio da Loteria Federal costuma ocorrer (ex: 19:00). Isso serve para informar ao usuário quando será a apuração."
+                            : "Configure os horários de sorteio Globais e por Praça."}
+                    </DialogDescription>
                 </DialogHeader>
+
+                {game?.type === 'MINUTO_SORTE' && (
+                    <div className="mx-6 mt-2 p-3 bg-blue-50 border border-blue-100 rounded-md text-xs text-blue-700">
+                        <strong>Nota:</strong> O Minuto da Sorte geralmente tem apenas <strong>um horário por dia</strong> (vinculado à Loteria Federal). Diferente de outros jogos, você não precisa de múltiplos horários diários.
+                    </div>
+                )}
 
                 <Tabs defaultValue="global" value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
                     <TabsList className="grid w-full grid-cols-2">
