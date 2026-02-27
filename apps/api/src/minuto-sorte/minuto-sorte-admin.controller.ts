@@ -2,6 +2,8 @@ import { Controller, Post, Body, UseGuards, Request, BadRequestException } from 
 import { DrawsService } from '../draws/draws.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/permissions.guard';
+import { RequirePermissions } from '../auth/permissions.decorator';
 
 @Controller('admin/minuto-sorte')
 export class MinutoSorteAdminController {
@@ -11,11 +13,9 @@ export class MinutoSorteAdminController {
     ) { }
 
     @Post('draw')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @RequirePermissions('MANAGE_MINUTO_SORTE')
     async processDraw(@Request() req: any, @Body() body: any) {
-        if (req.user.role !== 'MASTER' && req.user.role !== 'ADMIN') {
-            throw new BadRequestException("Apenas administradores podem processar sorteios.");
-        }
 
         const game = await this.prisma.client.game.findFirst({
             where: { companyId: req.user.companyId, type: 'MINUTO_SORTE' }

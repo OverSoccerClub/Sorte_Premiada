@@ -62,6 +62,9 @@ export const PERMISSIONS = {
     MANAGE_DEVICES: 'MANAGE_DEVICES',
     VIEW_LOGS: 'VIEW_LOGS',
     MANAGE_ANNOUNCEMENTS: 'MANAGE_ANNOUNCEMENTS',
+
+    // === MINUTO DA SORTE (1) ===
+    MANAGE_MINUTO_SORTE: 'MANAGE_MINUTO_SORTE',
 } as const;
 
 export type PermissionKey = keyof typeof PERMISSIONS;
@@ -129,6 +132,9 @@ export const PERMISSION_LABELS: Record<string, string> = {
     [PERMISSIONS.VIEW_PALPITA]: 'Visualizar Concursos Palpita Ai',
     [PERMISSIONS.CREATE_PALPITA_DRAW]: 'Criar Concursos Palpita Ai',
     [PERMISSIONS.MANAGE_PALPITA_RESULTS]: 'Apurar Resultados Palpita Ai',
+
+    // Minuto da Sorte
+    [PERMISSIONS.MANAGE_MINUTO_SORTE]: 'Gerenciar Sorteios Minuto da Sorte',
 };
 
 export const PERMISSION_GROUPS = {
@@ -194,5 +200,8 @@ export const PERMISSION_GROUPS = {
         PERMISSIONS.VIEW_PALPITA,
         PERMISSIONS.CREATE_PALPITA_DRAW,
         PERMISSIONS.MANAGE_PALPITA_RESULTS,
+    ],
+    'Minuto da Sorte': [
+        PERMISSIONS.MANAGE_MINUTO_SORTE,
     ],
 };

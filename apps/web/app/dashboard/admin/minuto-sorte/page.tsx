@@ -10,16 +10,18 @@ import { Calendar as CalendarIcon, Save, Ticket, AlertCircle, CheckCircle2 } fro
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERMISSIONS } from "@/lib/permissions";
 
 export default function MinutoSorteAdminPage() {
     const { user, token } = useAuth();
+    const { hasPermission } = usePermissions();
     const [date, setDate] = useState<Date>(new Date());
     const [lotteryNumber, setLotteryNumber] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // In a multi-tenant environment, only MASTER or users with specific permission can insert Loteria Federal.
-    // For Minuto da Sorte, we'll restrict to MASTER for safety, or allow standard admin.
-    if (user?.role !== "MASTER" && user?.role !== "ADMIN") {
+    // Access control using granular permissions
+    if (!hasPermission(PERMISSIONS.MANAGE_MINUTO_SORTE)) {
         return (
             <div className="flex flex-col items-center justify-center p-8 text-center bg-card rounded-xl border border-destructive/20 mt-8">
                 <AlertCircle className="w-12 h-12 text-destructive mb-4" />
