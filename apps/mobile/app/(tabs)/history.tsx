@@ -442,6 +442,14 @@ export default function HistoryScreen() {
                     // Additional messages from Game Config if available (might need to fetch game details if not in ticket)
                     promptMessage: selectedTicket.game?.promptMessage,
                     mainMatchMessage: selectedTicket.game?.mainMatchMessage,
+                    // Minuto da Sorte Structured Data
+                    minutoSorteData: selectedTicket.gameType === 'MINUTO_SORTE' ? {
+                        chosenHour: Number(selectedTicket.numbers?.[0] || 0),
+                        purchaseMinute: Number(selectedTicket.numbers?.[1] || 0),
+                        prizeOursHora: selectedTicket.game?.prizeOursHora ? `R$ ${Number((Number(selectedTicket.amount) / 10) * selectedTicket.game.prizeOursHora).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                        prizeOursMinuto: selectedTicket.game?.prizeOursMinuto ? `R$ ${Number((Number(selectedTicket.amount) / 10) * selectedTicket.game.prizeOursMinuto).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                        prizeOursAmbos: selectedTicket.game?.prizeOursAmbos ? `R$ ${Number((Number(selectedTicket.amount) / 10) * selectedTicket.game.prizeOursAmbos).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,
+                    } : undefined
                 } as TicketData) : null}
             />
 

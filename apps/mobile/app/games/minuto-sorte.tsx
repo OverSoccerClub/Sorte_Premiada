@@ -156,6 +156,13 @@ export default function GameMinutoSorteScreen() {
                 status: ticketData.status,
                 websiteUrl: companySettings?.websiteUrl || undefined,
                 promptMessage: "Escaneie o QR Code para conferir",
+                minutoSorteData: {
+                    chosenHour: boughtHour,
+                    purchaseMinute: boughtMinute,
+                    prizeOursHora: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((ticketData.amount / 10) * (ticketData.game?.prizeOursHora || 15)),
+                    prizeOursMinuto: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((ticketData.amount / 10) * (ticketData.game?.prizeOursMinuto || 15)),
+                    prizeOursAmbos: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((ticketData.amount / 10) * (ticketData.game?.prizeOursAmbos || 500)),
+                }
             };
 
             setLastTicket(fullTicket);
@@ -277,6 +284,13 @@ export default function GameMinutoSorteScreen() {
                                         companyName: settings.companyName,
                                         companyLogoUrl: settings.logoUrl,
                                         websiteUrl: companySettings?.websiteUrl || undefined,
+                                        minutoSorteData: {
+                                            chosenHour: parseInt(chosenHour, 10),
+                                            purchaseMinute: getBrazilNowDate().getMinutes(),
+                                            prizeOursHora: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((gamePrice / 10) * (15)), // Preview constant
+                                            prizeOursMinuto: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((gamePrice / 10) * (15)),
+                                            prizeOursAmbos: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((gamePrice / 10) * (500)),
+                                        }
                                     }}
                                     mode="preview"
                                     scale={0.8}

@@ -1,3 +1,4 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors
 > Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors
 > Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
@@ -21,7 +22,7 @@
 > Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
 > Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
 > Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
-> Task :expo-updates-gradle-plugin:compileKotlin
+> Task :expo-updates-gradle-plugin:compileKotlin UP-TO-DATE
 > Task :expo-updates-gradle-plugin:compileJava NO-SOURCE
 > Task :expo-updates-gradle-plugin:classes UP-TO-DATE
 > Task :expo-updates-gradle-plugin:jar UP-TO-DATE
@@ -164,7 +165,7 @@ To suppress this warning, remove "buildToolsVersion '32.0.0'" from your build.gr
 > Task :app:generateCodegenArtifactsFromSchema SKIPPED
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preReleaseBuild UP-TO-DATE
-> Task :app:generateReleaseBuildConfig
+> Task :app:generateReleaseBuildConfig UP-TO-DATE
 > Task :expo:generateExpoModulesPackageListTask UP-TO-DATE
 > Task :expo:preBuild UP-TO-DATE
 > Task :expo:preReleaseBuild UP-TO-DATE
@@ -285,7 +286,7 @@ To suppress this warning, remove "buildToolsVersion '32.0.0'" from your build.gr
 > Task :app:createBundleReleaseJsAndAssets
 Starting Metro Bundler
 warning: Bundler cache is empty, rebuilding (this may take a minute)
-Android Bundled 17139ms index.js (1883 modules)
+Android Bundled 16398ms index.js (1884 modules)
 Writing bundle output to: android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle
 Writing sourcemap output to: android\app\build\intermediates\sourcemaps\react\release\index.android.bundle.packager.map
 Copying 78 asset files
@@ -405,34 +406,34 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:91993:16: warning: Direct call to eval(), but lexical scope is not supported.
         return eval(body);
                ^~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:100746:9: warning: the variable "REACT_NAVIGATION_DEVTOOLS" was not declared in anonymous arrow function " 3698#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:100752:9: warning: the variable "REACT_NAVIGATION_DEVTOOLS" was not declared in anonymous arrow function " 3698#"
         REACT_NAVIGATION_DEVTOOLS.set(refContainer.current, {
         ^~~~~~~~~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:106072:16: warning: the variable "requestIdleCallback" was not declared in anonymous arrow function " 3915#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:106078:16: warning: the variable "requestIdleCallback" was not declared in anonymous arrow function " 3915#"
       var id = requestIdleCallback(() => {
                ^~~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:106075:20: warning: the variable "cancelIdleCallback" was not declared in anonymous arrow function " 3917#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:106081:20: warning: the variable "cancelIdleCallback" was not declared in anonymous arrow function " 3917#"
       return () => cancelIdleCallback(id);
                    ^~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:109587:11: warning: the variable "cancelAnimationFrame" was not declared in function "cleanup 1#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:109593:11: warning: the variable "cancelAnimationFrame" was not declared in function "cleanup 1#"
           cancelAnimationFrame(this.splashScreenAnimationFrame);
           ^~~~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:110767:16: warning: the variable "ReactNativeWebView" was not declared in function "emitDomEvent"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:110773:16: warning: the variable "ReactNativeWebView" was not declared in function "emitDomEvent"
     if (typeof ReactNativeWebView !== 'undefined') {
                ^~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152813:25: warning: the variable "Atomics" was not declared in anonymous function " 4893#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152819:25: warning: the variable "Atomics" was not declared in anonymous function " 4893#"
     '%Atomics%': typeof Atomics === 'undefined' ? undefined : Atomics,
                         ^~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152828:30: warning: the variable "Float16Array" was not declared in anonymous function " 4893#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152834:30: warning: the variable "Float16Array" was not declared in anonymous function " 4893#"
     '%Float16Array%': typeof Float16Array === 'undefined' ? undefined : Float...
                              ^~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152831:38: warning: the variable "FinalizationRegistry" was not declared in anonymous function " 4893#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152837:38: warning: the variable "FinalizationRegistry" was not declared in anonymous function " 4893#"
 ...lizationRegistry%': typeof FinalizationRegistry === 'undefined' ? undefine...
                               ^~~~~~~~~~~~~~~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152871:25: warning: the variable "WeakRef" was not declared in anonymous function " 4893#"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:152877:25: warning: the variable "WeakRef" was not declared in anonymous function " 4893#"
     '%WeakRef%': typeof WeakRef === 'undefined' ? undefined : WeakRef,
                         ^~~~~~~
-android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:187704:16: warning: the variable "hasOwnProperty" was not declared in function "getType"
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:187743:16: warning: the variable "hasOwnProperty" was not declared in function "getType"
         return hasOwnProperty.call(this.types, name) ? this.types[name] : null;
                ^~~~~~~~~~~~~~
 
@@ -545,10 +546,12 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-worklets-core:generateReleaseResValues UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:packageReleaseResources UP-TO-DATE
-> Task :app:mapReleaseSourceSetPaths
-> Task :app:generateReleaseResources
-> Task :app:packageReleaseResources
-> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateReleaseResources UP-TO-DATE
+> Task :app:mergeReleaseResources UP-TO-DATE
+> Task :app:packageReleaseResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources UP-TO-DATE
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksRelease UP-TO-DATE
 > Task :expo:extractDeepLinksRelease UP-TO-DATE
 > Task :expo:processReleaseManifest UP-TO-DATE
@@ -563,7 +566,6 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :expo-constants:extractDeepLinksRelease UP-TO-DATE
 > Task :expo-constants:processReleaseManifest UP-TO-DATE
 > Task :expo-device:extractDeepLinksRelease UP-TO-DATE
-> Task :app:parseReleaseLocalResources
 > Task :expo-device:processReleaseManifest UP-TO-DATE
 > Task :expo-eas-client:extractDeepLinksRelease UP-TO-DATE
 > Task :expo-eas-client:processReleaseManifest UP-TO-DATE
@@ -623,13 +625,9 @@ android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.
 > Task :react-native-view-shot:processReleaseManifest UP-TO-DATE
 > Task :react-native-worklets-core:extractDeepLinksRelease UP-TO-DATE
 > Task :react-native-worklets-core:processReleaseManifest UP-TO-DATE
-> Task :app:mergeReleaseResources
-
-> Task :app:processReleaseMainManifest
-C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml Warning:
-	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:0 to replace other declarations but no other declaration present
-
-> Task :app:processReleaseManifest
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
 > Task :expo:compileReleaseLibraryResources UP-TO-DATE
 > Task :expo:parseReleaseLocalResources UP-TO-DATE
 > Task :expo:generateReleaseRFile UP-TO-DATE
@@ -738,6 +736,7 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-worklets-core:compileReleaseLibraryResources UP-TO-DATE
 > Task :react-native-worklets-core:parseReleaseLocalResources UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseRFile UP-TO-DATE
+> Task :app:processReleaseResources UP-TO-DATE
 > Task :expo:checkKotlinGradlePluginConfigurationErrors
 > Task :expo:generateReleaseBuildConfig UP-TO-DATE
 > Task :expo-application:checkKotlinGradlePluginConfigurationErrors
@@ -810,7 +809,6 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo-json-utils:generateReleaseBuildConfig UP-TO-DATE
 > Task :expo-json-utils:compileReleaseKotlin UP-TO-DATE
 > Task :expo-json-utils:javaPreCompileRelease UP-TO-DATE
-> Task :app:processReleaseManifestForPackage
 > Task :expo-json-utils:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :expo-json-utils:bundleLibCompileToJarRelease UP-TO-DATE
 > Task :expo-keep-awake:checkKotlinGradlePluginConfigurationErrors
@@ -939,8 +937,10 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-worklets-core:javaPreCompileRelease UP-TO-DATE
 > Task :react-native-worklets-core:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :react-native-worklets-core:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :app:compileReleaseKotlin UP-TO-DATE
 > Task :app:buildKotlinToolingMetadata UP-TO-DATE
 > Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :app:compileReleaseJavaWithJavac UP-TO-DATE
 > Task :app:extractProguardFiles UP-TO-DATE
 > Task :expo:bundleLibRuntimeToJarRelease UP-TO-DATE
 > Task :expo:processReleaseJavaRes UP-TO-DATE
@@ -1158,6 +1158,7 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-worklets-core:extractProguardFiles UP-TO-DATE
 > Task :react-native-worklets-core:generateReleaseLintModel UP-TO-DATE
 > Task :react-native-worklets-core:prepareLintJarForPublish UP-TO-DATE
+> Task :app:generateReleaseLintVitalReportModel UP-TO-DATE
 > Task :expo:mergeReleaseJniLibFolders UP-TO-DATE
 > Task :expo:mergeReleaseNativeLibs NO-SOURCE
 > Task :expo:stripReleaseDebugSymbols NO-SOURCE
@@ -1193,7 +1194,6 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-screens:configureCMakeRelWithDebInfo[arm64-v8a]
 > Task :react-native-screens:buildCMakeRelWithDebInfo[arm64-v8a]
 > Task :react-native-screens:configureCMakeRelWithDebInfo[armeabi-v7a]
-> Task :app:processReleaseResources
 > Task :react-native-screens:buildCMakeRelWithDebInfo[armeabi-v7a]
 > Task :react-native-screens:configureCMakeRelWithDebInfo[x86]
 > Task :react-native-screens:buildCMakeRelWithDebInfo[x86]
@@ -1280,10 +1280,7 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-ping:syncReleaseLibJars UP-TO-DATE
 > Task :react-native-ping:bundleReleaseLocalLintAar UP-TO-DATE
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[arm64-v8a]
-> Task :app:compileReleaseKotlin
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[arm64-v8a]
-> Task :app:compileReleaseJavaWithJavac
-> Task :app:generateReleaseLintVitalReportModel
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[armeabi-v7a]
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[armeabi-v7a]
 > Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
@@ -1963,12 +1960,14 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo-updates-interface:bundleLibRuntimeToDirRelease UP-TO-DATE
 > Task :expo-modules-core:bundleLibRuntimeToDirRelease UP-TO-DATE
 > Task :app:checkReleaseDuplicateClasses UP-TO-DATE
-> Task :app:dexBuilderRelease
+> Task :app:dexBuilderRelease UP-TO-DATE
 > Task :app:desugarReleaseFileDependencies UP-TO-DATE
 > Task :app:mergeReleaseStartupProfile UP-TO-DATE
 > Task :app:mergeExtDexRelease UP-TO-DATE
+> Task :app:mergeDexRelease UP-TO-DATE
 > Task :app:mergeReleaseArtProfile UP-TO-DATE
 > Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:compileReleaseArtProfile UP-TO-DATE
 > Task :app:mergeReleaseShaders UP-TO-DATE
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:createReleaseUpdatesResources UP-TO-DATE
@@ -1977,6 +1976,7 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :app:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :app:processReleaseJavaRes UP-TO-DATE
 > Task :app:mergeReleaseJavaResource UP-TO-DATE
+> Task :app:optimizeReleaseResources UP-TO-DATE
 > Task :app:collectReleaseDependencies UP-TO-DATE
 > Task :app:sdkReleaseDependencyData UP-TO-DATE
 > Task :app:validateSigningRelease UP-TO-DATE
@@ -1985,11 +1985,11 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo:bundleReleaseAar UP-TO-DATE
 > Task :expo:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo:mergeReleaseResources UP-TO-DATE
+> Task :app:compressReleaseAssets
 > Task :expo:verifyReleaseResources UP-TO-DATE
 > Task :expo:assembleRelease UP-TO-DATE
 > Task :expo-application:bundleReleaseAar UP-TO-DATE
 > Task :expo-application:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:compressReleaseAssets
 > Task :expo-application:mergeReleaseResources UP-TO-DATE
 > Task :expo-application:verifyReleaseResources UP-TO-DATE
 > Task :expo-application:assembleRelease UP-TO-DATE
@@ -2015,7 +2015,6 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo-constants:assembleRelease
 > Task :expo-device:bundleReleaseAar UP-TO-DATE
 > Task :expo-device:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :expo:lintVitalAnalyzeRelease
 > Task :expo-device:mergeReleaseResources UP-TO-DATE
 > Task :expo-device:verifyReleaseResources UP-TO-DATE
 > Task :expo-device:assembleRelease UP-TO-DATE
@@ -2024,7 +2023,6 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo-eas-client:mergeReleaseResources UP-TO-DATE
 > Task :expo-eas-client:verifyReleaseResources UP-TO-DATE
 > Task :expo-eas-client:assembleRelease UP-TO-DATE
-> Task :app:optimizeReleaseResources
 > Task :expo-file-system:bundleReleaseAar UP-TO-DATE
 > Task :expo-file-system:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :expo-file-system:mergeReleaseResources UP-TO-DATE
@@ -2057,15 +2055,12 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :expo-linking:assembleRelease UP-TO-DATE
 > Task :expo-location:bundleReleaseAar UP-TO-DATE
 > Task :expo-location:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:lintVitalAnalyzeRelease
 > Task :expo-location:mergeReleaseResources UP-TO-DATE
 > Task :expo-location:verifyReleaseResources UP-TO-DATE
 > Task :expo-location:assembleRelease UP-TO-DATE
 > Task :expo-manifests:bundleReleaseAar UP-TO-DATE
 > Task :expo-manifests:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:lintVitalReportRelease
 > Task :expo-manifests:mergeReleaseResources UP-TO-DATE
-> Task :app:lintVitalRelease
 > Task :expo-manifests:verifyReleaseResources UP-TO-DATE
 > Task :expo-manifests:assembleRelease UP-TO-DATE
 > Task :expo-modules-core:bundleReleaseAar UP-TO-DATE
@@ -2130,11 +2125,12 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-community_netinfo:assembleRelease UP-TO-DATE
 > Task :react-native-ping:bundleReleaseAar UP-TO-DATE
 > Task :react-native-ping:mapReleaseSourceSetPaths UP-TO-DATE
-> Task :app:mergeDexRelease
 > Task :react-native-ping:mergeReleaseResources UP-TO-DATE
 > Task :react-native-ping:verifyReleaseResources UP-TO-DATE
 > Task :react-native-ping:assembleRelease UP-TO-DATE
 > Task :react-native-reanimated:bundleReleaseAar UP-TO-DATE
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect UP-TO-DATE
 > Task :react-native-reanimated:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :react-native-reanimated:mergeReleaseResources UP-TO-DATE
 > Task :react-native-reanimated:verifyReleaseResources UP-TO-DATE
@@ -2147,7 +2143,6 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-screens:bundleReleaseAar UP-TO-DATE
 > Task :react-native-screens:mapReleaseSourceSetPaths UP-TO-DATE
 > Task :react-native-screens:mergeReleaseResources UP-TO-DATE
-> Task :app:compileReleaseArtProfile
 > Task :react-native-screens:verifyReleaseResources UP-TO-DATE
 > Task :react-native-screens:assembleRelease UP-TO-DATE
 > Task :react-native-svg:bundleReleaseAar UP-TO-DATE
@@ -2170,9 +2165,11 @@ C:\Projetos\App\InnoBet\apps\mobile\android\app\src\main\AndroidManifest.xml War
 > Task :react-native-worklets-core:mergeReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:verifyReleaseResources UP-TO-DATE
 > Task :react-native-worklets-core:assembleRelease UP-TO-DATE
-> Task :app:packageRelease
-> Task :app:createReleaseApkListingFileRedirect
+> Task :expo:lintVitalAnalyzeRelease
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease UP-TO-DATE
+> Task :app:lintVitalRelease
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 25s
-1608 actionable tasks: 99 executed, 1509 up-to-date
+BUILD SUCCESSFUL in 2m 18s
+1608 actionable tasks: 78 executed, 1530 up-to-date

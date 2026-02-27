@@ -53,6 +53,14 @@ export interface TicketData {
     }[];
     bannerText?: string;
     websiteUrl?: string;
+    // Minuto da Sorte specific
+    minutoSorteData?: {
+        chosenHour: number;
+        purchaseMinute: number;
+        prizeOursHora?: string;
+        prizeOursMinuto?: string;
+        prizeOursAmbos?: string;
+    };
 }
 
 interface TicketContentProps {
@@ -234,6 +242,75 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             )}
 
+            {/* Premium Minuto da Sorte Section */}
+            {data.gameName === 'MINUTO DA SORTE' && data.minutoSorteData && (
+                <View style={tw`my-1 px-2`}>
+                    <View style={tw`border-[2px] border-black rounded-xl p-2 bg-gray-50 items-center`}>
+                        <View style={tw`flex-row justify-around w-full mb-2`}>
+                            {/* HORA BOX */}
+                            <View style={tw`items-center`}>
+                                <Text style={tw`text-[10px] font-black text-black uppercase mb-1`}>HORA DA SORTE</Text>
+                                <View style={tw`bg-black rounded-lg p-2 items-center justify-center w-16 h-16`}>
+                                    <Text style={tw`text-white font-black text-3xl`}>
+                                        {data.minutoSorteData.chosenHour.toString().padStart(2, '0')}
+                                    </Text>
+                                </View>
+                                <Ionicons name="time-outline" size={16} color="black" style={tw`mt-1`} />
+                            </View>
+
+                            {/* DIVIDER ICON */}
+                            <View style={tw`justify-center pt-4`}>
+                                <MaterialCommunityIcons name="clock-fast" size={30} color="black" />
+                            </View>
+
+                            {/* MINUTO BOX */}
+                            <View style={tw`items-center`}>
+                                <Text style={tw`text-[10px] font-black text-black uppercase mb-1`}>MINUTO DA SORTE</Text>
+                                <View style={tw`border-[3px] border-black rounded-lg p-2 items-center justify-center w-16 h-16`}>
+                                    <Text style={tw`text-black font-black text-3xl`}>
+                                        {data.minutoSorteData.purchaseMinute.toString().padStart(2, '0')}
+                                    </Text>
+                                </View>
+                                <MaterialCommunityIcons name="history" size={16} color="black" style={tw`mt-1`} />
+                            </View>
+                        </View>
+
+                        <View style={tw`w-full border-t border-dashed border-gray-400 my-1`} />
+
+                        {/* PRIZE LIST - PREMIUM STYLE */}
+                        <View style={tw`w-full`}>
+                            <Text style={tw`text-[9px] font-black text-black text-center mb-2 tracking-widest uppercase`}>
+                                CATEGORIAS DE PREMIAÇÃO
+                            </Text>
+
+                            <View style={tw`flex-row justify-between mb-1 px-2`}>
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="medal-outline" size={12} color="black" style={tw`mr-1`} />
+                                    <Text style={tw`text-[11px] font-bold text-black uppercase`}>ACERTO HORA:</Text>
+                                </View>
+                                <Text style={tw`text-[12px] font-black text-black`}>{data.minutoSorteData.prizeOursHora || 'R$ 0,00'}</Text>
+                            </View>
+
+                            <View style={tw`flex-row justify-between mb-1 px-2`}>
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="medal-outline" size={12} color="black" style={tw`mr-1`} />
+                                    <Text style={tw`text-[11px] font-bold text-black uppercase`}>ACERTO MINUTO:</Text>
+                                </View>
+                                <Text style={tw`text-[12px] font-black text-black`}>{data.minutoSorteData.prizeOursMinuto || 'R$ 0,00'}</Text>
+                            </View>
+
+                            <View style={tw`flex-row justify-between px-2 py-1 bg-black rounded-md`}>
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name="star" size={12} color="white" style={tw`mr-1`} />
+                                    <Text style={tw`text-[11px] font-black text-white uppercase`}>ACERTO AMBOS:</Text>
+                                </View>
+                                <Text style={tw`text-[12px] font-black text-white`}>{data.minutoSorteData.prizeOursAmbos || 'R$ 0,00'}</Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            )}
+
             <View style={tw`border-b border-dashed border-black mb-1 mx-2 mt-0.5`} />
 
             {/* Prompt Message (Incentivo) */}
@@ -260,7 +337,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             ) : data.possiblePrize ? (
                 <View style={tw`mb-2 border border-black rounded p-1 mx-2 bg-gray-100 items-center`}>
-                        <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
                     <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : null}

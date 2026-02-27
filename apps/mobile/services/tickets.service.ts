@@ -41,6 +41,9 @@ export interface Ticket {
         prizeMilhar?: string;
         prizeCentena?: string;
         prizeDezena?: string;
+        prizeOursHora?: number;
+        prizeOursMinuto?: number;
+        prizeOursAmbos?: number;
         secondChanceLabel?: string;
         promptMessage?: string;
         mainMatchMessage?: string;
