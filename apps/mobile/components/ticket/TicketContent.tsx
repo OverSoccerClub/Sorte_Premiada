@@ -69,7 +69,7 @@ interface TicketContentProps {
 }
 
 const numberToText = (num: number): string => {
-    const texts = ["ZERO", "UM", "DOIS", "TRÊS", "QUATRO", "CINCO", "SEIS", "SETE", "OITO", "NOVE"];
+    const texts = ["ZERO", "UM", "DOIS", "TRES", "QUATRO", "CINCO", "SEIS", "SETE", "OITO", "NOVE"];
     return texts[num] || "";
 };
 
@@ -113,7 +113,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
 
     // Helper to format Draw Date as per requirement: DD/MM/YY ÀS HH:MM
     const formatDrawDate = (dateStr: string | undefined) => {
-        return formatBrazilDate(dateStr, { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' ÀS ');
+        return formatBrazilDate(dateStr, { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' AS ');
     };
 
     return (
@@ -156,7 +156,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     </Text>
                 </View>
                 <Text style={tw`text-center font-bold text-black text-[10px] mt-0.5`}>
-                    EXTRAÇÃO: <Text style={tw`font-black text-[11px]`}>
+                    EXTRACAO: <Text style={tw`font-black text-[11px]`}>
                         {formatDrawDate(data.drawDate || data.date)}
                         {data.city || data.areaName ? ` - ${data.city ? `${data.city}/` : ''}${data.areaName || ''}` : ''}
                     </Text>
@@ -338,7 +338,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                 </View>
             ) : data.possiblePrize ? (
                 <View style={tw`mb-2 border border-black rounded p-1 mx-2 bg-gray-100 items-center`}>
-                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PRÊMIO MÁXIMO</Text>
+                    <Text style={tw`text-center font-bold text-[10px] text-black uppercase mb-0.5`}>PREMIO MAXIMO</Text>
                     <Text style={tw`text-center font-black text-2xl text-black`}>{data.possiblePrize}</Text>
                 </View>
             ) : null}
@@ -366,7 +366,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                             </Text>
                         </View>
                         <Text style={tw`text-gray-300 text-center text-[8px] font-bold uppercase mt-0.5`}>
-                            SORTEIO EXTRA - {data.secondChanceDrawDate || 'SÁBADO'}
+                            SORTEIO EXTRA - {data.secondChanceDrawDate || 'SABADO'}
                         </Text>
                     </View>
 
@@ -387,7 +387,7 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     {/* Main Match Message (Above dashed line with Black Strip) */}
                     <View style={tw`mt-1 bg-black py-1 px-4 w-full shadow-sm`}>
                         <Text style={[tw`text-white text-center font-black text-[9px] uppercase`, { letterSpacing: 0.5 }]}>
-                            {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                            {data.mainMatchMessage || "ACERTANDO TODOS OS NUMEROS NA ORDEM"}
                         </Text>
                     </View>
 
@@ -403,10 +403,10 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                     <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
                 <View style={tw`w-[30%] items-center`}>
-                    <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
+                    <Text style={tw`text-[10px] text-black font-bold`}>Serie: {data.series?.toString().padStart(4, '0') || '----'}</Text>
                 </View>
                 <View style={tw`w-[32%] items-end`}>
-                    <Text style={tw`text-[9px] text-black font-bold`}>Preço: {data.price}</Text>
+                    <Text style={tw`text-[9px] text-black font-bold`}>Preco: {data.price}</Text>
                 </View>
             </View>
 

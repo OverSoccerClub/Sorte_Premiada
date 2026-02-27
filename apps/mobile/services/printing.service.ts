@@ -272,6 +272,10 @@ export const printTicket = async (
     // BLE Printing Logic
     console.log(`[printTicket] 📝 Using TEXT-based BLE printing...`);
 
+    const stripAccents = (str: string) => {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    };
+
     if (template === 'alternative' || template === 'milhar') {
       console.warn(`[printTicket] ⚠️ WARNING: ${template} template selected but TEXT printing doesn't support it!`);
       console.warn(`[printTicket] ⚠️ The printed ticket will use DEFAULT layout instead.`);

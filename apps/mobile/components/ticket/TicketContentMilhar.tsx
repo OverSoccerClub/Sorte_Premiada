@@ -13,7 +13,7 @@ interface TicketContentMilharProps {
 }
 
 const numberToText = (num: number): string => {
-    const texts = ["zero", "um", "dois", "três", "quat", "cinc", "seis", "sete", "oito", "nove"];
+    const texts = ["zero", "um", "dois", "tres", "quat", "cinc", "seis", "sete", "oito", "nove"];
     return texts[num] || "";
 };
 
@@ -177,9 +177,8 @@ export const TicketContentMilhar: React.FC<TicketContentMilharProps> = ({ data, 
             {/* Prize Message Box */}
             <View style={tw`mb-1 -mt-1`}>
                 {/* Dashed Line */}
-                <Text style={tw`text-center text-black text-lg font-black mb-0 leading-tight tracking-widest`}>
-                    ___  ___  ___  ___  ___  ___  ___  ___
-                </Text>
+                {/* Line Divider */}
+                <View style={tw`border-t border-dashed border-black my-1 mx-2`} />
 
                 <Text style={tw`text-center font-bold text-[11px] text-black mb-0.5 uppercase leading-tight`}>
                     {data.promptMessage || "VOCÊ GANHA SE ACERTAR EM UM DOS MILHARES:"}
@@ -222,7 +221,7 @@ export const TicketContentMilhar: React.FC<TicketContentMilharProps> = ({ data, 
                         {data.secondChancePrize ? `PRÊMIO DO ${data.secondChanceLabel && data.secondChanceLabel.replace(/FEZINHA/ig, 'MILHAR') || 'MILHAR EXTRA'} - ${data.secondChancePrize}` : `PRÊMIO DO ${data.secondChanceLabel && data.secondChanceLabel.replace(/FEZINHA/ig, 'MILHAR') || 'MILHAR EXTRA'} - R$ 5.000,00`}
                     </Text>
                     <Text style={tw`text-center font-bold text-[10px] text-black uppercase`}>
-                        {data.mainMatchMessage || "ACERTANDO TODOS OS NÚMEROS NA ORDEM"}
+                        {data.mainMatchMessage || "ACERTANDO TODOS OS NUMEROS NA ORDEM"}
                     </Text>
                 </View>
             )}
@@ -234,10 +233,10 @@ export const TicketContentMilhar: React.FC<TicketContentMilharProps> = ({ data, 
                         <Text style={tw`text-[10px] text-black font-bold`}>Bilhete: {data.ticketNumber?.toString().padStart(4, '0') || '----'}</Text>
                     </View>
                     <View style={tw`w-[34%] items-center`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>Série: {data.series?.toString().padStart(4, '0') || '----'}</Text>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Serie: {data.series?.toString().padStart(4, '0') || '----'}</Text>
                     </View>
                     <View style={tw`w-[33%] items-end`}>
-                        <Text style={tw`text-[10px] text-black font-bold`}>Preço: {data.price}</Text>
+                        <Text style={tw`text-[10px] text-black font-bold`}>Preco: {data.price}</Text>
                     </View>
                 </View>
 
