@@ -443,7 +443,7 @@ export default function HistoryScreen() {
                     promptMessage: selectedTicket.game?.promptMessage,
                     mainMatchMessage: selectedTicket.game?.mainMatchMessage,
                     // Minuto da Sorte Structured Data
-                    minutoSorteData: selectedTicket.gameType === 'MINUTO_SORTE' ? {
+                    minutoSorteData: (selectedTicket.gameType === 'MINUTO_SORTE' || selectedTicket.game?.name?.toUpperCase() === 'MINUTO DA SORTE') ? {
                         chosenHour: Number(selectedTicket.numbers?.[0] || 0),
                         purchaseMinute: Number(selectedTicket.numbers?.[1] || 0),
                         prizeOursHora: selectedTicket.game?.prizeOursHora ? `R$ ${Number((Number(selectedTicket.amount) / 10) * selectedTicket.game.prizeOursHora).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : undefined,

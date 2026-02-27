@@ -75,6 +75,7 @@ const numberToText = (num: number): string => {
 
 export const TicketContent = ({ data, isCapture = false }: TicketContentProps) => {
     const [logoError, setLogoError] = useState(false);
+    const isMinutoSorte = data.gameName.toUpperCase() === 'MINUTO DA SORTE' || !!data.minutoSorteData;
     const sortedNumbers = [...data.numbers].sort((a, b) => Number(a) - Number(b));
     const scDigits = data.secondChanceNumber ? data.secondChanceNumber.toString().split('').map(Number) : [];
 
@@ -205,45 +206,8 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         );
                     })}
                 </View>
-            ) : (
-                /* Standard Numbers Grid */
-                <View style={tw`flex-row flex-wrap justify-between mb-0 px-1`}>
-                    {Array.from({ length: 4 }).map((_, idx) => {
-                        const num = sortedNumbers[idx];
-                        // Only render boxes if we have numbers or if it's 2x1000 expectation
-                        // If generic numbers array length < 4, this might break UI logic if we force 4.
-                        // Assuming this block is primarily for 2x1000 style.
-                        // If it's pure Loteria Traditional, it renders animals usually?
-                        // Actually 2x1000 uses this. Loteria Tradicional currently might use same generic display?
-                        // Let's check logic: Loteria Tradicional stores numbers in `numbers` array.
-                        // If I just display them in boxes, it works.
-                        return (
-                            <View key={idx} style={tw`w-[49%] mb-1 items-center border-[1.5px] border-black rounded p-1 bg-white`}>
-                                <Text style={tw`font-bold text-[10px] text-gray-800 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
-                                {num !== undefined ? (
-                                    <View style={tw`flex-row justify-between w-full px-1 mt-1`}>
-                                        {num.toString().padStart(4, '0').split('').map((digit, i) => (
-                                            <View key={i} style={tw`items-center`}>
-                                                <Text style={[tw`text-xl text-black font-black mb-0`, { fontFamily: 'Roboto_700Bold' }]}>{digit}</Text>
-                                                <Text style={[tw`text-[6px] text-gray-800 text-center font-bold uppercase -mt-0.5`, { fontFamily: 'Roboto_400Regular' }]}>
-                                                    {numberToText(parseInt(digit))}
-                                                </Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ) : (
-                                    <View style={tw`flex-row justify-center w-full px-4 items-center`}>
-                                        <Text style={tw`text-xl text-gray-400 font-bold mb-0 uppercase tracking-widest`}>AUTO</Text>
-                                    </View>
-                                )}
-                            </View>
-                        );
-                    })}
-                </View>
-            )}
-
-            {/* Premium Minuto da Sorte Section */}
-            {data.gameName === 'MINUTO DA SORTE' && data.minutoSorteData && (
+            ) : isMinutoSorte && data.minutoSorteData ? (
+                /* Premium Minuto da Sorte Section - EXCLUSIVE REPLACEMENT */
                 <View style={tw`my-1 px-2`}>
                     <View style={tw`border-[2px] border-black rounded-xl p-2 bg-gray-50 items-center`}>
                         <View style={tw`flex-row justify-around w-full mb-2`}>
@@ -309,7 +273,44 @@ export const TicketContent = ({ data, isCapture = false }: TicketContentProps) =
                         </View>
                     </View>
                 </View>
+            ) : (
+                /* Standard Numbers Grid */
+                <View style={tw`flex-row flex-wrap justify-between mb-0 px-1`}>
+                    {Array.from({ length: 4 }).map((_, idx) => {
+                        const num = sortedNumbers[idx];
+                        // Only render boxes if we have numbers or if it's 2x1000 expectation
+                        // If generic numbers array length < 4, this might break UI logic if we force 4.
+                        // Assuming this block is primarily for 2x1000 style.
+                        // If it's pure Loteria Traditional, it renders animals usually?
+                        // Actually 2x1000 uses this. Loteria Tradicional currently might use same generic display?
+                        // Let's check logic: Loteria Tradicional stores numbers in `numbers` array.
+                        // If I just display them in boxes, it works.
+                        return (
+                            <View key={idx} style={tw`w-[49%] mb-1 items-center border-[1.5px] border-black rounded p-1 bg-white`}>
+                                <Text style={tw`font-bold text-[10px] text-gray-800 self-start mb-0 ml-1 uppercase`}>{brandMain.split(' ')[0]} {idx + 1}</Text>
+                                {num !== undefined ? (
+                                    <View style={tw`flex-row justify-between w-full px-1 mt-1`}>
+                                        {num.toString().padStart(4, '0').split('').map((digit, i) => (
+                                            <View key={i} style={tw`items-center`}>
+                                                <Text style={[tw`text-xl text-black font-black mb-0`, { fontFamily: 'Roboto_700Bold' }]}>{digit}</Text>
+                                                <Text style={[tw`text-[6px] text-gray-800 text-center font-bold uppercase -mt-0.5`, { fontFamily: 'Roboto_400Regular' }]}>
+                                                    {numberToText(parseInt(digit))}
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <View style={tw`flex-row justify-center w-full px-4 items-center`}>
+                                        <Text style={tw`text-xl text-gray-400 font-bold mb-0 uppercase tracking-widest`}>AUTO</Text>
+                                    </View>
+                                )}
+                            </View>
+                        );
+                    })}
+                </View>
             )}
+
+
 
             <View style={tw`border-b border-dashed border-black mb-1 mx-2 mt-0.5`} />
 
