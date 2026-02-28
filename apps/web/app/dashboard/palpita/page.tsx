@@ -253,248 +253,250 @@ export default function PalpitaPage() {
         } finally {
             setSaving(false)
         }
-        const handleSeedTest = async () => {
-            setSaving(true)
-            try {
-                const token = localStorage.getItem("token")
-                const res = await fetch(`${API_URL}/draws/seed-palpita`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
+    }
 
-                if (res.ok) {
-                    showAlert("Sucesso", "Concurso de teste gerado com sucesso!", "success")
-                    fetchDraws()
-                } else {
-                    showAlert("Erro", "Falha ao gerar concurso de teste", "error")
+    const handleSeedTest = async () => {
+        setSaving(true)
+        try {
+            const token = localStorage.getItem("token")
+            const res = await fetch(`${API_URL}/draws/seed-palpita`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            } catch (e) {
-                showAlert("Erro", "Erro de comunicação ao gerar seed", "error")
-            } finally {
-                setSaving(false)
-            }
-        }
+            })
 
-        return (
-            <div className="space-y-6">
-                <StandardPageHeader
-                    icon={<Trophy className="w-8 h-8 text-yellow-500" />}
-                    title="Palpita Ai - Gestão de Concursos"
-                    description="Crie e gerencie os concursos da loteria esportiva."
-                    onRefresh={fetchDraws}
-                    refreshing={loading}
-                >
-                    <div className="flex gap-2">
-                        {games.length > 0 && (
-                            <Select value={selectedGameId} onValueChange={setSelectedGameId}>
-                                <SelectTrigger className="w-[200px] h-9">
-                                    <SelectValue placeholder="Selecione o Jogo" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        )}
-                        <Button onClick={handleSeedTest} disabled={saving} variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 h-9">
-                            <RefreshCw className="w-4 h-4 mr-2" /> Gerar Teste
-                        </Button>
-                        <Button onClick={handleNew} className="bg-emerald-600 hover:bg-emerald-700 h-9">
-                            <Plus className="w-4 h-4 mr-2" /> Novo Concurso
+            if (res.ok) {
+                showAlert("Sucesso", "Concurso de teste gerado com sucesso!", "success")
+                fetchDraws()
+            } else {
+                showAlert("Erro", "Falha ao gerar concurso de teste", "error")
+            }
+        } catch (e) {
+            showAlert("Erro", "Erro de comunicação ao gerar seed", "error")
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    return (
+        <div className="space-y-6">
+            <StandardPageHeader
+                icon={<Trophy className="w-8 h-8 text-yellow-500" />}
+                title="Palpita Ai - Gestão de Concursos"
+                description="Crie e gerencie os concursos da loteria esportiva."
+                onRefresh={fetchDraws}
+                refreshing={loading}
+            >
+                <div className="flex gap-2">
+                    {games.length > 0 && (
+                        <Select value={selectedGameId} onValueChange={setSelectedGameId}>
+                            <SelectTrigger className="w-[200px] h-9">
+                                <SelectValue placeholder="Selecione o Jogo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {games.map(g => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    )}
+                    <Button onClick={handleSeedTest} disabled={saving} variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 h-9">
+                        <RefreshCw className="w-4 h-4 mr-2" /> Gerar Teste
+                    </Button>
+                    <Button onClick={handleNew} className="bg-emerald-600 hover:bg-emerald-700 h-9">
+                        <Plus className="w-4 h-4 mr-2" /> Novo Concurso
+                    </Button>
+                </div>
+            </StandardPageHeader>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Concursos Recentes</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="pl-6">Concurso</TableHead>
+                                <TableHead>Data</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Jogos</TableHead>
+                                <TableHead>Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8">
+                                        <Loader2 className="animate-spin w-8 h-8 text-emerald-500 mx-auto" />
+                                    </TableCell>
+                                </TableRow>
+                            ) : draws.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                        Nenhum concurso encontrado.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                draws.map(draw => (
+                                    <TableRow key={draw.id}>
+                                        <TableCell className="pl-6 font-mono font-bold">
+                                            #{draw.series?.toString().padStart(4, '0') || '---'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={draw.numbers?.length > 0 ? "default" : "outline"} className={draw.numbers?.length > 0 ? "bg-emerald-500" : ""}>
+                                                {draw.numbers?.length > 0 ? "Finalizado" : "Em Aberto"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="text-sm text-muted-foreground">{draw.matches?.length || 0} jogos</span>
+                                        </TableCell>
+                                        <TableCell className="flex gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => handleEdit(draw)}>
+                                                Editar
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/palpita/${draw.id}`)}>
+                                                Detalhes / Apurar
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            {/* Modal Novo Concurso */}
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{selectedDrawId ? "Editar Concurso" : "Novo Concurso Palpita Ai"}</DialogTitle>
+                        <DialogDescription>Selecione a data de encerramento e os 14 jogos.</DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid grid-cols-2 gap-4 my-4">
+                        <div>
+                            <label className="text-sm font-medium">Data do Sorteio/Encerramento</label>
+                            <Input type="date" value={drawDate} onChange={e => setDrawDate(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium">Hora</label>
+                            <Input type="time" value={drawTime} onChange={e => setDrawTime(e.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="font-semibold">Grade de Jogos (14)</h3>
+                        <Button variant="secondary" size="sm" onClick={() => setImportModalOpen(true)}>
+                            <Search className="w-4 h-4 mr-2" /> Importar da API
                         </Button>
                     </div>
-                </StandardPageHeader>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Concursos Recentes</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="pl-6">Concurso</TableHead>
-                                    <TableHead>Data</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Jogos</TableHead>
-                                    <TableHead>Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
+                    <div className="space-y-2 border rounded-md p-2 bg-muted/20">
+                        {matches.map((match, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                                <span className="w-6 font-mono font-bold text-muted-foreground">{match.matchOrder}</span>
+                                <Input
+                                    placeholder="Casa"
+                                    value={match.homeTeam}
+                                    onChange={e => {
+                                        const newMatches = [...matches];
+                                        newMatches[idx].homeTeam = e.target.value;
+                                        setMatches(newMatches);
+                                    }}
+                                    className="flex-1 h-8"
+                                />
+                                <span className="text-xs font-bold text-muted-foreground">X</span>
+                                <Input
+                                    placeholder="Fora"
+                                    value={match.awayTeam}
+                                    onChange={e => {
+                                        const newMatches = [...matches];
+                                        newMatches[idx].awayTeam = e.target.value;
+                                        setMatches(newMatches);
+                                    }}
+                                    className="flex-1 h-8"
+                                />
+                                <Input
+                                    type="datetime-local"
+                                    value={match.matchDate ? new Date(match.matchDate).toISOString().slice(0, 16) : ""}
+                                    onChange={e => {
+                                        const newMatches = [...matches];
+                                        newMatches[idx].matchDate = e.target.value;
+                                        setMatches(newMatches);
+                                    }}
+                                    className="w-40 h-8 text-xs"
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleSave} disabled={saving} className="bg-emerald-600">
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Criar Concurso"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal Importar da API */}
+            <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Importar Jogos da API</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex gap-2 my-4">
+                        <Input type="date" value={importDate} onChange={e => setImportDate(e.target.value)} />
+                        <Button onClick={fetchFixtures} disabled={loadingFixtures}>
+                            {loadingFixtures ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
+                        </Button>
+                    </div>
+
+                    <div className="h-[400px] overflow-y-auto border rounded-md p-2">
+                        {importedFixtures.length === 0 ? (
+                            <div className="text-center py-10 text-muted-foreground">Nenhum jogo encontrado para esta data.</div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8">
-                                            <Loader2 className="animate-spin w-8 h-8 text-emerald-500 mx-auto" />
-                                        </TableCell>
+                                        <TableHead className="w-[50px]">Sel.</TableHead>
+                                        <TableHead>Liga</TableHead>
+                                        <TableHead>Jogo</TableHead>
+                                        <TableHead>Hora</TableHead>
                                     </TableRow>
-                                ) : draws.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                            Nenhum concurso encontrado.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    draws.map(draw => (
-                                        <TableRow key={draw.id}>
-                                            <TableCell className="pl-6 font-mono font-bold">
-                                                #{draw.series?.toString().padStart(4, '0') || '---'}
-                                            </TableCell>
+                                </TableHeader>
+                                <TableBody>
+                                    {importedFixtures.map(f => (
+                                        <TableRow key={f.id} onClick={() => toggleFixtureSelection(f.id.toString())} className="cursor-pointer hover:bg-muted">
                                             <TableCell>
-                                                {new Date(draw.drawDate).toLocaleString('pt-BR')}
+                                                <div className={`w-4 h-4 border rounded ${selectedFixtures.includes(f.id.toString()) ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
                                             </TableCell>
-                                            <TableCell>
-                                                <Badge variant={draw.numbers?.length > 0 ? "default" : "outline"} className={draw.numbers?.length > 0 ? "bg-emerald-500" : ""}>
-                                                    {draw.numbers?.length > 0 ? "Finalizado" : "Em Aberto"}
-                                                </Badge>
+                                            <TableCell className="text-xs">{f.league.name}</TableCell>
+                                            <TableCell className="text-xs font-semibold">
+                                                {f.homeTeam.name} x {f.awayTeam.name}
                                             </TableCell>
-                                            <TableCell>
-                                                <span className="text-sm text-muted-foreground">{draw.matches?.length || 0} jogos</span>
-                                            </TableCell>
-                                            <TableCell className="flex gap-2">
-                                                <Button variant="outline" size="sm" onClick={() => handleEdit(draw)}>
-                                                    Editar
-                                                </Button>
-                                                <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/palpita/${draw.id}`)}>
-                                                    Detalhes / Apurar
-                                                </Button>
+                                            <TableCell className="text-xs">
+                                                {new Date(f.timestamp * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </div>
 
-                {/* Modal Novo Concurso */}
-                <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>{selectedDrawId ? "Editar Concurso" : "Novo Concurso Palpita Ai"}</DialogTitle>
-                            <DialogDescription>Selecione a data de encerramento e os 14 jogos.</DialogDescription>
-                        </DialogHeader>
-
-                        <div className="grid grid-cols-2 gap-4 my-4">
-                            <div>
-                                <label className="text-sm font-medium">Data do Sorteio/Encerramento</label>
-                                <Input type="date" value={drawDate} onChange={e => setDrawDate(e.target.value)} />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium">Hora</label>
-                                <Input type="time" value={drawTime} onChange={e => setDrawTime(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center mb-2">
-                            <h3 className="font-semibold">Grade de Jogos (14)</h3>
-                            <Button variant="secondary" size="sm" onClick={() => setImportModalOpen(true)}>
-                                <Search className="w-4 h-4 mr-2" /> Importar da API
-                            </Button>
-                        </div>
-
-                        <div className="space-y-2 border rounded-md p-2 bg-muted/20">
-                            {matches.map((match, idx) => (
-                                <div key={idx} className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 font-mono font-bold text-muted-foreground">{match.matchOrder}</span>
-                                    <Input
-                                        placeholder="Casa"
-                                        value={match.homeTeam}
-                                        onChange={e => {
-                                            const newMatches = [...matches];
-                                            newMatches[idx].homeTeam = e.target.value;
-                                            setMatches(newMatches);
-                                        }}
-                                        className="flex-1 h-8"
-                                    />
-                                    <span className="text-xs font-bold text-muted-foreground">X</span>
-                                    <Input
-                                        placeholder="Fora"
-                                        value={match.awayTeam}
-                                        onChange={e => {
-                                            const newMatches = [...matches];
-                                            newMatches[idx].awayTeam = e.target.value;
-                                            setMatches(newMatches);
-                                        }}
-                                        className="flex-1 h-8"
-                                    />
-                                    <Input
-                                        type="datetime-local"
-                                        value={match.matchDate ? new Date(match.matchDate).toISOString().slice(0, 16) : ""}
-                                        onChange={e => {
-                                            const newMatches = [...matches];
-                                            newMatches[idx].matchDate = e.target.value;
-                                            setMatches(newMatches);
-                                        }}
-                                        className="w-40 h-8 text-xs"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-
-                        <DialogFooter>
-                            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
-                            <Button onClick={handleSave} disabled={saving} className="bg-emerald-600">
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Criar Concurso"}
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-
-                {/* Modal Importar da API */}
-                <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
-                    <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                            <DialogTitle>Importar Jogos da API</DialogTitle>
-                        </DialogHeader>
-                        <div className="flex gap-2 my-4">
-                            <Input type="date" value={importDate} onChange={e => setImportDate(e.target.value)} />
-                            <Button onClick={fetchFixtures} disabled={loadingFixtures}>
-                                {loadingFixtures ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
-                            </Button>
-                        </div>
-
-                        <div className="h-[400px] overflow-y-auto border rounded-md p-2">
-                            {importedFixtures.length === 0 ? (
-                                <div className="text-center py-10 text-muted-foreground">Nenhum jogo encontrado para esta data.</div>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[50px]">Sel.</TableHead>
-                                            <TableHead>Liga</TableHead>
-                                            <TableHead>Jogo</TableHead>
-                                            <TableHead>Hora</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {importedFixtures.map(f => (
-                                            <TableRow key={f.id} onClick={() => toggleFixtureSelection(f.id.toString())} className="cursor-pointer hover:bg-muted">
-                                                <TableCell>
-                                                    <div className={`w-4 h-4 border rounded ${selectedFixtures.includes(f.id.toString()) ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'}`} />
-                                                </TableCell>
-                                                <TableCell className="text-xs">{f.league.name}</TableCell>
-                                                <TableCell className="text-xs font-semibold">
-                                                    {f.homeTeam.name} x {f.awayTeam.name}
-                                                </TableCell>
-                                                <TableCell className="text-xs">
-                                                    {new Date(f.timestamp * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </div>
-
-                        <div className="flex justify-between items-center text-sm">
-                            <span>{selectedFixtures.length} selecionados (Máx 14)</span>
-                            <Button onClick={handleImportSelection} disabled={selectedFixtures.length === 0} className="bg-emerald-600">
-                                Confirmar Importação
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        )
-    }
+                    <div className="flex justify-between items-center text-sm">
+                        <span>{selectedFixtures.length} selecionados (Máx 14)</span>
+                        <Button onClick={handleImportSelection} disabled={selectedFixtures.length === 0} className="bg-emerald-600">
+                            Confirmar Importação
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
+}
