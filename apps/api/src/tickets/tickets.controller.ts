@@ -41,11 +41,12 @@ export class TicketsController {
     ) {
         // Determinar o companyId correto
         let companyId = req.user.companyId;
-        if (req.user.role === 'MASTER' && targetCompanyId) {
+        if (req.user.role === 'MASTER' && targetCompanyId && targetCompanyId !== 'null' && targetCompanyId !== 'undefined') {
             companyId = targetCompanyId;
         }
 
-        const filters = { status, startDate, endDate, gameType, gameId, companyId };
+        const sanitizedGameId = (gameId === 'null' || gameId === 'undefined') ? undefined : gameId;
+        const filters = { status, startDate, endDate, gameType, gameId: sanitizedGameId, companyId };
 
         if (req.user.role === 'ADMIN' || req.user.role === 'MASTER') {
             return this.ticketsService.findAll(filters);

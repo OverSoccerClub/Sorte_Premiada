@@ -22,10 +22,17 @@ import { StandardPagination } from "@/components/standard-pagination"
 import { useActiveCompanyId } from "@/context/use-active-company"
 
 const formatTicketNumbers = (numbers: any[], gameType: string) => {
-    if (!numbers) return "";
+    if (!numbers || !Array.isArray(numbers)) return "";
+    const gt = gameType?.toUpperCase() || "";
+
+    if (gt.includes('MINUTO_SORTE') || gt.includes('MINUTO')) {
+        const hour = (numbers[0] || '').toString().padStart(2, '0');
+        const minute = (numbers[1] || '').toString().padStart(2, '0');
+        return `${hour}h e ${minute}m`;
+    }
+
     return numbers.map(n => {
         const val = n.toString();
-        const gt = gameType?.toUpperCase() || "";
         if (gt.includes('1000') || gt.includes('MILHAR')) {
             return val.padStart(4, '0');
         }

@@ -228,6 +228,14 @@ export default function GamesPage() {
                         </Button>
                     </Link>
                 )}
+                {games.some(g => g.type === 'MINUTO_SORTE' || g.name.toLowerCase().includes('minuto')) && (
+                    <Link href="/dashboard/games/minuto-da-sorte">
+                        <Button variant="outline" size="sm" className="hidden sm:flex">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Relatório Minuto da Sorte
+                        </Button>
+                    </Link>
+                )}
                 {hasPermission(PERMISSIONS.VIEW_SALES_REPORT) && games.some(g => g.type === 'PAIPITA_AI' || g.name.toLowerCase().includes('palpita')) && (
                     <Link href="/dashboard/games/palpita">
                         <Button variant="outline" size="sm" className="hidden sm:flex">

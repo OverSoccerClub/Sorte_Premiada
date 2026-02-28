@@ -69,8 +69,14 @@ export default function TwoXOneThousandReportPage() {
 
                 if (gamesRes.ok) {
                     const games = await gamesRes.json()
-                    const game = games.find((g: any) => g.name === "2x1000")
-                    if (game) setGameId(game.id)
+                    console.log("[2x1000 Dashboard] Found games:", games.map((g: any) => g.name).join(", "))
+                    const game = games.find((g: any) => g.name?.toLowerCase() === "2x1000")
+                    if (game) {
+                        console.log("[2x1000 Dashboard] Matching Game Id:", game.id)
+                        setGameId(game.id)
+                    } else {
+                        console.error("[2x1000 Dashboard] Game '2x1000' not found in database!")
+                    }
                 }
 
                 if (usersRes.ok) {
@@ -95,7 +101,13 @@ export default function TwoXOneThousandReportPage() {
             const start = new Date(`${startDate}T00:00:00-03:00`)
             const end = new Date(`${endDate}T23:59:59.999-03:00`)
 
-            let url = `${API_URL}/tickets?gameId=${gameId}&startDate=${start.toISOString()}&endDate=${end.toISOString()}`
+            let url = `${API_URL}/tickets?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
+            if (gameId) {
+                url += `&gameId=${gameId}`
+            } else {
+                // Fallback to gameType if gameId is not yet loaded or not found
+                url += `&gameType=2x1000`
+            }
 
             const res = await fetch(url, {
                 headers: { Authorization: `Bearer ${token}` }
